@@ -1,0 +1,458 @@
+﻿<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>近日イベント地図</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <style>
+      :root {
+        --bg: #eaf2ff;
+        --panel: #ffffff;
+        --ink: #10243d;
+        --accent: #0f4c81;
+        --line: #c8d7ea;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "BIZ UDPGothic", "Yu Gothic", sans-serif;
+        color: var(--ink);
+        font-size: 17px;
+        background: radial-gradient(circle at 12% 18%, #f8fbff, #e6eefb 60%);
+      }
+
+      header {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .sub {
+        margin-top: 4px;
+        font-size: 15px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        height: calc(100vh - 74px);
+      }
+
+      .side {
+        border-right: 1px solid var(--line);
+        background: var(--panel);
+        overflow: auto;
+      }
+
+      .controls,
+      .list {
+        padding: 12px;
+      }
+
+      label,
+      input,
+      button {
+        display: block;
+        width: 100%;
+      }
+
+      label {
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.45;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        border: 1px solid #cfc4b2;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 6px;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      input[type="checkbox"] {
+        width: auto;
+        display: inline;
+        margin-right: 6px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 10px;
+        padding: 12px;
+        background: var(--accent);
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background: #ffffff;
+      }
+
+      .card h3 {
+        margin: 0 0 6px 0;
+        font-size: 18px;
+      }
+
+      .meta {
+        font-size: 14px;
+        color: #23415f;
+        line-height: 1.55;
+      }
+
+      #map {
+        height: 100%;
+      }
+
+      .ward-filter-title {
+        font-size: 15px;
+        font-weight: 700;
+        margin-top: 2px;
+      }
+
+      .ward-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 10px;
+        margin: 8px 0 12px;
+      }
+
+      .ward-bulk {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 10px;
+        margin-top: 8px;
+      }
+
+      .ward-option {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .ward-option input[type="checkbox"] {
+        margin: 0;
+      }
+
+      .loading {
+        font-size: 14px;
+        color: #23415f;
+        margin-bottom: 10px;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        #map {
+          height: 50vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>児童イベントマップ</h1>
+      <div class="sub" id="dateText">読み込み中...</div>
+    </header>
+
+    <div class="layout">
+      <aside class="side">
+        <div class="controls">
+          <label for="days">何日後まで表示？</label>
+          <input id="days" type="number" min="1" max="90" step="1" value="30" />
+
+          <div class="ward-filter-title">表示する区</div>
+          <div class="ward-bulk">
+            <label class="ward-option"><input id="selectAllWards" type="checkbox" />全選択</label>
+            <label class="ward-option"><input id="clearAllWards" type="checkbox" />全解除</label>
+          </div>
+          <div id="wardFilters" class="ward-filters"></div>
+
+          <button id="reloadBtn">再読み込み</button>
+          <p class="loading" id="status"></p>
+        </div>
+        <div class="list" id="list"></div>
+      </aside>
+      <main>
+        <div id="map"></div>
+      </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script>
+      const map = L.map("map").setView([35.681236, 139.767125], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      let markers = [];
+      let lastFetchedItems = [];
+      let lastDateText = "";
+      let lastWarningText = "";
+      const TOKYO_23_WARDS = [
+        "千代田区",
+        "中央区",
+        "港区",
+        "新宿区",
+        "文京区",
+        "台東区",
+        "墨田区",
+        "江東区",
+        "品川区",
+        "目黒区",
+        "大田区",
+        "世田谷区",
+        "渋谷区",
+        "中野区",
+        "杉並区",
+        "豊島区",
+        "北区",
+        "荒川区",
+        "板橋区",
+        "練馬区",
+        "足立区",
+        "葛飾区",
+        "江戸川区",
+      ];
+      const SOURCE_WARD_MAP = {
+        chiyoda: "千代田区",
+        chuo: "中央区",
+        minato: "港区",
+        shinjuku: "新宿区",
+        bunkyo: "文京区",
+        taito: "台東区",
+        sumida: "墨田区",
+        koto: "江東区",
+        shinagawa: "品川区",
+        meguro: "目黒区",
+        ota: "大田区",
+        setagaya: "世田谷区",
+        shibuya: "渋谷区",
+        nakano: "中野区",
+        suginami: "杉並区",
+        toshima: "豊島区",
+        kita: "北区",
+        arakawa: "荒川区",
+        itabashi: "板橋区",
+        nerima: "練馬区",
+        adachi: "足立区",
+        adachi_odekake: "足立区",
+        katsushika: "葛飾区",
+        edogawa: "江戸川区",
+      };
+      const selectedWards = new Set();
+
+      const statusEl = document.getElementById("status");
+      const listEl = document.getElementById("list");
+      const dateEl = document.getElementById("dateText");
+      const wardFiltersEl = document.getElementById("wardFilters");
+      const selectAllWardsEl = document.getElementById("selectAllWards");
+      const clearAllWardsEl = document.getElementById("clearAllWards");
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function summarizeBySource(items) {
+        const m = new Map();
+        for (const e of items) {
+          const k = e.source_label || e.source || "unknown";
+          m.set(k, (m.get(k) || 0) + 1);
+        }
+        return Array.from(m.entries())
+          .sort((a, b) => b[1] - a[1])
+          .map(([k, v]) => `${k}:${v}`)
+          .join(", ");
+      }
+
+      function clearMarkers() {
+        for (const m of markers) {
+          map.removeLayer(m);
+        }
+        markers = [];
+      }
+
+      function formatJst(iso) {
+        const d = new Date(iso);
+        return new Intl.DateTimeFormat("ja-JP", {
+          timeZone: "Asia/Tokyo",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(d);
+      }
+
+      function getWardLabel(item) {
+        const source = String(item.source || "");
+        if (source.startsWith("ward_")) {
+          const key = source.slice(5);
+          if (SOURCE_WARD_MAP[key]) return SOURCE_WARD_MAP[key];
+        }
+        const sourceLabel = String(item.source_label || "");
+        const fromLabel = sourceLabel.match(/([^\s　]+区)/u);
+        if (fromLabel) return fromLabel[1];
+        const address = String(item.address || "");
+        const fromAddress = address.match(/([^\s　]+区)/u);
+        if (fromAddress) return fromAddress[1];
+        return "";
+      }
+
+      function countByWard(items) {
+        const counts = new Map();
+        for (const item of items) {
+          const ward = getWardLabel(item);
+          if (!ward) continue;
+          counts.set(ward, (counts.get(ward) || 0) + 1);
+        }
+        return counts;
+      }
+
+      function renderWardFilters(wardCounts = new Map()) {
+        wardFiltersEl.innerHTML = "";
+        for (const ward of TOKYO_23_WARDS) {
+          const row = document.createElement("label");
+          row.className = "ward-option";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.value = ward;
+          cb.checked = selectedWards.has(ward);
+          cb.addEventListener("change", () => {
+            if (cb.checked) selectedWards.add(ward);
+            else selectedWards.delete(ward);
+            applyFiltersAndRender();
+          });
+          const text = document.createElement("span");
+          const count = wardCounts.get(ward) || 0;
+          text.textContent = `${ward} (${count})`;
+          row.appendChild(cb);
+          row.appendChild(text);
+          wardFiltersEl.appendChild(row);
+        }
+      }
+
+      function render(items) {
+        clearMarkers();
+        listEl.innerHTML = "";
+
+        if (items.length === 0) {
+          listEl.innerHTML = '<p class="meta">条件に合うイベントは見つかりませんでした。</p>';
+          return;
+        }
+
+        const bounds = [];
+        for (const e of items) {
+          const lat = Number(e.lat);
+          const lng = Number(e.lng);
+          if (Number.isFinite(lat) && Number.isFinite(lng)) {
+            const marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(
+              `<b>${e.title}</b><br>${formatJst(e.starts_at)}<br>${e.venue_name || "会場未設定"}<br><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>`
+            );
+            markers.push(marker);
+            bounds.push([lat, lng]);
+          }
+
+          const card = document.createElement("article");
+          card.className = "card";
+          card.innerHTML = `
+            <h3>${e.title}</h3>
+            <div class="meta">開始: ${formatJst(e.starts_at)}</div>
+            <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""}</div>
+            <div class="meta">ソース: ${e.source_label || e.source || "unknown"}</div>
+            <div class="meta"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a></div>
+          `;
+          listEl.appendChild(card);
+        }
+
+        if (bounds.length > 0) {
+          map.fitBounds(bounds, { padding: [30, 30] });
+        }
+      }
+
+      function applyFiltersAndRender() {
+        let baseItems = lastFetchedItems.slice();
+        renderWardFilters(countByWard(baseItems));
+        let items = baseItems;
+        items = items
+          .filter((e) => {
+            const ward = getWardLabel(e);
+            return !ward || selectedWards.has(ward);
+          })
+          .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+
+        const rawSummary = summarizeBySource(lastFetchedItems);
+        const shownSummary = summarizeBySource(items);
+        const warning = lastWarningText ? ` / ${lastWarningText}` : "";
+        dateEl.textContent = `${lastDateText} (JST) のイベント ${lastFetchedItems.length}件取得 / キャッシュ表示`;
+        setStatus(`表示件数: ${items.length}/${lastFetchedItems.length}件 / 取得内訳: ${rawSummary} / 表示内訳: ${shownSummary}${warning}`);
+        render(items);
+      }
+
+      async function loadEvents(forceRefresh = false) {
+        const days = Number(document.getElementById("days").value || 30);
+
+        setStatus("実データ取得中...");
+        const refreshPart = forceRefresh ? "&refresh=1" : "";
+        const url = `/api/events?days=${encodeURIComponent(days)}${refreshPart}`;
+
+        try {
+          const res = await fetch(url);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "fetch failed");
+
+          lastFetchedItems = data.items.slice();
+          lastDateText = data.date_jst;
+          lastWarningText = data.warning || "";
+          applyFiltersAndRender();
+        } catch (err) {
+          setStatus(`取得失敗: ${err.message}`);
+          render([]);
+        }
+      }
+
+      renderWardFilters();
+      selectAllWardsEl.addEventListener("change", () => {
+        if (!selectAllWardsEl.checked) return;
+        selectedWards.clear();
+        for (const ward of TOKYO_23_WARDS) selectedWards.add(ward);
+        selectAllWardsEl.checked = false;
+        clearAllWardsEl.checked = false;
+        applyFiltersAndRender();
+      });
+      clearAllWardsEl.addEventListener("change", () => {
+        if (!clearAllWardsEl.checked) return;
+        selectedWards.clear();
+        selectAllWardsEl.checked = false;
+        clearAllWardsEl.checked = false;
+        applyFiltersAndRender();
+      });
+      document.getElementById("reloadBtn").addEventListener("click", () => loadEvents(true));
+      loadEvents();
+    </script>
+  </body>
+</html>

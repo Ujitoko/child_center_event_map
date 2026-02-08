@@ -1,0 +1,9 @@
+﻿{
+  "name": "kids-play-map",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Same-day event map MVP using Doorkeeper real data",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
