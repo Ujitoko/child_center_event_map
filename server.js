@@ -1,174 +1,55 @@
 ﻿const http = require("http");
-const fs = require("fs");
 const path = require("path");
+const { sendFile, sendJson } = require("./src/server/http-utils");
+const { createGeoHelpers } = require("./src/server/geo-utils");
+const { clipByFieldDelimiter, normalizeJaDigits, normalizeText } = require("./src/server/text-utils");
+const { createCollectChuoAkachanTengokuEvents } = require("./src/server/collectors/chuo-akachan");
+const { createCollectKitaJidokanEvents } = require("./src/server/collectors/kita");
+const { createCollectWardGenericEvents } = require("./src/server/collectors/ward-generic");
+const { createCollectAdditionalWardsEvents } = require("./src/server/collectors/additional-wards");
+const { createGetEvents } = require("./src/server/events-service");
+const { buildAdditionalWardConfigs } = require("./src/config/additional-ward-configs");
 
 const PORT = process.env.PORT || 8787;
 const PUBLIC_DIR = path.join(__dirname, "public");
 
-const SETAGAYA_SOURCE = {
-  key: "setagaya",
-  label: "\u4e16\u7530\u8c37\u533a",
-  baseUrl: "https://www.city.setagaya.lg.jp",
-  listPath: "/cgi-bin/event_cal_multi/calendar.cgi",
-  center: { lat: 35.6466, lng: 139.6531 },
-};
-const OTA_SOURCE = {
-  key: "ota",
-  label: "\u5927\u7530\u533a",
-  baseUrl: "https://www.city.ota.tokyo.jp",
-  center: { lat: 35.5613, lng: 139.716 },
-};
-const SHINAGAWA_SOURCE = {
-  key: "shinagawa",
-  label: "\u54c1\u5ddd\u533a",
-  baseUrl: "https://www.city.shinagawa.tokyo.jp",
-  center: { lat: 35.6092, lng: 139.7302 },
-};
-const SHIBUYA_SOURCE = {
-  key: "shibuya",
-  label: "\u6e0b\u8c37\u533a",
-  baseUrl: "https://www.city.shibuya.tokyo.jp",
-  center: { lat: 35.6618, lng: 139.7041 },
-};
-const SHIBUYA_NEUVOLA_BASE = "https://shibuya-city-neuvola.tokyo";
-const SHIBUYA_FRIENDS_BASE = "https://friends-shibuya.com";
-const MINATO_SOURCE = {
-  key: "minato",
-  label: "\u6e2f\u533a",
-  baseUrl: "https://www.city.minato.tokyo.jp",
-  center: { lat: 35.6581, lng: 139.7516 },
-};
-const CHIYODA_SOURCE = {
-  key: "chiyoda",
-  label: "\u5343\u4ee3\u7530\u533a",
-  baseUrl: "https://www.city.chiyoda.lg.jp",
-  center: { lat: 35.6938, lng: 139.7535 },
-};
-const CHUO_SOURCE = {
-  key: "chuo",
-  label: "\u4e2d\u592e\u533a",
-  baseUrl: "https://www.city.chuo.lg.jp",
-  center: { lat: 35.6664, lng: 139.772 },
-};
-const BUNKYO_SOURCE = {
-  key: "bunkyo",
-  label: "\u6587\u4eac\u533a",
-  baseUrl: "https://www.city.bunkyo.lg.jp",
-  center: { lat: 35.7081, lng: 139.7528 },
-};
-const TAITO_SOURCE = {
-  key: "taito",
-  label: "\u53f0\u6771\u533a",
-  baseUrl: "https://www.city.taito.lg.jp",
-  center: { lat: 35.7128, lng: 139.7806 },
-};
-const SUMIDA_SOURCE = {
-  key: "sumida",
-  label: "\u58a8\u7530\u533a",
-  baseUrl: "https://www.city.sumida.lg.jp",
-  center: { lat: 35.7107, lng: 139.8015 },
-};
-const KOTO_SOURCE = {
-  key: "koto",
-  label: "\u6c5f\u6771\u533a",
-  baseUrl: "https://www.city.koto.lg.jp",
-  center: { lat: 35.6731, lng: 139.817 },
-};
-const NAKANO_SOURCE = {
-  key: "nakano",
-  label: "\u4e2d\u91ce\u533a",
-  baseUrl: "https://www.city.tokyo-nakano.lg.jp",
-  center: { lat: 35.7074, lng: 139.6638 },
-};
-const SUGINAMI_SOURCE = {
-  key: "suginami",
-  label: "\u6749\u4e26\u533a",
-  baseUrl: "https://www.city.suginami.tokyo.jp",
-  center: { lat: 35.6994, lng: 139.6364 },
-};
-const TOSHIMA_SOURCE = {
-  key: "toshima",
-  label: "\u8c4a\u5cf6\u533a",
-  baseUrl: "https://www.city.toshima.lg.jp",
-  center: { lat: 35.7261, lng: 139.716 },
-};
-const KITA_SOURCE = {
-  key: "kita",
-  label: "\u5317\u533a",
-  baseUrl: "https://www.city.kita.lg.jp",
-  center: { lat: 35.752, lng: 139.7336 },
-};
-const ARAKAWA_SOURCE = {
-  key: "arakawa",
-  label: "\u8352\u5ddd\u533a",
-  baseUrl: "https://www.city.arakawa.tokyo.jp",
-  center: { lat: 35.7361, lng: 139.7835 },
-};
-const ITABASHI_SOURCE = {
-  key: "itabashi",
-  label: "\u677f\u6a4b\u533a",
-  baseUrl: "https://www.city.itabashi.tokyo.jp",
-  center: { lat: 35.7512, lng: 139.7094 },
-};
-const NERIMA_SOURCE = {
-  key: "nerima",
-  label: "\u7df4\u99ac\u533a",
-  baseUrl: "https://www.city.nerima.tokyo.jp",
-  center: { lat: 35.7356, lng: 139.6517 },
-};
-const ADACHI_SOURCE = {
-  key: "adachi",
-  label: "\u8db3\u7acb\u533a",
-  baseUrl: "https://www.city.adachi.tokyo.jp",
-  center: { lat: 35.7758, lng: 139.8045 },
-};
-const KATSUSHIKA_SOURCE = {
-  key: "katsushika",
-  label: "\u845b\u98fe\u533a",
-  baseUrl: "https://www.city.katsushika.lg.jp",
-  center: { lat: 35.7436, lng: 139.8472 },
-};
-const EDOGAWA_SOURCE = {
-  key: "edogawa",
-  label: "\u6c5f\u6238\u5ddd\u533a",
-  baseUrl: "https://www.city.edogawa.tokyo.jp",
-  center: { lat: 35.7069, lng: 139.8683 },
-};
-const SHINJUKU_SOURCE = {
-  key: "shinjuku",
-  label: "\u65b0\u5bbf\u533a",
-  baseUrl: "https://www.city.shinjuku.lg.jp",
-  center: { lat: 35.6938, lng: 139.7034 },
-};
-const MINATO_APII_URL = "https://www.city.minato.tokyo.jp/kodomo/kodomo/kodomo/shienshisetsu/apii.html";
-const MINATO_ASSOCIE_FUREAI_URL = "https://associe-international.co.jp/%e6%96%bd%e8%a8%ad%e7%b4%b9%e4%bb%8b/nishiazabu_fureairoom/";
-const MEGURO_SOURCE = {
-  key: "meguro",
-  label: "\u76ee\u9ed2\u533a",
-  baseUrl: "https://www.city.meguro.tokyo.jp",
-  center: { lat: 35.6415, lng: 139.6982 },
-};
-const SHINAGAWA_POCKET_BASE = "https://shinagawa-pocket.city-hc.jp";
-
-const JIDOKAN_HINTS = [
-  "\u5150\u7ae5",
-  "\u5150\u7ae5\u9928",
-  "\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc",
-  "\u5150\u7ae5\u4f1a\u9928",
-  "\u3053\u3069\u3082\u30bb\u30f3\u30bf\u30fc",
-  "\u5b50\u3069\u3082\u30bb\u30f3\u30bf\u30fc",
-  "\u3053\u3069\u3082\u4f1a\u9928",
-  "\u5b50\u3069\u3082\u4f1a\u9928",
-  "\u5b50\u80b2\u3066\u5150\u7ae5\u3072\u308d\u3070",
-  "\u5965\u6ca2\u5b50\u80b2\u3066\u5150\u7ae5\u3072\u308d\u3070",
-];
-const WARD_CHILD_HINT_RE =
-  /(\u5150\u7ae5|\u5150\u7ae5\u9928|\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc|\u5150\u7ae5\u4f1a\u9928|\u5b50\u3069\u3082|\u3053\u3069\u3082|\u5b50\u80b2\u3066|\u89aa\u5b50|\u80b2\u5150|\u4e73\u5e7c\u5150|\u4e73\u5150|\u5e7c\u5150|\u672a\u5c31\u5712|\u672a\u5c31\u5b66|\u5e7c\u7a1a\u5712|\u4fdd\u80b2\u5712|\u3053\u3069\u3082\u5712|\u5b66\u7ae5|\u5c0f\u5b66\u751f|\u4e2d\u5b66\u751f|\u8d64\u3061\u3083\u3093|\u3042\u304b\u3061\u3083\u3093|\u30d9\u30d3\u30fc|\u96e2\u4e73\u98df|\u59ca\u5a20|\u51fa\u7523|\u6bcd\u5b50|\u30d7\u30ec\u30de\u30de|\u30d1\u30d1\u30de\u30de|\u30ad\u30c3\u30ba|\u30d5\u30a1\u30df\u30ea\u30fc|\u3072\u308d\u3070|\u8aad\u307f\u805e\u304b\u305b|\u7d75\u672c|\u3042\u3063\u3074\u3043)/i;
-const WARD_CHILD_URL_HINT_RE = /(kodomo|kosodate|jidokan|jido|gakudo|akachan|baby|kids|oyako|ikuji|kyoiku|hoiku|hiroba|hirobakan|fureai|family|teens|nikoniko|nerijiten)/i;
-
-// Setagaya section IDs for children/youth facility pages.
-const SETAGAYA_JIDOKAN_URL_RE = /city\.setagaya\.lg\.jp\/03(?:06[1-9]|07\d|08[0-5])\//i;
-const CACHE_TTL_MS = 5 * 60 * 1000;
+const {
+  ADACHI_SOURCE,
+  ARAKAWA_SOURCE,
+  BUNKYO_SOURCE,
+  CACHE_TTL_MS,
+  CHIYODA_SOURCE,
+  CHUO_SOURCE,
+  EDOGAWA_SOURCE,
+  ITABASHI_SOURCE,
+  JIDOKAN_HINTS,
+  KATSUSHIKA_SOURCE,
+  KITA_SOURCE,
+  KOTO_SOURCE,
+  MEGURO_SOURCE,
+  MINATO_APII_URL,
+  MINATO_ASSOCIE_FUREAI_URL,
+  MINATO_SOURCE,
+  NAKANO_SOURCE,
+  NERIMA_SOURCE,
+  OTA_SOURCE,
+  SETAGAYA_JIDOKAN_URL_RE,
+  SETAGAYA_SOURCE,
+  SHIBUYA_FRIENDS_BASE,
+  SHIBUYA_NEUVOLA_BASE,
+  SHIBUYA_SOURCE,
+  SHINAGAWA_POCKET_BASE,
+  SHINAGAWA_SOURCE,
+  SHINJUKU_SOURCE,
+  SUGINAMI_SOURCE,
+  SUMIDA_SOURCE,
+  TAITO_SOURCE,
+  TOSHIMA_SOURCE,
+  WARD_CHILD_HINT_RE,
+  WARD_CHILD_URL_HINT_RE,
+  WARD_EVENT_WORD_RE,
+  WARD_LABEL_BY_KEY,
+} = require("./src/config/wards");
 
 let cache = {
   key: "",
@@ -176,41 +57,233 @@ let cache = {
   savedAt: 0,
 };
 const geoCache = new Map();
+const facilityAddressMaster = new Map();
+const facilityPointMaster = new Map();
 
-function sendJson(res, statusCode, payload) {
-  res.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Access-Control-Allow-Origin": "*",
-    "Cache-Control": "no-store",
-  });
-  res.end(JSON.stringify(payload));
+const { geocodeForWard, haversineKm, sanitizeWardPoint } = createGeoHelpers({
+  geoCache,
+  normalizeText,
+  sanitizeAddressText,
+});
+
+function sanitizeVenueText(value) {
+  let text = clipByFieldDelimiter(value).replace(/https?:\/\/\S+/gi, "");
+  text = text
+    .replace(/\s*組織詳細へ\s*/g, " ")
+    .replace(/\s*(?:ページ番号|法人番号)[:：]?\s*[0-9\-]+\s*/gi, " ")
+    .replace(/\s*FAX[:：]?\s*0\d{1,4}[-ー－]\d{1,4}[-ー－]\d{3,4}.*/i, " ");
+  text = normalizeText(text);
+  if (/厚生文化会館/.test(text)) text = "厚生文化会館";
+  if (/(部|課|係|担当|組織)/.test(text)) {
+    const facilityTail = text.match(
+      /([^\s　]{1,40}(?:児童館|児童センター|児童会館|厚生文化会館|未来館|図書館|学習センター|プラザ|ひろば))/u
+    );
+    if (facilityTail) text = facilityTail[1];
+  }
+  if (!text) return "";
+  if (text.length > 90) text = normalizeText(text.slice(0, 90));
+  return text;
 }
 
-function sendFile(res, filePath) {
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("Not Found");
-      return;
-    }
-    const ext = path.extname(filePath).toLowerCase();
-    const typeMap = {
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css; charset=utf-8",
-      ".js": "application/javascript; charset=utf-8",
-      ".json": "application/json; charset=utf-8",
-      ".png": "image/png",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".svg": "image/svg+xml",
-    };
-    res.writeHead(200, { "Content-Type": typeMap[ext] || "application/octet-stream" });
-    res.end(data);
-  });
+function sanitizeGeoQueryText(value) {
+  let text = normalizeJaDigits(normalizeText(value));
+  if (!text) return "";
+  text = text
+    .replace(/〒\s*\d{3}\s*-\s*\d{4}/g, " ")
+    .replace(/\s*(?:電話|tel|お問い合わせ|問い合わせ|問合せ|対象|定員|費用|料金|持ち物|URL|https?:\/\/).*/i, "")
+    .replace(/[（(](?:注|※|対象|定員|費用|料金|持ち物|問い合わせ|問合せ)[^）)]{0,80}[）)]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length > 120) text = normalizeText(text.slice(0, 120));
+  return text;
 }
 
-function normalizeText(value) {
-  return String(value || "").replace(/\s+/g, " ").trim();
+function sanitizeAddressText(value) {
+  let text = clipByFieldDelimiter(value).replace(/https?:\/\/\S+/gi, "");
+  text = normalizeText(text);
+  if (!text) return "";
+  text = text.replace(/郵便番号\s*/g, "");
+  if (/(ページ番号|法人番号|copyright|&copy;|PC版を表示する|スマートフォン版を表示する)/i.test(text)) return "";
+  if (text.length > 140) text = normalizeText(text.slice(0, 140));
+  if (/^\d{3}\s*-\s*\d{4}$/.test(text)) return "";
+  if (/^(?:東京都)?[^\s\u3000]{2,8}区\s*\d{3}\s*-\s*\d{4}$/u.test(text)) return "";
+  if (!/(\u90fd|\u9053|\u5e9c|\u770c|\u533a|\u5e02|\u753a|\u6751|\u4e01\u76ee|\u756a\u5730?|\u53f7|\d{1,4}-\d{1,4})/.test(text)) return "";
+  return text;
+}
+
+function hasConcreteAddressToken(value) {
+  const text = normalizeText(value);
+  if (!text) return false;
+  if (/(ページ番号|郵便番号|法人番号|copyright|&copy;|PC版|スマートフォン版)/i.test(text)) return false;
+  return /([0-9０-９]{1,4}\s*[-ー－]\s*[0-9０-９]{1,4}(?:\s*[-ー－]\s*[0-9０-９]{1,4})?|丁目|番地|[0-9０-９]{1,4}番(?:[0-9０-９]{1,4})?号?)/.test(
+    text
+  );
+}
+
+function extractTokyoAddress(textRaw) {
+  const text = normalizeJaDigits(normalizeText(stripTags(textRaw)));
+  if (!text) return "";
+  const hasAddressToken = (s) => /([0-9０-９]{1,4}\s*[-ー－]\s*[0-9０-９]{1,4}|丁目|番地|号|[0-9０-９]{1,4})/.test(s);
+  const tokyo = text.match(/(東京都[^\n。]{4,160})/);
+  if (tokyo) {
+    const addr = sanitizeAddressText(tokyo[1]);
+    if (addr && hasAddressToken(addr)) return addr;
+  }
+  const ward = text.match(/([^\s\u3000]{2,8}区[^\n。]{4,120})/u);
+  if (ward) {
+    const addr = sanitizeAddressText(`東京都${ward[1]}`);
+    if (addr && hasAddressToken(addr)) return addr;
+  }
+  return "";
+}
+
+function extractWardAddressFromText(source, textRaw) {
+  const wardLabel = normalizeText(source?.label || "");
+  const sourceKey = normalizeText(source?.key || "");
+  const text = normalizeJaDigits(normalizeText(stripTags(textRaw)));
+  if (!wardLabel || !text) return "";
+  const out = [];
+  const add = (raw) => {
+    let normalized = String(raw || "")
+      .replace(/〒\s*\d{3}\s*-\s*\d{4}/g, " ")
+      .replace(/\s*0\d{1,4}-\d{1,4}-\d{3,4}.*/g, " ")
+      .replace(
+        /\s*(?:電話|TEL|お問い合わせ|問い合わせ|問合せ|法人番号|Copyright|copyright|&copy;|PC版を表示する|スマートフォン版を表示する|Map).*/i,
+        " "
+      );
+    const cleaned = sanitizeAddressText(normalized);
+    if (/(ページ番号|郵便番号|法人番号|copyright|&copy;|PC版|スマートフォン版)/i.test(cleaned)) return;
+    if (!cleaned || !hasConcreteAddressToken(cleaned)) return;
+    const addr = /東京都/.test(cleaned) ? cleaned : `東京都${cleaned}`;
+    if (!addr.includes(wardLabel)) return;
+    if (isLikelyWardOfficeAddress(sourceKey, addr)) return;
+    if (!out.includes(addr)) out.push(addr);
+  };
+
+  const tokyoWardRe = new RegExp(`東京都\\s*${wardLabel}[^。\\n]{4,180}`, "g");
+  let m;
+  while ((m = tokyoWardRe.exec(text)) !== null) add(m[0]);
+
+  const wardOnlyRe = new RegExp(`${wardLabel}[^。\\n]{4,160}`, "g");
+  while ((m = wardOnlyRe.exec(text)) !== null) add(m[0]);
+
+  const localAddrRe = /([^\s　]{1,20}(?:[0-9０-９一二三四五六七八九十]{1,3}丁目)?[0-9０-９一二三四五六七八九十]{1,4}番(?:地)?[0-9０-９一二三四五六七八九十]{1,4}号?)/g;
+  while ((m = localAddrRe.exec(text)) !== null) add(`${wardLabel}${m[1]}`);
+
+  const hyphenAddrRe = /([^\s　]{1,20}\d{1,4}\s*[-ー－]\s*\d{1,4}(?:\s*[-ー－]\s*\d{1,4})?)/g;
+  while ((m = hyphenAddrRe.exec(text)) !== null) add(`${wardLabel}${m[1]}`);
+
+  return out[0] || "";
+}
+
+function normalizeFacilityName(value) {
+  return normalizeText(value)
+    .replace(/[（）()【】\[\]「」『』]/g, " ")
+    .replace(/[・･]/g, "")
+    .replace(/\s+/g, "")
+    .toLowerCase();
+}
+
+function buildFacilityMasterKey(sourceKey, venueName) {
+  const key = String(sourceKey || "").trim();
+  const venue = normalizeFacilityName(venueName);
+  if (!key || !venue) return "";
+  return `${key}:${venue}`;
+}
+
+function isGenericWardVenueName(venueName, wardLabel) {
+  const v = normalizeText(venueName);
+  const w = normalizeText(wardLabel);
+  if (!v || !w) return false;
+  const re = new RegExp(`^${w}(?:\\u5b50\\u3069\\u3082\\u95a2\\u9023\\u65bd\\u8a2d|\\u5150\\u7ae5\\u9928|\\u5150\\u7ae5\\u30bb\\u30f3\\u30bf\\u30fc|\\u5b50\\u80b2\\u3066\\u30a4\\u30d9\\u30f3\\u30c8)$`);
+  return re.test(v);
+}
+
+function getFacilityAddressFromMaster(sourceKey, venueName) {
+  const key = buildFacilityMasterKey(sourceKey, venueName);
+  if (!key) return "";
+  return facilityAddressMaster.get(key) || "";
+}
+
+function getFacilityPointFromMaster(sourceKey, venueName) {
+  const key = buildFacilityMasterKey(sourceKey, venueName);
+  if (!key) return null;
+  const point = facilityPointMaster.get(key);
+  if (!point) return null;
+  return { lat: Number(point.lat), lng: Number(point.lng) };
+}
+
+function setFacilityAddressToMaster(sourceKey, venueName, address) {
+  const key = buildFacilityMasterKey(sourceKey, venueName);
+  const addr = sanitizeAddressText(address);
+  if (!key || !addr) return;
+  const label = WARD_LABEL_BY_KEY[String(sourceKey || "")] || "";
+  if (label) {
+    const ward = (addr.match(/([^\s\u3000]{2,8}\u533a)/u) || [])[1] || "";
+    if (ward && ward !== label) return;
+  }
+  if (!facilityAddressMaster.has(key)) facilityAddressMaster.set(key, addr);
+}
+
+function setFacilityPointToMaster(sourceKey, venueName, point) {
+  const key = buildFacilityMasterKey(sourceKey, venueName);
+  if (!key || !point) return;
+  const normalized = sanitizeWardPoint(point, {
+    key: String(sourceKey || ""),
+    label: WARD_LABEL_BY_KEY[String(sourceKey || "")] || "",
+  });
+  if (!normalized) return;
+  if (!facilityPointMaster.has(key)) facilityPointMaster.set(key, { lat: normalized.lat, lng: normalized.lng });
+}
+
+function inferAddressFromPoint(sourceOrCenter, point) {
+  const sourceKey = sourceOrCenter?.key || "";
+  const label = sourceOrCenter?.label || WARD_LABEL_BY_KEY[sourceKey] || "";
+  const addr = sanitizeAddressText(point?.address || "");
+  if (!addr) return "";
+  if (!/東京都/.test(addr)) return "";
+  if (label) {
+    const ward = (addr.match(/([^\s\u3000]{2,8}\u533a)/u) || [])[1] || "";
+    if (ward && ward !== label) return "";
+  }
+  return addr;
+}
+
+function isLikelyWardOfficeAddress(sourceKey, addressRaw) {
+  const addr = sanitizeAddressText(addressRaw);
+  if (!addr) return false;
+  const key = String(sourceKey || "");
+  if (key === "setagaya" && /世田谷4丁目21番27号/.test(addr)) return true;
+  if (key === "ota" && /蒲田五丁目13番14号/.test(addr)) return true;
+  if (key === "nerima" && /豊玉北6丁目12番1号/.test(addr)) return true;
+  if (key === "adachi" && /(中央本町1丁目17番1号|中央本町一丁目17番1号|120-8510)/.test(addr)) return true;
+  return false;
+}
+
+function resolveEventAddress(sourceOrCenter, venueName, currentAddress, point) {
+  const sourceKey = sourceOrCenter?.key || "";
+  const wardLabel = sourceOrCenter?.label || WARD_LABEL_BY_KEY[sourceKey] || "";
+  const genericVenue = isGenericWardVenueName(venueName, wardLabel);
+  let address = sanitizeAddressText(currentAddress || "");
+  if (isLikelyWardOfficeAddress(sourceKey, address)) address = "";
+  if (!address && sourceKey && venueName && !genericVenue) address = getFacilityAddressFromMaster(sourceKey, venueName);
+  if (!address) address = inferAddressFromPoint(sourceOrCenter, point);
+  if (isLikelyWardOfficeAddress(sourceKey, address)) address = "";
+  if (address && sourceKey && venueName && !genericVenue) setFacilityAddressToMaster(sourceKey, venueName, address);
+  return address;
+}
+
+function resolveEventPoint(sourceOrCenter, venueName, currentPoint, currentAddress) {
+  const sourceKey = sourceOrCenter?.key || "";
+  const wardLabel = sourceOrCenter?.label || WARD_LABEL_BY_KEY[sourceKey] || "";
+  const genericVenue = isGenericWardVenueName(venueName, wardLabel);
+  const address = sanitizeAddressText(currentAddress || "");
+  const hasConcreteAddress = hasConcreteAddressToken(address);
+  let point = sanitizeWardPoint(currentPoint, sourceOrCenter);
+  if (point && genericVenue && !hasConcreteAddress) point = null;
+  if (!point && sourceKey && venueName && !genericVenue) point = getFacilityPointFromMaster(sourceKey, venueName);
+  if (point && sourceKey && venueName && !genericVenue) setFacilityPointToMaster(sourceKey, venueName, point);
+  return point;
 }
 
 function normalizeJapaneseEraYears(textRaw) {
@@ -263,6 +336,122 @@ function extractVenueFromTitle(title) {
   if (hiroba) return hiroba[1];
   const m = t.match(/([^\s]{1,40}\u5150\u7ae5\u9928)/u);
   return m ? m[1] : "\u4e16\u7530\u8c37\u533a\u5150\u7ae5\u9928";
+}
+
+function inferWardVenueFromTitle(title, sourceLabel) {
+  const text = normalizeText(title);
+  if (!text) return `${sourceLabel}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`;
+  const paren = text.match(
+    /[\uff08(]([^\uff09)]{2,100}(?:\u5150\u7ae5\u9928|\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc|\u5b50\u3069\u3082\u30fb\u5b50\u80b2\u3066\u30d7\u30e9\u30b6|\u5b50\u80b2\u3066\u30d7\u30e9\u30b6|\u3072\u308d\u3070|\u3053\u3069\u3082\u30d7\u30e9\u30b6|\u308f\u3093\u3071\u304f\u3072\u308d\u3070|\u30d7\u30e9\u30b6)[^\uff09)]{0,30})[\uff09)]/u
+  );
+  if (paren) return sanitizeVenueText(paren[1]);
+  const inline = text.match(
+    /([^\s]{2,100}(?:\u5150\u7ae5\u9928|\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc|\u5b50\u3069\u3082\u30fb\u5b50\u80b2\u3066\u30d7\u30e9\u30b6|\u5b50\u80b2\u3066\u30d7\u30e9\u30b6|\u3072\u308d\u3070|\u3053\u3069\u3082\u30d7\u30e9\u30b6|\u308f\u3093\u3071\u304f\u3072\u308d\u3070|\u30d7\u30e9\u30b6)[^\s]{0,20})/u
+  );
+  if (inline) return sanitizeVenueText(inline[1]);
+  return `${sourceLabel}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`;
+}
+
+function inferVenueFromTitleSupplement(title, sourceLabel) {
+  const text = normalizeText(title);
+  if (!text) return "";
+  const facilityWord =
+    "(?:\\u56f3\\u66f8\\u9928|\\u5206\\u5ba4|\\u5150\\u7ae5\\u9928|\\u5150\\u7ae5\\u30bb\\u30f3\\u30bf\\u30fc|\\u5b50\\u3069\\u3082\\u5bb6\\u5ead\\u652f\\u63f4\\u30bb\\u30f3\\u30bf\\u30fc|\\u3053\\u3069\\u3082\\u3068\\u3057\\u3087\\u3057\\u3064|\\u3068\\u3057\\u3087\\u3057\\u3064|\\u3072\\u308d\\u3070|\\u30d7\\u30e9\\u30b6|\\u4f1a\\u9928|\\u30db\\u30fc\\u30eb)";
+
+  let m = text.match(new RegExp(`\\u3010([^\\u3011]{2,80}${facilityWord}[^\\u3011]{0,30})\\u3011`, "u"));
+  if (m) {
+    const v = sanitizeVenueText(m[1]);
+    if (v && v !== `${sourceLabel}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`) return v;
+  }
+
+  m = text.match(new RegExp(`([^\n\\s]{2,80}${facilityWord}[^\n\\s]{0,20})`, "u"));
+  if (m) {
+    const v = sanitizeVenueText(m[1]);
+    if (v && v !== `${sourceLabel}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`) return v;
+  }
+
+  return "";
+}
+
+function inferRegionalVenueFromTitle(sourceKey, title) {
+  if (String(sourceKey || "") !== "nerima") return "";
+  const text = normalizeText(title);
+  if (!text || !/にこにこ/.test(text)) return "";
+  const region =
+    (text.match(/(練馬地域|石神井地域|大泉地域|光が丘地域)/) || [])[1] ||
+    (text.match(/〒\s*17[6-9]\s*([^\s　]{2,12}地域)/) || [])[1] ||
+    "";
+  if (!region) return "";
+  return `${region} にこにこ`;
+}
+
+function isLikelyAudienceText(textRaw) {
+  const text = normalizeText(textRaw);
+  if (!text) return false;
+  return /^(?:どなたでも|区内在住|在勤|在学|小学生|中学|中学生|高校|高校生|未就学|乳幼児|親子|保護者|[0-9０-９]+歳以上|上記をご確認ください)/.test(
+    text
+  );
+}
+
+function isLikelyDepartmentVenue(textRaw) {
+  const text = normalizeText(textRaw);
+  if (!text) return false;
+  if (isLikelyAudienceText(text)) return true;
+  if (/(児童館|児童センター|子ども|こども|ひろば|プラザ|会館|図書館|学習センター|学校|公園|未来館)/.test(text)) return false;
+  return /(部|課|係|担当|組織|推進|支援|保育サービス|保育課|環境課)/.test(text);
+}
+
+function inferWardVenueFromUrl(sourceKey, url) {
+  const key = String(sourceKey || "");
+  const href = normalizeText(url);
+  if (!href) return "";
+  let pathname = "";
+  try {
+    pathname = new URL(href).pathname.toLowerCase();
+  } catch {
+    pathname = href.toLowerCase();
+  }
+
+  if (key === "nerima") {
+    if (/\/shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido\//.test(pathname)) return "厚生文化会館";
+    const nikoniko = pathname.match(/\/jidokan\/nikoniko\/([a-z0-9_-]+)\.html/);
+    if (nikoniko) {
+      const m = nikoniko[1];
+      if (m === "nerima") return "練馬地域 にこにこ";
+      if (m === "shakuiji") return "石神井地域 にこにこ";
+      if (m === "oizumi") return "大泉地域 にこにこ";
+      if (m === "hikarigaoka") return "光が丘地域 にこにこ";
+    }
+
+    const map = {
+      shakujii_jidokan: "石神井児童館",
+      kamishakujii: "上石神井児童館",
+      hikarigaoka: "光が丘児童館",
+      sakaecho: "栄町児童館",
+      nakamura_jidokan: "中村児童館",
+      miharadai: "三原台児童館",
+      heiwadai: "平和台児童館",
+      harunohi: "北町はるのひ児童館",
+      higashioizumi: "東大泉児童館",
+      minamitanaka: "南田中児童館",
+      kitamachi: "北町児童館",
+    };
+    for (const [token, venue] of Object.entries(map)) {
+      if (pathname.includes(`/${token}/`) || pathname.endsWith(`/${token}.html`)) return venue;
+    }
+  }
+  return "";
+}
+
+function isOnlineOnlyWithoutPlace(textRaw) {
+  const text = normalizeText(textRaw);
+  if (!text) return false;
+  const online = /(\u30aa\u30f3\u30e9\u30a4\u30f3|web|zoom|youtube|\u914d\u4fe1|\u9332\u753b)/i.test(text);
+  if (!online) return false;
+  const physical = /(\u5150\u7ae5\u9928|\u56f3\u66f8\u9928|\u5206\u5ba4|\u30bb\u30f3\u30bf\u30fc|\u3072\u308d\u3070|\u30d7\u30e9\u30b6|\u4f1a\u9928|\u30db\u30fc\u30eb|\u4f53\u80b2\u9928|\u5b66\u6821|\u516c\u5712|\u4f4f\u6240|\u6240\u5728\u5730)/.test(
+    text
+  );
+  return !physical;
 }
 
 function inRangeJst(y, m, d, maxDays) {
@@ -353,6 +542,15 @@ function stripTags(html) {
 function parseDetailMeta(html) {
   let venue = "";
   let address = "";
+  const venueKeyRe = /(\u4f1a\u5834|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240|\u5834\u6240|\u4f1a\u5834\u540d|\u65bd\u8a2d\u540d|\u540d\u79f0)/;
+  const looksLikeVenue = (textRaw) => {
+    const text = sanitizeVenueText(textRaw);
+    if (!text) return false;
+    if (/(小学生|中学生|高校生|未就学|乳幼児|親子|どなたでも|区内在住|在勤|在学)/.test(text)) return false;
+    if (/(児童館|児童センター|児童会館|子ども|こども|ひろば|プラザ|会館|センター|図書館|学習センター|学校|公園|ホール|未来館|館)/.test(text))
+      return true;
+    return hasConcreteAddressToken(text);
+  };
 
   const rowRe = /<tr[\s\S]*?<th[^>]*>([\s\S]*?)<\/th>[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>[\s\S]*?<\/tr>/gi;
   let m;
@@ -360,7 +558,7 @@ function parseDetailMeta(html) {
     const k = stripTags(m[1]);
     const v = stripTags(m[2]);
     if (!k || !v) continue;
-    if (!venue && /(\u4f1a\u5834|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240|\u5834\u6240)/.test(k)) venue = v;
+    if (!venue && venueKeyRe.test(k) && (k !== "名称" || looksLikeVenue(v))) venue = v;
     if (!address && /(\u4f4f\u6240|\u6240\u5728\u5730)/.test(k)) address = v;
   }
 
@@ -370,124 +568,12 @@ function parseDetailMeta(html) {
       const k = stripTags(m[1]);
       const v = stripTags(m[2]);
       if (!k || !v) continue;
-      if (!venue && /(\u4f1a\u5834|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240|\u5834\u6240)/.test(k)) venue = v;
+      if (!venue && venueKeyRe.test(k) && (k !== "名称" || looksLikeVenue(v))) venue = v;
       if (!address && /(\u4f4f\u6240|\u6240\u5728\u5730)/.test(k)) address = v;
     }
   }
 
   return { venue, address };
-}
-
-async function geocodeQuery(query) {
-  const q = normalizeText(query);
-  if (!q) return null;
-  if (geoCache.has(q)) return geoCache.get(q);
-  try {
-    const url = `https://msearch.gsi.go.jp/address-search/AddressSearch?q=${encodeURIComponent(q)}`;
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!res.ok) {
-      geoCache.set(q, null);
-      return null;
-    }
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) {
-      geoCache.set(q, null);
-      return null;
-    }
-    const c = data[0]?.geometry?.coordinates;
-    if (!Array.isArray(c) || c.length < 2) {
-      geoCache.set(q, null);
-      return null;
-    }
-    const point = { lat: Number(c[1]), lng: Number(c[0]) };
-    if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) {
-      geoCache.set(q, null);
-      return null;
-    }
-    geoCache.set(q, point);
-    return point;
-  } catch {
-    geoCache.set(q, null);
-    return null;
-  }
-}
-
-function haversineKm(lat1, lng1, lat2, lng2) {
-  const toRad = (deg) => (Number(deg) * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return 6371 * c;
-}
-
-function isLikelyTokyoPoint(point) {
-  if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-  return point.lat >= 35.45 && point.lat <= 35.9 && point.lng >= 139.5 && point.lng <= 140.0;
-}
-
-function isNearWardCenter(point, wardCenter, maxKm) {
-  if (!point || !wardCenter) return false;
-  return haversineKm(point.lat, point.lng, wardCenter.lat, wardCenter.lng) <= Number(maxKm || 30);
-}
-
-function getWardGeoMaxKm(sourceKey) {
-  const key = String(sourceKey || "");
-  const overrides = {
-    chiyoda: 8,
-    chuo: 8,
-    minato: 9,
-    shinjuku: 9,
-    bunkyo: 8,
-    taito: 8,
-    sumida: 9,
-    koto: 10,
-    shinagawa: 10,
-    meguro: 9,
-    ota: 12,
-    setagaya: 12,
-    shibuya: 9,
-    nakano: 9,
-    suginami: 11,
-    toshima: 9,
-    kita: 9,
-    arakawa: 8,
-    itabashi: 11,
-    nerima: 12,
-    adachi: 12,
-    katsushika: 12,
-    edogawa: 12,
-  };
-  return overrides[key] || 10;
-}
-
-function sanitizeWardPoint(point, sourceOrCenter, maxKmOverride) {
-  if (!point) return null;
-  const lat = Number(point.lat);
-  const lng = Number(point.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  const normalized = { lat, lng };
-  if (!isLikelyTokyoPoint(normalized)) return null;
-  const center = sourceOrCenter?.center || sourceOrCenter || null;
-  if (center) {
-    const maxKm = Number(maxKmOverride || getWardGeoMaxKm(sourceOrCenter?.key));
-    if (!isNearWardCenter(normalized, center, maxKm)) return null;
-  }
-  return normalized;
-}
-
-async function geocodeForWard(candidates, sourceOrCenter, maxKmOverride) {
-  for (const q of candidates || []) {
-    const point = await geocodeQuery(q);
-    const ok = sanitizeWardPoint(point, sourceOrCenter, maxKmOverride);
-    if (ok) return ok;
-  }
-  return null;
 }
 
 function buildGeoCandidates(title, venue, address) {
@@ -599,10 +685,11 @@ function buildOtaTags(facilityUrl, venueName, title) {
 
 function parseAnchors(html, baseUrl) {
   const out = [];
-  const re = /<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  const re = /<a([^>]*?)href=(["'])(.*?)\2([^>]*)>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
-    const hrefRaw = String(m[1] || "").replace(/&amp;/g, "&").trim();
+    const attrs = `${m[1] || ""} ${m[4] || ""}`;
+    const hrefRaw = String(m[3] || "").replace(/&amp;/g, "&").trim();
     if (!hrefRaw || hrefRaw.startsWith("#") || /^javascript:/i.test(hrefRaw)) continue;
     let abs = "";
     try {
@@ -610,7 +697,12 @@ function parseAnchors(html, baseUrl) {
     } catch {
       continue;
     }
-    out.push({ url: abs, text: normalizeText(stripTags(m[2])) });
+    const innerText = normalizeText(stripTags(m[5]));
+    const titleAttr =
+      normalizeText((attrs.match(/\btitle=(["'])(.*?)\1/i) || [])[2] || "") ||
+      normalizeText((attrs.match(/\baria-label=(["'])(.*?)\1/i) || [])[2] || "");
+    const text = innerText || titleAttr;
+    out.push({ url: abs, text });
   }
   return out;
 }
@@ -663,14 +755,9 @@ function parseShinagawaPocketDate(textRaw) {
   return { y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) };
 }
 
-function normalizeJaDigits(text) {
-  return String(text || "")
-    .replace(/[\uFF10-\uFF19]/g, (ch) => String(ch.charCodeAt(0) - 0xff10))
-    .replace(/\uFF1A/g, ":");
-}
-
 function parseTimeRangeFromText(textRaw) {
   const text = normalizeJaDigits(normalizeText(textRaw))
+    .replace(/(\d{1,2})\s*\u6642(?!\s*\d)/g, "$1:00")
     .replace(/\u5348\u524D/g, "AM ")
     .replace(/\u5348\u5f8c/g, "PM ")
     .replace(/\u6642\u534a/g, ":30")
@@ -720,11 +807,61 @@ function parseTimeRangeFromText(textRaw) {
   return null;
 }
 
-function buildStartsEndsForDate(d, timeRange, defaultStartHour = 10) {
-  const startHour =
-    timeRange && Number.isFinite(timeRange.startHour) ? Number(timeRange.startHour) : defaultStartHour;
-  const startMinute =
-    timeRange && Number.isFinite(timeRange.startMinute) ? Number(timeRange.startMinute) : 0;
+function buildDateKey(y, mo, d) {
+  return `${Number(y)}-${Number(mo)}-${Number(d)}`;
+}
+
+function parseDateSpecificTimeRanges(textRaw, dates, baseY, baseMo) {
+  const text = normalizeJapaneseEraYears(normalizeJaDigits(String(textRaw || "")));
+  if (!text) return {};
+  const out = {};
+  const targetDates = Array.isArray(dates) ? dates : [];
+  const register = (d, snippet) => {
+    if (!d || !Number.isFinite(d.y) || !Number.isFinite(d.mo) || !Number.isFinite(d.d)) return;
+    const key = buildDateKey(d.y, d.mo, d.d);
+    if (out[key]) return;
+    const tr = parseTimeRangeFromText(snippet);
+    if (tr) out[key] = tr;
+  };
+
+  for (const d of targetDates) {
+    const key = buildDateKey(d.y, d.mo, d.d);
+    if (out[key]) continue;
+    const patterns = [
+      new RegExp(`${d.y}\\s*年\\s*${d.mo}\\s*月\\s*${d.d}\\s*日`, "g"),
+      new RegExp(`${d.mo}\\s*月\\s*${d.d}\\s*日`, "g"),
+    ];
+    for (const re of patterns) {
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const from = Math.max(0, m.index - 40);
+        const to = Math.min(text.length, m.index + m[0].length + 90);
+        register(d, text.slice(from, to));
+        if (out[key]) break;
+      }
+      if (out[key]) break;
+    }
+  }
+
+  if (Object.keys(out).length === 0) {
+    const pairRe =
+      /(?:(20\d{2})\s*年\s*)?(\d{1,2})\s*月\s*(\d{1,2})\s*日[\s\S]{0,48}?((?:午前|午後)?\s*\d{1,2}\s*(?::|時)\s*\d{0,2}\s*(?:分)?\s*(?:~|-|〜|～|ー|から)\s*(?:午前|午後)?\s*\d{1,2}\s*(?::|時)\s*\d{0,2}\s*(?:分)?|(?:午前|午後)?\s*\d{1,2}\s*(?::|時)\s*\d{0,2}\s*(?:分)?)/g;
+    let m;
+    while ((m = pairRe.exec(text)) !== null) {
+      let y = m[1] ? Number(m[1]) : Number(baseY);
+      const mo = Number(m[2]);
+      const d = Number(m[3]);
+      if (!m[1] && Number.isFinite(mo) && Number.isFinite(baseMo) && mo < Number(baseMo) - 6) y += 1;
+      register({ y, mo, d }, m[4] || "");
+    }
+  }
+  return out;
+}
+
+function buildStartsEndsForDate(d, timeRange) {
+  const hasStartTime = Boolean(timeRange && Number.isFinite(timeRange.startHour));
+  const startHour = hasStartTime ? Number(timeRange.startHour) : 0;
+  const startMinute = hasStartTime && Number.isFinite(timeRange.startMinute) ? Number(timeRange.startMinute) : 0;
   const startDate = toJstDate(d.y, d.mo, d.d, startHour, startMinute);
   let endIso = null;
   if (timeRange && Number.isFinite(timeRange.endHour)) {
@@ -734,7 +871,8 @@ function buildStartsEndsForDate(d, timeRange, defaultStartHour = 10) {
     if (endDate.getTime() < startDate.getTime()) endDate = new Date(endDate.getTime() + 86400000);
     endIso = endDate.toISOString();
   }
-  return { startsAt: startDate.toISOString(), endsAt: endIso };
+  const timeUnknown = !hasStartTime;
+  return { startsAt: startDate.toISOString(), endsAt: endIso, timeUnknown };
 }
 
 function parseShinagawaPocketDetailMeta(html) {
@@ -742,8 +880,10 @@ function parseShinagawaPocketDetailMeta(html) {
   const date = parseYmdFromJpText(dateText);
   const bodyText = normalizeJaDigits(normalizeText(stripTags((html.match(/<div[^>]*class="announcement-article"[^>]*>([\s\S]*?)<\/div>/i) || [])[1] || "")));
   const text = bodyText
+    .replace(/(\d{1,2})\s*\u6642(?!\s*\d)/g, "$1:00")
     .replace(/\u5348\u524D/g, "AM ")
     .replace(/\u5348\u5F8C/g, "PM ")
+    .replace(/\uFF1A/g, ":")
     .replace(/\u6642/g, ":")
     .replace(/\u5206/g, "")
     .replace(/[\u301C\uFF5E\u30FC\uFF0D\u2212]/g, "~")
@@ -958,11 +1098,13 @@ function parseShibuyaNeuvolaDetailMeta(html) {
   const now = parseYmdFromJst(new Date());
   const dates = parseOtaDatesFromText(`${dateHint} ${title} ${bodyText}`, now.y, now.m);
   const timeRange = parseTimeRangeFromText(`${timeHint} ${dateHint} ${title} ${bodyText}`);
+  const address = extractTokyoAddress(bodyText);
   return {
     title,
     dates,
     timeRange,
     venue_name: venueName,
+    address,
     bodyText,
   };
 }
@@ -1017,7 +1159,8 @@ function parseShibuyaFriendsDetailMeta(html) {
   );
   if (venueMatch) venue_name = venueMatch[1];
 
-  return { title, dates, timeRange, venue_name, bodyText };
+  const address = extractTokyoAddress(bodyText);
+  return { title, dates, timeRange, venue_name, address, bodyText };
 }
 
 function parseMinatoListEventLinks(html, pageUrl) {
@@ -1055,6 +1198,7 @@ function parseMinatoDetailMeta(html) {
   const dateHtml = (html.match(/<div[^>]*class="kaisai_date"[^>]*>([\s\S]*?)<\/div>/i) || [])[1] || "";
   const dateText = normalizeJaDigits(normalizeText(stripTags(dateHtml)));
   const placeText = parseMinatoSectionText(html, "\u958b\u50ac\u5834\u6240");
+  const addressText = parseMinatoSectionText(html, "\u4f4f\u6240") || parseMinatoSectionText(html, "\u6240\u5728\u5730");
   const detailText = parseMinatoSectionText(html, "\u30a4\u30d9\u30f3\u30c8\u8a73\u7d30");
   const targetText = parseMinatoSectionText(html, "\u5bfe\u8c61");
   const bodyText = normalizeText(`${dateText} ${placeText} ${detailText} ${targetText}`);
@@ -1063,7 +1207,8 @@ function parseMinatoDetailMeta(html) {
   const dates = parseOtaDatesFromText(normalizedDatePayload, now.y, now.m);
   const timeRange = parseTimeRangeFromText(`${dateText} ${bodyText}`);
   const venue_name = placeText || "\u6e2f\u533a\u5150\u7ae5\u9928";
-  return { title, dates, timeRange, venue_name, bodyText };
+  const address = sanitizeAddressText(addressText) || extractTokyoAddress(bodyText);
+  return { title, dates, timeRange, venue_name, address, bodyText };
 }
 
 function parseNextDataJson(html) {
@@ -1139,6 +1284,15 @@ function parseMinatoNihonhoikuEvents(html, pageUrl) {
     pageProps?.content?.baseInfo?.baseInfo?.storeNameKanji?.text ||
       stripTags((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || "").split(/[|｜]/)[0]
   );
+  const storeAddress = sanitizeAddressText(
+    normalizeText(
+      pageProps?.content?.baseInfo?.baseInfo?.address?.text ||
+        pageProps?.content?.baseInfo?.address?.text ||
+        pageProps?.content?.baseInfo?.baseInfo?.address ||
+        pageProps?.content?.baseInfo?.address ||
+        ""
+    )
+  );
   const lat = Number(pageProps?.content?.baseInfo?.baseInfo?.latlng?.latitude);
   const lng = Number(pageProps?.content?.baseInfo?.baseInfo?.latlng?.longitude);
 
@@ -1186,7 +1340,7 @@ function parseMinatoNihonhoikuEvents(html, pageUrl) {
         dates,
         timeRange,
         venue_name: storeName || "\u5b50\u80b2\u3066\u3072\u308d\u3070 \u3042\u3063\u3074\u3043",
-        address: "",
+        address: storeAddress,
         url,
         lat: Number.isFinite(lat) ? lat : null,
         lng: Number.isFinite(lng) ? lng : null,
@@ -1254,7 +1408,9 @@ async function collectMinatoFacilityLinkedEvents(maxDays) {
         const cands = buildMinatoGeoCandidates(ev.title, ev.venue_name, ev.address || "");
         point = await geocodeForWard(cands, MINATO_SOURCE);
       }
-      if (!point) point = { ...MINATO_SOURCE.center };
+      const venueName = ev.venue_name || "\u6e2f\u533a\u5b50\u80b2\u3066\u652f\u63f4\u65bd\u8a2d";
+      point = resolveEventPoint(MINATO_SOURCE, venueName, point, ev.address || "");
+      const address = resolveEventAddress(MINATO_SOURCE, venueName, ev.address || "", point);
 
       byId.set(id, {
         id,
@@ -1264,11 +1420,11 @@ async function collectMinatoFacilityLinkedEvents(maxDays) {
         starts_at: startsAt,
         ends_at: endsAt,
         updated_at: startsAt,
-        venue_name: ev.venue_name || "\u6e2f\u533a\u5b50\u80b2\u3066\u652f\u63f4\u65bd\u8a2d",
-        address: ev.address || "",
+        venue_name: venueName,
+        address,
         url: ev.url,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -1460,13 +1616,14 @@ function parseOtaEventsFromDetail(detailHtml, monthUrl, facilityName) {
     let venue = facilityName || "\u5927\u7530\u533a\u5150\u7ae5\u9928";
     const vm = bodyText.match(/([^\s]{2,50}(?:\u5150\u7ae5\u9928|\u3072\u308d\u3070|\u30bb\u30f3\u30bf\u30fc|\u4f1a\u9928))/u);
     if (vm) venue = vm[1];
+    const rowAddress = extractTokyoAddress(`${bodyText} ${tds.join(" ")}`);
     const timeRange = parseTimeRangeFromText(`${title} ${bodyText} ${dateCell} ${tds.join(" ")}`);
     out.push({
       title,
       dates,
       timeRange,
       venue_name: venue,
-      address: "",
+      address: rowAddress,
       url: monthUrl,
     });
   }
@@ -1489,11 +1646,12 @@ async function collectDetailMetaMap(rows, maxDays) {
         const dates = parseDatesFromHtml(html).filter((d) => inRangeJst(d.y, d.mo, d.d, maxDays));
         const detail = parseDetailMeta(html);
         const timeRange = parseTimeRangeFromText(stripTags(html));
+        const address = sanitizeAddressText(detail.address || "") || extractTokyoAddress(html);
         map.set(url, {
           dates,
           timeRange,
           venue: detail.venue || "",
-          address: detail.address || "",
+          address,
         });
       } catch {
         // ignore per-page error
@@ -1540,11 +1698,14 @@ async function collectSetagayaJidokanEvents(maxDays) {
     }
 
     const venueName = detailMeta.venue || extractVenueFromTitle(row.title);
-    const addressText = detailMeta.address || "";
+    const rawAddressCandidate = detailMeta.address || "";
+    const rawAddressText = isLikelyWardOfficeAddress(SETAGAYA_SOURCE.key, rawAddressCandidate) ? "" : rawAddressCandidate;
     const rowTimeRange = detailMeta.timeRange || parseTimeRangeFromText(`${row.title} ${row.dateText}`);
-    const geoCandidates = buildGeoCandidates(row.title, venueName, addressText);
+    const geoVenue = normalizeText(String(venueName || "").replace(/^世田谷区/, ""));
+    const geoCandidates = buildGeoCandidates(row.title, geoVenue || venueName, rawAddressText);
     let point = await geocodeForWard(geoCandidates, SETAGAYA_SOURCE);
-    if (!point) point = { ...SETAGAYA_SOURCE.center };
+    point = resolveEventPoint(SETAGAYA_SOURCE, venueName, point, rawAddressText);
+    const addressText = resolveEventAddress(SETAGAYA_SOURCE, venueName, rawAddressText, point);
 
     for (const d of uniq.values()) {
       if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -1563,8 +1724,8 @@ async function collectSetagayaJidokanEvents(maxDays) {
         venue_name: venueName,
         address: addressText,
         url: row.url,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -1595,6 +1756,10 @@ async function collectOtaJidokanEvents(maxDays) {
     } catch {
       continue;
     }
+    const facilityDetail = parseDetailMeta(facilityHtml);
+    let facilityAddress = sanitizeAddressText(facilityDetail.address || "") || extractTokyoAddress(facilityHtml);
+    if (isLikelyWardOfficeAddress(OTA_SOURCE.key, facilityAddress)) facilityAddress = "";
+    if (facility.title && facilityAddress) setFacilityAddressToMaster(OTA_SOURCE.key, facility.title, facilityAddress);
     const monthLinks = parseOtaMonthPageLinks(facility.url, facilityHtml);
     for (const monthUrl of monthLinks) {
       let detailHtml = "";
@@ -1605,10 +1770,16 @@ async function collectOtaJidokanEvents(maxDays) {
       }
       const rows = parseOtaEventsFromDetail(detailHtml, monthUrl, facility.title);
       for (const row of rows) {
-        const tags = buildOtaTags(monthUrl, row.venue_name || facility.title, row.title);
-        const geoCandidates = buildOtaGeoCandidates(row.title, row.venue_name || facility.title, row.address || "");
+        const venueName = row.venue_name || facility.title || "\u5927\u7530\u533a\u5150\u7ae5\u9928";
+        const rawAddress = isLikelyWardOfficeAddress(OTA_SOURCE.key, row.address || "")
+          ? ""
+          : row.address || facilityAddress || "";
+        const tags = buildOtaTags(monthUrl, venueName, row.title);
+        const geoVenue = normalizeText(String(venueName || "").replace(/^大田区/, ""));
+        const geoCandidates = buildOtaGeoCandidates(row.title, geoVenue || venueName, rawAddress);
         let point = await geocodeForWard(geoCandidates, OTA_SOURCE);
-        if (!point) point = { ...OTA_SOURCE.center };
+        point = resolveEventPoint(OTA_SOURCE, venueName, point, rawAddress);
+        const address = resolveEventAddress(OTA_SOURCE, venueName, rawAddress, point);
         for (const d of row.dates) {
           if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
           const { startsAt, endsAt } = buildStartsEndsForDate(d, row.timeRange, 10);
@@ -1623,11 +1794,11 @@ async function collectOtaJidokanEvents(maxDays) {
             starts_at: startsAt,
             ends_at: endsAt,
             updated_at: startsAt,
-            venue_name: row.venue_name || "\u5927\u7530\u533a\u5150\u7ae5\u9928",
-            address: row.address || "",
+            venue_name: venueName,
+            address,
             url: row.url,
-            lat: point.lat,
-            lng: point.lng,
+            lat: point ? point.lat : null,
+            lng: point ? point.lng : null,
             participants: null,
             waitlisted: null,
             recently_updated: true,
@@ -1689,6 +1860,8 @@ async function collectShinagawaJidokanEvents(maxDays) {
       const v = normalizeText(stripTags(rm[2]));
       if (!addressText && /(\u4f4f\u6240|\u6240\u5728\u5730)/.test(k)) addressText = v;
     }
+    addressText = sanitizeAddressText(addressText);
+    if (centerName && addressText) setFacilityAddressToMaster(SHINAGAWA_SOURCE.key, centerName, addressText);
 
     const eventSearchLink = parseAnchors(centerHtml, centerUrl).find((x) => /\/event-calendar\/result\?/.test(x.url));
     const eventSearchUrl =
@@ -1706,7 +1879,9 @@ async function collectShinagawaJidokanEvents(maxDays) {
 
     const geoCandidates = buildShinagawaGeoCandidates(centerName, centerName, addressText);
     let point = await geocodeForWard(geoCandidates, SHINAGAWA_SOURCE);
-    if (!point) point = { ...SHINAGAWA_SOURCE.center };
+    const venueName = centerName || "\u54c1\u5ddd\u533a\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc";
+    point = resolveEventPoint(SHINAGAWA_SOURCE, venueName, point, addressText);
+    const resolvedAddress = resolveEventAddress(SHINAGAWA_SOURCE, venueName, addressText, point);
 
     const itemRe = /<li class="list-item">([\s\S]*?)<\/li>/gi;
     let im;
@@ -1744,11 +1919,11 @@ async function collectShinagawaJidokanEvents(maxDays) {
         starts_at: startsAt,
         ends_at: endsAt,
         updated_at: startsAt,
-        venue_name: centerName || "\u54c1\u5ddd\u533a\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc",
-        address: addressText,
+        venue_name: venueName,
+        address: resolvedAddress,
         url: absUrl,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -1804,9 +1979,11 @@ async function collectMeguroJidokanEvents(maxDays) {
     if (uniq.size === 0) continue;
 
     const venueName = placeText || extractMeguroVenueFromTitle(h1);
-    const geoCandidates = buildMeguroGeoCandidates(h1, venueName, "");
+    const rawAddress = extractTokyoAddress(placeText);
+    const geoCandidates = buildMeguroGeoCandidates(h1, venueName, rawAddress);
     let point = await geocodeForWard(geoCandidates, MEGURO_SOURCE);
-    if (!point) point = { ...MEGURO_SOURCE.center };
+    point = resolveEventPoint(MEGURO_SOURCE, venueName, point, rawAddress);
+    const address = resolveEventAddress(MEGURO_SOURCE, venueName, rawAddress, point);
 
     for (const d of uniq.values()) {
       const { startsAt, endsAt } = buildStartsEndsForDate(d, timeRange, 10);
@@ -1822,10 +1999,10 @@ async function collectMeguroJidokanEvents(maxDays) {
         ends_at: endsAt,
         updated_at: startsAt,
         venue_name: venueName,
-        address: "",
+        address,
         url: detailUrl,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -1878,9 +2055,11 @@ async function collectShibuyaJidokanEvents(maxDays) {
     if (!meta.dates || meta.dates.length === 0) continue;
 
     const venueName = meta.venue_name || row.author || "\u6e0b\u8c37\u533a\u5b50\u80b2\u3066\u30a4\u30d9\u30f3\u30c8";
-    const geoCandidates = buildShibuyaGeoCandidates(title, venueName, "");
+    const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+    const geoCandidates = buildShibuyaGeoCandidates(title, venueName, rawAddress);
     let point = await geocodeForWard(geoCandidates, SHIBUYA_SOURCE);
-    if (!point) point = { ...SHIBUYA_SOURCE.center };
+    point = resolveEventPoint(SHIBUYA_SOURCE, venueName, point, rawAddress);
+    const address = resolveEventAddress(SHIBUYA_SOURCE, venueName, rawAddress, point);
 
     for (const d of meta.dates) {
       if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -1897,10 +2076,10 @@ async function collectShibuyaJidokanEvents(maxDays) {
         ends_at: endsAt,
         updated_at: startsAt,
         venue_name: venueName,
-        address: "",
+        address,
         url: row.url,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -1970,9 +2149,11 @@ async function collectShibuyaJidokanEvents(maxDays) {
       if (!meta.title || !meta.dates || meta.dates.length === 0) continue;
       if (/^\s*\u30a4\u30d9\u30f3\u30c8\s*$/.test(meta.title)) continue;
 
-      const geoCandidates = buildShibuyaGeoCandidates(meta.title, meta.venue_name, "\u6e0b\u8c37\u533a\u672c\u753a");
+      const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      const geoCandidates = buildShibuyaGeoCandidates(meta.title, meta.venue_name, rawAddress || "\u6e0b\u8c37\u533a\u672c\u753a");
       let point = await geocodeForWard(geoCandidates, SHIBUYA_SOURCE);
-      if (!point) point = { ...SHIBUYA_SOURCE.center };
+      point = resolveEventPoint(SHIBUYA_SOURCE, meta.venue_name, point, rawAddress);
+      const address = resolveEventAddress(SHIBUYA_SOURCE, meta.venue_name, rawAddress, point);
 
       for (const d of meta.dates) {
         if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -1989,10 +2170,10 @@ async function collectShibuyaJidokanEvents(maxDays) {
           ends_at: endsAt,
           updated_at: startsAt,
           venue_name: meta.venue_name,
-          address: "",
+          address,
           url: detailUrl,
-          lat: point.lat,
-          lng: point.lng,
+          lat: point ? point.lat : null,
+          lng: point ? point.lng : null,
           participants: null,
           waitlisted: null,
           recently_updated: true,
@@ -2053,9 +2234,12 @@ async function collectMinatoJidokanEvents(maxDays) {
     if (!facilityHint.test(hay) && !titleHint.test(hay) && !appiiHint.test(hay) && !WARD_CHILD_URL_HINT_RE.test(row.url) && !/\/kouhou\/event\//i.test(row.url))
       continue;
 
-    const geoCandidates = buildMinatoGeoCandidates(title, meta.venue_name, "");
+    const venueName = meta.venue_name || "\u6e2f\u533a\u5150\u7ae5\u9928";
+    const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+    const geoCandidates = buildMinatoGeoCandidates(title, venueName, rawAddress);
     let point = await geocodeForWard(geoCandidates, MINATO_SOURCE);
-    if (!point) point = { ...MINATO_SOURCE.center };
+    point = resolveEventPoint(MINATO_SOURCE, venueName, point, rawAddress);
+    const address = resolveEventAddress(MINATO_SOURCE, venueName, rawAddress, point);
 
     for (const d of meta.dates) {
       if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -2071,11 +2255,11 @@ async function collectMinatoJidokanEvents(maxDays) {
         starts_at: startsAt,
         ends_at: endsAt,
         updated_at: startsAt,
-        venue_name: meta.venue_name || "\u6e2f\u533a\u5150\u7ae5\u9928",
-        address: "",
+        venue_name: venueName,
+        address,
         url: row.url,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -2153,6 +2337,7 @@ function parseChiyodaDetailMeta(html, fallbackDate) {
   const dates = parseOtaDatesFromText(normalized, fallbackDate.y, fallbackDate.mo);
 
   let venue_name = "";
+  let address = "";
   for (const sec of sections) {
     const heading = sec.heading;
     const value = sec.value;
@@ -2161,28 +2346,46 @@ function parseChiyodaDetailMeta(html, fallbackDate) {
       break;
     }
   }
+  for (const sec of sections) {
+    const heading = sec.heading;
+    const value = sec.value;
+    if (/\u4f4f\u6240|\u6240\u5728\u5730/i.test(heading)) {
+      address = value;
+      break;
+    }
+  }
   if (!venue_name) {
     const v = normalized.match(/(?:\u4f1a\u5834|\u5834\u6240|[\u540d\u79f0]{2})\s*[:\uff1a]\s*([^\n]{2,100})/);
     if (v) venue_name = normalizeText(v[1]);
   }
+  if (!address) {
+    const a = normalized.match(/(?:\u4f4f\u6240|\u6240\u5728\u5730)\s*[:\uff1a]\s*([^\n]{6,180})/);
+    if (a) address = normalizeText(a[1]);
+  }
   if (!venue_name) venue_name = "\u5343\u4ee3\u7530\u533a\u5b50\u80b2\u3066\u95a2\u9023\u65bd\u8a2d";
+  address = sanitizeAddressText(address) || extractTokyoAddress(`${normalized} ${venue_name}`);
 
   return {
     title,
     dates: dates.length ? dates : [fallbackDate],
     timeRange,
     venue_name,
+    address,
     bodyText: allText,
   };
 }
 
-function buildChiyodaGeoCandidates(title, venue_name) {
+function buildChiyodaGeoCandidates(title, venue_name, address = "") {
   const out = [];
   const push = (s) => {
     const t = normalizeText(s);
     if (!t) return;
     if (!out.includes(t)) out.push(t);
   };
+  if (address) {
+    if (!/東京都/.test(address)) push(`東京都千代田区${address}`);
+    push(address);
+  }
   const venue = normalizeText(venue_name);
   const noisyVenueRe =
     /(\u7121\u6599|\u3069\u306a\u305f\u3067\u3082|\u5728\u4f4f|\u5728\u52e4|\u5728\u5b66|\u533a\u6c11|\u5bfe\u8c61|\u5b9a\u54e1|\u7533\u8fbc|\u53c2\u52a0|\u8b1b\u5ea7|\u8aac\u660e\u4f1a|\u30aa\u30f3\u30e9\u30a4\u30f3|Zoom|Web|WEB)/i;
@@ -2341,6 +2544,7 @@ async function collectChiyodaJidokanEvents(maxDays) {
         dates: [row.date],
         timeRange: null,
         venue_name: "",
+        address: "",
         bodyText: row.title || "",
       };
     }
@@ -2352,9 +2556,12 @@ async function collectChiyodaJidokanEvents(maxDays) {
     if (/\/koho\/event\//i.test(row.url || "") && !strictChildRe.test(hay)) continue;
     if (!childHint.test(hay)) continue;
 
-    const geoCandidates = buildChiyodaGeoCandidates(title, meta.venue_name);
+    const venueName = meta.venue_name || "\u5343\u4ee3\u7530\u533a\u5b50\u80b2\u3066\u95a2\u9023\u65bd\u8a2d";
+    const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+    const geoCandidates = buildChiyodaGeoCandidates(title, venueName, rawAddress);
     let point = await geocodeForWard(geoCandidates, CHIYODA_SOURCE);
-    if (!point) point = { ...CHIYODA_SOURCE.center };
+    point = resolveEventPoint(CHIYODA_SOURCE, venueName, point, rawAddress);
+    const address = resolveEventAddress(CHIYODA_SOURCE, venueName, rawAddress, point);
 
     for (const d of meta.dates) {
       if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -2370,11 +2577,11 @@ async function collectChiyodaJidokanEvents(maxDays) {
         starts_at: startsAt,
         ends_at: endsAt,
         updated_at: startsAt,
-        venue_name: meta.venue_name || "\u5343\u4ee3\u7530\u533a\u5b50\u80b2\u3066\u95a2\u9023\u65bd\u8a2d",
-        address: "",
+        venue_name: venueName,
+        address,
         url: row.url,
-        lat: point.lat,
-        lng: point.lng,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
         participants: null,
         waitlisted: null,
         recently_updated: true,
@@ -2476,9 +2683,11 @@ async function collectChiyodaJidokanEvents(maxDays) {
       const venue = row.facility || "\u5343\u4ee3\u7530\u533a\u5150\u7ae5\u9928";
       const title = row.title.includes(row.facility) ? row.title : `${row.facility} ${row.title}`;
       const timeRange = parseTimeRangeFromText(normalized);
+      const rawAddress = extractTokyoAddress(normalized);
 
-      let point = await geocodeForWard(buildChiyodaGeoCandidates(title, venue), CHIYODA_SOURCE);
-      if (!point) point = { ...CHIYODA_SOURCE.center };
+      let point = await geocodeForWard(buildChiyodaGeoCandidates(title, venue, rawAddress), CHIYODA_SOURCE);
+      point = resolveEventPoint(CHIYODA_SOURCE, venue, point, rawAddress);
+      const address = resolveEventAddress(CHIYODA_SOURCE, venue, rawAddress, point);
 
       for (const d of dates) {
         if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
@@ -2495,10 +2704,10 @@ async function collectChiyodaJidokanEvents(maxDays) {
           ends_at: endsAt,
           updated_at: startsAt,
           venue_name: venue,
-          address: "",
+          address,
           url: row.url,
-          lat: point.lat,
-          lng: point.lng,
+          lat: point ? point.lat : null,
+          lng: point ? point.lng : null,
           participants: null,
           waitlisted: null,
           recently_updated: true,
@@ -2541,26 +2750,100 @@ function extractDateFromUrl(url, baseY, baseMo) {
 function buildWardGeoCandidates(wardLabel, title, venue, address) {
   const out = [];
   const add = (s) => {
-    const t = normalizeText(s);
+    const t = sanitizeGeoQueryText(s);
     if (!t) return;
     if (!out.includes(t)) out.push(t);
   };
   const tokyoWard = `\u6771\u4eac\u90fd${wardLabel}`;
-  if (address) {
-    if (!/\u6771\u4eac\u90fd/.test(address)) add(`${tokyoWard}${address}`);
-    add(address);
+  const cleanAddress = sanitizeAddressText(address || "");
+  const cleanVenue = sanitizeVenueText(venue || "");
+  const cleanTitle = sanitizeVenueText(title || "");
+
+  if (cleanAddress) {
+    const hasTokyo = /東京都/.test(cleanAddress);
+    const hasWard = wardLabel && cleanAddress.includes(wardLabel);
+    add(cleanAddress);
+    if (!hasTokyo) {
+      if (hasWard) {
+        add(`東京都${cleanAddress}`);
+      } else {
+        add(`${tokyoWard}${cleanAddress}`);
+      }
+    } else if (!hasWard) {
+      const noTokyo = cleanAddress.replace(/^東京都\s*/, "");
+      add(`${tokyoWard}${noTokyo}`);
+    }
+    if (hasTokyo) {
+      const noTokyo = cleanAddress.replace(/^東京都\s*/, "");
+      if (noTokyo) add(noTokyo);
+    }
   }
-  if (venue) add(`${tokyoWard}${venue}`);
-  if (title && venue) add(`${title} ${venue} ${tokyoWard}`);
-  if (title) add(`${title} ${tokyoWard}`);
-  add(`${tokyoWard}\u5f79\u6240`);
-  add(`${wardLabel}\u5f79\u6240`);
+  if (cleanVenue) {
+    add(`${tokyoWard}${cleanVenue}`);
+    add(`${wardLabel}${cleanVenue}`);
+  }
+  if (cleanTitle && cleanVenue) add(`${cleanTitle} ${cleanVenue} ${tokyoWard}`);
+  if (cleanTitle) add(`${cleanTitle} ${tokyoWard}`);
   return out;
+}
+
+function parseIsoDateTimeParts(textRaw) {
+  const text = normalizeJaDigits(normalizeText(textRaw)).replace(/\//g, "-");
+  const m = text.match(/(20\d{2})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2}))?/i);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]);
+  const d = Number(m[3]);
+  if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return null;
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const h = m[4] === undefined ? null : Number(m[4]);
+  const mi = m[5] === undefined ? null : Number(m[5]);
+  return {
+    y,
+    mo,
+    d,
+    h: Number.isFinite(h) ? h : null,
+    mi: Number.isFinite(mi) ? mi : null,
+  };
+}
+
+function parseJsonLdEventMeta(html) {
+  const scriptRe = /<script[^>]*type=(["'])application\/ld\+json\1[^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = scriptRe.exec(String(html || ""))) !== null) {
+    const raw = String(m[2] || "").replace(/<!--|-->/g, " ");
+    if (!/"startDate"|"@type"\s*:\s*"Event"/i.test(raw)) continue;
+    const startRaw = (raw.match(/"startDate"\s*:\s*"([^"]+)"/i) || [])[1] || "";
+    const endRaw = (raw.match(/"endDate"\s*:\s*"([^"]+)"/i) || [])[1] || "";
+    let venue_name =
+      normalizeText((raw.match(/"location"\s*:\s*"([^"]{1,180})"/i) || [])[1] || "") ||
+      normalizeText((raw.match(/"location"\s*:\s*\{[\s\S]{0,900}?"name"\s*:\s*"([^"]{1,180})"/i) || [])[1] || "");
+    let address =
+      normalizeText((raw.match(/"streetAddress"\s*:\s*"([^"]{2,220})"/i) || [])[1] || "") ||
+      normalizeText((raw.match(/"address"\s*:\s*"([^"]{4,220})"/i) || [])[1] || "");
+    const start = parseIsoDateTimeParts(startRaw);
+    const end = parseIsoDateTimeParts(endRaw);
+    const date = start ? { y: start.y, mo: start.mo, d: start.d } : null;
+    let timeRange = null;
+    if (start && Number.isFinite(start.h)) {
+      timeRange = {
+        startHour: start.h,
+        startMinute: Number.isFinite(start.mi) ? start.mi : 0,
+        endHour: end && Number.isFinite(end.h) ? end.h : null,
+        endMinute: end && Number.isFinite(end.mi) ? end.mi : null,
+      };
+    }
+    if (venue_name || address || date || timeRange) {
+      return { venue_name, address, date, timeRange };
+    }
+  }
+  return { venue_name: "", address: "", date: null, timeRange: null };
 }
 
 function parseGenericWardDetailMeta(source, html, fallbackDate, fallbackTitle) {
   const title = normalizeText(stripTags((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || "")) || normalizeText(fallbackTitle);
   const allText = normalizeJaDigits(normalizeText(stripTags(html)));
+  const jsonLdMeta = parseJsonLdEventMeta(html);
   const sections = [];
   const pushSection = (heading, value) => {
     const h = normalizeText(stripTags(heading));
@@ -2577,13 +2860,45 @@ function parseGenericWardDetailMeta(source, html, fallbackDate, fallbackTitle) {
   while ((m = thRe.exec(html)) !== null) pushSection(m[1], m[2]);
 
   const basic = parseDetailMeta(html);
-  let venue_name = normalizeText(basic.venue || "");
-  let address = normalizeText(basic.address || "");
+  let venue_name = sanitizeVenueText(basic.venue || "");
+  let address = sanitizeAddressText(basic.address || "");
   for (const sec of sections) {
-    if (!venue_name && /\u4f1a\u5834|\u5834\u6240|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240/i.test(sec.heading)) venue_name = sec.value;
-    if (!address && /\u4f4f\u6240|\u6240\u5728\u5730|\u4f4f\u6240\u5730/i.test(sec.heading)) address = sec.value;
+    if (!venue_name && /\u4f1a\u5834|\u5834\u6240|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240/i.test(sec.heading))
+      venue_name = sanitizeVenueText(sec.value);
+    if (!address && /\u4f4f\u6240|\u6240\u5728\u5730|\u4f4f\u6240\u5730/i.test(sec.heading)) address = sanitizeAddressText(sec.value);
   }
-  if (!venue_name) venue_name = `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`;
+  if (!venue_name && jsonLdMeta.venue_name) venue_name = sanitizeVenueText(jsonLdMeta.venue_name);
+  if (!address && jsonLdMeta.address) address = sanitizeAddressText(jsonLdMeta.address);
+  if (!venue_name) {
+    const vm = allText.match(/(?:\u4f1a\u5834|\u5834\u6240|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240)\s*[:\uff1a]\s*([^\n]{2,120})/);
+    if (vm) venue_name = sanitizeVenueText(vm[1]);
+  }
+  if (!venue_name) {
+    const vb = allText.match(/\u3010(?:\u4f1a\u5834|\u5834\u6240|\u958b\u50ac\u5834\u6240|\u5b9f\u65bd\u5834\u6240)\u3011\s*([^\n\u3010]{2,120})/);
+    if (vb) venue_name = sanitizeVenueText(vb[1]);
+  }
+  if (!address) {
+    const am = allText.match(/(?:\u4f4f\u6240|\u6240\u5728\u5730)\s*[:\uff1a]\s*([^\n]{4,160})/);
+    if (am) address = sanitizeAddressText(am[1]);
+  }
+  if (!address) {
+    const ab = allText.match(/\u3010(?:\u4f4f\u6240|\u6240\u5728\u5730)\u3011\s*([^\n\u3010]{4,160})/);
+    if (ab) address = sanitizeAddressText(ab[1]);
+  }
+  if (!address) address = extractTokyoAddress(allText);
+  const titleForVenue = normalizeText(`${title || ""} ${fallbackTitle || ""}`);
+  if ((!venue_name || venue_name === `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`) && titleForVenue) {
+    const inferredVenue = inferWardVenueFromTitle(titleForVenue, source.label);
+    if (inferredVenue && inferredVenue !== `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`) venue_name = inferredVenue;
+  }
+  if (!venue_name || venue_name === `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`) {
+    const inferredSupplement = inferVenueFromTitleSupplement(`${titleForVenue} ${allText.slice(0, 300)}`, source.label);
+    if (inferredSupplement) venue_name = inferredSupplement;
+  }
+  if (address && source?.label && !address.includes(source.label)) {
+    const wardInAddress = (address.match(/([^\s\u3000]{2,8}\u533a)/u) || [])[1] || "";
+    if (wardInAddress && wardInAddress !== source.label) address = "";
+  }
 
   const dateText = sections
     .filter((x) => /\u65e5\u6642|\u958b\u50ac\u65e5|\u65e5\u7a0b|\u671f\u9593|\u5bfe\u8c61\u65e5/i.test(x.heading))
@@ -2596,21 +2911,37 @@ function parseGenericWardDetailMeta(source, html, fallbackDate, fallbackTitle) {
   }
   const normalizedDatePayload = normalizeJapaneseEraYears(`${datePayload} ${title}`);
   let dates = parseOtaDatesFromText(normalizedDatePayload, fallbackDate.y, fallbackDate.mo);
+  if (jsonLdMeta.date) {
+    const d = jsonLdMeta.date;
+    dates.push({ y: d.y, mo: d.mo, d: d.d });
+  }
+  if (dates.length > 0) {
+    const uniq = new Map();
+    for (const d of dates) {
+      const key = `${d.y}-${d.mo}-${d.d}`;
+      if (!uniq.has(key)) uniq.set(key, d);
+    }
+    dates = Array.from(uniq.values());
+  }
   if (dates.length === 0 && fallbackDate) dates = [fallbackDate];
 
-  const timeRange = parseTimeRangeFromText(`${dateText} ${allText}`);
-  return { title, dates, timeRange, venue_name, address, bodyText: allText };
+  let timeRange = parseTimeRangeFromText(`${dateText} ${allText}`);
+  if (!timeRange && jsonLdMeta.timeRange) timeRange = jsonLdMeta.timeRange;
+  const timeRangeByDate = parseDateSpecificTimeRanges(`${dateText}\n${allText}`, dates, fallbackDate.y, fallbackDate.mo);
+  if (!venue_name) venue_name = `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`;
+  return { title, dates, timeRange, timeRangeByDate, venue_name, address, bodyText: allText };
 }
 
 async function parseGenericWardPdfMeta(source, pdfUrl, fallbackDate, fallbackTitle) {
   const markdown = await fetchChiyodaPdfMarkdown(pdfUrl);
+  const normalizedRaw = normalizeJapaneseEraYears(normalizeJaDigits(String(markdown || "")));
   const normalized = normalizeJapaneseEraYears(normalizeJaDigits(normalizeText(markdown)));
   const title = normalizeText(fallbackTitle) || normalizeText((markdown.match(/Title:\s*(.+)/i) || [])[1] || "");
   const venueMatch =
-    normalized.match(/譚ｿ讖句玄遶欺s*([^\s]{1,30}蜈千ｫ･鬢ｨ)/) ||
-    normalized.match(/(CAP['窶兢S[^\s]{0,20}蜈千ｫ･鬢ｨ)/i) ||
-    title.match(/(CAP['窶兢S[^\s]{0,20}蜈千ｫ･鬢ｨ)/i);
-  const venue_name = normalizeText((venueMatch && venueMatch[1]) || "");
+    normalized.match(/(?:\u4f1a\u5834|\u5834\u6240|\u958b\u50ac\u5834\u6240)\s*[:\uff1a]\s*([^\n]{2,120})/) ||
+    normalized.match(/([^\s]{1,50}(?:\u5150\u7ae5\u9928|\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc|\u3072\u308d\u3070|\u30d7\u30e9\u30b6))/u) ||
+    title.match(/([^\s]{1,50}(?:\u5150\u7ae5\u9928|\u5150\u7ae5\u30bb\u30f3\u30bf\u30fc|\u3072\u308d\u3070|\u30d7\u30e9\u30b6))/u);
+  const venue_name = sanitizeVenueText((venueMatch && venueMatch[1]) || "");
   const dateCandidates = [
     ...parseOtaDatesFromText(`${normalized} ${title}`, fallbackDate.y, fallbackDate.mo),
     ...parseChiyodaSlashDates(normalized, fallbackDate.y, fallbackDate.mo),
@@ -2618,18 +2949,20 @@ async function parseGenericWardPdfMeta(source, pdfUrl, fallbackDate, fallbackTit
   const uniqDates = [];
   const seenDate = new Set();
   for (const d of dateCandidates) {
-    const k = `${d.y}-${d.mo}-${d.d}`;
+    const k = buildDateKey(d.y, d.mo, d.d);
     if (seenDate.has(k)) continue;
     seenDate.add(k);
     uniqDates.push(d);
   }
   const dates = uniqDates.length ? uniqDates.slice(0, 180) : fallbackDate ? [fallbackDate] : [];
-  const timeRange = parseTimeRangeFromText(normalized);
+  const timeRange = parseTimeRangeFromText(normalizedRaw) || parseTimeRangeFromText(normalized);
+  const timeRangeByDate = parseDateSpecificTimeRanges(normalizedRaw, dates, fallbackDate.y, fallbackDate.mo);
   return {
     title,
     dates,
     timeRange,
-    venue_name: venue_name || `${source.label}蟄舌←繧る未騾｣譁ｽ險ｭ`,
+    timeRangeByDate,
+    venue_name: venue_name || `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`,
     address: "",
     bodyText: normalized,
   };
@@ -2709,827 +3042,113 @@ function buildListCalendarUrl(baseDir, m, now) {
   return `${baseDir}/list_calendar${suffix}.html`;
 }
 
-function parseChuoAkachanTengokuRows(html, pageUrl) {
-  const monthHint = parseJpYearMonth(html);
-  const out = [];
-  const sectionRe =
-    /<h4[^>]*>\s*(?:<a[^>]*>\s*&nbsp;\s*<\/a>\s*)?([\s\S]*?)<\/h4>\s*([\s\S]*?)(?=<h4[^>]*>|<p><strong>|<h2>|<div id="cms_hidden_page_event_group"|$)/gi;
-  let s;
-  while ((s = sectionRe.exec(html)) !== null) {
-    const facility = normalizeText(stripTags(s[1]));
-    const block = s[2] || "";
-    if (!facility) continue;
-    const pdfLink = parseAnchors(block, pageUrl).find((a) => /\.pdf(?:\?|$)/i.test(a.url));
-    const defaultUrl = (pdfLink && pdfLink.url) || pageUrl;
-
-    const eventRe = /<h5[^>]*>([\s\S]*?)<\/h5>\s*<ul[^>]*>([\s\S]*?)<\/ul>/gi;
-    let e;
-    while ((e = eventRe.exec(block)) !== null) {
-      const title = normalizeText(stripTags(e[1]));
-      const ul = e[2] || "";
-      if (!title) continue;
-      const liTexts = [];
-      const liRe = /<li[^>]*>([\s\S]*?)<\/li>/gi;
-      let li;
-      while ((li = liRe.exec(ul)) !== null) {
-        const t = normalizeText(stripTags(li[1]));
-        if (t) liTexts.push(t);
-      }
-      if (liTexts.length === 0) continue;
-      const dateLine = liTexts.find((t) => /(\u958b\u50ac\u65e5\u6642|\u65e5\u6642|\u958b\u50ac\u65e5|\u65e5\u7a0b)/.test(t)) || liTexts[0];
-      const normalized = normalizeJapaneseEraYears(normalizeJaDigits(`${title} ${dateLine} ${liTexts.join(" ")}`));
-      let dates = parseOtaDatesFromText(normalized, monthHint.y, monthHint.mo);
-      if (dates.length === 0) {
-        const fallback = inferChiyodaMonthlyFallbackDate(dateLine, monthHint.y, monthHint.mo);
-        if (fallback) dates = [fallback];
-      }
-      if (dates.length === 0) continue;
-
-      const linkInEvent = parseAnchors(ul, pageUrl).find((a) => /\.pdf(?:\?|$)|city\.chuo\.lg\.jp\/.+\.html/i.test(a.url));
-      out.push({
-        facility,
-        title,
-        dates,
-        timeRange: parseTimeRangeFromText(normalized),
-        bodyText: liTexts.join(" "),
-        url: (linkInEvent && linkInEvent.url) || defaultUrl,
-      });
-    }
-  }
-  return out;
-}
-
-async function collectChuoAkachanTengokuEvents(maxDays) {
-  const pageUrl = `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/akachantengoku/akachantengokuevent.html`;
-  let html = "";
-  try {
-    html = await fetchText(pageUrl);
-  } catch {
-    return [];
-  }
-  const rows = parseChuoAkachanTengokuRows(html, pageUrl);
-  const byId = new Map();
-  for (const row of rows) {
-    let point = await geocodeForWard(buildWardGeoCandidates(CHUO_SOURCE.label, row.title, row.facility, "").slice(0, 3), CHUO_SOURCE);
-    if (!point) point = { ...CHUO_SOURCE.center };
-
-    for (const d of row.dates) {
-      if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
-      const { startsAt, endsAt } = buildStartsEndsForDate(d, row.timeRange, 10);
-      const dateKey = `${d.y}${String(d.mo).padStart(2, "0")}${String(d.d).padStart(2, "0")}`;
-      const id = `ward:chuo:akachan:${row.url}:${row.facility}:${row.title}:${dateKey}`;
-      if (byId.has(id)) continue;
-      byId.set(id, {
-        id,
-        source: "ward_chuo",
-        source_label: CHUO_SOURCE.label,
-        title: row.title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        updated_at: startsAt,
-        venue_name: row.facility || `${CHUO_SOURCE.label}\u5150\u7ae5\u9928`,
-        address: "",
-        url: row.url,
-        lat: point.lat,
-        lng: point.lng,
-        participants: null,
-        waitlisted: null,
-        recently_updated: true,
-        query_hit: `${CHUO_SOURCE.label} \u3042\u304b\u3061\u3083\u3093\u5929\u56fd`,
-        tags: ["chuo_jidokan_event", "chuo_akachan_tengoku"],
-      });
-    }
-  }
-  return Array.from(byId.values()).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-}
-
-async function collectWardGenericEvents(source, maxDays, cfg) {
-  const months = getMonthsForRange(maxDays);
-  const now = parseYmdFromJst(new Date());
-  const rows = [];
-  for (const m of months) {
-    const listUrls = (cfg.listUrls ? cfg.listUrls(m, now, maxDays) : []) || [];
-    for (const listUrl of listUrls) {
-      let html = "";
-      try {
-        html = await fetchText(listUrl);
-      } catch {
-        continue;
-      }
-      rows.push(...parseWardListRows(html, listUrl, m.year, m.month, cfg.parseOpts || {}));
-    }
-  }
-
-  const uniqRows = [];
-  const seenRows = new Set();
-  for (const row of rows) {
-    const d = row.date ? `${row.date.y}-${row.date.mo}-${row.date.d}` : "";
-    const k = `${row.url}|${d}`;
-    if (seenRows.has(k)) continue;
-    seenRows.add(k);
-    uniqRows.push(row);
-  }
-
-  const byId = new Map();
-  const preHintRe = cfg.preHintRe || WARD_CHILD_HINT_RE;
-  const childHintRe = cfg.childHintRe || WARD_CHILD_HINT_RE;
-  const relaxChildFilter = cfg.relaxChildFilter === true;
-  for (const row of uniqRows.slice(0, cfg.maxRows || 260)) {
-    const preHay = `${row.title || ""} ${row.url || ""}`;
-    const urlHintMatched = WARD_CHILD_URL_HINT_RE.test(row.url || "");
-    if (cfg.requirePreHint === true && !preHintRe.test(preHay) && !urlHintMatched) continue;
-
-    const fallbackDate = row.date || extractDateFromUrl(row.url, now.y, now.m) || { y: now.y, mo: now.m, d: now.d };
-    const isPdfRow = /\.pdf(?:\?|$)/i.test(row.url || "");
-    let meta = null;
-    if (isPdfRow && cfg.allowPdfDetail === true) {
-      try {
-        meta = await parseGenericWardPdfMeta(source, row.url, fallbackDate, row.title);
-      } catch {
-        if (cfg.allowRowFallbackOnDetailError === true) {
-          meta = {
-            title: row.title || "",
-            dates: [fallbackDate],
-            timeRange: null,
-            venue_name: "",
-            address: "",
-            bodyText: row.title || "",
-          };
-        } else {
-          continue;
-        }
-      }
-    } else {
-      let detailHtml = "";
-      let useRowFallback = false;
-      try {
-        detailHtml = await fetchText(row.url);
-      } catch {
-        if (cfg.allowRowFallbackOnDetailError === true) {
-          useRowFallback = true;
-        } else {
-          continue;
-        }
-      }
-      meta = useRowFallback
-        ? {
-            title: row.title || "",
-            dates: [fallbackDate],
-            timeRange: null,
-            venue_name: "",
-            address: "",
-            bodyText: row.title || "",
-          }
-        : parseGenericWardDetailMeta(source, detailHtml, fallbackDate, row.title);
-    }
-    const title = meta.title || row.title;
-    if (!title) continue;
-
-    const hay = `${title} ${meta.venue_name || ""} ${meta.address || ""} ${meta.bodyText || ""} ${row.title || ""}`;
-    if (!relaxChildFilter && !childHintRe.test(hay) && !urlHintMatched) continue;
-
-    const dates = Array.isArray(meta.dates) && meta.dates.length ? meta.dates.slice() : [fallbackDate];
-    if (cfg.appendFallbackDate === true && fallbackDate) {
-      const fk = `${fallbackDate.y}-${fallbackDate.mo}-${fallbackDate.d}`;
-      if (!dates.some((d) => `${d.y}-${d.mo}-${d.d}` === fk)) dates.push(fallbackDate);
-    }
-    let point = await geocodeForWard(buildWardGeoCandidates(source.label, title, meta.venue_name, meta.address).slice(0, 3), source);
-    if (!point) point = { ...source.center };
-
-    for (const d of dates) {
-      if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
-      const { startsAt, endsAt } = buildStartsEndsForDate(d, meta.timeRange, 10);
-      const dateKey = `${d.y}${String(d.mo).padStart(2, "0")}${String(d.d).padStart(2, "0")}`;
-      const id = `ward:${source.key}:${row.url}:${title}:${dateKey}`;
-      if (byId.has(id)) continue;
-      byId.set(id, {
-        id,
-        source: `ward_${source.key}`,
-        source_label: source.label,
-        title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        updated_at: startsAt,
-        venue_name: meta.venue_name || `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`,
-        address: meta.address || "",
-        url: row.url,
-        lat: point.lat,
-        lng: point.lng,
-        participants: null,
-        waitlisted: null,
-        recently_updated: true,
-        query_hit: `${source.label} \u5150\u7ae5\u9928`,
-        tags: [`${source.key}_jidokan_event`, `${source.key}_kids`],
-      });
-    }
-  }
-  return Array.from(byId.values()).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-}
-
-async function collectKitaJidokanEvents(maxDays) {
-  let js = "";
-  try {
-    js = await fetchText(`${KITA_SOURCE.baseUrl}/education/event_edu.js`);
-  } catch {
-    return [];
-  }
-  const raw = (js.match(/events:\s*(\[[\s\S]*?\])\s*,\s*categories:/i) || [])[1] || "";
-  if (!raw) return [];
-
-  let events = [];
-  try {
-    events = JSON.parse(raw);
-  } catch {
-    try {
-      events = new Function(`return (${raw});`)();
-    } catch {
-      events = [];
-    }
-  }
-  if (!Array.isArray(events)) return [];
-
-  const byId = new Map();
-  for (const ev of events.slice(0, 1200)) {
-    const title = normalizeText(ev?.eventtitle || "");
-    if (!title) continue;
-    const bodyText = normalizeText(ev?.description || "");
-    const venue_name = normalizeText(ev?.place2 || "\u5317\u533a\u5150\u7ae5\u9928");
-    const hay = `${title} ${venue_name} ${bodyText}`;
-    if (!WARD_CHILD_HINT_RE.test(hay)) continue;
-
-    let url = "";
-    try {
-      url = ev?.url ? new URL(String(ev.url), `${KITA_SOURCE.baseUrl}/`).toString() : "";
-    } catch {
-      url = "";
-    }
-    if (!url) continue;
-
-    const opendays = Array.isArray(ev?.opendays) ? ev.opendays : [];
-    if (opendays.length === 0) continue;
-    const timeRange = parseTimeRangeFromText(`${(Array.isArray(ev?.times) ? ev.times.join(" ") : "")} ${ev?.time_texts || ""}`);
-
-    let point = await geocodeForWard(buildWardGeoCandidates(KITA_SOURCE.label, title, venue_name, "").slice(0, 2), KITA_SOURCE);
-    if (!point) point = { ...KITA_SOURCE.center };
-
-    for (const dayText of opendays) {
-      const m = String(dayText || "").match(/(20\d{2})[./-](\d{1,2})[./-](\d{1,2})/);
-      if (!m) continue;
-      const d = { y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) };
-      if (!inRangeJst(d.y, d.mo, d.d, maxDays)) continue;
-      const { startsAt, endsAt } = buildStartsEndsForDate(d, timeRange, 10);
-      const dateKey = `${d.y}${String(d.mo).padStart(2, "0")}${String(d.d).padStart(2, "0")}`;
-      const id = `ward:kita:${url}:${title}:${dateKey}`;
-      if (byId.has(id)) continue;
-      byId.set(id, {
-        id,
-        source: "ward_kita",
-        source_label: KITA_SOURCE.label,
-        title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        updated_at: startsAt,
-        venue_name,
-        address: "",
-        url,
-        lat: point.lat,
-        lng: point.lng,
-        participants: null,
-        waitlisted: null,
-        recently_updated: true,
-        query_hit: `${KITA_SOURCE.label} \u5150\u7ae5\u9928`,
-        tags: ["kita_jidokan_event", "kita_kids_js"],
-      });
-    }
-  }
-  return Array.from(byId.values()).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-}
-
-async function collectAdditionalWardsEvents(maxDays) {
-  const configs = {
-    chuo: {
-      source: CHUO_SOURCE,
-      listUrls: (m) => [`${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`],
-      parseOpts: {
-        blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
-        urlAllow: /city\.chuo\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-    bunkyo: {
-      source: BUNKYO_SOURCE,
-      listUrls: (m) => [
-        `${BUNKYO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
-        `${BUNKYO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=2`,
-        `${BUNKYO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
-      ],
-      parseOpts: {
-        blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
-        urlAllow: /city\.bunkyo\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      maxRows: 420,
-    },
-    taito: {
-      source: TAITO_SOURCE,
-      listUrls: (m, now) => [
-        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event`, m, now),
-        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event/kosodate/calendar`, m, now),
-        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/library/news/event_news/calendar`, m, now),
-        `${TAITO_SOURCE.baseUrl}/library/news/event_news/calendar/list_calendar.html`,
-        `${TAITO_SOURCE.baseUrl}/event/kosodate/index.html`,
-        `${TAITO_SOURCE.baseUrl}/library/kodomo/index.html`,
-        `${TAITO_SOURCE.baseUrl}/library/kodomo/allNewsList.html`,
-        `${TAITO_SOURCE.baseUrl}/library/kodomo/kodomo_news/chuojidoshinchaku.html`,
-      ],
-      parseOpts: {
-        blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow:
-          /city\.taito\.lg\.jp\/(?:event\/(?:kosodate|kosodatekyouiku)|library\/kodomo|library\/news\/event_news|kosodate|kodomo|jidokan|jido)\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/index\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      maxRows: 420,
-    },
-    sumida: {
-      source: SUMIDA_SOURCE,
-      listUrls: (m, now) => [
-        buildListCalendarUrl(`${SUMIDA_SOURCE.baseUrl}/eventcalendar/kodomo_kosodate/calendar`, m, now),
-        buildListCalendarUrl(`${SUMIDA_SOURCE.baseUrl}/eventcalendar/calendar`, m, now),
-      ],
-      parseOpts: {
-        blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.sumida\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      maxRows: 520,
-    },
-    koto: {
-      source: KOTO_SOURCE,
-      listUrls: (m, now) => [
-        `${KOTO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_category=2`,
-        `${KOTO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
-        `${KOTO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
-        buildListCalendarUrl(`${KOTO_SOURCE.baseUrl}/event/kosodate/calendar`, m, now),
-        `${KOTO_SOURCE.baseUrl}/kodomo/index.html`,
-      ],
-      parseOpts: {
-        blockRe: /<table[^>]*class="event_cal_list"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.koto\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      maxRows: 420,
-    },
-    nakano: {
-      source: NAKANO_SOURCE,
-      listUrls: (m, now) => [
-        buildListCalendarUrl(`${NAKANO_SOURCE.baseUrl}/event/kosodate/calendar`, m, now),
-        buildListCalendarUrl(`${NAKANO_SOURCE.baseUrl}/event/calendar`, m, now),
-      ],
-      parseOpts: {
-        blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.tokyo-nakano\.lg\.jp\/(?:event|kosodate|kurashi\/bunka\/bunka\/kodomowakamono_bunka)\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/index\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-    suginami: {
-      source: SUGINAMI_SOURCE,
-      listUrls: (m) => [
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u80b2\u3066")}`,
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
-        `${SUGINAMI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
-      ],
-      parseOpts: {
-        blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
-        urlAllow: /city\.suginami\.tokyo\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      maxRows: 520,
-    },
-    toshima: {
-      source: TOSHIMA_SOURCE,
-      listUrls: (m) => {
-        const base = [
-          `${TOSHIMA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${m.year}&month=${m.month}&page_target=1`,
-          `${TOSHIMA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${m.year}&month=${m.month}&page_target=0`,
-          `${TOSHIMA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
-          `${TOSHIMA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
-        ];
-        const dayUrls = [];
-        const days = getDaysInMonth(m.year, m.month);
-        for (let d = 1; d <= days; d += 1) {
-          dayUrls.push(`${TOSHIMA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=3&year=${m.year}&month=${m.month}&day=${d}`);
-        }
-        return [...base, ...dayUrls];
-      },
-      parseOpts: {
-        blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
-        urlAllow: /city\.toshima\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$|\/(?:search_result|privacy|link|idkensaku)\.html$|\/012\/kuse\/koho\/|\/chosha\//i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-    },
-    arakawa: {
-      source: ARAKAWA_SOURCE,
-      listUrls: (m) => [
-        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_category=2&event_target=1`,
-        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
-      ],
-      parseOpts: {
-        blockRe: /<ul class="event_item_list">([\s\S]*?)<\/ul>/i,
-        urlAllow: /city\.arakawa\.tokyo\.jp\/.+\.html/i,
-        urlDeny: /\/(?:index|sitemap)\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      childHintRe: WARD_CHILD_HINT_RE,
-    },
-    itabashi: {
-      source: ITABASHI_SOURCE,
-      listUrls: (m) => [
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/1000930/index.html`,
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/1000930/etc/`,
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/1000930/etc/index.html`,
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/asobiba/jidoukan/index.html`,
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/asobiba/jidoukan/1047271.html`,
-        `${ITABASHI_SOURCE.baseUrl}/kosodate/asobiba/jidoukan/1053207.html`,
-        `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?year=${m.year}&month=${m.month}&day=1&mode_link=1&prev=1&c50=50`,
-        `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?year=${m.year}&month=${m.month}&day=1&mode_link=2&prev=1&c50=50`,
-        `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?year=${m.year}&month=${m.month}&day=1&mode_link=2&prev=2&c50=50`,
-        `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?&prev=2&c50=50`,
-      ],
-      parseOpts: {
-        urlAllow:
-          /city\.itabashi\.tokyo\.jp\/(?:kosodate\/(?:1000930|asobiba\/jidoukan)|_res\/projects\/default_project\/_page_)\/.+\.(?:html?|pdf)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$|\/cgi-crm\//i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      relaxChildFilter: true,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      allowPdfDetail: true,
-      maxRows: 900,
-    },
-    nerima: {
-      source: NERIMA_SOURCE,
-      listUrls: (m, now) => [
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/index.html`,
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/nerima.html`,
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/shakuiji.html`,
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/oizumi.html`,
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/hikarigaoka.html`,
-        `${NERIMA_SOURCE.baseUrl}/shisetsu/hokenfuku/fukushi/koseibunka/jido/club_gyouji.html`,
-        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/index.html`,
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/kodomo/calendar`, m, now),
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/calendar`, m, now),
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/bunka/calendar`, m, now),
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/chiiki/calendar`, m, now),
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/sports/calendar`, m, now),
-        buildListCalendarUrl(`${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/sonota/calendar`, m, now),
-        `${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/kodomo/index.html`,
-        `${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/index.html`,
-      ],
-      parseOpts: {
-        urlAllow: /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido|kankomoyoshi\/event|event)\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$|\/aboutweb\/|\/photo\.html$|\/riyou-annai\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-      childHintRe: WARD_CHILD_HINT_RE,
-      appendFallbackDate: true,
-      allowRowFallbackOnDetailError: true,
-      maxRows: 420,
-    },
-    adachi: {
-      source: ADACHI_SOURCE,
-      listUrls: (m) => [`${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`],
-      parseOpts: {
-        blockRe: /<table[^>]*class="event_cal_7w"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.adachi\.tokyo\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap|search_index)\.html/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-    katsushika: {
-      source: KATSUSHIKA_SOURCE,
-      listUrls: (m) => [`${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=21`],
-      parseOpts: {
-        blockRe: /<ul class="listlink">([\s\S]*?)<\/ul>/i,
-        urlAllow: /city\.katsushika\.lg\.jp\/(?:event|kosodate)\/.+\.html/i,
-        urlDeny: /\/event\/index\.html$/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-    edogawa: {
-      source: EDOGAWA_SOURCE,
-      listUrls: (m) => [
-        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&siteid=6&event_target=1`,
-      ],
-      parseOpts: {
-        urlAllow: /city\.edogawa\.tokyo\.jp\/(?:event|kosodate|shisetsu)\/.+\.html/i,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-    shinjuku: {
-      source: SHINJUKU_SOURCE,
-      listUrls: (m) => [`${SHINJUKU_SOURCE.baseUrl}/event/calendar/calendar.php?Y=${m.year}&M=${m.month}`],
-      parseOpts: {
-        dayBlockRe: /<div[^>]*class="eventSelectDay[^"]*"[^>]*>[\s\S]*?<p>\s*(\d{1,2})\u65e5[\s\S]*?<ul>([\s\S]*?)<\/ul>[\s\S]*?<\/div>/gi,
-        urlAllow: /city\.shinjuku\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
-        skipTr: true,
-        useAnchorFallback: true,
-        fallbackWhenRowsExist: true,
-      },
-      requirePreHint: false,
-    },
-  };
-
-  const [
-    chuoBase,
-    chuoAkachan,
-    bunkyo,
-    taito,
-    sumida,
-    koto,
-    nakano,
-    suginami,
-    toshima,
-    kita,
-    arakawa,
-    itabashi,
-    nerima,
-    adachi,
-    katsushika,
-    edogawa,
-    shinjuku,
-  ] = await Promise.all([
-    collectWardGenericEvents(configs.chuo.source, maxDays, configs.chuo),
-    collectChuoAkachanTengokuEvents(maxDays),
-    collectWardGenericEvents(configs.bunkyo.source, maxDays, configs.bunkyo),
-    collectWardGenericEvents(configs.taito.source, maxDays, configs.taito),
-    collectWardGenericEvents(configs.sumida.source, maxDays, configs.sumida),
-    collectWardGenericEvents(configs.koto.source, maxDays, configs.koto),
-    collectWardGenericEvents(configs.nakano.source, maxDays, configs.nakano),
-    collectWardGenericEvents(configs.suginami.source, maxDays, configs.suginami),
-    collectWardGenericEvents(configs.toshima.source, maxDays, configs.toshima),
-    collectKitaJidokanEvents(maxDays),
-    collectWardGenericEvents(configs.arakawa.source, maxDays, configs.arakawa),
-    collectWardGenericEvents(configs.itabashi.source, maxDays, configs.itabashi),
-    collectWardGenericEvents(configs.nerima.source, maxDays, configs.nerima),
-    collectWardGenericEvents(configs.adachi.source, maxDays, configs.adachi),
-    collectWardGenericEvents(configs.katsushika.source, maxDays, configs.katsushika),
-    collectWardGenericEvents(configs.edogawa.source, maxDays, configs.edogawa),
-    collectWardGenericEvents(configs.shinjuku.source, maxDays, configs.shinjuku),
-  ]);
-
-  const chuo = [];
-  const seenChuo = new Set();
-  for (const ev of [...chuoBase, ...chuoAkachan]) {
-    const k = `${ev.url}|${ev.title}|${ev.starts_at}`;
-    if (seenChuo.has(k)) continue;
-    seenChuo.add(k);
-    chuo.push(ev);
-  }
-  chuo.sort((a, b) => a.starts_at.localeCompare(b.starts_at));
-
-  return {
-    chuo,
-    bunkyo,
-    taito,
-    sumida,
-    koto,
-    nakano,
-    suginami,
-    toshima,
-    kita,
-    arakawa,
-    itabashi,
-    nerima,
-    adachi,
-    katsushika,
-    edogawa,
-    shinjuku,
-  };
-}
-
-async function getEvents(maxDays, refresh) {
-  const days = Math.min(Math.max(Number(maxDays) || 30, 1), 90);
-  const cacheKey = `jidokan:${days}`;
-  const isFresh = cache.data && cache.key === cacheKey && Date.now() - cache.savedAt < CACHE_TTL_MS;
-  if (!refresh && isFresh) {
-    return {
-      ...cache.data,
-      from_cache: true,
-      snapshot_saved_at: new Date(cache.savedAt).toISOString(),
-    };
-  }
-
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional] = await Promise.all([
-    collectSetagayaJidokanEvents(days),
-    collectOtaJidokanEvents(days),
-    collectShinagawaJidokanEvents(days),
-    collectMeguroJidokanEvents(days),
-    collectShibuyaJidokanEvents(days),
-    collectMinatoJidokanEvents(days),
-    collectChiyodaJidokanEvents(days),
-    collectAdditionalWardsEvents(days),
-  ]);
-  const {
-    chuo,
-    bunkyo,
-    taito,
-    sumida,
-    koto,
-    nakano,
-    suginami,
-    toshima,
-    kita,
-    arakawa,
-    itabashi,
-    nerima,
-    adachi,
-    katsushika,
-    edogawa,
-    shinjuku,
-  } = additional;
-  const items = [
-    ...setagaya,
-    ...ota,
-    ...shinagawa,
-    ...meguro,
-    ...shibuya,
-    ...minato,
-    ...chiyoda,
-    ...chuo,
-    ...bunkyo,
-    ...taito,
-    ...sumida,
-    ...koto,
-    ...nakano,
-    ...suginami,
-    ...toshima,
-    ...kita,
-    ...arakawa,
-    ...itabashi,
-    ...nerima,
-    ...adachi,
-    ...katsushika,
-    ...edogawa,
-    ...shinjuku,
-  ].sort((a, b) =>
-    a.starts_at.localeCompare(b.starts_at)
-  );
-  const now = parseYmdFromJst(new Date());
-  const end = new Date();
-  end.setUTCDate(end.getUTCDate() + days);
-  const endJst = parseYmdFromJst(end);
-
-  const payload = {
-    date_jst: `${now.key}..${endJst.key}`,
-    count: items.length,
-    source: "tokyo_jidokan",
-    debug_counts: {
-      raw: {
-        ward_setagaya: setagaya.length,
-        ward_ota: ota.length,
-        ward_shinagawa: shinagawa.length,
-        ward_meguro: meguro.length,
-        ward_shibuya: shibuya.length,
-        ward_minato: minato.length,
-        ward_chiyoda: chiyoda.length,
-        ward_chuo: chuo.length,
-        ward_bunkyo: bunkyo.length,
-        ward_taito: taito.length,
-        ward_sumida: sumida.length,
-        ward_koto: koto.length,
-        ward_nakano: nakano.length,
-        ward_suginami: suginami.length,
-        ward_toshima: toshima.length,
-        ward_kita: kita.length,
-        ward_arakawa: arakawa.length,
-        ward_itabashi: itabashi.length,
-        ward_nerima: nerima.length,
-        ward_adachi: adachi.length,
-        ward_katsushika: katsushika.length,
-        ward_edogawa: edogawa.length,
-        ward_shinjuku: shinjuku.length,
-      },
-      filtered: {
-        ward_setagaya: setagaya.length,
-        ward_ota: ota.length,
-        ward_shinagawa: shinagawa.length,
-        ward_meguro: meguro.length,
-        ward_shibuya: shibuya.length,
-        ward_minato: minato.length,
-        ward_chiyoda: chiyoda.length,
-        ward_chuo: chuo.length,
-        ward_bunkyo: bunkyo.length,
-        ward_taito: taito.length,
-        ward_sumida: sumida.length,
-        ward_koto: koto.length,
-        ward_nakano: nakano.length,
-        ward_suginami: suginami.length,
-        ward_toshima: toshima.length,
-        ward_kita: kita.length,
-        ward_arakawa: arakawa.length,
-        ward_itabashi: itabashi.length,
-        ward_nerima: nerima.length,
-        ward_adachi: adachi.length,
-        ward_katsushika: katsushika.length,
-        ward_edogawa: edogawa.length,
-        ward_shinjuku: shinjuku.length,
-      },
-      implemented_wards: [
-        SETAGAYA_SOURCE.label,
-        OTA_SOURCE.label,
-        SHINAGAWA_SOURCE.label,
-        MEGURO_SOURCE.label,
-        SHIBUYA_SOURCE.label,
-        MINATO_SOURCE.label,
-        CHIYODA_SOURCE.label,
-        CHUO_SOURCE.label,
-        BUNKYO_SOURCE.label,
-        TAITO_SOURCE.label,
-        SUMIDA_SOURCE.label,
-        KOTO_SOURCE.label,
-        NAKANO_SOURCE.label,
-        SUGINAMI_SOURCE.label,
-        TOSHIMA_SOURCE.label,
-        KITA_SOURCE.label,
-        ARAKAWA_SOURCE.label,
-        ITABASHI_SOURCE.label,
-        NERIMA_SOURCE.label,
-        ADACHI_SOURCE.label,
-        KATSUSHIKA_SOURCE.label,
-        EDOGAWA_SOURCE.label,
-        SHINJUKU_SOURCE.label,
-      ],
-    },
-    items,
-    refresh_in_progress: false,
-  };
-
-  cache = {
-    key: cacheKey,
-    data: payload,
-    savedAt: Date.now(),
-  };
-
-  return {
-    ...payload,
-    from_cache: false,
-    snapshot_saved_at: new Date(cache.savedAt).toISOString(),
-  };
-}
-
+const collectChuoAkachanTengokuEvents = createCollectChuoAkachanTengokuEvents({
+  CHUO_SOURCE,
+  buildStartsEndsForDate,
+  buildWardGeoCandidates,
+  extractTokyoAddress,
+  fetchText,
+  geocodeForWard,
+  inRangeJst,
+  inferChiyodaMonthlyFallbackDate,
+  normalizeJaDigits,
+  normalizeJapaneseEraYears,
+  normalizeText,
+  parseAnchors,
+  parseJpYearMonth,
+  parseOtaDatesFromText,
+  parseTimeRangeFromText,
+  resolveEventAddress,
+  resolveEventPoint,
+  stripTags,
+});
+const collectWardGenericEvents = createCollectWardGenericEvents({
+  WARD_CHILD_HINT_RE,
+  WARD_CHILD_URL_HINT_RE,
+  buildDateKey,
+  buildStartsEndsForDate,
+  buildWardGeoCandidates,
+  extractDateFromUrl,
+  extractWardAddressFromText,
+  fetchText,
+  geocodeForWard,
+  getFacilityAddressFromMaster,
+  getMonthsForRange,
+  hasConcreteAddressToken,
+  haversineKm,
+  inferRegionalVenueFromTitle,
+  inferVenueFromTitleSupplement,
+  inferWardVenueFromTitle,
+  inferWardVenueFromUrl,
+  inRangeJst,
+  isLikelyAudienceText,
+  isLikelyDepartmentVenue,
+  isLikelyWardOfficeAddress,
+  isOnlineOnlyWithoutPlace,
+  normalizeText,
+  parseGenericWardDetailMeta,
+  parseGenericWardPdfMeta,
+  parseTimeRangeFromText,
+  parseWardListRows,
+  parseYmdFromJst,
+  resolveEventAddress,
+  resolveEventPoint,
+  sanitizeAddressText,
+  sanitizeVenueText,
+});
+const collectKitaJidokanEvents = createCollectKitaJidokanEvents({
+  KITA_SOURCE,
+  WARD_CHILD_HINT_RE,
+  buildStartsEndsForDate,
+  buildWardGeoCandidates,
+  extractTokyoAddress,
+  fetchText,
+  geocodeForWard,
+  inRangeJst,
+  normalizeText,
+  parseTimeRangeFromText,
+  resolveEventAddress,
+  resolveEventPoint,
+});
+const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
+  ADACHI_SOURCE,
+  ARAKAWA_SOURCE,
+  BUNKYO_SOURCE,
+  CHUO_SOURCE,
+  EDOGAWA_SOURCE,
+  ITABASHI_SOURCE,
+  KATSUSHIKA_SOURCE,
+  KOTO_SOURCE,
+  NAKANO_SOURCE,
+  NERIMA_SOURCE,
+  SHINJUKU_SOURCE,
+  SUGINAMI_SOURCE,
+  SUMIDA_SOURCE,
+  TAITO_SOURCE,
+  TOSHIMA_SOURCE,
+  WARD_CHILD_HINT_RE,
+  WARD_EVENT_WORD_RE,
+  buildAdditionalWardConfigs,
+  buildListCalendarUrl,
+  collectChuoAkachanTengokuEvents,
+  collectKitaJidokanEvents,
+  collectWardGenericEvents,
+  fetchText,
+  getDaysInMonth,
+  normalizeText,
+});
+const getEvents = createGetEvents({
+  CACHE_TTL_MS,
+  cache,
+  collectAdditionalWardsEvents,
+  collectChiyodaJidokanEvents,
+  collectMeguroJidokanEvents,
+  collectMinatoJidokanEvents,
+  collectOtaJidokanEvents,
+  collectSetagayaJidokanEvents,
+  collectShibuyaJidokanEvents,
+  collectShinagawaJidokanEvents,
+});
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
@@ -3565,4 +3184,9 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`kids-play-map running on http://localhost:${PORT}`);
 });
+
+
+
+
+
 

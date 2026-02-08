@@ -1,0 +1,133 @@
+function createGeoHelpers(deps) {
+  const normalizeText = deps?.normalizeText;
+  const sanitizeAddressText = deps?.sanitizeAddressText;
+  const geoCache = deps?.geoCache instanceof Map ? deps.geoCache : new Map();
+
+  async function geocodeQuery(query) {
+    const q = normalizeText(query);
+    if (!q) return null;
+    if (geoCache.has(q)) return geoCache.get(q);
+    try {
+      const url = `https://msearch.gsi.go.jp/address-search/AddressSearch?q=${encodeURIComponent(q)}`;
+      const res = await fetch(url, {
+        headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+        signal: AbortSignal.timeout(12000),
+      });
+      if (!res.ok) {
+        geoCache.set(q, null);
+        return null;
+      }
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        geoCache.set(q, null);
+        return null;
+      }
+      const top = data[0] || {};
+      const c = top?.geometry?.coordinates;
+      if (!Array.isArray(c) || c.length < 2) {
+        geoCache.set(q, null);
+        return null;
+      }
+      const point = {
+        lat: Number(c[1]),
+        lng: Number(c[0]),
+        address: sanitizeAddressText(top?.properties?.title || top?.properties?.address || ""),
+      };
+      if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) {
+        geoCache.set(q, null);
+        return null;
+      }
+      geoCache.set(q, point);
+      return point;
+    } catch {
+      geoCache.set(q, null);
+      return null;
+    }
+  }
+
+  function haversineKm(lat1, lng1, lat2, lng2) {
+    const toRad = (deg) => (Number(deg) * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return 6371 * c;
+  }
+
+  function isLikelyTokyoPoint(point) {
+    if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
+    return point.lat >= 35.45 && point.lat <= 35.9 && point.lng >= 139.5 && point.lng <= 140.0;
+  }
+
+  function isNearWardCenter(point, wardCenter, maxKm) {
+    if (!point || !wardCenter) return false;
+    return haversineKm(point.lat, point.lng, wardCenter.lat, wardCenter.lng) <= Number(maxKm || 30);
+  }
+
+  function getWardGeoMaxKm(sourceKey) {
+    const key = String(sourceKey || "");
+    const overrides = {
+      chiyoda: 8,
+      chuo: 8,
+      minato: 9,
+      shinjuku: 9,
+      bunkyo: 8,
+      taito: 8,
+      sumida: 9,
+      koto: 10,
+      shinagawa: 10,
+      meguro: 9,
+      ota: 12,
+      setagaya: 12,
+      shibuya: 9,
+      nakano: 9,
+      suginami: 11,
+      toshima: 9,
+      kita: 9,
+      arakawa: 8,
+      itabashi: 11,
+      nerima: 12,
+      adachi: 12,
+      katsushika: 12,
+      edogawa: 12,
+    };
+    return overrides[key] || 10;
+  }
+
+  function sanitizeWardPoint(point, sourceOrCenter, maxKmOverride) {
+    if (!point) return null;
+    const lat = Number(point.lat);
+    const lng = Number(point.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+    const normalized = { lat, lng, address: sanitizeAddressText(point.address || "") };
+    if (!isLikelyTokyoPoint(normalized)) return null;
+    const center = sourceOrCenter?.center || sourceOrCenter || null;
+    if (center) {
+      const maxKm = Number(maxKmOverride || getWardGeoMaxKm(sourceOrCenter?.key));
+      if (!isNearWardCenter(normalized, center, maxKm)) return null;
+    }
+    return normalized;
+  }
+
+  async function geocodeForWard(candidates, sourceOrCenter, maxKmOverride) {
+    for (const q of candidates || []) {
+      const point = await geocodeQuery(q);
+      const ok = sanitizeWardPoint(point, sourceOrCenter, maxKmOverride);
+      if (ok) return ok;
+    }
+    return null;
+  }
+
+  return {
+    geocodeForWard,
+    geocodeQuery,
+    haversineKm,
+    sanitizeWardPoint,
+  };
+}
+
+module.exports = {
+  createGeoHelpers,
+};
