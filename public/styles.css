@@ -75,6 +75,13 @@ h1 {
   color: var(--muted);
 }
 
+.description {
+  margin: 6px 0 0;
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .layout {
   position: relative;
   z-index: 1;
