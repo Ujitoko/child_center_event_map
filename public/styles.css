@@ -441,19 +441,114 @@ button:active {
   }
 }
 
+/* モバイルタブバー（デスクトップでは非表示） */
+.mobile-tabs {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .mobile-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--panel-strong);
+    border-top: 1px solid var(--line);
+    padding: 0;
+    box-shadow: 0 -4px 16px rgba(16, 36, 61, 0.12);
+  }
+
+  .mobile-tab {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    padding: 14px 0;
+    font-size: 15px;
+    font-weight: 700;
+    background: transparent;
+    color: var(--muted);
+    box-shadow: none;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .mobile-tab:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .mobile-tab:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .mobile-tab.active {
+    color: white;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  }
+
   .layout {
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 10px;
-    height: auto;
+    gap: 0;
+    padding: 0;
+    height: calc(100dvh - 100px - 52px);
+  }
+
+  .side {
+    display: none;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+  }
+
+  .side.show {
+    display: block;
+    height: 100%;
+    overflow: auto;
+  }
+
+  main {
+    display: none;
+  }
+
+  main.show {
+    display: block;
+    height: 100%;
+  }
+
+  main.show #map {
+    height: 100%;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
 
   h1 {
     font-size: 23px;
   }
 
-  #map {
-    height: 52vh;
+  /* タッチ最適化 */
+  button,
+  input[type="date"] {
+    min-height: 44px;
+  }
+
+  .date-presets button {
+    padding: 10px 4px;
+  }
+
+  .ward-option {
+    padding: 10px 8px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  /* タブバー分の余白を確保 */
+  .list {
+    padding-bottom: 60px;
   }
 }

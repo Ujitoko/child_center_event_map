@@ -277,6 +277,7 @@ function render(items, options = {}) {
       if (ev.target.tagName === "A") return;
       const entry = markerMap.get(idx);
       if (entry) {
+        if (isMobile()) switchTab("map");
         map.setView(entry.marker.getLatLng(), 16);
         entry.marker.openPopup();
       }
@@ -588,6 +589,31 @@ document.querySelectorAll(".date-presets button").forEach((btn) => {
     applyFiltersAndRender({ autoFit: false });
   });
 });
+
+// モバイルタブ切り替え
+const mobileTabs = document.querySelectorAll(".mobile-tab");
+const sideEl = document.querySelector(".side");
+const mainEl = document.querySelector("main");
+
+function switchTab(target) {
+  mobileTabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === target));
+  sideEl.classList.toggle("show", target === "list");
+  mainEl.classList.toggle("show", target === "map");
+  if (target === "map") map.invalidateSize();
+}
+
+function isMobile() {
+  return window.matchMedia("(max-width: 900px)").matches;
+}
+
+mobileTabs.forEach((tab) => {
+  tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+});
+
+// 初期状態: モバイルではリストタブをアクティブに
+if (isMobile()) {
+  switchTab("list");
+}
 
 initDateRange();
 restoreFromUrl();
