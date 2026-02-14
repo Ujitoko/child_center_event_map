@@ -265,9 +265,21 @@ function render(items, options = {}) {
     const lng = parseFiniteCoord(e.lng);
     if (lat !== null && lng !== null) {
       const marker = L.marker([lat, lng], { icon: eventPinIcon }).addTo(markerLayer);
-      marker.bindPopup(
-        `<b>${e.title}</b><br>${formatStartForPopup(e)}<br>${e.venue_name || "会場未設定"}<br><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>`
-      );
+      const popupEl = document.createElement("div");
+      popupEl.className = "popup-content";
+      const shareAttr = navigator.share ? `<button type="button" class="popup-share-btn" data-popup-share="${i}">共有</button>` : "";
+      popupEl.innerHTML = `<div class="popup-title">${e.title}</div><div class="popup-meta">${formatStartForPopup(e)}</div><div class="popup-meta">${e.venue_name || "会場未設定"}</div><div class="popup-actions"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>${shareAttr}</div>`;
+      const popupShareBtn = popupEl.querySelector(".popup-share-btn");
+      if (popupShareBtn) {
+        popupShareBtn.addEventListener("click", () => {
+          navigator.share({
+            title: e.title,
+            text: `${e.title}\n${formatStartForPopup(e)} ${e.venue_name || ""}\n`,
+            url: e.url,
+          }).catch(() => {});
+        });
+      }
+      marker.bindPopup(popupEl, { maxWidth: 280, minWidth: 200 });
       marker._eventIdx = i;
       bounds.push([lat, lng]);
       markerMap.set(i, { marker, lat, lng });
