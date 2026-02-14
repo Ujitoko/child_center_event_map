@@ -633,6 +633,10 @@ function computePresetRange(preset) {
   if (preset === "today") {
     return { from: today, until: today };
   }
+  if (preset === "tomorrow") {
+    const tmr = new Date(today.getTime() + 86400000);
+    return { from: tmr, until: tmr };
+  }
   if (preset === "weekend") {
     return computeWeekendRange(today);
   }
