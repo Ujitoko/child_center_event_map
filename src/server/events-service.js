@@ -66,31 +66,42 @@ function createGetEvents(deps) {
   return async function getEvents(maxDays, refresh) {
   const days = Math.min(Math.max(Number(maxDays) || 30, 1), 90);
   const cacheKey = `jidokan:${days}`;
-  const isFresh = cache.data && cache.key === cacheKey && Date.now() - cache.savedAt < CACHE_TTL_MS;
-  if (!refresh && isFresh) {
-    return {
-      ...cache.data,
-      from_cache: true,
-      snapshot_saved_at: new Date(cache.savedAt).toISOString(),
-    };
-  }
 
-  if (!refresh && !cache.data && snapshotPath) {
-    const snapshot = loadSnapshot(snapshotPath);
-    if (snapshot) {
-      cache.key = cacheKey;
-      cache.data = snapshot;
-      cache.savedAt = Date.now();
-      console.log("[snapshot] loaded from disk:", snapshotPath);
-      // trigger background refresh
-      setImmediate(() => getEvents(maxDays, true).catch(() => {}));
+  // Normal user access: return cached data only, never scrape
+  if (!refresh) {
+    if (cache.data && cache.key === cacheKey) {
       return {
-        ...snapshot,
+        ...cache.data,
         from_cache: true,
         snapshot_saved_at: new Date(cache.savedAt).toISOString(),
       };
     }
+    if (snapshotPath) {
+      const snapshot = loadSnapshot(snapshotPath);
+      if (snapshot) {
+        cache.key = cacheKey;
+        cache.data = snapshot;
+        cache.savedAt = Date.now();
+        console.log("[snapshot] loaded from disk:", snapshotPath);
+        return {
+          ...snapshot,
+          from_cache: true,
+          snapshot_saved_at: new Date(cache.savedAt).toISOString(),
+        };
+      }
+    }
+    return {
+      date_jst: "",
+      count: 0,
+      source: "tokyo_jidokan",
+      items: [],
+      debug_counts: { raw: {}, filtered: {}, implemented_wards: [] },
+      from_cache: true,
+      snapshot_saved_at: null,
+    };
   }
+
+  // refresh=1 (cron only): actually scrape
 
   const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional] = await Promise.all([
     collectSetagayaJidokanEvents(days),
