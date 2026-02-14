@@ -220,6 +220,33 @@ function renderWardFilters(wardCounts = new Map()) {
   }
 }
 
+const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
+const DISTANCE_BRACKETS = [1, 3, 5, 10];
+
+function getDateGroupKey(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "不明";
+  const jst = new Date(d.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+  const m = jst.getMonth() + 1;
+  const day = jst.getDate();
+  const dow = DAY_NAMES[jst.getDay()];
+  const today = getJstToday();
+  const tomorrow = new Date(today.getTime() + 86400000);
+  const jstDate = new Date(jst.getFullYear(), jst.getMonth(), jst.getDate());
+  let prefix = "";
+  if (jstDate.getTime() === today.getTime()) prefix = "今日 ";
+  else if (jstDate.getTime() === tomorrow.getTime()) prefix = "明日 ";
+  return `${prefix}${m}/${day} (${dow})`;
+}
+
+function getDistanceGroupKey(km) {
+  if (km === null) return "位置情報なし";
+  for (const bracket of DISTANCE_BRACKETS) {
+    if (km < bracket) return `${bracket}km以内`;
+  }
+  return `${DISTANCE_BRACKETS[DISTANCE_BRACKETS.length - 1]}km以上`;
+}
+
 function render(items, options = {}) {
   const autoFit = options.autoFit === true;
   clearMarkers();
@@ -249,8 +276,28 @@ function render(items, options = {}) {
 
   const frag = document.createDocumentFragment();
   const listLimit = Math.min(items.length, MAX_LIST_RENDER);
+  let lastGroupKey = "";
   for (let i = 0; i < listLimit; i += 1) {
     const e = items[i];
+
+    // グループヘッダー挿入
+    let groupKey = "";
+    if (sortByDistance && userLocation) {
+      const eLat = parseFiniteCoord(e.lat);
+      const eLng = parseFiniteCoord(e.lng);
+      const km = eLat !== null && eLng !== null ? haversineDist(userLocation.lat, userLocation.lng, eLat, eLng) : null;
+      groupKey = getDistanceGroupKey(km);
+    } else {
+      groupKey = getDateGroupKey(e.starts_at);
+    }
+    if (groupKey !== lastGroupKey) {
+      const header = document.createElement("div");
+      header.className = "group-header";
+      header.textContent = groupKey;
+      frag.appendChild(header);
+      lastGroupKey = groupKey;
+    }
+
     const card = document.createElement("article");
     card.className = "card";
     card.style.setProperty("--i", String(i));
