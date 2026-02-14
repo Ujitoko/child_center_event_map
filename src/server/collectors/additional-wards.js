@@ -1,30 +1,13 @@
-﻿function createCollectAdditionalWardsEvents(deps) {
+const { normalizeText } = require("../text-utils");
+const { fetchText } = require("../fetch-utils");
+const { BUNKYO_SOURCE } = require("../../config/wards");
+const { buildAdditionalWardConfigs } = require("../../config/additional-ward-configs");
+
+function createCollectAdditionalWardsEvents(deps) {
   const {
-    ADACHI_SOURCE,
-    ARAKAWA_SOURCE,
-    BUNKYO_SOURCE,
-    CHUO_SOURCE,
-    EDOGAWA_SOURCE,
-    ITABASHI_SOURCE,
-    KATSUSHIKA_SOURCE,
-    KOTO_SOURCE,
-    NAKANO_SOURCE,
-    NERIMA_SOURCE,
-    SHINJUKU_SOURCE,
-    SUGINAMI_SOURCE,
-    SUMIDA_SOURCE,
-    TAITO_SOURCE,
-    TOSHIMA_SOURCE,
-    WARD_CHILD_HINT_RE,
-    WARD_EVENT_WORD_RE,
-    buildAdditionalWardConfigs,
-    buildListCalendarUrl,
     collectChuoAkachanTengokuEvents,
     collectKitaJidokanEvents,
     collectWardGenericEvents,
-    fetchText,
-    getDaysInMonth,
-    normalizeText,
   } = deps;
 
   async function fetchBunkyoJidokanSeedUrls() {
@@ -56,34 +39,15 @@
       if (!u) continue;
       seeds.push(u);
     }
-  } catch {
-    // keep static seeds
+  } catch (e) {
+    console.warn("[additional-wards] bunkyo sitemap fetch failed:", e.message || e);
   }
   return Array.from(new Set(seeds.map((u) => normalizeText(u)).filter(Boolean))).slice(0, 220);
 }
 
 async function collectAdditionalWardsEvents(maxDays) {
   const configs = buildAdditionalWardConfigs({
-    ADACHI_SOURCE,
-    ARAKAWA_SOURCE,
-    BUNKYO_SOURCE,
-    CHUO_SOURCE,
-    EDOGAWA_SOURCE,
-    ITABASHI_SOURCE,
-    KATSUSHIKA_SOURCE,
-    KOTO_SOURCE,
-    NAKANO_SOURCE,
-    NERIMA_SOURCE,
-    SHINJUKU_SOURCE,
-    SUGINAMI_SOURCE,
-    SUMIDA_SOURCE,
-    TAITO_SOURCE,
-    TOSHIMA_SOURCE,
-    WARD_CHILD_HINT_RE,
-    WARD_EVENT_WORD_RE,
-    buildListCalendarUrl,
     fetchBunkyoJidokanSeedUrls,
-    getDaysInMonth,
   });
   const [
     chuoBase,
@@ -159,5 +123,3 @@ async function collectAdditionalWardsEvents(maxDays) {
 module.exports = {
   createCollectAdditionalWardsEvents,
 };
-
-

@@ -1,0 +1,13 @@
+node_modules/
+tmp_*
+.tmp_*
+_tmp_*
+_diag.js
+_nerima_investigate.js
+audit_noise.js
+*_diag.js
+data/
+*.log
+.env
+nul
+.claude/

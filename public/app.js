@@ -71,6 +71,8 @@ const SOURCE_WARD_MAP = {
   edogawa: "江戸川区",
 };
 const selectedWards = new Set();
+let searchQuery = "";
+let searchDebounceTimer = null;
 
 const statusEl = document.getElementById("status");
 const listEl = document.getElementById("list");
@@ -261,6 +263,13 @@ function applyFiltersAndRender(options = {}) {
       const ward = getWardLabel(e);
       return !ward || selectedWards.has(ward);
     });
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    items = items.filter((e) => {
+      const hay = `${e.title || ""} ${e.venue_name || ""} ${e.address || ""}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }
 
   const rawSummary = summarizeBySource(lastFetchedItems);
   const shownSummary = summarizeBySource(items);
@@ -291,6 +300,15 @@ async function loadEvents(forceRefresh = false) {
     render([], { autoFit: false });
   }
 }
+
+const searchInputEl = document.getElementById("searchInput");
+searchInputEl.addEventListener("input", () => {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    searchQuery = searchInputEl.value.trim();
+    applyFiltersAndRender({ autoFit: false });
+  }, 250);
+});
 
 renderWardFilters();
 selectAllWardsBtnEl.addEventListener("click", () => {

@@ -1,0 +1,17 @@
+name: Daily Scrape
+
+on:
+  schedule:
+    # JST 06:00 = UTC 21:00 (previous day)
+    - cron: '0 21 * * *'
+  workflow_dispatch: # manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger refresh
+        run: |
+          curl -sf --retry 3 --retry-delay 30 --max-time 300 \
+            "${{ secrets.RENDER_URL }}/api/events?refresh=1" \
+            -o /dev/null -w "HTTP %{http_code}\n"

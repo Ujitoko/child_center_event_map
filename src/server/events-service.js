@@ -1,7 +1,58 @@
-﻿function createGetEvents(deps) {
+const fs = require("fs");
+const { parseYmdFromJst } = require("./date-utils");
+const { saveGeoCache } = require("./geo-utils");
+const {
+  SETAGAYA_SOURCE,
+  OTA_SOURCE,
+  SHINAGAWA_SOURCE,
+  MEGURO_SOURCE,
+  SHIBUYA_SOURCE,
+  MINATO_SOURCE,
+  CHIYODA_SOURCE,
+  CHUO_SOURCE,
+  BUNKYO_SOURCE,
+  TAITO_SOURCE,
+  SUMIDA_SOURCE,
+  KOTO_SOURCE,
+  NAKANO_SOURCE,
+  SUGINAMI_SOURCE,
+  TOSHIMA_SOURCE,
+  KITA_SOURCE,
+  ARAKAWA_SOURCE,
+  ITABASHI_SOURCE,
+  NERIMA_SOURCE,
+  ADACHI_SOURCE,
+  KATSUSHIKA_SOURCE,
+  EDOGAWA_SOURCE,
+  SHINJUKU_SOURCE,
+} = require("../config/wards");
+
+function loadSnapshot(snapshotPath) {
+  try {
+    const raw = fs.readFileSync(snapshotPath, "utf8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveSnapshot(snapshotPath, data) {
+  try {
+    const dir = require("path").dirname(snapshotPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(snapshotPath, JSON.stringify(data), "utf8");
+  } catch (e) {
+    console.warn("[snapshot] save failed:", e.message || e);
+  }
+}
+
+function createGetEvents(deps) {
   const {
     CACHE_TTL_MS,
     cache,
+    snapshotPath,
+    geoCache,
+    geoCachePath,
     collectAdditionalWardsEvents,
     collectChiyodaJidokanEvents,
     collectMeguroJidokanEvents,
@@ -22,6 +73,23 @@
       from_cache: true,
       snapshot_saved_at: new Date(cache.savedAt).toISOString(),
     };
+  }
+
+  if (!refresh && !cache.data && snapshotPath) {
+    const snapshot = loadSnapshot(snapshotPath);
+    if (snapshot) {
+      cache.key = cacheKey;
+      cache.data = snapshot;
+      cache.savedAt = Date.now();
+      console.log("[snapshot] loaded from disk:", snapshotPath);
+      // trigger background refresh
+      setImmediate(() => getEvents(maxDays, true).catch(() => {}));
+      return {
+        ...snapshot,
+        from_cache: true,
+        snapshot_saved_at: new Date(cache.savedAt).toISOString(),
+      };
+    }
   }
 
   const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional] = await Promise.all([
@@ -186,11 +254,12 @@
     refresh_in_progress: false,
   };
 
-  cache = {
-    key: cacheKey,
-    data: payload,
-    savedAt: Date.now(),
-  };
+  cache.key = cacheKey;
+  cache.data = payload;
+  cache.savedAt = Date.now();
+
+  if (snapshotPath) saveSnapshot(snapshotPath, payload);
+  if (geoCachePath && geoCache) saveGeoCache(geoCachePath, geoCache);
 
   return {
     ...payload,
@@ -203,5 +272,3 @@
 module.exports = {
   createGetEvents,
 };
-
-

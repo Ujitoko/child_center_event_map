@@ -1,38 +1,64 @@
-﻿function buildAdditionalWardConfigs(deps) {
-  const {
-    ADACHI_SOURCE,
-    ARAKAWA_SOURCE,
-    BUNKYO_SOURCE,
-    CHUO_SOURCE,
-    EDOGAWA_SOURCE,
-    ITABASHI_SOURCE,
-    KATSUSHIKA_SOURCE,
-    KOTO_SOURCE,
-    NAKANO_SOURCE,
-    NERIMA_SOURCE,
-    SHINJUKU_SOURCE,
-    SUGINAMI_SOURCE,
-    SUMIDA_SOURCE,
-    TAITO_SOURCE,
-    TOSHIMA_SOURCE,
-    WARD_CHILD_HINT_RE,
-    WARD_EVENT_WORD_RE,
-    buildListCalendarUrl,
-    fetchBunkyoJidokanSeedUrls,
-    getDaysInMonth,
-  } = deps;
+const {
+  ADACHI_SOURCE,
+  ARAKAWA_SOURCE,
+  BUNKYO_SOURCE,
+  CHUO_SOURCE,
+  EDOGAWA_SOURCE,
+  ITABASHI_SOURCE,
+  KATSUSHIKA_SOURCE,
+  KOTO_SOURCE,
+  NAKANO_SOURCE,
+  NERIMA_SOURCE,
+  SHINJUKU_SOURCE,
+  SUGINAMI_SOURCE,
+  SUMIDA_SOURCE,
+  TAITO_SOURCE,
+  TOSHIMA_SOURCE,
+  WARD_CHILD_HINT_RE,
+  WARD_EVENT_WORD_RE,
+} = require("./wards");
+const { buildListCalendarUrl } = require("../server/ward-parsing");
+const { getDaysInMonth } = require("../server/date-utils");
+
+function buildAdditionalWardConfigs(deps) {
+  const { fetchBunkyoJidokanSeedUrls } = deps;
 
   return {
     chuo: {
       source: CHUO_SOURCE,
-      listUrls: (m) => [`${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`],
+      listUrls: (m) => [
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=2`,
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
+        `${CHUO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
+      ],
+      oneTimeListUrls: () => Promise.resolve([
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/tukijijidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/sinkawajidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/horidomecyoujidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/hamacyoujidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/tukudajidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/tukishimajidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/kachidokijidoukan.html`,
+        `${CHUO_SOURCE.baseUrl}/a0025/kosodate/kosodate/shien/jidoukan/harumijidoukan.html`,
+      ]),
       parseOpts: {
         blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
-        urlAllow: /city\.chuo\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
+        urlAllow: /city\.chuo\.lg\.jp\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
+      relaxChildFilter: true,
+      titleDenyRe:
+        /(サイトマップ|アクセシビリティ|ウェブアクセシビリティ|個人情報|プライバシーポリシー|このサイトについて|ご利用にあたって|携帯サイト|組織から探す|よくある質問|並び順変更|文字サイズ|区役所案内|ホームページの|このホームページの|^中央区役所$|ゲートキーパー|^お問い合わせ$|介護者教室|おしらせ.*PDF|^リンク集$)/i,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 700,
     },
     bunkyo: {
       source: BUNKYO_SOURCE,
@@ -44,13 +70,15 @@
       oneTimeListUrls: () => fetchBunkyoJidokanSeedUrls(),
       parseOpts: {
         urlAllow:
-          /city\.bunkyo\.lg\.jp\/(?:kosodatekyouiku\/ibashozukuri\/jidoukan\/.+\.(?:html?|pdf)|b050\/p\d+\.html|documents\/\d+\/.+\.pdf)(?:\?|$)/i,
+          /city\.bunkyo\.lg\.jp\/(?:kosodatekyouiku\/.+\.(?:html?|pdf)|b050\/p\d+\.html)(?:\?|$)/i,
         urlDeny: /\/(?:index|sitemap)\.html$|\/b050\/p002413\.html/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
       relaxChildFilter: false,
+      titleDenyRe:
+        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|ページID検索|表紙[・、]目次|^表紙$|^目次$|^本文$|参考資料[（(]|報告書|答申|計画[（(].*PDF|概要版|プラン[）)）].*PDF|会議録|議事要旨|議事録|条例|規則|要綱|ルールとマナー|民間学童クラブ|検討部会|設立の手引き|あり方に関する|やさしい日本語|子ども110番|^やん\s*ぐ$|アフタースクール|^1月の予定$|^おたより$|令和\s*\d+\s*年度.*文京区|令\s*\(\s*れい\s*\)\s*和)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -60,30 +88,26 @@
     taito: {
       source: TAITO_SOURCE,
       listUrls: (m, now) => [
-        `${TAITO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
-        `${TAITO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
-        `${TAITO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
-        `${TAITO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
-        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event`, m, now),
         buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event/kosodate/calendar`, m, now),
+        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event/calendar`, m, now),
+        buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/event/shogaigakushu/calendar`, m, now),
         buildListCalendarUrl(`${TAITO_SOURCE.baseUrl}/library/news/event_news/calendar`, m, now),
-        `${TAITO_SOURCE.baseUrl}/library/news/event_news/calendar/list_calendar.html`,
         `${TAITO_SOURCE.baseUrl}/event/kosodate/index.html`,
         `${TAITO_SOURCE.baseUrl}/library/kodomo/index.html`,
       ],
       parseOpts: {
         blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
         urlAllow:
-          /city\.taito\.lg\.jp\/(?:event\/(?:kosodate|kosodatekyouiku)|library\/kodomo\/event|library\/kodomo\/index\.html|library\/news\/event_news|kosodate|kodomo|jidokan|jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+          /city\.taito\.lg\.jp\/(?:event|library\/(?:kodomo|news\/event_news)|kosodate|kodomo|jidokan|jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny:
-          /\/index\.html$|\/library\/kodomo\/(?:allNewsList\.html|kodomo_news\/|osusume\/)|(?:\u65b0\u3057\u3044\u672c\u306e\u30ea\u30b9\u30c8|\u5168\u65b0\u7740\u4e00\u89a7|\u304a\u3059\u3059\u3081\u30d6\u30c3\u30af\u30ea\u30b9\u30c8|\u3053\u306e\u672c\u3088\u3093\u3060|\u8aad\u307f\u805e\u304b\u305b\u306b\u5411\u304f\u7d75\u672c\u30ea\u30b9\u30c8|\u8abf\u3079\u5b66\u7fd2\u306e\u624b\u5f15\u304d|\u3054\u5bb6\u5ead\u3067\u306e\u8aad\u307f\u805e\u304b\u305b|\u304a\u3059\u3059\u3081\u8cc7\u6599\u306e\u3054\u6848\u5185)/i,
+          /\/index\.html$|\/(?:list_)?calendar(?:\d+)?\.html$|\/library\/kodomo\/(?:allNewsList\.html|kodomo_news\/|osusume\/)|(?:\u65b0\u3057\u3044\u672c\u306e\u30ea\u30b9\u30c8|\u5168\u65b0\u7740\u4e00\u89a7|\u304a\u3059\u3059\u3081\u30d6\u30c3\u30af\u30ea\u30b9\u30c8|\u3053\u306e\u672c\u3088\u3093\u3060|\u8aad\u307f\u805e\u304b\u305b\u306b\u5411\u304f\u7d75\u672c\u30ea\u30b9\u30c8|\u8abf\u3079\u5b66\u7fd2\u306e\u624b\u5f15\u304d|\u3054\u5bb6\u5ead\u3067\u306e\u8aad\u307f\u805e\u304b\u305b|\u304a\u3059\u3059\u3081\u8cc7\u6599\u306e\u3054\u6848\u5185)/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
       relaxChildFilter: true,
       titleDenyRe:
-        /(\u65b0\u3057\u3044\u672c\u306e\u30ea\u30b9\u30c8|\u5168\u65b0\u7740\u4e00\u89a7|\u304a\u3059\u3059\u3081\u30d6\u30c3\u30af\u30ea\u30b9\u30c8|\u3053\u306e\u672c\u3088\u3093\u3060|\u8aad\u307f\u805e\u304b\u305b\u306b\u5411\u304f\u7d75\u672c\u30ea\u30b9\u30c8|\u8abf\u3079\u5b66\u7fd2\u306e\u624b\u5f15\u304d|\u3054\u5bb6\u5ead\u3067\u306e\u8aad\u307f\u805e\u304b\u305b|\u304a\u3059\u3059\u3081\u8cc7\u6599\u306e\u3054\u6848\u5185)/i,
+        /(新しい本のリスト|全新着一覧|おすすめブックリスト|この本よんだ|読み聞かせに向く絵本リスト|調べ学習の手引き|ご家庭での読み聞かせ|おすすめ資料のご案内|しゃべり場たいとう|日本語スピーチ交流会)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -95,19 +119,24 @@
       listUrls: (m, now) => [
         buildListCalendarUrl(`${SUMIDA_SOURCE.baseUrl}/eventcalendar/kodomo_kosodate/calendar`, m, now),
         buildListCalendarUrl(`${SUMIDA_SOURCE.baseUrl}/eventcalendar/calendar`, m, now),
+        `${SUMIDA_SOURCE.baseUrl}/kosodate/jidoukan/index.html`,
+        `${SUMIDA_SOURCE.baseUrl}/kosodate/kosodate_hiroba/index.html`,
       ],
       parseOpts: {
         blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.sumida\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
+        urlAllow: /city\.sumida\.lg\.jp\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny: /\/(?:index|sitemap)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
       relaxChildFilter: true,
+      titleDenyRe:
+        /(すみだモダンコミュニティ|フードドライブ|すみだランフェスタ|手ぶらで魚つり|分譲マンション.*相談|区民スポーツ教室|おとなの伝統工芸|働く人対象講座|千葉大学区民向け公開講座|男女共同参画推進啓発|食品衛生実務|ゲートキーパー養成|認知症サポーター養成)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
-      maxRows: 520,
+      allowPdfDetail: true,
+      maxRows: 700,
     },
     koto: {
       source: KOTO_SOURCE,
@@ -127,6 +156,8 @@
       },
       requirePreHint: false,
       relaxChildFilter: true,
+      titleDenyRe:
+        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|ページ番号検索|文字サイズ|プライバシー|^RSS|著作権|児童手当|校庭遊び場|小学校教員|地域学校協働|コミュニティ・スクール|放課後こどもプラン|高齢者スマートフォン|高齢者スマホ|^選挙$|マンション再生|法律.*相談|食の安全|バードウォッチング|難病講演会|パラスポーツ体験|こうとうゆーすてっぷ|江東こどもまつり.*協賛|ウィークエンドスクール|みどりのカーテン|^リンク集$|区役所へのアクセス)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -138,6 +169,9 @@
       listUrls: (m, now) => [
         `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
         `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
+        `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u80b2\u3066")}`,
+        `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
         `${NAKANO_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
         buildListCalendarUrl(`${NAKANO_SOURCE.baseUrl}/event/kosodate/calendar`, m, now),
         buildListCalendarUrl(`${NAKANO_SOURCE.baseUrl}/event/calendar`, m, now),
@@ -146,12 +180,19 @@
       ],
       parseOpts: {
         blockRe: /<table[^>]*id="calendarlist"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.tokyo-nakano\.lg\.jp\/(?:event|kosodate|kurashi\/bunka\/bunka\/kodomowakamono_bunka)\/.+\.(?:html?|php)(?:\?|$)/i,
+        urlAllow: /city\.tokyo-nakano\.lg\.jp\/(?:event|kosodate|kurashi\/bunka\/bunka\/kodomowakamono_bunka)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny: /\/index\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
+      relaxChildFilter: true,
+      titleDenyRe:
+        /(創業セミナー|高齢者・障害者の人権|ランニングフェスタ)/i,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 700,
     },
     suginami: {
       source: SUGINAMI_SOURCE,
@@ -173,7 +214,7 @@
       requirePreHint: false,
       relaxChildFilter: false,
       ignoreUrlHint: true,
-      titleDenyRe: /(\u6587\u5b57\u30b5\u30a4\u30ba|\u8272\u5408\u3044\u5909\u66f4|Multilingual|\u691c\u7d22\u306e\u65b9\u6cd5|\u30da\u30fc\u30b8ID\u691c\u7d22)/i,
+      titleDenyRe: /(文字サイズ|色合い変更|Multilingual|検索の方法|ページID検索|まちの湯健康事業|荻窪イルミネーション|荻外荘展示棟|すぎなみコレクション|NEWSTART健康セミナー|シルバー人材センター|原水爆禁止署名)/i,
       eventWordRe: WARD_EVENT_WORD_RE,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
@@ -207,6 +248,8 @@
       },
       requirePreHint: false,
       relaxChildFilter: true,
+      titleDenyRe:
+        /(介護に関する入門的研修|コミュニティ大学|発達障害講演会)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -217,6 +260,11 @@
       source: ARAKAWA_SOURCE,
       listUrls: (m) => [
         `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_category=2&event_target=1`,
+        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
+        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=2`,
+        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
+        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
         `${ARAKAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
       ],
       parseOpts: {
@@ -227,10 +275,12 @@
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
-      ignoreUrlHint: true,
-      titleDenyRe: /(\u6587\u5b57\u30b5\u30a4\u30ba|\u8272\u5408\u3044\u5909\u66f4|Multilingual|\u691c\u7d22\u306e\u65b9\u6cd5|\u30da\u30fc\u30b8ID\u691c\u7d22|\u9632\u707d\u30fb\u7dca\u6025\u60c5\u5831)/i,
+      relaxChildFilter: true,
+      titleDenyRe: /(文字サイズ|色合い変更|Multilingual|検索の方法|ページID検索|防災・緊急情報|ディスカバーあらかわ|スマホで仲間づくり|パラスポーツフェスティバル)/i,
       childHintRe: WARD_CHILD_HINT_RE,
-      eventWordRe: WARD_EVENT_WORD_RE,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 700,
     },
     itabashi: {
       source: ITABASHI_SOURCE,
@@ -246,6 +296,16 @@
         `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?year=${m.year}&month=${m.month}&day=1&mode_link=2&prev=2&c50=50`,
         `${ITABASHI_SOURCE.baseUrl}/cgi-bin/event/event.cgi?&prev=2&c50=50`,
       ],
+      oneTimeListUrls: () => {
+        const caps = [
+          "akatsuka", "azusawa", "ooyama", "kamiitabashi", "koubai", "sakaue",
+          "shimizu", "shimura", "shimurabashi", "shirasagi", "shinkawagishi",
+          "takashimadaira", "toshin", "narimasu", "nishitokuji", "hasune",
+          "hasune2", "hasunomi", "hikawa", "fujimidai", "midorigaoka",
+          "minamimaeno", "minamiitabashi", "mukaihara", "yayoi", "yurinoki",
+        ];
+        return Promise.resolve(caps.map((c) => `${ITABASHI_SOURCE.baseUrl}/kosodate/asobiba/jidoukan/${c}/index.html`));
+      },
       parseOpts: {
         urlAllow:
           /city\.itabashi\.tokyo\.jp\/(?:kosodate\/(?:1000930|asobiba\/jidoukan)|_res\/projects\/default_project\/_page_)\/.+\.(?:html?|pdf)(?:\?|$)/i,
@@ -270,39 +330,62 @@
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/hikarigaoka.html`,
         `${NERIMA_SOURCE.baseUrl}/shisetsu/hokenfuku/fukushi/koseibunka/jido/club_gyouji.html`,
       ],
+      oneTimeListUrls: () => {
+        const facilities = [
+          "heiwadai", "sakaecho", "shakujii_jidokan", "kitaoizumi",
+          "hikarigaoka", "kamishakujii", "doshida_jidokan", "harunohi",
+          "nakamura_jidokan", "minamitanaka", "kitamachi", "sekimachi",
+          "higashioizumi", "shakujiidai", "nishioizumi", "miharadai", "nakayoshi",
+        ];
+        return Promise.resolve(facilities.map((f) => `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/${f}/index.html`));
+      },
       parseOpts: {
         urlAllow:
-          /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php)(?:\?|$)/i,
+          /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny:
-          /\/(?:index|sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
+          /\/(?:sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       rowUrlAllowRe:
-        /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php)(?:\?|$)/i,
+        /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
       rowUrlDenyRe:
-        /\/(?:index|sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
+        /\/(?:sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
       requirePreHint: false,
-      ignoreUrlHint: true,
+      relaxChildFilter: true,
       titleDenyRe:
-        /(\u308a\u3088\u3046\u3042\u3093\u306a\u3044|\u5229\u7528\u6848\u5185|\u5bfe\u5fdc|\u6c11\u9593\u5b66\u7ae5\u30af\u30e9\u30d6\u4e8b\u696d|\u4fdd\u80b2\u306e\u6b74\u53f2\u3068\u3053\u308c\u304b\u3089|\u304a\u554f\u3044\u5408\u308f\u305b|Multilingual|\u30e2\u30d0\u30a4\u30eb|\u30b5\u30a4\u30c8\u30de\u30c3\u30d7|\u30ab\u30ec\u30f3\u30c0\u30fc|\u30a4\u30d9\u30f3\u30c8\u60c5\u5831\u4e00\u89a7|\u3053\u306e\u30b5\u30a4\u30c8\u306b\u3064\u3044\u3066|\u7d44\u7e54\u3068\u696d\u52d9\u6848\u5185|\u30a2\u30af\u30bb\u30b7\u30d3\u30ea\u30c6\u30a3|\u65b0\u7740\u60c5\u5831\u4e00\u89a7)/i,
+        /(りようあんない|利用案内|対応$|民間学童クラブ事業|保育の歴史とこれから|お問い合わせ|Multilingual|モバイル|サイトマップ|カレンダー|^イベント一覧$|イベント情報一覧|このサイトについて|組織と業務案内|アクセシビリティ|新着情報一覧|施設案内|施設紹介|館内のご紹介|への地図|への行き方|アクセス（|Q＆A|活動紹介|活動のご紹介|活動のご案内|おもちゃライブラリー|図書コーナーの写真|画像で見る児童館|目的利用マップ|中高生の居場所づくり事業|居場所づくり事業「|子育ての広場 「にこにこ」|おひさまぴよぴよ|ワイワイランド|児童館地域（PDF|おやこ子育ての広場 「にこにこ」 〒|おたより|お便り|じどうしつだより|児童館だより|児童館たより|中高生たより|中高生タイムス|ひよこだより|たより（PDF|^お知らせ$|^児童室$|メンバー制クラブ|^小学生以上のお友だちへ$|^小学生以上対象事業$|^乳幼児対象事業$|^今月のいつでも参加クラブ$|^今月のイチ推しニュース$|^ナカルングランデ|^児童向け活動|^幼児向け活動|^乳幼児向け活動|^南田中児童館の|^栄町児童館 乳幼児|^子育てのひろば|ぴよぴよ$|大きな地震|ねりまのじどうかん|準備期間.*臨時休館|臨時休館.*お知らせ)/i,
       childHintRe: WARD_CHILD_HINT_RE,
-      eventWordRe: WARD_EVENT_WORD_RE,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
-      maxRows: 420,
+      allowPdfDetail: true,
+      maxRows: 900,
     },
     adachi: {
       source: ADACHI_SOURCE,
-      listUrls: (m) => [`${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`],
+      listUrls: (m) => [
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=1`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&event_target=2`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
+        `${ADACHI_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
+      ],
       parseOpts: {
         blockRe: /<table[^>]*class="event_cal_7w"[^>]*>([\s\S]*?)<\/table>/i,
-        urlAllow: /city\.adachi\.tokyo\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
+        urlAllow: /city\.adachi\.tokyo\.jp\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny: /\/(?:index|sitemap|search_index)\.html/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
+      titleDenyRe: /(サイトマップ|アクセシビリティ|個人情報|プライバシー|ウェブアクセシビリティ|リンク集|詳細ページ|区役所へのアクセス|施設案内|よくある質問|お問い合わせ|サイト内検索|多重債務|消費者団体)/i,
       requirePreHint: false,
+      relaxChildFilter: true,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 900,
     },
     katsushika: {
       source: KATSUSHIKA_SOURCE,
@@ -312,11 +395,18 @@
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u80b2\u3066")}`,
       ],
+      oneTimeListUrls: () => Promise.resolve([
+        `${KATSUSHIKA_SOURCE.baseUrl}/event/1000114/index.html`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/event/1022292/index.html`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/event/1000115/index.html`,
+      ]),
       parseOpts: {
         blockRe: /<ul class="listlink">([\s\S]*?)<\/ul>/i,
-        urlAllow: /city\.katsushika\.lg\.jp\/(?:event|kosodate)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
-        urlDeny: /\/event\/index\.html$/i,
+        urlAllow: /city\.katsushika\.lg\.jp\/(?:event|kosodate|shisetsu)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap)\.html$|\/event\/(?:1000114|1022292|1000115)\/index\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
@@ -332,25 +422,50 @@
       source: EDOGAWA_SOURCE,
       listUrls: (m) => [
         `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&siteid=6&event_target=1`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&siteid=6&event_target=2`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&siteid=6`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
       ],
       parseOpts: {
-        urlAllow: /city\.edogawa\.tokyo\.jp\/(?:event|kosodate|shisetsu)\/.+\.html/i,
+        urlAllow: /city\.edogawa\.tokyo\.jp\/(?:event|kosodate|shisetsu)\/.+\.(?:html?|pdf)/i,
+        urlDeny: /\/(?:index|sitemap)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
+      relaxChildFilter: true,
+      titleDenyRe:
+        /(えどがわスポーツサポートクラブ|女性視点でアップデート|小規模保育所就職フェア)/i,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 700,
     },
     shinjuku: {
       source: SHINJUKU_SOURCE,
-      listUrls: (m) => [`${SHINJUKU_SOURCE.baseUrl}/event/calendar/calendar.php?Y=${m.year}&M=${m.month}`],
+      listUrls: (m) => [
+        `${SHINJUKU_SOURCE.baseUrl}/event/calendar/calendar.php?Y=${m.year}&M=${m.month}`,
+        `${SHINJUKU_SOURCE.baseUrl}/event/calendar/calendar.php?Y=${m.year}&M=${m.month}&C=5`,
+        `${SHINJUKU_SOURCE.baseUrl}/kosodate/index.html`,
+      ],
       parseOpts: {
         dayBlockRe: /<div[^>]*class="eventSelectDay[^"]*"[^>]*>[\s\S]*?<p>\s*(\d{1,2})\u65e5[\s\S]*?<ul>([\s\S]*?)<\/ul>[\s\S]*?<\/div>/gi,
-        urlAllow: /city\.shinjuku\.lg\.jp\/.+\.(?:html?|php)(?:\?|$)/i,
+        urlAllow: /city\.shinjuku\.lg\.jp\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap)\.html$/i,
         skipTr: true,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       requirePreHint: false,
+      relaxChildFilter: true,
+      titleDenyRe:
+        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|検索について|色変更|音声読み上げ|多言語対応|Language|フォントサイズ|文字サイズ|アクセシビリティ方針|^福祉・介護$|^ごみ・資源・環境$|^くらし$|^地域共生・区民活動$|^消費生活・相談$|^道路・交通・自転車$|^住まい$|^健康・衛生$|^産業・商工$|^産業振興・企業支援$|^国際・文化・スポーツ$|^まちづくり$|^防災・防犯$|^芸術・文化・歴史$|^環境・廃棄物$|^雇用・就労支援$|^区政情報$|^届出・届出窓口$|^審査請求|^まちづくり・都市計画$|モバイル新宿区の紹介|^大久保・百人町地区クリーン活動$|転生したら芸術家|SOMPO美術館|ワーク・ライフ・バランス|常任委員会|^選挙$|^施設案内$|新宿文化センターリニューアル|NHK.*公開収録|^行政評価$|^有償刊行物$|^防犯[、,]|^防災$|避難場所・ターミナル)/i,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 900,
     },
   };
 }

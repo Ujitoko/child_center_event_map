@@ -124,6 +124,21 @@ label {
   line-height: 1.45;
 }
 
+#searchInput {
+  border: 1px solid rgba(0, 93, 115, 0.3);
+  border-radius: 12px;
+  padding: 11px 12px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+}
+
+#searchInput::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
 input[type="text"],
 input[type="number"] {
   border: 1px solid rgba(0, 93, 115, 0.3);

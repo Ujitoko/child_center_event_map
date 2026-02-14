@@ -1,37 +1,26 @@
-﻿function createCollectWardGenericEvents(deps) {
+const { normalizeText, sanitizeAddressText, sanitizeVenueText, hasConcreteAddressToken } = require("../text-utils");
+const { buildDateKey, buildStartsEndsForDate, inRangeJst, parseYmdFromJst, getMonthsForRange, parseTimeRangeFromText } = require("../date-utils");
+const { buildWardGeoCandidates, parseWardListRows, extractDateFromUrl, parseGenericWardDetailMeta, parseGenericWardPdfMeta } = require("../ward-parsing");
+const { extractWardAddressFromText, isLikelyWardOfficeAddress } = require("../address-utils");
+const { fetchText } = require("../fetch-utils");
+const {
+  inferWardVenueFromTitle,
+  inferVenueFromTitleSupplement,
+  inferWardVenueFromUrl,
+  inferRegionalVenueFromTitle,
+  isLikelyAudienceText,
+  isLikelyDepartmentVenue,
+  isOnlineOnlyWithoutPlace,
+} = require("../venue-utils");
+const { WARD_CHILD_HINT_RE, WARD_CHILD_URL_HINT_RE } = require("../../config/wards");
+
+function createCollectWardGenericEvents(deps) {
   const {
-    WARD_CHILD_HINT_RE,
-    WARD_CHILD_URL_HINT_RE,
-    buildDateKey,
-    buildStartsEndsForDate,
-    buildWardGeoCandidates,
-    extractDateFromUrl,
-    extractWardAddressFromText,
-    fetchText,
     geocodeForWard,
     getFacilityAddressFromMaster,
-    getMonthsForRange,
-    hasConcreteAddressToken,
     haversineKm,
-    inferRegionalVenueFromTitle,
-    inferVenueFromTitleSupplement,
-    inferWardVenueFromTitle,
-    inferWardVenueFromUrl,
-    inRangeJst,
-    isLikelyAudienceText,
-    isLikelyDepartmentVenue,
-    isLikelyWardOfficeAddress,
-    isOnlineOnlyWithoutPlace,
-    normalizeText,
-    parseGenericWardDetailMeta,
-    parseGenericWardPdfMeta,
-    parseTimeRangeFromText,
-    parseWardListRows,
-    parseYmdFromJst,
     resolveEventAddress,
     resolveEventPoint,
-    sanitizeAddressText,
-    sanitizeVenueText,
   } = deps;
 
   return async function collectWardGenericEvents(source, maxDays, cfg) {
@@ -42,7 +31,8 @@
   if (cfg.oneTimeListUrls) {
     try {
       oneTimeListUrls = (await cfg.oneTimeListUrls(now, maxDays)) || [];
-    } catch {
+    } catch (e) {
+      console.warn(`[ward-generic:${source.key}] oneTimeListUrls failed:`, e.message || e);
       oneTimeListUrls = [];
     }
   }
@@ -84,7 +74,13 @@
   const preHintRe = cfg.preHintRe || WARD_CHILD_HINT_RE;
   const childHintRe = cfg.childHintRe || WARD_CHILD_HINT_RE;
   const relaxChildFilter = cfg.relaxChildFilter === true;
-  for (const row of rowsForProcessing.slice(0, cfg.maxRows || 520)) {
+  const items = rowsForProcessing.slice(0, cfg.maxRows || 520);
+  const concurrency = 6;
+  let idx = 0;
+  async function worker() {
+    while (idx < items.length) {
+      const i = idx; idx += 1;
+      const row = items[i];
     if (cfg.rowUrlAllowRe && !cfg.rowUrlAllowRe.test(row.url || "")) continue;
     if (cfg.rowUrlDenyRe && cfg.rowUrlDenyRe.test(row.url || "")) continue;
     const preHay = `${row.title || ""} ${row.url || ""}`;
@@ -240,7 +236,9 @@
         tags: [`${source.key}_jidokan_event`, `${source.key}_kids`],
       });
     }
+    }
   }
+  await Promise.all(Array.from({ length: concurrency }, () => worker()));
   return Array.from(byId.values()).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
 };
 }
@@ -248,5 +246,3 @@
 module.exports = {
   createCollectWardGenericEvents,
 };
-
-

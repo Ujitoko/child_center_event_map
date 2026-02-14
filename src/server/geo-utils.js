@@ -1,6 +1,9 @@
+const fs = require("fs");
+const path = require("path");
+const { normalizeText } = require("./text-utils");
+const { sanitizeAddressText } = require("./text-utils");
+
 function createGeoHelpers(deps) {
-  const normalizeText = deps?.normalizeText;
-  const sanitizeAddressText = deps?.sanitizeAddressText;
   const geoCache = deps?.geoCache instanceof Map ? deps.geoCache : new Map();
 
   async function geocodeQuery(query) {
@@ -128,6 +131,27 @@ function createGeoHelpers(deps) {
   };
 }
 
+function loadGeoCache(filePath, targetMap) {
+  try {
+    const raw = fs.readFileSync(filePath, "utf8");
+    const entries = JSON.parse(raw);
+    for (const [k, v] of entries) targetMap.set(k, v);
+    console.log(`[geo] loaded ${targetMap.size} entries from cache`);
+  } catch { /* first run */ }
+}
+
+function saveGeoCache(filePath, sourceMap) {
+  try {
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(filePath, JSON.stringify([...sourceMap]), "utf8");
+  } catch (e) {
+    console.warn("[geo] cache save failed:", e.message || e);
+  }
+}
+
 module.exports = {
   createGeoHelpers,
+  loadGeoCache,
+  saveGeoCache,
 };

@@ -1,23 +1,17 @@
+const { normalizeJaDigits, normalizeText } = require("../text-utils");
+const { normalizeJapaneseEraYears } = require("../text-utils");
+const { buildStartsEndsForDate, inRangeJst, parseTimeRangeFromText, parseOtaDatesFromText, parseJpYearMonth, inferChiyodaMonthlyFallbackDate } = require("../date-utils");
+const { buildWardGeoCandidates } = require("../ward-parsing");
+const { extractTokyoAddress } = require("../address-utils");
+const { fetchText } = require("../fetch-utils");
+const { stripTags, parseAnchors } = require("../html-utils");
+const { CHUO_SOURCE } = require("../../config/wards");
+
 function createCollectChuoAkachanTengokuEvents(deps) {
   const {
-    CHUO_SOURCE,
-    buildStartsEndsForDate,
-    buildWardGeoCandidates,
-    extractTokyoAddress,
-    fetchText,
     geocodeForWard,
-    inRangeJst,
-    inferChiyodaMonthlyFallbackDate,
-    normalizeJaDigits,
-    normalizeJapaneseEraYears,
-    normalizeText,
-    parseAnchors,
-    parseJpYearMonth,
-    parseOtaDatesFromText,
-    parseTimeRangeFromText,
     resolveEventAddress,
     resolveEventPoint,
-    stripTags,
   } = deps;
 
   function parseChuoAkachanTengokuRows(html, pageUrl) {
@@ -75,7 +69,8 @@ function createCollectChuoAkachanTengokuEvents(deps) {
     let html = "";
     try {
       html = await fetchText(pageUrl);
-    } catch {
+    } catch (e) {
+      console.warn("[chuo-akachan] page fetch failed:", e.message || e);
       return [];
     }
     const rows = parseChuoAkachanTengokuRows(html, pageUrl);
