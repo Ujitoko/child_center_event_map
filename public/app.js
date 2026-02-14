@@ -73,6 +73,9 @@ const SOURCE_WARD_MAP = {
 const selectedWards = new Set();
 let searchQuery = "";
 let searchDebounceTimer = null;
+let userLocation = null;
+let userLocationMarker = null;
+let sortByDistance = false;
 
 const statusEl = document.getElementById("status");
 const listEl = document.getElementById("list");
@@ -153,6 +156,22 @@ function parseFiniteCoord(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+function haversineDist(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const toRad = (x) => (x * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function distanceLabel(km) {
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  return `${km.toFixed(1)}km`;
+}
+
 function getWardLabel(item) {
   const source = String(item.source || "");
   if (source.startsWith("ward_")) {
@@ -212,7 +231,9 @@ function render(items, options = {}) {
   }
 
   const bounds = [];
-  for (const e of items) {
+  const markerMap = new Map();
+  for (let i = 0; i < items.length; i += 1) {
+    const e = items[i];
     const lat = parseFiniteCoord(e.lat);
     const lng = parseFiniteCoord(e.lng);
     if (lat !== null && lng !== null) {
@@ -220,7 +241,9 @@ function render(items, options = {}) {
       marker.bindPopup(
         `<b>${e.title}</b><br>${formatStartForPopup(e)}<br>${e.venue_name || "会場未設定"}<br><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>`
       );
+      marker._eventIdx = i;
       bounds.push([lat, lng]);
+      markerMap.set(i, { marker, lat, lng });
     }
   }
 
@@ -231,13 +254,34 @@ function render(items, options = {}) {
     const card = document.createElement("article");
     card.className = "card";
     card.style.setProperty("--i", String(i));
+    let distHtml = "";
+    if (userLocation) {
+      const eLat = parseFiniteCoord(e.lat);
+      const eLng = parseFiniteCoord(e.lng);
+      if (eLat !== null && eLng !== null) {
+        const km = haversineDist(userLocation.lat, userLocation.lng, eLat, eLng);
+        distHtml = `<div class="meta">距離: ${distanceLabel(km)}</div>`;
+      }
+    }
     card.innerHTML = `
       <h3>${e.title}</h3>
       <div class="meta">開始: ${formatStartLabel(e)}</div>
       <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""}</div>
+      ${distHtml}
       <div class="meta">ソース: ${e.source_label || e.source || "unknown"}</div>
       <div class="meta"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a></div>
     `;
+    card.dataset.idx = String(i);
+    const idx = i;
+    card.addEventListener("click", (ev) => {
+      if (ev.target.tagName === "A") return;
+      const entry = markerMap.get(idx);
+      if (entry) {
+        map.setView(entry.marker.getLatLng(), 16);
+        entry.marker.openPopup();
+      }
+    });
+    card.style.cursor = "pointer";
     frag.appendChild(card);
   }
   if (items.length > listLimit) {
@@ -251,18 +295,117 @@ function render(items, options = {}) {
   if (autoFit && bounds.length > 0) {
     map.fitBounds(bounds, { padding: [30, 30] });
   }
+
+  map.off("popupopen.cardlink");
+  map.on("popupopen.cardlink", (ev) => {
+    const marker = ev.popup._source;
+    if (marker && marker._eventIdx != null) {
+      const card = listEl.querySelector(`[data-idx="${marker._eventIdx}"]`);
+      if (card) {
+        listEl.querySelectorAll(".card.highlight").forEach((c) => c.classList.remove("highlight"));
+        card.classList.add("highlight");
+        const sideEl = listEl.closest(".side");
+        if (sideEl) {
+          const cardTop = card.offsetTop - sideEl.offsetTop;
+          sideEl.scrollTo({ top: cardTop - sideEl.clientHeight / 3, behavior: "smooth" });
+        }
+      }
+    }
+  });
+}
+
+function getJstToday() {
+  const now = new Date();
+  const jstNow = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+  return new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate());
+}
+
+function formatDateValue(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function parseDateValue(val) {
+  if (!val) return null;
+  const parts = val.split("-");
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
+function syncUrlParams() {
+  const params = new URLSearchParams();
+  const fromVal = document.getElementById("fromDate").value;
+  const untilVal = document.getElementById("untilDate").value;
+  const todayStart = getJstToday();
+  const defaultFrom = formatDateValue(todayStart);
+  const defaultUntil = formatDateValue(new Date(todayStart.getTime() + 30 * 86400000));
+  if (fromVal && fromVal !== defaultFrom) params.set("from", fromVal);
+  if (untilVal && untilVal !== defaultUntil) params.set("until", untilVal);
+  if (selectedWards.size > 0) params.set("wards", Array.from(selectedWards).join(","));
+  if (searchQuery) params.set("q", searchQuery);
+  const qs = params.toString();
+  const newUrl = qs ? `${location.pathname}?${qs}` : location.pathname;
+  history.replaceState(null, "", newUrl);
+}
+
+function restoreFromUrl() {
+  const params = new URLSearchParams(location.search);
+  if (params.has("from")) document.getElementById("fromDate").value = params.get("from");
+  if (params.has("until")) document.getElementById("untilDate").value = params.get("until");
+  if (params.has("wards")) {
+    selectedWards.clear();
+    for (const w of params.get("wards").split(",")) {
+      if (TOKYO_23_WARDS.includes(w)) selectedWards.add(w);
+    }
+  }
+  if (params.has("q")) {
+    searchQuery = params.get("q");
+    document.getElementById("searchInput").value = searchQuery;
+  }
+}
+
+function initDateRange() {
+  const fromEl = document.getElementById("fromDate");
+  const untilEl = document.getElementById("untilDate");
+  const todayStart = getJstToday();
+  const minDate = formatDateValue(todayStart);
+  const maxDate = formatDateValue(new Date(todayStart.getTime() + 90 * 86400000));
+  const defaultUntil = formatDateValue(new Date(todayStart.getTime() + 30 * 86400000));
+  fromEl.min = minDate;
+  fromEl.max = maxDate;
+  untilEl.min = minDate;
+  untilEl.max = maxDate;
+  if (!fromEl.value) fromEl.value = minDate;
+  if (!untilEl.value) untilEl.value = defaultUntil;
 }
 
 function applyFiltersAndRender(options = {}) {
   const autoFit = options.autoFit === true;
-  let baseItems = lastFetchedItems.slice();
-  renderWardFilters(countByWard(baseItems));
-  let items = baseItems;
-  items = items
-    .filter((e) => {
+  const todayStart = getJstToday();
+
+  // 開始日・終了日を取得
+  const fromDate = parseDateValue(document.getElementById("fromDate").value) || todayStart;
+  const untilDate = parseDateValue(document.getElementById("untilDate").value);
+  const cutoff = untilDate ? new Date(untilDate.getTime() + 86400000) : new Date(todayStart.getTime() + 30 * 86400000);
+
+  let items = lastFetchedItems.filter((e) => {
+    const d = new Date(e.starts_at);
+    return !Number.isNaN(d.getTime()) && d >= fromDate && d < cutoff;
+  });
+
+  // 区カウントは日数フィルタ済みデータで計算
+  renderWardFilters(countByWard(items));
+
+  // 区フィルタ
+  if (selectedWards.size > 0) {
+    items = items.filter((e) => {
       const ward = getWardLabel(e);
       return !ward || selectedWards.has(ward);
     });
+  }
+
+  // テキスト検索
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     items = items.filter((e) => {
@@ -271,20 +414,35 @@ function applyFiltersAndRender(options = {}) {
     });
   }
 
-  const rawSummary = summarizeBySource(lastFetchedItems);
-  const shownSummary = summarizeBySource(items);
+  // 距離ソート
+  if (sortByDistance && userLocation) {
+    items.sort((a, b) => {
+      const aLat = parseFiniteCoord(a.lat);
+      const aLng = parseFiniteCoord(a.lng);
+      const bLat = parseFiniteCoord(b.lat);
+      const bLng = parseFiniteCoord(b.lng);
+      const aDist = aLat !== null && aLng !== null ? haversineDist(userLocation.lat, userLocation.lng, aLat, aLng) : Infinity;
+      const bDist = bLat !== null && bLng !== null ? haversineDist(userLocation.lat, userLocation.lng, bLat, bLng) : Infinity;
+      return aDist - bDist;
+    });
+  }
+
+  // ステータス表示
+  const totalInRange = lastFetchedItems.filter((e) => {
+    const d = new Date(e.starts_at);
+    return !Number.isNaN(d.getTime()) && d >= fromDate && d < cutoff;
+  }).length;
+  const days = Math.round((cutoff - fromDate) / 86400000);
   const warning = lastWarningText ? ` / ${lastWarningText}` : "";
-  dateEl.textContent = `${lastDateText} (JST) のイベント ${lastFetchedItems.length}件取得 / キャッシュ表示`;
-  setStatus(`表示件数: ${items.length}/${lastFetchedItems.length}件 / 取得内訳: ${rawSummary} / 表示内訳: ${shownSummary}${warning}`);
+  dateEl.textContent = `${lastDateText} (JST) のイベント ${lastFetchedItems.length}件取得`;
+  setStatus(`表示件数: ${items.length}/${totalInRange}件（${days}日間）${warning}`);
   render(items, { autoFit });
+  syncUrlParams();
 }
 
-async function loadEvents(forceRefresh = false) {
-  const days = Number(document.getElementById("days").value || 30);
-
-  setStatus("実データ取得中...");
-  const refreshPart = forceRefresh ? "&refresh=1" : "";
-  const url = `/api/events?days=${encodeURIComponent(days)}${refreshPart}`;
+async function loadEvents() {
+  setStatus("データ取得中...");
+  const url = "/api/events?days=90";
 
   try {
     const res = await fetch(url);
@@ -320,5 +478,118 @@ clearAllWardsBtnEl.addEventListener("click", () => {
   selectedWards.clear();
   applyFiltersAndRender({ autoFit: false });
 });
-document.getElementById("reloadBtn").addEventListener("click", () => loadEvents(false));
+const nearbyBtn = document.getElementById("nearbyBtn");
+nearbyBtn.addEventListener("click", () => {
+  if (sortByDistance) {
+    sortByDistance = false;
+    nearbyBtn.classList.remove("active");
+    nearbyBtn.textContent = "現在地から近い順";
+    if (userLocationMarker) {
+      map.removeLayer(userLocationMarker);
+      userLocationMarker = null;
+    }
+    applyFiltersAndRender({ autoFit: false });
+    return;
+  }
+  if (!navigator.geolocation) {
+    setStatus("位置情報に対応していません");
+    return;
+  }
+  nearbyBtn.textContent = "取得中...";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      sortByDistance = true;
+      nearbyBtn.classList.add("active");
+      nearbyBtn.textContent = "現在地から近い順 (解除)";
+      if (userLocationMarker) map.removeLayer(userLocationMarker);
+      userLocationMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+        radius: 9,
+        color: "#fff",
+        weight: 3,
+        fillColor: "#4285f4",
+        fillOpacity: 1,
+      }).addTo(map).bindPopup("現在地");
+      map.setView([userLocation.lat, userLocation.lng], 14);
+      applyFiltersAndRender({ autoFit: false });
+    },
+    (err) => {
+      nearbyBtn.textContent = "現在地から近い順";
+      setStatus(`位置情報を取得できません: ${err.message}`);
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+});
+
+document.getElementById("fromDate").addEventListener("change", () => {
+  updatePresetHighlight();
+  applyFiltersAndRender({ autoFit: false });
+});
+document.getElementById("untilDate").addEventListener("change", () => {
+  updatePresetHighlight();
+  applyFiltersAndRender({ autoFit: false });
+});
+
+function computeWeekendRange(today) {
+  const dow = today.getDay();
+  if (dow === 0) {
+    return {
+      from: new Date(today.getTime() - 86400000),
+      until: today,
+    };
+  }
+  if (dow === 6) {
+    return {
+      from: today,
+      until: new Date(today.getTime() + 86400000),
+    };
+  }
+  const satOffset = 6 - dow;
+  const sat = new Date(today.getTime() + satOffset * 86400000);
+  const sun = new Date(sat.getTime() + 86400000);
+  return { from: sat, until: sun };
+}
+
+function computePresetRange(preset) {
+  const today = getJstToday();
+  if (preset === "weekend") {
+    return computeWeekendRange(today);
+  }
+  if (preset === "next-weekend") {
+    const thisWeekend = computeWeekendRange(today);
+    return {
+      from: new Date(thisWeekend.from.getTime() + 7 * 86400000),
+      until: new Date(thisWeekend.until.getTime() + 7 * 86400000),
+    };
+  }
+  return {
+    from: today,
+    until: new Date(today.getTime() + Number(preset) * 86400000),
+  };
+}
+
+function updatePresetHighlight() {
+  const currentFrom = document.getElementById("fromDate").value;
+  const currentUntil = document.getElementById("untilDate").value;
+  document.querySelectorAll(".date-presets button").forEach((btn) => {
+    const range = computePresetRange(btn.dataset.preset);
+    const matchFrom = currentFrom === formatDateValue(range.from);
+    const matchUntil = currentUntil === formatDateValue(range.until);
+    btn.classList.toggle("active", matchFrom && matchUntil);
+  });
+}
+
+document.querySelectorAll(".date-presets button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const range = computePresetRange(btn.dataset.preset);
+    document.getElementById("fromDate").value = formatDateValue(range.from);
+    document.getElementById("untilDate").value = formatDateValue(range.until);
+    updatePresetHighlight();
+    applyFiltersAndRender({ autoFit: false });
+  });
+});
+
+initDateRange();
+restoreFromUrl();
+updatePresetHighlight();
 loadEvents();
