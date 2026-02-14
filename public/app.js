@@ -630,6 +630,9 @@ function computeWeekendRange(today) {
 
 function computePresetRange(preset) {
   const today = getJstToday();
+  if (preset === "today") {
+    return { from: today, until: today };
+  }
   if (preset === "weekend") {
     return computeWeekendRange(today);
   }
