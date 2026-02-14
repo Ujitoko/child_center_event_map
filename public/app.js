@@ -320,5 +320,5 @@ clearAllWardsBtnEl.addEventListener("click", () => {
   selectedWards.clear();
   applyFiltersAndRender({ autoFit: false });
 });
-document.getElementById("reloadBtn").addEventListener("click", () => loadEvents(true));
+document.getElementById("reloadBtn").addEventListener("click", () => loadEvents(false));
 loadEvents();
