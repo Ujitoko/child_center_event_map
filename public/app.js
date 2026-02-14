@@ -223,6 +223,17 @@ function renderWardFilters(wardCounts = new Map()) {
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 const DISTANCE_BRACKETS = [1, 3, 5, 10];
 
+function getDayBadge(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const jst = new Date(d.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+  const jstDate = new Date(jst.getFullYear(), jst.getMonth(), jst.getDate());
+  const today = getJstToday();
+  if (jstDate.getTime() === today.getTime()) return "today";
+  if (jstDate.getTime() === today.getTime() + 86400000) return "tomorrow";
+  return "";
+}
+
 function getDateGroupKey(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "不明";
@@ -322,9 +333,11 @@ function render(items, options = {}) {
         distHtml = `<div class="meta">距離: ${distanceLabel(km)}</div>`;
       }
     }
+    const badge = getDayBadge(e.starts_at);
+    const badgeHtml = badge === "today" ? '<span class="day-badge today">今日</span>' : badge === "tomorrow" ? '<span class="day-badge tomorrow">明日</span>' : "";
     const shareBtn = navigator.share ? `<button type="button" class="share-btn" data-share="${i}">共有</button>` : "";
     card.innerHTML = `
-      <h3>${e.title}</h3>
+      <h3>${badgeHtml}${e.title}</h3>
       <div class="meta">開始: ${formatStartLabel(e)}</div>
       <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""}</div>
       ${distHtml}

@@ -95,7 +95,7 @@ const server = http.createServer(async (req, res) => {
       uptime_s: Math.floor(process.uptime()),
       cache_age_s: cache.savedAt ? Math.floor((Date.now() - cache.savedAt) / 1000) : null,
       cached_items: cache.data?.items?.length ?? 0,
-    });
+    }, req);
     return;
   }
 
@@ -104,18 +104,18 @@ const server = http.createServer(async (req, res) => {
       const days = Number(url.searchParams.get("days") || "30");
       const refresh = url.searchParams.get("refresh") === "1";
       const data = await getEvents(days, refresh);
-      sendJson(res, 200, data);
+      sendJson(res, 200, data, req);
     } catch (err) {
       sendJson(res, 500, {
         error: "failed_to_fetch_events",
         message: err instanceof Error ? err.message : String(err),
-      });
+      }, req);
     }
     return;
   }
 
   if (url.pathname === "/" || url.pathname === "/index.html") {
-    sendFile(res, path.join(PUBLIC_DIR, "index.html"));
+    sendFile(res, path.join(PUBLIC_DIR, "index.html"), req);
     return;
   }
 
@@ -125,7 +125,7 @@ const server = http.createServer(async (req, res) => {
     res.end("Forbidden");
     return;
   }
-  sendFile(res, candidate);
+  sendFile(res, candidate, req);
 });
 
 server.listen(PORT, () => {
