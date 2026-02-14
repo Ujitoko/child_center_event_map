@@ -446,6 +446,15 @@ button:active {
   display: none;
 }
 
+/* フィルター折りたたみ（デスクトップではトグル非表示） */
+.controls-section {
+  border: none;
+}
+
+.controls-toggle {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .mobile-tabs {
     display: flex;
@@ -492,7 +501,7 @@ button:active {
     grid-template-columns: 1fr;
     gap: 0;
     padding: 0;
-    height: calc(100dvh - 100px - 52px);
+    height: calc(100dvh - 62px - 52px);
   }
 
   .side {
@@ -525,8 +534,53 @@ button:active {
     box-shadow: none;
   }
 
+  .description {
+    display: none;
+  }
+
   h1 {
     font-size: 23px;
+  }
+
+  .controls-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .controls-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .controls-toggle::before {
+    content: "▶";
+    font-size: 10px;
+    transition: transform 0.2s ease;
+  }
+
+  .controls-section[open] > .controls-toggle::before {
+    transform: rotate(90deg);
+  }
+
+  .controls-section[open] > .controls-toggle {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .controls-section:not([open]) > .controls-toggle {
+    border-bottom: none;
+  }
+
+  .mobile-tab .tab-badge {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.85;
   }
 
   /* タッチ最適化 */

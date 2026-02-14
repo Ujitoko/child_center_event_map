@@ -29,38 +29,41 @@
 
     <div class="layout">
       <aside class="side">
-        <div class="controls">
-          <div class="date-range">
-            <div class="date-field">
-              <label for="fromDate">いつから</label>
-              <input id="fromDate" type="date" />
+        <details class="controls-section" open>
+          <summary class="controls-toggle">絞り込み</summary>
+          <div class="controls">
+            <div class="date-range">
+              <div class="date-field">
+                <label for="fromDate">いつから</label>
+                <input id="fromDate" type="date" />
+              </div>
+              <span class="date-separator">〜</span>
+              <div class="date-field">
+                <label for="untilDate">いつまで</label>
+                <input id="untilDate" type="date" />
+              </div>
             </div>
-            <span class="date-separator">〜</span>
-            <div class="date-field">
-              <label for="untilDate">いつまで</label>
-              <input id="untilDate" type="date" />
+            <div class="date-presets">
+              <button type="button" data-preset="weekend">今週末</button>
+              <button type="button" data-preset="next-weekend">来週末</button>
+              <button type="button" data-preset="7">1週間</button>
             </div>
+
+            <input type="text" id="searchInput" placeholder="イベント名・会場で検索…" />
+
+            <details class="ward-section">
+              <summary class="ward-filter-title">表示する区</summary>
+              <div class="ward-bulk">
+                <button id="selectAllWardsBtn" type="button">全選択</button>
+                <button id="clearAllWardsBtn" type="button">全解除</button>
+              </div>
+              <div id="wardFilters" class="ward-filters"></div>
+            </details>
+
+            <button type="button" id="nearbyBtn">現在地から近い順</button>
+            <p class="loading" id="status"></p>
           </div>
-          <div class="date-presets">
-            <button type="button" data-preset="weekend">今週末</button>
-            <button type="button" data-preset="next-weekend">来週末</button>
-            <button type="button" data-preset="7">1週間</button>
-          </div>
-
-          <input type="text" id="searchInput" placeholder="イベント名・会場で検索…" />
-
-          <details class="ward-section">
-            <summary class="ward-filter-title">表示する区</summary>
-            <div class="ward-bulk">
-              <button id="selectAllWardsBtn" type="button">全選択</button>
-              <button id="clearAllWardsBtn" type="button">全解除</button>
-            </div>
-            <div id="wardFilters" class="ward-filters"></div>
-          </details>
-
-          <button type="button" id="nearbyBtn">現在地から近い順</button>
-          <p class="loading" id="status"></p>
-        </div>
+        </details>
         <div class="list" id="list"></div>
       </aside>
       <main>

@@ -437,6 +437,7 @@ function applyFiltersAndRender(options = {}) {
   const warning = lastWarningText ? ` / ${lastWarningText}` : "";
   dateEl.textContent = `${lastDateText} (JST) のイベント ${lastFetchedItems.length}件取得`;
   setStatus(`表示件数: ${items.length}/${totalInRange}件（${days}日間）${warning}`);
+  updateTabBadge(items.length);
   render(items, { autoFit });
   syncUrlParams();
 }
@@ -606,13 +607,41 @@ function isMobile() {
   return window.matchMedia("(max-width: 900px)").matches;
 }
 
+function updateTabBadge(count) {
+  const listTab = document.querySelector('.mobile-tab[data-tab="list"]');
+  if (listTab) listTab.innerHTML = `リスト <span class="tab-badge">(${count})</span>`;
+}
+
 mobileTabs.forEach((tab) => {
   tab.addEventListener("click", () => switchTab(tab.dataset.tab));
 });
 
-// 初期状態: モバイルではリストタブをアクティブに
+// スワイプでタブ切り替え
+let touchStartX = 0;
+let touchStartY = 0;
+const SWIPE_THRESHOLD = 50;
+const layoutEl = document.querySelector(".layout");
+
+layoutEl.addEventListener("touchstart", (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+
+layoutEl.addEventListener("touchend", (e) => {
+  if (!isMobile()) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0) switchTab("map");
+    else switchTab("list");
+  }
+}, { passive: true });
+
+// 初期状態: モバイルではリストタブをアクティブに + フィルター折りたたみ
 if (isMobile()) {
   switchTab("list");
+  const controlsSection = document.querySelector(".controls-section");
+  if (controlsSection) controlsSection.removeAttribute("open");
 }
 
 initDateRange();
