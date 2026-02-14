@@ -56,7 +56,7 @@ function parseMinatoDetailMeta(html) {
   const now = parseYmdFromJst(new Date());
   const dates = parseOtaDatesFromText(normalizedDatePayload, now.y, now.m);
   const timeRange = parseTimeRangeFromText(`${dateText} ${bodyText}`);
-  const venue_name = placeText || "\u6E2F\u533A\u5150\u7AE5\u9928";
+  const venue_name = sanitizeVenueText(placeText) || "\u6E2F\u533A\u5150\u7AE5\u9928";
   const address = sanitizeAddressText(addressText) || extractTokyoAddress(bodyText);
   return { title, dates, timeRange, venue_name, address, bodyText };
 }
@@ -329,6 +329,7 @@ function createCollectMinatoJidokanEvents(deps) {
       const meta = parseMinatoDetailMeta(detailHtml);
       const title = meta.title || row.title;
       if (!title || !meta.dates || meta.dates.length === 0) continue;
+      if (/(介護予防|フレイル予防|認知症サポーター養成|男女共同参画|青少年問題協議会|景観まちづくり審議会)/.test(title)) continue;
       const hay = `${title} ${meta.venue_name || ""} ${meta.bodyText || ""} ${row.url} ${row.title}`;
       if (!facilityHint.test(hay) && !titleHint.test(hay) && !appiiHint.test(hay) && !WARD_CHILD_URL_HINT_RE.test(row.url) && !/\/kouhou\/event\//i.test(row.url))
         continue;

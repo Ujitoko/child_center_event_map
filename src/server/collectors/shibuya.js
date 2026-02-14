@@ -1,4 +1,4 @@
-const { normalizeText, normalizeJaDigits } = require("../text-utils");
+const { normalizeText, normalizeJaDigits, sanitizeVenueText } = require("../text-utils");
 const { fetchText } = require("../fetch-utils");
 const { stripTags, parseAnchors } = require("../html-utils");
 const {
@@ -190,7 +190,7 @@ function createCollectShibuyaJidokanEvents(deps) {
       if (!keepHint.test(`${title} ${meta.bodyText || ""} ${row.author || ""}`)) continue;
       if (!meta.dates || meta.dates.length === 0) continue;
 
-      const venueName = meta.venue_name || row.author || "渋谷区子育てイベント";
+      const venueName = sanitizeVenueText(meta.venue_name) || row.author || "渋谷区子育てイベント";
       const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
       const geoCandidates = buildShibuyaGeoCandidates(title, venueName, rawAddress);
       let point = await geocodeForWard(geoCandidates, SHIBUYA_SOURCE);

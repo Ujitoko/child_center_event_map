@@ -21,11 +21,17 @@ function inferWardVenueFromTitle(title, sourceLabel) {
   const text = normalizeText(title);
   if (!text) return `${sourceLabel}子ども関連施設`;
   const facilityPat =
-    "(?:児童館|児童センター|児童会館|子ども交流館|交流館|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|子育てひろば|子ども・子育てプラザ|子育てプラザ|こどもプラザ|わんぱくひろば|ひろば|プラザ|図書館|学習センター|コミュニティセンター|保育園|保健センター)";
+    "(?:児童館|児童センター|児童会館|子ども交流館|交流館|子どもセンター|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|子育てひろば|子ども・子育てプラザ|子育てプラザ|こどもプラザ|わんぱくひろば|ひろば|プラザ|図書館|学習センター|コミュニティセンター|保育園|保健センター)";
   const paren = text.match(
     new RegExp(`[（(]([^）)]{2,100}${facilityPat}[^）)]{0,30})[）)]`, "u")
   );
   if (paren) return sanitizeVenueText(paren[1]);
+  // Bracketed venue at start of title: 【ギャラクシティ】, 【XX児童館】
+  const bracket = text.match(/^【([^】]{2,40})】/u);
+  if (bracket) {
+    const v = sanitizeVenueText(bracket[1]);
+    if (v && v.length >= 2 && v.length <= 40 && !/^(お知らせ|注意|重要|中止|延期|開催|募集|変更|参加|無料|有料|予約|速報)/.test(v)) return v;
+  }
   const inline = text.match(
     new RegExp(`([^\\s]{2,100}${facilityPat})(?:[^\\s令和平成年月日0-9０-９]{0,10})`, "u")
   );
@@ -48,7 +54,7 @@ function inferVenueFromTitleSupplement(title, sourceLabel) {
   const text = normalizeText(title);
   if (!text) return "";
   const facilityWord =
-    "(?:図書館|分室|児童館|児童センター|児童会館|子ども交流館|交流館|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|学習センター|コミュニティセンター|こどもとしょしつ|としょしつ|ひろば|プラザ|会館|ホール|保育園|保健センター)";
+    "(?:図書館|分室|児童館|児童センター|児童会館|子ども交流館|交流館|子どもセンター|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|学習センター|コミュニティセンター|こどもとしょしつ|としょしつ|ひろば|プラザ|会館|ホール|保育園|保健センター)";
 
   let m = text.match(new RegExp(`【([^】]{2,80}${facilityWord}[^】]{0,30})】`, "u"));
   if (m) {
@@ -173,7 +179,7 @@ function isLikelyDepartmentVenue(textRaw) {
   const text = normalizeText(textRaw);
   if (!text) return false;
   if (isLikelyAudienceText(text)) return true;
-  if (/(児童館|児童センター|児童会館|子ども交流館|交流館|子ども|こども|ひろば|プラザ|会館|図書館|学習センター|コミュニティセンター|保育園|福祉センター|区民センター|住区センター|区民活動センター|文化センター|保健センター|学校|公園|未来館)/.test(text)) return false;
+  if (/(児童館|児童センター|児童会館|子ども交流館|交流館|子どもセンター|子ども|こども|ひろば|プラザ|会館|図書館|学習センター|コミュニティセンター|保育園|福祉センター|区民センター|住区センター|区民活動センター|文化センター|保健センター|学校|公園|未来館)/.test(text)) return false;
   return /(部|課|係|担当|組織|推進|支援|保育サービス|保育課|環境課)/.test(text);
 }
 

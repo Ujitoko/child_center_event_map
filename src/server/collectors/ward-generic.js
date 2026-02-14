@@ -119,6 +119,7 @@ function createCollectWardGenericEvents(deps) {
           continue;
         }
       }
+      if (!useRowFallback && /(?:ご指定のページは見つかりませんでした|ページが見つかりません|お探しのページは見つかりません|指定されたページは存在しません)/.test(detailHtml)) continue;
       meta = useRowFallback
         ? {
             title: row.title || "",

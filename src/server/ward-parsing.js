@@ -220,8 +220,26 @@ function parseGenericWardDetailMeta(source, html, fallbackDate, fallbackTitle) {
     sections.push({ heading: h, value: v });
   };
   let m;
-  const h2Re = /<h2[^>]*>([\s\S]*?)<\/h2>\s*<p[^>]*>([\s\S]*?)<\/p>/gi;
-  while ((m = h2Re.exec(html)) !== null) pushSection(m[1], m[2]);
+  // Two-step h2 parsing to prevent backtracking across h2 boundaries
+  {
+    const h2TagRe = /<h2[^>]*>((?:[^<]|<(?!\/h2>))*)<\/h2>/gi;
+    while ((m = h2TagRe.exec(html)) !== null) {
+      const after = html.slice(h2TagRe.lastIndex);
+      const pMatch = after.match(/^\s*<p[^>]*>([\s\S]*?)<\/p>/i);
+      if (pMatch) { pushSection(m[1], pMatch[1]); continue; }
+      const tdMatch = after.match(/^\s*<table[^>]*>[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (tdMatch) pushSection(m[1], tdMatch[1]);
+    }
+  }
+  // h3 sections (墨田区 pattern: <div><h3>heading</h3></div></div><p>value</p>)
+  {
+    const h3TagRe = /<h3[^>]*>((?:[^<]|<(?!\/h3>))*)<\/h3>/gi;
+    while ((m = h3TagRe.exec(html)) !== null) {
+      const after = html.slice(h3TagRe.lastIndex, h3TagRe.lastIndex + 200);
+      const pMatch = after.match(/<p[^>]*>([\s\S]*?)<\/p>/i);
+      if (pMatch) pushSection(m[1], pMatch[1]);
+    }
+  }
   const dtRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
   while ((m = dtRe.exec(html)) !== null) pushSection(m[1], m[2]);
   const thRe = /<tr[\s\S]*?<th[^>]*>([\s\S]*?)<\/th>[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>[\s\S]*?<\/tr>/gi;
@@ -238,12 +256,17 @@ function parseGenericWardDetailMeta(source, html, fallbackDate, fallbackTitle) {
   if (!venue_name && jsonLdMeta.venue_name) venue_name = sanitizeVenueText(jsonLdMeta.venue_name);
   if (!address && jsonLdMeta.address) address = sanitizeAddressText(jsonLdMeta.address);
   if (!venue_name) {
-    const vm = allText.match(/(?:会場|場所|開催場所|実施場所)\s*[:：]\s*([^\n]{2,120})/);
+    const vm = allText.match(/(?:会場|場所|開催場所|実施場所)\s*[:：]\s*([^。、！？]{2,80})/);
     if (vm) venue_name = sanitizeVenueText(vm[1]);
   }
   if (!venue_name) {
-    const vb = allText.match(/【(?:会場|場所|開催場所|実施場所)】\s*([^\n【]{2,120})/);
+    const vb = allText.match(/【(?:会場|場所|開催場所|実施場所)】\s*([^。、【]{2,80})/);
     if (vb) venue_name = sanitizeVenueText(vb[1]);
+  }
+  // "Xで実施/開催します" pattern (中野区 etc.)
+  if (!venue_name) {
+    const vm = allText.match(/([^\s。、をがのにてはも]{2,20})で(?:実施|開催)(?:します|いたします)/);
+    if (vm) venue_name = sanitizeVenueText(vm[1]);
   }
   if (!address) {
     const am = allText.match(/(?:住所|所在地)\s*[:：]\s*([^\n]{4,160})/);

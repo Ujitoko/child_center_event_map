@@ -47,7 +47,7 @@ function sanitizeVenueText(value) {
   text = text.replace(/\s*【住所】.*/, "");
   text = text.replace(/\s*[（(]住所[:：].*/, "");
   // Truncate at parenthesized addresses: （東京都X区...） or （X区Y丁目...）
-  text = text.replace(/\s*[（(](?:東京都)?[^\s（）()]{2,8}区[^\s（）()]{2,}[0-9０-９丁目番号][^）)]*[）)].*/, "");
+  text = text.replace(/\s*[（(](?:東京都)?[^\s（）()]{2,8}区[^\s（）()]{2,}[0-9０-９丁目番号][^）)]*(?:[）)].*|$)/, "");
   // Truncate at parenthesized date ranges: （令和N年...) or （20XX年...)
   text = text.replace(/\s*[（(](?:令和\d+年|20\d{2}年)\d{1,2}月.*/, "");
   // Truncate at parenthesized descriptions: （無料で...) etc.
@@ -77,7 +77,7 @@ function sanitizeVenueText(value) {
   // Reject venue starting with ・ (list items like "・ゆいの森あらかわ ...")
   if (/^・/.test(text)) return "";
   // Reject descriptions/explanatory text mistaken as venue
-  if (/^(?:協定を結んで|観察場所|集合場所|コース[:：]|令和\d+年\d+月\d+日|・20\d{2}年)/.test(text)) return "";
+  if (/^(?:協定を結んで|観察場所|集合場所|コース[:：]|令和\d+年\d+月\d+日|・20\d{2}年|詳細は)/.test(text)) return "";
   // Reject text that looks like generic description, not a venue
   if (/^(?:子育ての「|演劇・|区内小・中|対象児童|当日は、|今回は、)/.test(text)) return "";
   if (/^(?:子\s*\(\s*こ\s*\)|文京区\s*\()/.test(text)) return "";
@@ -88,9 +88,11 @@ function sanitizeVenueText(value) {
   // Reject "現地集合現地解散" etc. with マイページ
   if (/くわしくは.*(?:マイページ|ページ)/.test(text)) return "";
   // Truncate at performer/artist info after venue name (中野区 pattern)
-  text = text.replace(/\s+(?:ヴァイオリン|ピアノ|チェロ|フルート|ギター)\s+[^\s]{1,10}氏\s.*/, "");
+  text = text.replace(/\s+(?:ヴァイオリン|ピアノ|チェロ|フルート|ギター)\s+[^\s]{1,10}(?:\s+[^\s]{1,10})?氏\s.*/, "");
+  // Truncate at comma followed by performer/instrument names
+  text = text.replace(/[、,]\s*[^\s、,]{1,20}\s+(?:ヴァイオリン|ピアノ|チェロ|フルート|ギター)\s.*/, "");
   // If text starts with a facility name followed by address/admin content, extract just the facility
-  const facilityPat = "(?:児童館|児童センター|児童会館|子ども交流館|交流館|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|子育てひろば|子ども・子育てプラザ|子育てプラザ|こどもプラザ|わんぱくひろば|ひろば|プラザ|図書館|学習センター|コミュニティセンター|保育園|保健センター|ホール|体育館|会館|未来館|公園|スポーツセンター|キャンパス|小学校|ぼたん苑|公会堂|キッズパーク|区役所|推進センター)";
+  const facilityPat = "(?:児童館|児童センター|児童会館|子ども交流館|交流館|子どもセンター|子ども家庭支援センター|子育て支援センター|すこやか福祉センター|福祉センター|住区センター|区民センター|区民活動センター|文化センター|子育てひろば|子ども・子育てプラザ|子育てプラザ|こどもプラザ|わんぱくひろば|ひろば|プラザ|図書館|学習センター|コミュニティセンター|保育園|保健センター|ホール|体育館|会館|未来館|公園|スポーツセンター|キャンパス|小学校|ぼたん苑|公会堂|キッズパーク|区役所|推進センター)";
   const leadingFacility = text.match(new RegExp(`^([^\\s　]{1,40}${facilityPat})`, "u"));
   if (leadingFacility) {
     const after = text.slice(leadingFacility[0].length);

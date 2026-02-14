@@ -47,13 +47,28 @@ function parseChiyodaDetailMeta(html, fallbackDate) {
   const title = normalizeText(stripTags((html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || [])[1] || ""));
   const allText = normalizeJaDigits(normalizeText(stripTags(html)));
   const sections = [];
-  const h2Re = /<h2[^>]*>([\s\S]*?)<\/h2>\s*<p[^>]*>([\s\S]*?)<\/p>/gi;
   let m;
-  while ((m = h2Re.exec(html)) !== null) {
-    const heading = normalizeText(stripTags(m[1]));
-    const value = normalizeJaDigits(normalizeText(stripTags(m[2])));
-    if (!heading || !value) continue;
-    sections.push({ heading, value });
+  // Use two-step approach to prevent backtracking across h2 boundaries
+  {
+    const h2TagRe = /<h2[^>]*>((?:[^<]|<(?!\/h2>))*)<\/h2>/gi;
+    while ((m = h2TagRe.exec(html)) !== null) {
+      const heading = normalizeText(stripTags(m[1]));
+      if (!heading) continue;
+      const after = html.slice(h2TagRe.lastIndex);
+      // h2 followed by <p>
+      const pMatch = after.match(/^\s*<p[^>]*>([\s\S]*?)<\/p>/i);
+      if (pMatch) {
+        const value = normalizeJaDigits(normalizeText(stripTags(pMatch[1])));
+        if (value) sections.push({ heading, value });
+        continue;
+      }
+      // h2 followed by <table> → extract first <td>
+      const tdMatch = after.match(/^\s*<table[^>]*>[\s\S]*?<td[^>]*>([\s\S]*?)<\/td>/i);
+      if (tdMatch) {
+        const value = normalizeJaDigits(normalizeText(stripTags(tdMatch[1])));
+        if (value) sections.push({ heading, value });
+      }
+    }
   }
   const dateText = sections.filter((x) => /日時|開催日|日程|開催期間/i.test(x.heading)).map((x) => x.value).join(" ");
   const timeRange = parseTimeRangeFromText(`${dateText} ${allText}`);
