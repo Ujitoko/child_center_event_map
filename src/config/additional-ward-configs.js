@@ -214,7 +214,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: false,
       ignoreUrlHint: true,
-      titleDenyRe: /(文字サイズ|色合い変更|Multilingual|検索の方法|ページID検索|まちの湯健康事業|荻窪イルミネーション|荻外荘展示棟|すぎなみコレクション|NEWSTART健康セミナー|シルバー人材センター|原水爆禁止署名)/i,
+      titleDenyRe: /(文字サイズ|色合い変更|Multilingual|検索の方法|ページID検索|まちの湯健康事業|荻窪イルミネーション|荻外荘展示棟|すぎなみコレクション|NEWSTART健康セミナー|シルバー人材センター|原水爆禁止署名|自立サポート体操教室)/i,
       eventWordRe: WARD_EVENT_WORD_RE,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
@@ -249,7 +249,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: true,
       titleDenyRe:
-        /(介護に関する入門的研修|コミュニティ大学|発達障害講演会)/i,
+        /(介護に関する入門的研修|コミュニティ大学|発達障害講演会|ヒアリングフレイル|男女共同参画.*宣言)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -315,6 +315,7 @@ function buildAdditionalWardConfigs(deps) {
       },
       requirePreHint: false,
       relaxChildFilter: true,
+      titleDenyRe: /(臨時休館.*お知らせ|児童館の臨時休館)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -437,7 +438,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: true,
       titleDenyRe:
-        /(えどがわスポーツサポートクラブ|女性視点でアップデート|小規模保育所就職フェア)/i,
+        /(えどがわスポーツサポートクラブ|女性視点でアップデート|小規模保育所就職フェア|あなたが区議会議員)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -461,7 +462,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: true,
       titleDenyRe:
-        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|検索について|色変更|音声読み上げ|多言語対応|Language|フォントサイズ|文字サイズ|アクセシビリティ方針|^福祉・介護$|^ごみ・資源・環境$|^くらし$|^地域共生・区民活動$|^消費生活・相談$|^道路・交通・自転車$|^住まい$|^健康・衛生$|^産業・商工$|^産業振興・企業支援$|^国際・文化・スポーツ$|^まちづくり$|^防災・防犯$|^芸術・文化・歴史$|^環境・廃棄物$|^雇用・就労支援$|^区政情報$|^届出・届出窓口$|^審査請求|^まちづくり・都市計画$|モバイル新宿区の紹介|^大久保・百人町地区クリーン活動$|転生したら芸術家|SOMPO美術館|ワーク・ライフ・バランス|常任委員会|^選挙$|^施設案内$|新宿文化センターリニューアル|NHK.*公開収録|^行政評価$|^有償刊行物$|^防犯[、,]|^防災$|避難場所・ターミナル)/i,
+        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|検索について|色変更|音声読み上げ|多言語対応|Language|フォントサイズ|文字サイズ|アクセシビリティ方針|^福祉・介護$|^ごみ・資源・環境$|^くらし$|^地域共生・区民活動$|^消費生活・相談$|^道路・交通・自転車$|^住まい$|^健康・衛生$|^産業・商工$|^産業振興・企業支援$|^国際・文化・スポーツ$|^まちづくり$|^防災・防犯$|^芸術・文化・歴史$|^環境・廃棄物$|^雇用・就労支援$|^区政情報$|^届出・届出窓口$|^審査請求|^まちづくり・都市計画$|モバイル新宿区の紹介|^大久保・百人町地区クリーン活動$|転生したら芸術家|SOMPO美術館|ワーク・ライフ・バランス|常任委員会|^選挙$|^施設案内$|新宿文化センターリニューアル|NHK.*公開収録|^行政評価$|^有償刊行物$|^防犯[、,]|^防災$|避難場所・ターミナル|次世代育成協議会|働く女性応援講座|新宿区議会|定例会.*本会議|議会中継|傍聴のご案内|議会だより|請願・陳情|議長・副議長|会派別名簿|議会の仕組み|議決結果一覧|議員報酬|政務活動費)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,

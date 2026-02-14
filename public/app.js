@@ -126,7 +126,7 @@ function formatJstDate(iso) {
 function formatStartLabel(eventItem) {
   if (eventItem && eventItem.time_unknown) {
     const d = formatJstDate(eventItem.starts_at);
-    return d ? `${d} 不明` : "不明";
+    return d || "";
   }
   return formatJst(eventItem?.starts_at);
 }
@@ -134,10 +134,10 @@ function formatStartLabel(eventItem) {
 function formatStartForPopup(eventItem) {
   if (eventItem && eventItem.time_unknown) {
     const d = formatJstDate(eventItem.starts_at);
-    return d ? `${d} (時刻不明)` : "時刻不明";
+    return d || "";
   }
   const d = new Date(eventItem?.starts_at);
-  if (Number.isNaN(d.getTime())) return "時刻不明";
+  if (Number.isNaN(d.getTime())) return "";
   return new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
     month: "2-digit",

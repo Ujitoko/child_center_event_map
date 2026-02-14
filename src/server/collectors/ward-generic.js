@@ -133,6 +133,7 @@ function createCollectWardGenericEvents(deps) {
     const title = meta.title || row.title;
     if (!title) continue;
     if (cfg.titleDenyRe && cfg.titleDenyRe.test(title)) continue;
+    if (/(男女共同参画|フレイル予防|認知症サポーター養成|介護予防(?:総合|コネクター)|青少年問題協議会|議会定例会|清掃一部事務組合|景観まちづくり審議会|個人情報の取扱)/.test(title)) continue;
     if (!meta.timeRange) {
       meta.timeRange = parseTimeRangeFromText(`${title} ${row.title || ""} ${meta.bodyText || ""}`);
     }

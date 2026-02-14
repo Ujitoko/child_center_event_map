@@ -109,6 +109,18 @@ function sanitizeVenueText(value) {
   }
   // Reject audience/eligibility text used as venue
   if (/^(?:小学|小・中|中学|高校|未就学|乳幼児|[0-9０-９]+歳)/.test(text) && /(?:年生|以上|以下|対象|保護者|※)/.test(text)) return "";
+  // Truncate at ※ annotations
+  text = text.replace(/\s*※.*/, "");
+  // Truncate at sentence endings that indicate descriptions, not venue names
+  text = text.replace(/[。、]\s*(?:集合場所等|くわしくは|詳しくは|詳細は).*/, "");
+  text = text.replace(/\s*(?:をご覧ください|をご利用ください|をご参照ください|をご用意ください|をご確認ください).*/, "");
+  // Reject text that reads as instructions, not venue names
+  if (/(?:ください|をご覧$|します[。]?$)/.test(text)) return "";
+  text = normalizeText(text);
+  // Truncate after "集合・解散" pattern
+  text = text.replace(/集合[・、]解散.*/, "集合");
+  // Truncate venue at address after facility name (電話番号: pattern)
+  text = text.replace(/^\s*電話番号\s*[:：].*/, "");
   // Reject long descriptions that don't look like venue names (no facility keyword)
   if (text.length > 50 && !new RegExp(facilityPat).test(text)) return "";
   if (!text) return "";
