@@ -310,18 +310,35 @@ function render(items, options = {}) {
         distHtml = `<div class="meta">距離: ${distanceLabel(km)}</div>`;
       }
     }
+    const shareBtn = navigator.share ? `<button type="button" class="share-btn" data-share="${i}">共有</button>` : "";
     card.innerHTML = `
       <h3>${e.title}</h3>
       <div class="meta">開始: ${formatStartLabel(e)}</div>
       <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""}</div>
       ${distHtml}
       <div class="meta">ソース: ${e.source_label || e.source || "unknown"}</div>
-      <div class="meta"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a></div>
+      <div class="card-actions">
+        <a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>
+        ${shareBtn}
+      </div>
     `;
+    const shareBtnEl = card.querySelector(".share-btn");
+    if (shareBtnEl) {
+      shareBtnEl.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const venue = e.venue_name || "";
+        const dateStr = formatStartLabel(e);
+        navigator.share({
+          title: e.title,
+          text: `${e.title}\n${dateStr} ${venue}\n`,
+          url: e.url,
+        }).catch(() => {});
+      });
+    }
     card.dataset.idx = String(i);
     const idx = i;
     card.addEventListener("click", (ev) => {
-      if (ev.target.tagName === "A") return;
+      if (ev.target.tagName === "A" || ev.target.closest(".share-btn")) return;
       const entry = markerMap.get(idx);
       if (entry) {
         if (isMobile()) switchTab("map");
