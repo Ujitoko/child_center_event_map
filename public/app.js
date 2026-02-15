@@ -338,10 +338,12 @@ function render(items, options = {}) {
     const badge = getDayBadge(e.starts_at);
     const badgeHtml = badge === "today" ? '<span class="day-badge today">今日</span>' : badge === "tomorrow" ? '<span class="day-badge tomorrow">明日</span>' : "";
     const shareBtn = navigator.share ? `<button type="button" class="share-btn" data-share="${i}">共有</button>` : "";
+    const hasCoord = parseFiniteCoord(e.lat) !== null && parseFiniteCoord(e.lng) !== null;
+    const noMapTag = hasCoord ? "" : '<span class="no-map-tag">地図なし</span>';
     card.innerHTML = `
       <h3>${badgeHtml}${e.title}</h3>
       <div class="meta">開始: ${formatStartLabel(e)}</div>
-      <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""}</div>
+      <div class="meta">場所: ${e.venue_name || "会場未設定"} ${e.address || ""} ${noMapTag}</div>
       ${distHtml}
       <div class="meta">ソース: ${e.source_label || e.source || "unknown"}</div>
       <div class="card-actions">

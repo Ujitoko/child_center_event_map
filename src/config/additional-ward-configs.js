@@ -71,7 +71,7 @@ function buildAdditionalWardConfigs(deps) {
       parseOpts: {
         urlAllow:
           /city\.bunkyo\.lg\.jp\/(?:kosodatekyouiku\/.+\.(?:html?|pdf)|b050\/p\d+\.html)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$|\/b050\/p002413\.html/i,
+        urlDeny: /\/(?:index|sitemap)\.html$|\/b050\/p002413\.html|tsutaeru\.cloud/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },

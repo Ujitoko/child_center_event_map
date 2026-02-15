@@ -8,6 +8,7 @@ const {
   inferVenueFromTitleSupplement,
   inferWardVenueFromUrl,
   inferRegionalVenueFromTitle,
+  isJunkVenueName,
   isLikelyAudienceText,
   isLikelyDepartmentVenue,
   isOnlineOnlyWithoutPlace,
@@ -161,6 +162,7 @@ function createCollectWardGenericEvents(deps) {
       if (regionalVenue) venue_name = regionalVenue;
     }
     if (isLikelyAudienceText(venue_name)) venue_name = "";
+    if (isJunkVenueName(venue_name)) venue_name = "";
     if (!venue_name) venue_name = `${source.label}\u5b50\u3069\u3082\u95a2\u9023\u65bd\u8a2d`;
     const venueLooksGeneric =
       genericVenueRe.test(venue_name) ||

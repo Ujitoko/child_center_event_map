@@ -1,11 +1,33 @@
 const { normalizeText, sanitizeVenueText, hasConcreteAddressToken } = require("./text-utils");
 
-function stripTags(html) {
-  return String(html || "")
-    .replace(/<br\s*\/?>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
+function decodeHtmlEntities(text) {
+  return text
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, "'")
+    .replace(/&rsquo;/gi, "\u2019")
+    .replace(/&lsquo;/gi, "\u2018")
+    .replace(/&rdquo;/gi, "\u201D")
+    .replace(/&ldquo;/gi, "\u201C")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const cp = parseInt(hex, 16);
+      return cp > 0 && cp <= 0x10FFFF ? String.fromCodePoint(cp) : "";
+    })
+    .replace(/&#(\d+);/g, (_, dec) => {
+      const cp = parseInt(dec, 10);
+      return cp > 0 && cp <= 0x10FFFF ? String.fromCodePoint(cp) : "";
+    });
+}
+
+function stripTags(html) {
+  return decodeHtmlEntities(
+    String(html || "")
+      .replace(/<br\s*\/?>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+  )
     .replace(/\s+/g, " ")
     .trim();
 }

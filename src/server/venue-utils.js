@@ -192,6 +192,16 @@ function isOnlineOnlyWithoutPlace(textRaw) {
   return !physical;
 }
 
+function isJunkVenueName(venueName) {
+  const v = normalizeText(venueName);
+  if (!v) return true;
+  if (v.length <= 3 && /^[\u3040-\u309F]+$/.test(v)) return true;
+  if (/innerHTML|getElementById|getTracker|function\s*\(|\.php|\.js|UA-\d/i.test(v)) return true;
+  if (/^(ホール|テナント|募集終了|例|募集案内|err)$/i.test(v)) return true;
+  if (/^[月火水木金土日・、（）()\s\d:：～〜時分]+$/.test(v)) return true;
+  return false;
+}
+
 function isGenericWardVenueName(venueName, wardLabel) {
   const v = normalizeText(venueName);
   const w = normalizeText(wardLabel);
@@ -213,6 +223,7 @@ module.exports = {
   inferWardVenueFromTitle,
   inferWardVenueFromUrl,
   isGenericWardVenueName,
+  isJunkVenueName,
   isLikelyAudienceText,
   isLikelyDepartmentVenue,
   isOnlineOnlyWithoutPlace,
