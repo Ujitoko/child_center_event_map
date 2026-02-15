@@ -126,7 +126,25 @@ label {
 
 #nearbyBtn {
   margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+.reset-btn {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 12px;
   margin-bottom: 10px;
+}
+
+.reset-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  box-shadow: none;
+  transform: none;
 }
 
 #nearbyBtn.active {

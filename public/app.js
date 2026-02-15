@@ -423,6 +423,27 @@ function parseDateValue(val) {
   return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
 }
 
+function saveWardsToStorage() {
+  try {
+    if (selectedWards.size > 0) {
+      localStorage.setItem("selectedWards", JSON.stringify([...selectedWards]));
+    } else {
+      localStorage.removeItem("selectedWards");
+    }
+  } catch (_) {}
+}
+
+function restoreWardsFromStorage() {
+  try {
+    const saved = localStorage.getItem("selectedWards");
+    if (saved) {
+      for (const w of JSON.parse(saved)) {
+        if (TOKYO_23_WARDS.includes(w)) selectedWards.add(w);
+      }
+    }
+  } catch (_) {}
+}
+
 function syncUrlParams() {
   const params = new URLSearchParams();
   const fromVal = document.getElementById("fromDate").value;
@@ -529,6 +550,7 @@ function applyFiltersAndRender(options = {}) {
   updateTabBadge(items.length);
   render(items, { autoFit });
   syncUrlParams();
+  saveWardsToStorage();
 }
 
 async function loadEvents() {
@@ -740,7 +762,25 @@ if (isMobile()) {
   if (controlsSection) controlsSection.removeAttribute("open");
 }
 
+// リセットボタン
+document.getElementById("resetBtn").addEventListener("click", () => {
+  selectedWards.clear();
+  searchQuery = "";
+  document.getElementById("searchInput").value = "";
+  sortByDistance = false;
+  nearbyBtn.classList.remove("active");
+  nearbyBtn.textContent = "現在地から近い順";
+  if (userLocationMarker) {
+    map.removeLayer(userLocationMarker);
+    userLocationMarker = null;
+  }
+  initDateRange();
+  updatePresetHighlight();
+  applyFiltersAndRender({ autoFit: true });
+});
+
 initDateRange();
+restoreWardsFromStorage();
 restoreFromUrl();
 updatePresetHighlight();
 loadEvents();
