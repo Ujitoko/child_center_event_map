@@ -23,7 +23,7 @@ function buildGeoCandidates(venue) {
   // 括弧内の町名+番地 (八王子市なし)
   const townPatterns = venue.match(/(?:[\u4E00-\u9FFF]{2,}町)[0-9０-９]+[-ー－][0-9０-９]+(?:[-ー－][0-9０-９]+)*/g) || [];
   for (const town of townPatterns) {
-    candidates.push(`八王子市${town}`);
+    candidates.push(`東京都八王子市${town}`);
   }
   // 施設名のみ (括弧・階数・部屋名を除去)
   const cleaned = venue
@@ -32,18 +32,18 @@ function buildGeoCandidates(venue) {
     .replace(/\s*(地下|地上).*$/, "")
     .trim();
   if (cleaned && cleaned !== venue) {
-    candidates.push(`八王子市 ${cleaned}`);
+    candidates.push(`東京都八王子市 ${cleaned}`);
   }
   // 既知施設の住所引き当て
   const normalized = venue.replace(/[\s　・･]/g, "").replace(/[（(][^）)]*[）)]/g, "");
   for (const [name, addr] of Object.entries(KNOWN_FACILITY_ADDRESSES)) {
     if (normalized.includes(name)) {
-      candidates.unshift(addr);
+      candidates.unshift(/東京都/.test(addr) ? addr : `東京都${addr}`);
       break;
     }
   }
   // 元の会場名
-  candidates.push(`八王子市 ${venue}`);
+  candidates.push(`東京都八王子市 ${venue}`);
   return [...new Set(candidates)];
 }
 

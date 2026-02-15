@@ -25,6 +25,8 @@ function decodeHtmlEntities(text) {
 function stripTags(html) {
   return decodeHtmlEntities(
     String(html || "")
+      .replace(/<script[\s>][\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s>][\s\S]*?<\/style>/gi, " ")
       .replace(/<br\s*\/?>/gi, " ")
       .replace(/<[^>]+>/g, " ")
   )

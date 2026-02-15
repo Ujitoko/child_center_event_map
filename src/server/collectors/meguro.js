@@ -10,7 +10,7 @@ const {
   buildStartsEndsForDate,
   parseTimeRangeFromText,
 } = require("../date-utils");
-const { extractTokyoAddress } = require("../address-utils");
+const { extractTokyoAddress, isLikelyWardOfficeAddress } = require("../address-utils");
 const { hasJidokanHint } = require("../venue-utils");
 const { MEGURO_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 
@@ -133,9 +133,10 @@ function createCollectMeguroJidokanEvents(deps) {
 
         const placeSectionText = normalizeText(stripTags(placeSection));
         const venue = extractMeguroVenueFromTitle(`${title} ${placeSectionText}`);
-        const rawAddress =
+        let rawAddress =
           extractTokyoAddress(placeSectionText) ||
           extractTokyoAddress(allText);
+        if (isLikelyWardOfficeAddress("meguro", rawAddress)) rawAddress = "";
 
         const geoCandidates = buildMeguroGeoCandidates(title, venue, rawAddress);
         let point = await geocodeForWard(geoCandidates, MEGURO_SOURCE);

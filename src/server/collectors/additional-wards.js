@@ -67,6 +67,15 @@ async function collectAdditionalWardsEvents(maxDays) {
     katsushika,
     edogawa,
     shinjuku,
+    chofu,
+    fuchu,
+    koganei,
+    nishitokyo,
+    machida,
+    fussa,
+    musashimurayama,
+    akiruno,
+    komae,
   ] = await Promise.all([
     collectWardGenericEvents(configs.chuo.source, maxDays, configs.chuo),
     collectChuoAkachanTengokuEvents(maxDays),
@@ -85,6 +94,15 @@ async function collectAdditionalWardsEvents(maxDays) {
     collectWardGenericEvents(configs.katsushika.source, maxDays, configs.katsushika),
     collectWardGenericEvents(configs.edogawa.source, maxDays, configs.edogawa),
     collectWardGenericEvents(configs.shinjuku.source, maxDays, configs.shinjuku),
+    collectWardGenericEvents(configs.chofu.source, maxDays, configs.chofu),
+    collectWardGenericEvents(configs.fuchu.source, maxDays, configs.fuchu),
+    collectWardGenericEvents(configs.koganei.source, maxDays, configs.koganei),
+    collectWardGenericEvents(configs.nishitokyo.source, maxDays, configs.nishitokyo),
+    collectWardGenericEvents(configs.machida.source, maxDays, configs.machida),
+    collectWardGenericEvents(configs.fussa.source, maxDays, configs.fussa),
+    collectWardGenericEvents(configs.musashimurayama.source, maxDays, configs.musashimurayama),
+    collectWardGenericEvents(configs.akiruno.source, maxDays, configs.akiruno),
+    collectWardGenericEvents(configs.komae.source, maxDays, configs.komae),
   ]);
 
   const chuo = [];
@@ -114,6 +132,15 @@ async function collectAdditionalWardsEvents(maxDays) {
     katsushika,
     edogawa,
     shinjuku,
+    chofu,
+    fuchu,
+    koganei,
+    nishitokyo,
+    machida,
+    fussa,
+    musashimurayama,
+    akiruno,
+    komae,
   };
 }
 

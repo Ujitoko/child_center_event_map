@@ -26,7 +26,17 @@ function createFacilityMaster(deps) {
   function getFacilityAddressFromMaster(sourceKey, venueName) {
     const key = buildFacilityMasterKey(sourceKey, venueName);
     if (!key) return "";
-    return facilityAddressMaster.get(key) || "";
+    const exact = facilityAddressMaster.get(key);
+    if (exact) return exact;
+    // Fallback: partial match — venue contains a known facility name (荒川区 room suffix pattern)
+    const venueNorm = normalizeFacilityName(venueName);
+    const prefix = `${String(sourceKey || "").trim()}:`;
+    for (const [mk, addr] of facilityAddressMaster.entries()) {
+      if (!mk.startsWith(prefix)) continue;
+      const facName = mk.slice(prefix.length);
+      if (facName.length >= 3 && venueNorm.includes(facName)) return addr;
+    }
+    return "";
   }
 
   function getFacilityPointFromMaster(sourceKey, venueName) {

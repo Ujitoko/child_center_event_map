@@ -2,6 +2,7 @@ const {
   ADACHI_SOURCE,
   ARAKAWA_SOURCE,
   BUNKYO_SOURCE,
+  CHOFU_SOURCE,
   CHUO_SOURCE,
   EDOGAWA_SOURCE,
   ITABASHI_SOURCE,
@@ -16,6 +17,14 @@ const {
   TOSHIMA_SOURCE,
   WARD_CHILD_HINT_RE,
   WARD_EVENT_WORD_RE,
+  FUCHU_SOURCE,
+  KOGANEI_SOURCE,
+  NISHITOKYO_SOURCE,
+  MACHIDA_SOURCE,
+  FUSSA_SOURCE,
+  MUSASHIMURAYAMA_SOURCE,
+  AKIRUNO_SOURCE,
+  KOMAE_SOURCE,
 } = require("./wards");
 const { buildListCalendarUrl } = require("../server/ward-parsing");
 const { getDaysInMonth } = require("../server/date-utils");
@@ -467,6 +476,173 @@ function buildAdditionalWardConfigs(deps) {
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
       maxRows: 900,
+    },
+    chofu: {
+      source: CHOFU_SOURCE,
+      listUrls: (m) => [
+        `${CHOFU_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}`,
+      ],
+      parseOpts: {
+        blockRe: /<div id="tmp_event_cal_list">([\s\S]*?)<div id="event_cal_list_end_position">/i,
+        urlAllow: /city\.chofu\.lg\.jp\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: false,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
+      maxRows: 900,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|入札・契約|パブリック・コメント|附属機関等の会議|交通規制)/i,
+    },
+    fuchu: {
+      source: FUCHU_SOURCE,
+      listUrls: (m, now) => [
+        buildListCalendarUrl(`${FUCHU_SOURCE.baseUrl}/event/kodomo/calendar`, m, now),
+      ],
+      parseOpts: {
+        urlAllow: /city\.fuchu\.tokyo\.jp\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 500,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+    },
+    koganei: {
+      source: KOGANEI_SOURCE,
+      listUrls: (m, now) => [
+        buildListCalendarUrl(`${KOGANEI_SOURCE.baseUrl}/event/kosodatekyoiku/calendar`, m, now),
+      ],
+      parseOpts: {
+        urlAllow: /city\.koganei\.lg\.jp\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 500,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+    },
+    nishitokyo: {
+      source: NISHITOKYO_SOURCE,
+      listUrls: (m, now) => [
+        buildListCalendarUrl(`${NISHITOKYO_SOURCE.baseUrl}/event/calendar`, m, now),
+      ],
+      parseOpts: {
+        urlAllow: /city\.nishitokyo\.lg\.jp\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: false,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 500,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+    },
+    machida: {
+      source: MACHIDA_SOURCE,
+      listUrls: (m, now) => [
+        buildListCalendarUrl(`${MACHIDA_SOURCE.baseUrl}/event/kodomo/calendar`, m, now),
+      ],
+      parseOpts: {
+        urlAllow: /city\.machida\.tokyo\.jp\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 500,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+    },
+    fussa: {
+      source: FUSSA_SOURCE,
+      listUrls: (m) => [
+        `${FUSSA_SOURCE.baseUrl}/cgi-evt/event.cgi?year=${m.year}&month=${m.month}&cate=6&target=0`,
+      ],
+      parseOpts: {
+        blockRe: /<table[^>]*id="event"[^>]*>([\s\S]*?)<\/table>/i,
+        urlAllow: /city\.fussa\.tokyo\.jp\/(?!cgi-evt\/).+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$|eventsearch\.cgi/i,
+        useAnchorFallback: false,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 300,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ)/i,
+    },
+    musashimurayama: {
+      source: MUSASHIMURAYAMA_SOURCE,
+      listUrls: (m) => [
+        `${MUSASHIMURAYAMA_SOURCE.baseUrl}/cgi-evt/event.cgi?year=${m.year}&month=${m.month}&cate=4`,
+      ],
+      parseOpts: {
+        blockRe: /<table[^>]*id="event"[^>]*>([\s\S]*?)<\/table>/i,
+        urlAllow: /city\.musashimurayama\.lg\.jp\/(?!cgi-evt\/).+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$|eventsearch\.cgi/i,
+        useAnchorFallback: false,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 300,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ)/i,
+    },
+    akiruno: {
+      source: AKIRUNO_SOURCE,
+      listUrls: (m) => {
+        const ms = String(m.month).padStart(2, "0");
+        return [`${AKIRUNO_SOURCE.baseUrl}/event2/${m.year}${ms}_8.html`];
+      },
+      parseOpts: {
+        blockRe: /<table[^>]*class="calendar_month"[^>]*>([\s\S]*?)<\/table>/i,
+        urlAllow: /city\.akiruno\.tokyo\.jp\/(?:kosodate|event2)\/.+\.html?(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: false,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 300,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ)/i,
+    },
+    komae: {
+      source: KOMAE_SOURCE,
+      listUrls: (m) => {
+        const ms = String(m.month).padStart(2, "0");
+        return [`${KOMAE_SOURCE.baseUrl}/events/index.cfm/view.4.${m.year}${ms}.2035.html`];
+      },
+      parseOpts: {
+        blockRe: /<article[^>]*id="eventbox"[^>]*>([\s\S]*?)<\/article>/i,
+        urlAllow: /city\.komae\.tokyo\.jp\/events\/index\.cfm\/detail\.\d+\.\d+\.html/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        useAnchorFallback: true,
+        fallbackWhenRowsExist: true,
+      },
+      relaxChildFilter: true,
+      requirePreHint: false,
+      appendFallbackDate: true,
+      allowRowFallbackOnDetailError: true,
+      maxRows: 300,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ)/i,
     },
   };
 }

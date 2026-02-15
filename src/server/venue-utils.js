@@ -136,6 +136,10 @@ function inferWardVenueFromUrl(sourceKey, url) {
     }
   }
 
+  if (key === "arakawa") {
+    if (/\/hirobakan\//.test(pathname)) return "ゆいの森あらかわ";
+  }
+
   if (key === "nerima") {
     if (/\/shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido\//.test(pathname)) return "厚生文化会館";
     const nikoniko = pathname.match(/\/jidokan\/nikoniko\/([a-z0-9_-]+)\.html/);
@@ -198,7 +202,13 @@ function isJunkVenueName(venueName) {
   if (v.length <= 3 && /^[\u3040-\u309F]+$/.test(v)) return true;
   if (/innerHTML|getElementById|getTracker|function\s*\(|\.php|\.js|UA-\d/i.test(v)) return true;
   if (/^(ホール|テナント|募集終了|例|募集案内|err)$/i.test(v)) return true;
+  if (/^(事業終了|抽選結果を送信しました|映画上映会・講演会)$/.test(v)) return true;
+  if (/^まつり[」）)]内$/.test(v)) return true;
+  if (/^各児童館により/.test(v)) return true;
+  if (/^(?:観光[・\/]お祭り|講演[・\/]講座|スポーツ$|文化[・\/]芸術)/.test(v)) return true;
+  if (/^(?:区役所(?:北庁舎|本庁舎|新庁舎)|[^\s]{2,6}(?:市役所|区役所))\d+階/.test(v)) return true;
   if (/^[月火水木金土日・、（）()\s\d:：～〜時分]+$/.test(v)) return true;
+  if (/^[0-9０-９]+階[\s　]*(?:遊戯室|図工室|卓球室|会議室|集会室|研修室|多目的室|和室|体育室|ロビー)$/.test(v)) return true;
   return false;
 }
 
@@ -206,7 +216,7 @@ function isGenericWardVenueName(venueName, wardLabel) {
   const v = normalizeText(venueName);
   const w = normalizeText(wardLabel);
   if (!v || !w) return false;
-  const re = new RegExp(`^${w}(?:子ども関連施設|児童館|児童センター|子育てイベント)$`);
+  const re = new RegExp(`^${w}(?:子ども関連施設|子育て関連施設|子育て施設|児童館|児童センター|子育てイベント)$`);
   return re.test(v);
 }
 

@@ -1,4 +1,4 @@
-const { normalizeText, sanitizeAddressText, sanitizeVenueText, hasConcreteAddressToken } = require("../text-utils");
+const { normalizeText, sanitizeAddressText, sanitizeVenueText, hasConcreteAddressToken, stripFurigana } = require("../text-utils");
 const { buildDateKey, buildStartsEndsForDate, inRangeJst, parseYmdFromJst, getMonthsForRange, parseTimeRangeFromText } = require("../date-utils");
 const { buildWardGeoCandidates, parseWardListRows, extractDateFromUrl, parseGenericWardDetailMeta, parseGenericWardPdfMeta } = require("../ward-parsing");
 const { extractWardAddressFromText, isLikelyWardOfficeAddress } = require("../address-utils");
@@ -72,6 +72,7 @@ function createCollectWardGenericEvents(deps) {
     : uniqRows;
 
   const byId = new Map();
+  const byContentKey = new Map();
   const preHintRe = cfg.preHintRe || WARD_CHILD_HINT_RE;
   const childHintRe = cfg.childHintRe || WARD_CHILD_HINT_RE;
   const relaxChildFilter = cfg.relaxChildFilter === true;
@@ -132,10 +133,11 @@ function createCollectWardGenericEvents(deps) {
           }
         : parseGenericWardDetailMeta(source, detailHtml, fallbackDate, row.title);
     }
-    const title = meta.title || row.title;
+    const title = stripFurigana(meta.title || row.title);
     if (!title) continue;
     if (cfg.titleDenyRe && cfg.titleDenyRe.test(title)) continue;
     if (/(男女共同参画|フレイル予防|認知症サポーター養成|介護予防(?:総合|コネクター)|青少年問題協議会|議会定例会|清掃一部事務組合|景観まちづくり審議会|個人情報の取扱)/.test(title)) continue;
+    if (/^(受付時間|検索方法|空家等対策|入札・契約|広報・広聴|気象情報|条例・規則|保育政策|観光|救急医療|足立区役所|検索の方法)$/.test(title)) continue;
     if (!meta.timeRange) {
       meta.timeRange = parseTimeRangeFromText(`${title} ${row.title || ""} ${meta.bodyText || ""}`);
     }
@@ -153,7 +155,7 @@ function createCollectWardGenericEvents(deps) {
       if (inferredSupplement) venue_name = inferredSupplement;
     }
     const nerimaGenericVenue = source?.key === "nerima" && /ねりまのじどうかん|練馬区立児童館/.test(venue_name || "");
-    if (!venue_name || genericVenueRe.test(venue_name) || nerimaGenericVenue || isLikelyDepartmentVenue(venue_name)) {
+    if (!venue_name || genericVenueRe.test(venue_name) || nerimaGenericVenue || isLikelyDepartmentVenue(venue_name) || isJunkVenueName(venue_name)) {
       const urlVenue = inferWardVenueFromUrl(source.key, row.url);
       if (urlVenue) venue_name = urlVenue;
     }
@@ -180,7 +182,12 @@ function createCollectWardGenericEvents(deps) {
       if (inferredAddress) address = inferredAddress;
     }
     if (!address && source?.key && venue_name) address = getFacilityAddressFromMaster(source.key, venue_name);
+    if (!address && source?.key && venue_name) {
+      const baseVenue = venue_name.replace(/[（(][^）)]*[）)].*/u, "").trim();
+      if (baseVenue && baseVenue !== venue_name) address = getFacilityAddressFromMaster(source.key, baseVenue);
+    }
     if (isLikelyWardOfficeAddress(source?.key, address)) address = "";
+    if (!address && source?.key && venue_name) address = getFacilityAddressFromMaster(source.key, venue_name);
 
     const hay = `${title} ${venue_name} ${address} ${meta.bodyText || ""} ${row.title || ""}`;
     if (!relaxChildFilter && !childHintRe.test(hay) && !urlHintMatched) continue;
@@ -218,6 +225,9 @@ function createCollectWardGenericEvents(deps) {
       const dateTimeRange = meta?.timeRangeByDate && typeof meta.timeRangeByDate === "object" ? meta.timeRangeByDate[dKey] : null;
       const { startsAt, endsAt } = buildStartsEndsForDate(d, dateTimeRange || meta.timeRange, 10);
       const dateKey = `${d.y}${String(d.mo).padStart(2, "0")}${String(d.d).padStart(2, "0")}`;
+      const contentKey = `${source.key}|${title}|${dateKey}|${venue_name}`;
+      if (byContentKey.has(contentKey)) continue;
+      byContentKey.set(contentKey, true);
       const id = `ward:${source.key}:${row.url}:${title}:${dateKey}`;
       if (byId.has(id)) continue;
       byId.set(id, {

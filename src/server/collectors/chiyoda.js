@@ -13,7 +13,7 @@ const {
   inferChiyodaMonthlyFallbackDate,
   alignMonthlyFallbackDate,
 } = require("../date-utils");
-const { extractTokyoAddress } = require("../address-utils");
+const { extractTokyoAddress, isLikelyWardOfficeAddress } = require("../address-utils");
 const { CHIYODA_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 
 function parseChiyodaListRows(html, pageUrl, year, month) {
@@ -92,13 +92,21 @@ function parseChiyodaDetailMeta(html, fallbackDate) {
 function buildChiyodaGeoCandidates(title, venue_name, address) {
   const out = [];
   const push = (s) => { const t = normalizeText(s); if (!t) return; if (!out.includes(t)) out.push(t); };
-  if (address) { if (!/東京都/.test(address)) push(`東京都千代田区${address}`); push(address); }
+  if (address) {
+    const hasTokyo = /東京都/.test(address);
+    const hasWard = /千代田区/.test(address);
+    if (!hasTokyo) {
+      push(hasWard ? `東京都${address}` : `東京都千代田区${address}`);
+    }
+    push(address);
+    if (hasTokyo && !hasWard) push(address.replace(/^東京都\s*/, "千代田区"));
+  }
   const venue = normalizeText(venue_name);
   const noisyVenueRe = /(無料|どなたでも|在住|在勤|在学|区民|対象|定員|申込|参加|講座|説明会|オンライン|Zoom|Web|WEB)/i;
+  if (venue && !noisyVenueRe.test(venue)) push(`東京都千代田区 ${venue}`);
   if (venue && !noisyVenueRe.test(venue)) push(`${venue} 千代田区`);
   push(`${title} ${venue_name} 千代田区`);
   push(`${title} 千代田区`);
-  push("千代田区役所");
   return out;
 }
 
@@ -130,7 +138,7 @@ function parseChiyodaOshiraseRows(html, pageUrl) {
 }
 
 function createCollectChiyodaJidokanEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
 
   async function collectChiyodaJidokanEvents(maxDays) {
     const months = getMonthsForRange(maxDays);
@@ -201,7 +209,11 @@ function createCollectChiyodaJidokanEvents(deps) {
       let venueName = sanitizeVenueText(meta.venue_name);
       if (venueName && (isLikelyAudienceText(venueName) || /^(?:無料|有料|なし|千代田(?:区)?(?:に?在住|在勤|在学))/.test(venueName) || /(?:ましょう|ください|します)[）)（(]?/.test(venueName) || venueName === title)) venueName = "";
       if (!venueName) venueName = "\u5343\u4ee3\u7530\u533a\u5b50\u80b2\u3066\u95a2\u9023\u65bd\u8a2d";
-      const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      let rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      if (isLikelyWardOfficeAddress("chiyoda", rawAddress)) rawAddress = "";
+      if (!rawAddress && getFacilityAddressFromMaster) {
+        rawAddress = getFacilityAddressFromMaster("chiyoda", venueName) || "";
+      }
       const geoCandidates = buildChiyodaGeoCandidates(title, venueName, rawAddress);
       let point = await geocodeForWard(geoCandidates, CHIYODA_SOURCE);
       point = resolveEventPoint(CHIYODA_SOURCE, venueName, point, rawAddress);
@@ -269,7 +281,11 @@ function createCollectChiyodaJidokanEvents(deps) {
         let supVenue = sanitizeVenueText((supText.match(/(?:会場|場所)\s*[:：]\s*([^\n]{2,80})/) || [])[1] || "");
         if (supVenue && (isLikelyAudienceText(supVenue) || /^(?:無料|有料|なし|千代田(?:区)?(?:に?在住|在勤|在学))/.test(supVenue) || /(?:ましょう|ください|します)[）)（(]?/.test(supVenue))) supVenue = "";
         if (!supVenue) supVenue = "千代田区子育て施設";
-        const supAddress = extractTokyoAddress(supText);
+        let supAddress = extractTokyoAddress(supText);
+        if (isLikelyWardOfficeAddress("chiyoda", supAddress)) supAddress = "";
+        if (!supAddress && getFacilityAddressFromMaster) {
+          supAddress = getFacilityAddressFromMaster("chiyoda", supVenue) || "";
+        }
         let point = await geocodeForWard(buildChiyodaGeoCandidates(supTitle, supVenue, supAddress), CHIYODA_SOURCE);
         point = resolveEventPoint(CHIYODA_SOURCE, supVenue, point, supAddress);
         const address = resolveEventAddress(CHIYODA_SOURCE, supVenue, supAddress, point);
@@ -321,7 +337,11 @@ function createCollectChiyodaJidokanEvents(deps) {
           let venueName = sanitizeVenueText(meta.venue_name);
           if (venueName && (isLikelyAudienceText(venueName) || /^(?:無料|有料|なし|千代田(?:区)?(?:に?在住|在勤|在学))/.test(venueName) || /(?:ましょう|ください|します)[）)（(]?/.test(venueName) || venueName === meta.title)) venueName = "";
           if (!venueName) venueName = "千代田区保育園";
-          const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+          let rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+          if (isLikelyWardOfficeAddress("chiyoda", rawAddress)) rawAddress = "";
+          if (!rawAddress && getFacilityAddressFromMaster) {
+            rawAddress = getFacilityAddressFromMaster("chiyoda", venueName) || "";
+          }
           let point = await geocodeForWard(buildChiyodaGeoCandidates(meta.title, venueName, rawAddress), CHIYODA_SOURCE);
           point = resolveEventPoint(CHIYODA_SOURCE, venueName, point, rawAddress);
           const address = resolveEventAddress(CHIYODA_SOURCE, venueName, rawAddress, point);
@@ -456,7 +476,11 @@ function createCollectChiyodaJidokanEvents(deps) {
         const venue = row.facility || "\u5343\u4ee3\u7530\u533a\u5150\u7ae5\u9928";
         const title = row.title.includes(row.facility) ? row.title : `${row.facility} ${row.title}`;
         const timeRange = parseTimeRangeFromText(normalized);
-        const rawAddress = extractTokyoAddress(normalized);
+        let rawAddress = extractTokyoAddress(normalized);
+        if (isLikelyWardOfficeAddress("chiyoda", rawAddress)) rawAddress = "";
+        if (!rawAddress && getFacilityAddressFromMaster) {
+          rawAddress = getFacilityAddressFromMaster("chiyoda", venue) || "";
+        }
 
         let point = await geocodeForWard(buildChiyodaGeoCandidates(title, venue, rawAddress), CHIYODA_SOURCE);
         point = resolveEventPoint(CHIYODA_SOURCE, venue, point, rawAddress);

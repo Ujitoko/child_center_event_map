@@ -45,12 +45,13 @@ function extractDateFromUrl(url, baseY, baseMo) {
 function extractEmbeddedAddress(text, wardLabel) {
   if (!text) return [];
   const results = [];
-  // 括弧内の住所 (例: "（東日暮里6-28-15）", "(南砂2-3-5-102)")
+  // 括弧内の住所 (例: "（東日暮里6-28-15）", "(南砂2-3-5-102)", "（東日暮里6丁目17番6号）")
   const parenMatches = text.match(/[（(]([^）)]{3,60})[）)]/g) || [];
   for (const m of parenMatches) {
     const inner = m.slice(1, -1);
-    if (/[0-9０-９]+[-ー－][0-9０-９]+/.test(inner)) {
-      const addr = /東京都|区/.test(inner) ? inner : `${wardLabel}${inner}`;
+    if (/[0-9０-９]+[-ー－][0-9０-９]+|[0-9０-９]+丁目/.test(inner)) {
+      let addr = /東京都|区/.test(inner) ? inner : `${wardLabel}${inner}`;
+      if (!/東京都/.test(addr)) addr = `東京都${addr}`;
       results.push(addr);
     }
   }
@@ -166,6 +167,8 @@ function parseWardListRows(html, pageUrl, year, month, opts = {}) {
         row.match(/id="day(\d{1,2})"/i) ||
         row.match(/<th[^>]*class="[^"]*(?:day|sat|sun)[^"]*"[^>]*>[\s\S]*?<span[^>]*class="em"[^>]*>\s*(\d{1,2})\s*<\/span>/i) ||
         row.match(/calendar_day[^>]*>\s*(\d{1,2})\s*日/i) ||
+        row.match(/<th[^>]*class="[^"]*(?:day|sat|sun)[^"]*"[^>]*>\s*(\d{1,2})日/i) ||
+        row.match(/<th[^>]*class="cal_date"[^>]*>\s*(\d{1,2})\s*<\/th>/i) ||
         row.match(/class="[^"]*date[^"]*"[^>]*>\s*([\s\S]*?)<\/td>/i);
       let day = null;
       if (dayMatch) {

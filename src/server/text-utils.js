@@ -54,6 +54,8 @@ function sanitizeVenueText(value) {
   text = text.replace(/[（(](?:無料|有料|予約|申込|当日|詳細|参加)[^）)]{0,80}[）)].*/, "");
   // Truncate at schedule/activity info after facility name
   text = text.replace(/\s+(?:時間|活動期間|活動時間|開催日|内容|職員が)[:：].*/, "");
+  // Truncate at date info embedded after venue name (あきる野市 pattern)
+  text = text.replace(/\s+期日[:：].*/, "");
   // Truncate after "当日は" or descriptive content following venue
   text = text.replace(/\s+当日は[、,].*/, "");
   // Truncate at "大きなスクリーンで" etc. (description after room name)
@@ -68,6 +70,10 @@ function sanitizeVenueText(value) {
   if (/厚生文化会館/.test(text)) text = "厚生文化会館";
   // Reject venue starting with ★
   if (/^★/.test(text)) return "";
+  // Reject venue starting with date/schedule info (あきる野市 pattern)
+  if (/^(?:期日|日時|開催日|日程|時間)[:：]/.test(text)) return "";
+  // Reject CMS category labels used as venue (小金井市 pattern)
+  if (/^(?:子育て[・\/]教育|くらし[・\/]手続き|健康[・\/]福祉|まちづくり|文化[・\/]スポーツ|行政情報|施設案内)$/.test(text)) return "";
   // Truncate "ホール N年生の部" schedule text (文京区 pattern)
   if (/^ホール\s+(?:\d+年生|職員|大きな)/.test(text)) text = "ホール";
   // Reject venue starting with year (performer bios like "1997年、新日本フィル...")
@@ -148,6 +154,10 @@ function sanitizeAddressText(value) {
   text = normalizeText(text);
   if (!text) return "";
   text = text.replace(/郵便番号\s*/g, "");
+  // Strip floor/room prefix mixed into addresses (e.g., "中野区1階（江古田4丁目...")
+  text = text.replace(/([区市])\s*(?:地下)?[0-9０-９]+階[（(]/u, "$1");
+  // Strip stray opening paren between ward label and address (e.g., "中野区（江古田4丁目...")
+  text = text.replace(/([区市])\s*[（(](?=[\u4E00-\u9FFF])/u, "$1");
   if (/(ページ番号|法人番号|copyright|&copy;|PC版を表示する|スマートフォン版を表示する)/i.test(text)) return "";
   if (text.length > 140) text = normalizeText(text.slice(0, 140));
   if (/^\d{3}\s*-\s*\d{4}$/.test(text)) return "";
@@ -179,6 +189,12 @@ function scoreJapaneseText(textRaw) {
   return jaChars + dateMarkers * 3 + friendMarkers * 10 - brokenMarkers * 2;
 }
 
+function stripFurigana(text) {
+  return normalizeText(
+    String(text || "").replace(/\s+[（(]\s*[ぁ-ん]+\s*[）)]\s*/g, "")
+  );
+}
+
 module.exports = {
   clipByFieldDelimiter,
   hasConcreteAddressToken,
@@ -189,4 +205,5 @@ module.exports = {
   sanitizeGeoQueryText,
   sanitizeVenueText,
   scoreJapaneseText,
+  stripFurigana,
 };
