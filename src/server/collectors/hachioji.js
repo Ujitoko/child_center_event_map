@@ -2,6 +2,55 @@ const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst } = require("../date-utils");
 const { HACHIOJI_SOURCE } = require("../../config/wards");
 
+// 八王子市の代表点 — GSIが施設名で解決できない時に返す汎用座標
+const HACHIOJI_GENERIC_LAT = 35.6667;
+const HACHIOJI_GENERIC_LNG = 139.3158;
+
+// GSIが施設名で解決できない既知施設の住所
+const KNOWN_FACILITY_ADDRESSES = {
+  クリエイトホール: "八王子市東町5-6",
+  生涯学習センター: "八王子市東町5-6",
+  あったかホール: "八王子市北野町596-3",
+  コニカミノルタサイエンスドーム: "八王子市大横町9-13",
+  サイエンスドーム: "八王子市大横町9-13",
+  京王プラザホテル八王子: "八王子市旭町14-1",
+};
+
+/** 会場名から埋め込み住所を抽出し、ジオコーディング候補リストを構築 */
+function buildGeoCandidates(venue) {
+  const candidates = [];
+  // 括弧内の住所を抽出 (例: "八王子市散田町2-37-1", "北野町596-3")
+  const addrPatterns = venue.match(/八王子市[^\s（）()]+?[0-9０-９]+[-ー－][0-9０-９]+(?:[-ー－][0-9０-９]+)*/g) || [];
+  for (const addr of addrPatterns) {
+    candidates.push(addr);
+  }
+  // 括弧内の町名+番地 (八王子市なし)
+  const townPatterns = venue.match(/(?:[\u4E00-\u9FFF]{2,}町)[0-9０-９]+[-ー－][0-9０-９]+(?:[-ー－][0-9０-９]+)*/g) || [];
+  for (const town of townPatterns) {
+    candidates.push(`八王子市${town}`);
+  }
+  // 施設名のみ (括弧・階数・部屋名を除去)
+  const cleaned = venue
+    .replace(/[（(][^）)]*[）)]/g, "")
+    .replace(/\d+階.*$/, "")
+    .replace(/\s*(地下|地上).*$/, "")
+    .trim();
+  if (cleaned && cleaned !== venue) {
+    candidates.push(`八王子市 ${cleaned}`);
+  }
+  // 既知施設の住所引き当て
+  const normalized = venue.replace(/[\s　・･]/g, "").replace(/[（(][^）)]*[）)]/g, "");
+  for (const [name, addr] of Object.entries(KNOWN_FACILITY_ADDRESSES)) {
+    if (normalized.includes(name)) {
+      candidates.unshift(addr);
+      break;
+    }
+  }
+  // 元の会場名
+  candidates.push(`八王子市 ${venue}`);
+  return [...new Set(candidates)];
+}
+
 function createCollectHachiojiEvents(deps) {
   const { geocodeForWard, resolveEventPoint } = deps;
 
@@ -67,7 +116,13 @@ function createCollectHachiojiEvents(deps) {
       const venue = ev.venue_name;
       let point = null;
       if (venue) {
-        point = await geocodeForWard([`八王子市 ${venue}`], HACHIOJI_SOURCE);
+        const geoCandidates = buildGeoCandidates(venue);
+        point = await geocodeForWard(geoCandidates, HACHIOJI_SOURCE);
+        // GSIが「八王子市」の代表点を返した場合は未解決とみなす
+        if (point && Math.abs(point.lat - HACHIOJI_GENERIC_LAT) < 0.001
+            && Math.abs(point.lng - HACHIOJI_GENERIC_LNG) < 0.001) {
+          point = null;
+        }
         point = resolveEventPoint(HACHIOJI_SOURCE, venue, point, `八王子市 ${venue}`);
       }
       results.push({
