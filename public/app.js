@@ -181,10 +181,10 @@ function getWardLabel(item) {
     if (SOURCE_WARD_MAP[key]) return SOURCE_WARD_MAP[key];
   }
   const sourceLabel = String(item.source_label || "");
-  const fromLabel = sourceLabel.match(/([^\s　]+区)/u);
+  const fromLabel = sourceLabel.match(/([^\s　]+[区市])/u);
   if (fromLabel) return fromLabel[1];
   const address = String(item.address || "");
-  const fromAddress = address.match(/([^\s　]+区)/u);
+  const fromAddress = address.match(/([^\s　]+[区市])/u);
   if (fromAddress) return fromAddress[1];
   return "";
 }
