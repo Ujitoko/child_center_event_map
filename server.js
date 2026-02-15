@@ -32,6 +32,11 @@ const {
   KNOWN_ARAKAWA_FACILITIES, KNOWN_CHOFU_FACILITIES, KNOWN_MUSASHIMURAYAMA_FACILITIES,
   KNOWN_KOMAE_FACILITIES,
   KNOWN_MUSASHINO_FACILITIES, KNOWN_TACHIKAWA_FACILITIES,
+  KNOWN_OTA_FACILITIES, KNOWN_MINATO_FACILITIES,
+  KNOWN_TOSHIMA_FACILITIES, KNOWN_MEGURO_FACILITIES,
+  KNOWN_KITA_FACILITIES, KNOWN_ITABASHI_FACILITIES,
+  KNOWN_BUNKYO_FACILITIES, KNOWN_AKIRUNO_FACILITIES,
+  KNOWN_NISHITOKYO_FACILITIES,
   AKISHIMA_SOURCE, KNOWN_AKISHIMA_FACILITIES,
   HIGASHIYAMATO_SOURCE, KNOWN_HIGASHIYAMATO_FACILITIES,
   KIYOSE_SOURCE, KNOWN_KIYOSE_FACILITIES,
@@ -146,22 +151,49 @@ for (const [name, address] of Object.entries(KNOWN_MUSASHIMURAYAMA_FACILITIES)) 
 for (const [name, address] of Object.entries(KNOWN_KOMAE_FACILITIES)) {
   setFacilityAddressToMaster("komae", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_OTA_FACILITIES)) {
+  setFacilityAddressToMaster("ota", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MINATO_FACILITIES)) {
+  setFacilityAddressToMaster("minato", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TOSHIMA_FACILITIES)) {
+  setFacilityAddressToMaster("toshima", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MEGURO_FACILITIES)) {
+  setFacilityAddressToMaster("meguro", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KITA_FACILITIES)) {
+  setFacilityAddressToMaster("kita", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ITABASHI_FACILITIES)) {
+  setFacilityAddressToMaster("itabashi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_BUNKYO_FACILITIES)) {
+  setFacilityAddressToMaster("bunkyo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_AKIRUNO_FACILITIES)) {
+  setFacilityAddressToMaster("akiruno", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NISHITOKYO_FACILITIES)) {
+  setFacilityAddressToMaster("nishitokyo", name, address);
+}
 
 // --- Shared deps for collectors ---
 const geoDeps = { geocodeForWard, resolveEventPoint, resolveEventAddress };
 
 // --- Ward-specific collectors ---
 const collectSetagayaJidokanEvents = createCollectSetagayaJidokanEvents(geoDeps);
-const collectOtaJidokanEvents = createCollectOtaJidokanEvents({ ...geoDeps, setFacilityAddressToMaster });
+const collectOtaJidokanEvents = createCollectOtaJidokanEvents({ ...geoDeps, setFacilityAddressToMaster, getFacilityAddressFromMaster });
 const collectShinagawaJidokanEvents = createCollectShinagawaJidokanEvents({ ...geoDeps, setFacilityAddressToMaster });
-const collectMeguroJidokanEvents = createCollectMeguroJidokanEvents(geoDeps);
+const collectMeguroJidokanEvents = createCollectMeguroJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectShibuyaJidokanEvents = createCollectShibuyaJidokanEvents(geoDeps);
-const collectMinatoJidokanEvents = createCollectMinatoJidokanEvents({ ...geoDeps, sanitizeWardPoint });
+const collectMinatoJidokanEvents = createCollectMinatoJidokanEvents({ ...geoDeps, sanitizeWardPoint, getFacilityAddressFromMaster });
 const collectChiyodaJidokanEvents = createCollectChiyodaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 
 // --- Generic + specialized collectors ---
 const collectChuoAkachanTengokuEvents = createCollectChuoAkachanTengokuEvents(geoDeps);
-const collectKitaJidokanEvents = createCollectKitaJidokanEvents(geoDeps);
+const collectKitaJidokanEvents = createCollectKitaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectWardGenericEvents = createCollectWardGenericEvents({
   ...geoDeps,
   getFacilityAddressFromMaster,

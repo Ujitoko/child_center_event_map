@@ -475,6 +475,7 @@ function buildAdditionalWardConfigs(deps) {
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
+      skipOnlineOnlyWithoutPlace: true,
       maxRows: 900,
     },
     chofu: {
@@ -496,6 +497,7 @@ function buildAdditionalWardConfigs(deps) {
       allowPdfDetail: true,
       maxRows: 900,
       titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|入札・契約|パブリック・コメント|附属機関等の会議|交通規制)/i,
+      skipOnlineOnlyWithoutPlace: true,
     },
     fuchu: {
       source: FUCHU_SOURCE,

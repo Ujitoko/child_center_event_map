@@ -169,7 +169,7 @@ function buildMinatoGeoCandidates(title, venue, address) {
 }
 
 function createCollectMinatoJidokanEvents(deps) {
-  const { geocodeForWard, sanitizeWardPoint, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, sanitizeWardPoint, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
 
   async function collectMinatoFacilityLinkedEvents(maxDays) {
     const raw = [];
@@ -335,7 +335,10 @@ function createCollectMinatoJidokanEvents(deps) {
         continue;
 
       const venueName = meta.venue_name || "\u6E2F\u533A\u5150\u7AE5\u9928";
-      const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      let rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      if (!rawAddress && getFacilityAddressFromMaster) {
+        rawAddress = getFacilityAddressFromMaster(MINATO_SOURCE.key, venueName) || "";
+      }
       const geoCandidates = buildMinatoGeoCandidates(title, venueName, rawAddress);
       let point = await geocodeForWard(geoCandidates, MINATO_SOURCE);
       point = resolveEventPoint(MINATO_SOURCE, venueName, point, rawAddress);

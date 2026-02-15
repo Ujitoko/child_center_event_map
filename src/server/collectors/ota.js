@@ -103,7 +103,7 @@ function parseOtaEventsFromDetail(detailHtml, monthUrl, facilityName) {
 }
 
 function createCollectOtaJidokanEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress, setFacilityAddressToMaster } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, setFacilityAddressToMaster, getFacilityAddressFromMaster } = deps;
 
   async function collectOtaJidokanEvents(maxDays) {
     let indexHtml = "";
@@ -144,9 +144,12 @@ function createCollectOtaJidokanEvents(deps) {
         const rows = parseOtaEventsFromDetail(detailHtml, monthUrl, facility.title);
         for (const row of rows) {
           const venueName = row.venue_name || facility.title || "大田区児童館";
-          const rawAddress = isLikelyWardOfficeAddress(OTA_SOURCE.key, row.address || "")
+          let rawAddress = isLikelyWardOfficeAddress(OTA_SOURCE.key, row.address || "")
             ? ""
             : row.address || facilityAddress || "";
+          if (!rawAddress && getFacilityAddressFromMaster) {
+            rawAddress = getFacilityAddressFromMaster(OTA_SOURCE.key, venueName) || "";
+          }
           const tags = buildOtaTags(monthUrl, venueName, row.title);
           const geoVenue = normalizeText(String(venueName || "").replace(/^大田区/, ""));
           const geoCandidates = buildOtaGeoCandidates(row.title, geoVenue || venueName, rawAddress);

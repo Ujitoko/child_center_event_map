@@ -3,6 +3,7 @@ const { buildStartsEndsForDate, inRangeJst, parseTimeRangeFromText } = require("
 const { buildWardGeoCandidates } = require("../ward-parsing");
 const { extractTokyoAddress } = require("../address-utils");
 const { fetchText } = require("../fetch-utils");
+const { isJunkVenueName } = require("../venue-utils");
 const { KITA_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 
 const KITA_URL_FACILITY_MAP = {
@@ -40,6 +41,13 @@ const KITA_URL_FACILITY_MAP = {
   "childrens-center/akabane-nishi": "赤羽西児童館",
   "childrens-center/iwabuchi": "岩淵児童館",
   "childrens-center/sakurada": "桜田児童館",
+  "childrens-center/fukuro": "袋児童館",
+  "childrens-center/hachimanyama": "八幡山子どもセンター",
+  "childrens-center/nishigahara": "西が原子どもセンター",
+  "childrens-center/takinogawanishi": "滝野川西児童館",
+  "childrens-center/takinogawahigashi": "滝野川東児童館",
+  "childrens-center/kamijujohigashi": "上十条東児童館",
+  "childrens-center/akabanenishi": "赤羽西児童館",
 };
 
 function inferKitaVenueFromTitle(title) {
@@ -74,6 +82,7 @@ function createCollectKitaJidokanEvents(deps) {
     geocodeForWard,
     resolveEventAddress,
     resolveEventPoint,
+    getFacilityAddressFromMaster,
   } = deps;
 
   return async function collectKitaJidokanEvents(maxDays) {
@@ -114,8 +123,8 @@ function createCollectKitaJidokanEvents(deps) {
       if (!url) continue;
 
       let venue_name = normalizeText(ev?.place2 || "");
-      if (!venue_name) venue_name = inferKitaVenueFromTitle(`${title} ${bodyText}`);
-      if (!venue_name) venue_name = inferKitaVenueFromUrl(url);
+      if (!venue_name || isJunkVenueName(venue_name)) venue_name = inferKitaVenueFromTitle(`${title} ${bodyText}`);
+      if (!venue_name || isJunkVenueName(venue_name)) venue_name = inferKitaVenueFromUrl(url);
       if (!venue_name) venue_name = "\u5317\u533a\u5150\u7ae5\u9928";
       const hay = `${title} ${venue_name} ${bodyText}`;
       if (!WARD_CHILD_HINT_RE.test(hay)) continue;
@@ -123,7 +132,10 @@ function createCollectKitaJidokanEvents(deps) {
       const opendays = Array.isArray(ev?.opendays) ? ev.opendays : [];
       if (opendays.length === 0) continue;
       const timeRange = parseTimeRangeFromText(`${(Array.isArray(ev?.times) ? ev.times.join(" ") : "")} ${ev?.time_texts || ""}`);
-      const rawAddress = extractTokyoAddress(bodyText);
+      let rawAddress = extractTokyoAddress(bodyText);
+      if (!rawAddress && getFacilityAddressFromMaster) {
+        rawAddress = getFacilityAddressFromMaster(KITA_SOURCE.key, venue_name) || "";
+      }
 
       let point = await geocodeForWard(buildWardGeoCandidates(KITA_SOURCE.label, title, venue_name, rawAddress).slice(0, 2), KITA_SOURCE);
       point = resolveEventPoint(KITA_SOURCE, venue_name, point, rawAddress);

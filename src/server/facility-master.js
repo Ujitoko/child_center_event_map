@@ -10,8 +10,10 @@ function createFacilityMaster(deps) {
 
   function normalizeFacilityName(value) {
     return normalizeText(value)
+      .replace(/[Ａ-Ｚａ-ｚ０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
       .replace(/[（）()【】\[\]「」『』]/g, " ")
       .replace(/[・･]/g, "")
+      .replace(/[\u2018\u2019\u02BC\u0060\u00B4\uFF07']/g, "'")
       .replace(/\s+/g, "")
       .toLowerCase();
   }

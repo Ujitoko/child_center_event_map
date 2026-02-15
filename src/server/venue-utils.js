@@ -126,6 +126,9 @@ function inferWardVenueFromUrl(sourceKey, url) {
       "childrens-center/akabane-nishi": "赤羽西児童館",
       "childrens-center/iwabuchi": "岩淵児童館",
       "childrens-center/sakurada": "桜田児童館",
+      "childrens-center/fukuro": "袋児童館",
+      "childrens-center/hachimanyama": "八幡山子どもセンター",
+      "childrens-center/nishigahara": "西が原子どもセンター",
     };
     for (const [token, venue] of Object.entries(kitaMap)) {
       if (token.includes("/")) {
@@ -133,6 +136,41 @@ function inferWardVenueFromUrl(sourceKey, url) {
       } else {
         if (pathname.includes(`/${token}/`) || pathname.includes(`/${token}.`)) return venue;
       }
+    }
+  }
+
+  if (key === "itabashi") {
+    const capsMatch = pathname.match(/\/jidoukan\/([a-z0-9_-]+)\//);
+    if (capsMatch) {
+      const capsMap = {
+        akatsuka: "CAP'S赤塚児童館",
+        azusawa: "CAP'Sあずさわ児童館",
+        ooyama: "CAP'S大山東児童館",
+        kamiitabashi: "CAP'S上板橋児童館",
+        koubai: "CAP'S紅梅児童館",
+        sakaue: "CAP'Sさかうえ児童館",
+        shimizu: "CAP'S清水児童館",
+        shimura: "CAP'S志村児童館",
+        shimurabashi: "CAP'S志村橋児童館",
+        shirasagi: "CAP'Sしらさぎ児童館",
+        shinkawagishi: "CAP'S新河岸児童館",
+        takashimadaira: "CAP'S高島平児童館",
+        toshin: "CAP'S東新児童館",
+        narimasu: "CAP'Sなります児童館",
+        nishitokuji: "CAP'S西徳児童館",
+        hasune: "CAP'S蓮根児童館",
+        hasune2: "CAP'S蓮根第二児童館",
+        hasunomi: "CAP'Sはすのみ児童館",
+        hikawa: "CAP'S氷川児童館",
+        fujimidai: "CAP'S富士見台児童館",
+        midorigaoka: "CAP'S緑が丘児童館",
+        minamimaeno: "CAP'S南前野児童館",
+        minamiitabashi: "CAP'S南板橋児童館",
+        mukaihara: "CAP'S向原児童館",
+        yayoi: "CAP'S弥生児童館",
+        yurinoki: "CAP'Sゆりの木児童館",
+      };
+      if (capsMap[capsMatch[1]]) return capsMap[capsMatch[1]];
     }
   }
 
@@ -208,7 +246,20 @@ function isJunkVenueName(venueName) {
   if (/^(?:観光[・\/]お祭り|講演[・\/]講座|スポーツ$|文化[・\/]芸術)/.test(v)) return true;
   if (/^(?:区役所(?:北庁舎|本庁舎|新庁舎)|[^\s]{2,6}(?:市役所|区役所))\d+階/.test(v)) return true;
   if (/^[月火水木金土日・、（）()\s\d:：～〜時分]+$/.test(v)) return true;
-  if (/^[0-9０-９]+階[\s　]*(?:遊戯室|図工室|卓球室|会議室|集会室|研修室|多目的室|和室|体育室|ロビー)$/.test(v)) return true;
+  if (/^[0-9０-９]+階[\s　]*(?:遊戯室|図工室|卓球室|会議室|集会室|研修室|多目的室|和室|体育室|ロビー|ピロティー|図書室|ギャラリー|プレイルーム|プレイホール|工作室)$/.test(v)) return true;
+  // Room-only names without facility context
+  if (/^(?:プレイルーム|プレイホール|ニコニコルーム|工作室|図書室|遊戯室|体育室)$/.test(v)) return true;
+  // Schedule/capacity text extracted as venue
+  if (/^各日[、,]/.test(v)) return true;
+  if (/^(?:50人|100人|各?回?\d+人)/.test(v)) return true;
+  // Pure floor reference
+  if (/^(?:\d+階|\d+階\s*(?:ピロティー|ギャラリー|特別展示室))$/.test(v)) return true;
+  // "令和N年度" prefix — not a venue
+  if (/^令和\d+年度?\s/.test(v)) return true;
+  // Category labels (学童保育, 防災, etc.)
+  if (/^(?:学童保育|防災|安心・安全|コミュニティ|くらし・観光|平和・人権|子ども・教育)$/.test(v)) return true;
+  // Date strings extracted as venue (chofu pattern: "2025年12月24日...")
+  if (/^\d{4}年\d{1,2}月\d{1,2}日/.test(v)) return true;
   return false;
 }
 

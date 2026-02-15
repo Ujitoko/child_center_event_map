@@ -124,6 +124,11 @@ function sanitizeVenueText(value) {
   text = text.replace(/\s*(?:をご覧ください|をご利用ください|をご参照ください|をご用意ください|をご確認ください).*/, "");
   // Reject text that reads as instructions, not venue names
   if (/(?:ください|をご覧$|します[。]?$)/.test(text)) return "";
+  // Reject pure online/virtual venue text (no physical location)
+  if (/^(?:オンライン|Zoom|YouTube|Web)$/i.test(text)) return "";
+  if (/^(?:YouTubeを利用|Webオンライン|ハイブリ[ッ]?ト)/.test(text)) return "";
+  // Strip phone numbers within venue text
+  text = text.replace(/\s*0\d{1,4}[-ー－]\d{2,4}[-ー－]\d{3,4}\s*/g, " ");
   text = normalizeText(text);
   // Truncate after "集合・解散" pattern
   text = text.replace(/集合[・、]解散.*/, "集合");
@@ -154,14 +159,23 @@ function sanitizeAddressText(value) {
   text = normalizeText(text);
   if (!text) return "";
   text = text.replace(/郵便番号\s*/g, "");
+  // Strip postal codes (〒123-4567 or 〒1234567)
+  text = text.replace(/〒\s*\d{3}-?\d{4}\s*/g, "");
+  // Strip trailing "Map" (品川区 pattern)
+  text = text.replace(/\s+Map\s*$/i, "");
   // Strip floor/room prefix mixed into addresses (e.g., "中野区1階（江古田4丁目...")
   text = text.replace(/([区市])\s*(?:地下)?[0-9０-９]+階[（(]/u, "$1");
   // Strip stray opening paren between ward label and address (e.g., "中野区（江古田4丁目...")
   text = text.replace(/([区市])\s*[（(](?=[\u4E00-\u9FFF])/u, "$1");
+  text = normalizeText(text);
   if (/(ページ番号|法人番号|copyright|&copy;|PC版を表示する|スマートフォン版を表示する)/i.test(text)) return "";
   if (text.length > 140) text = normalizeText(text.slice(0, 140));
   if (/^\d{3}\s*-\s*\d{4}$/.test(text)) return "";
   if (/^(?:東京都)?[^\s\u3000]{2,8}区\s*\d{3}\s*-\s*\d{4}$/u.test(text)) return "";
+  // Reject phone numbers extracted as addresses (あきる野市 pattern: "あきる野市042-550-3314")
+  if (/(?:区|市)\s*0\d{1,4}[-ー－]\d{2,4}[-ー－]\d{3,4}/.test(text)) return "";
+  // Reject garbage number sequences after city/ward (西東京市 pattern: "西東京市667-010-247")
+  if (/(?:区|市)\s*\d{3,}[-ー－]\d{3,}[-ー－]\d{3,}/.test(text)) return "";
   if (!/(都|道|府|県|区|市|町|村|丁目|番地?|号|\d{1,4}-\d{1,4})/.test(text)) return "";
   return text;
 }

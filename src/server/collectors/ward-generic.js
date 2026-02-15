@@ -138,6 +138,11 @@ function createCollectWardGenericEvents(deps) {
     if (cfg.titleDenyRe && cfg.titleDenyRe.test(title)) continue;
     if (/(男女共同参画|フレイル予防|認知症サポーター養成|介護予防(?:総合|コネクター)|青少年問題協議会|議会定例会|清掃一部事務組合|景観まちづくり審議会|個人情報の取扱)/.test(title)) continue;
     if (/^(受付時間|検索方法|空家等対策|入札・契約|広報・広聴|気象情報|条例・規則|保育政策|観光|救急医療|足立区役所|検索の方法)$/.test(title)) continue;
+    if (/^(電子申請サービス|ＡＩサイト内検索ボット|コールセンターのご案内|本ホームページの使い方|ホームページについて|社会保障・税番号|マイナンバー|新宿行政手続きナビ|構想・計画・自治)$/.test(title)) continue;
+    if (/^(「ITメディアに関する|文京区立児童館利用登録|育成室入室のご案内|住民税非課税世帯等への|育成室（学童保育）について|『中高生育成基本方針』)/.test(title)) continue;
+    if (/^\d{4}年\d{1,2}月(?:イベント)?カレンダー/.test(title)) continue;
+    if (/^(危機管理|被災地|手続きの情報|窓口受付|テーマから探す|組織から探す|統計・調査|事業別申請|財政・会計|みどり・河川|ポイ捨て防止|歌舞伎町クリーン|クリーン作戦$)/.test(title)) continue;
+    if (/^(ごみ・資源|くらし$|消費生活|道路・交通|住まい$|産業・商工|雇用・就労|区政情報$|届出・届出窓口|防犯[、,]|^防災$)$/.test(title)) continue;
     if (!meta.timeRange) {
       meta.timeRange = parseTimeRangeFromText(`${title} ${row.title || ""} ${meta.bodyText || ""}`);
     }

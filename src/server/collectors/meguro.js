@@ -64,7 +64,7 @@ function buildMeguroGeoCandidates(title, venue, address) {
 }
 
 function createCollectMeguroJidokanEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
 
   async function collectMeguroJidokanEvents(maxDays) {
     const indexUrls = [
@@ -137,6 +137,9 @@ function createCollectMeguroJidokanEvents(deps) {
           extractTokyoAddress(placeSectionText) ||
           extractTokyoAddress(allText);
         if (isLikelyWardOfficeAddress("meguro", rawAddress)) rawAddress = "";
+        if (!rawAddress && getFacilityAddressFromMaster) {
+          rawAddress = getFacilityAddressFromMaster(MEGURO_SOURCE.key, venue) || "";
+        }
 
         const geoCandidates = buildMeguroGeoCandidates(title, venue, rawAddress);
         let point = await geocodeForWard(geoCandidates, MEGURO_SOURCE);
