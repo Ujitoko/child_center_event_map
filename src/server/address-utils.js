@@ -68,6 +68,20 @@ function isLikelyWardOfficeAddress(sourceKey, addressRaw) {
   if (key === "shinjuku" && /歌舞伎町1丁目4番1号|歌舞伎町1-4-1/.test(addr)) return true;
   if (key === "bunkyo" && /春日1丁目16番21号|春日1-16-21/.test(addr)) return true;
   if (key === "katsushika" && /立石5丁目13番1号|立石5-13-1/.test(addr)) return true;
+  if (key === "arakawa" && /荒川二丁目2番3号|荒川2-2-3/.test(addr)) return true;
+  if (key === "sumida" && /吾妻橋[一1]丁目23番20号|吾妻橋1-23-20/.test(addr)) return true;
+  if (key === "taito" && /東上野4丁目5番6号|東上野4-5-6/.test(addr)) return true;
+  if (key === "koto" && /東陽4丁目11番28号|東陽4-11-28/.test(addr)) return true;
+  if (key === "chiyoda" && /九段南1[丁-]2[番-]1号?|九段南一丁目2番1号/.test(addr)) return true;
+  if (key === "minato" && /芝公園[一1]丁目5番25号|芝公園1-5-25/.test(addr)) return true;
+  if (key === "toshima" && /南池袋2丁目45番1号|南池袋2-45-1/.test(addr)) return true;
+  if (key === "shinagawa" && /広町2丁目1番36号|広町2-1-36/.test(addr)) return true;
+  if (key === "meguro" && /上目黒2丁目19番15号|上目黒2-19-15/.test(addr)) return true;
+  if (key === "suginami" && /阿佐谷南1丁目15番1号|阿佐谷南1-15-1/.test(addr)) return true;
+  if (key === "kita" && /王子本町1丁目15番22号|王子本町1-15-22/.test(addr)) return true;
+  if (key === "itabashi" && /板橋2丁目66番1号|板橋2-66-1/.test(addr)) return true;
+  if (key === "edogawa" && /中央1丁目4番1号|中央1-4-1/.test(addr)) return true;
+  if (key === "nakano" && /中野4丁目8番1号|中野4-8-1/.test(addr)) return true;
   return false;
 }
 

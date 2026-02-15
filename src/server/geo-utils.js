@@ -115,9 +115,16 @@ function createGeoHelpers(deps) {
     return normalized;
   }
 
+  function isGenericMunicipalityGeocode(point) {
+    if (!point || !point.address) return false;
+    const addr = String(point.address).trim();
+    return /^東京都[^\s\d丁番号]+[区市]$/.test(addr);
+  }
+
   async function geocodeForWard(candidates, sourceOrCenter, maxKmOverride) {
     for (const q of candidates || []) {
       const point = await geocodeQuery(q);
+      if (isGenericMunicipalityGeocode(point)) continue;
       const ok = sanitizeWardPoint(point, sourceOrCenter, maxKmOverride);
       if (ok) return ok;
     }

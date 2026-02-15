@@ -41,6 +41,39 @@ function extractDateFromUrl(url, baseY, baseMo) {
   return null;
 }
 
+/** 会場名・タイトルから括弧内の住所を抽出 */
+function extractEmbeddedAddress(text, wardLabel) {
+  if (!text) return [];
+  const results = [];
+  // 括弧内の住所 (例: "（東日暮里6-28-15）", "(南砂2-3-5-102)")
+  const parenMatches = text.match(/[（(]([^）)]{3,60})[）)]/g) || [];
+  for (const m of parenMatches) {
+    const inner = m.slice(1, -1);
+    if (/[0-9０-９]+[-ー－][0-9０-９]+/.test(inner)) {
+      const addr = /東京都|区/.test(inner) ? inner : `${wardLabel}${inner}`;
+      results.push(addr);
+    }
+  }
+  // テキスト中の町名+番地 (例: "散田町2-37-1")
+  const townMatches = text.match(/[\u4E00-\u9FFF]{2,}(?:町|丁目)[0-9０-９]+[-ー－][0-9０-９]+(?:[-ー－][0-9０-９]+)*/g) || [];
+  for (const t of townMatches) {
+    const addr = `${wardLabel}${t}`;
+    if (!results.includes(addr)) results.push(addr);
+  }
+  return results;
+}
+
+/** 会場名を簡略化（階数・部屋名・括弧を除去） */
+function cleanVenueForGeo(venue) {
+  if (!venue) return "";
+  return venue
+    .replace(/[（(][^）)]*[）)]/g, "")
+    .replace(/\d+階.*$/, "")
+    .replace(/\s*(地下|地上).*$/, "")
+    .replace(/\s*(第?\d+\s*(?:学習室|会議室|集会室|研修室|多目的室|ホール|スタジオ|体育室|遊戯室|工作室|活動室|音楽室)).*$/i, "")
+    .trim();
+}
+
 function buildWardGeoCandidates(wardLabel, title, venue, address) {
   const out = [];
   const add = (s) => {
@@ -53,6 +86,11 @@ function buildWardGeoCandidates(wardLabel, title, venue, address) {
   const cleanVenue = sanitizeVenueText(venue || "");
   const cleanTitle = sanitizeVenueText(title || "");
 
+  // 1. 会場名・タイトルから埋め込み住所を抽出（最優先）
+  const embeddedAddrs = extractEmbeddedAddress(`${venue || ""} ${title || ""}`, wardLabel);
+  for (const ea of embeddedAddrs) add(ea);
+
+  // 2. 明示的な住所
   if (cleanAddress) {
     const hasTokyo = /東京都/.test(cleanAddress);
     const hasWard = wardLabel && cleanAddress.includes(wardLabel);
@@ -72,6 +110,14 @@ function buildWardGeoCandidates(wardLabel, title, venue, address) {
       if (noTokyo) add(noTokyo);
     }
   }
+
+  // 3. 会場名の簡略版（階数・部屋名を除去）
+  const simpleVenue = cleanVenueForGeo(venue);
+  if (simpleVenue && simpleVenue !== cleanVenue) {
+    add(`${tokyoWard}${sanitizeVenueText(simpleVenue)}`);
+  }
+
+  // 4. 会場名そのまま
   if (cleanVenue) {
     add(`${tokyoWard}${cleanVenue}`);
     add(`${wardLabel}${cleanVenue}`);

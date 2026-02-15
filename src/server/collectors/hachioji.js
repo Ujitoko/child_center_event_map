@@ -2,10 +2,6 @@ const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst } = require("../date-utils");
 const { HACHIOJI_SOURCE } = require("../../config/wards");
 
-// 八王子市の代表点 — GSIが施設名で解決できない時に返す汎用座標
-const HACHIOJI_GENERIC_LAT = 35.6667;
-const HACHIOJI_GENERIC_LNG = 139.3158;
-
 // GSIが施設名で解決できない既知施設の住所
 const KNOWN_FACILITY_ADDRESSES = {
   クリエイトホール: "八王子市東町5-6",
@@ -118,11 +114,6 @@ function createCollectHachiojiEvents(deps) {
       if (venue) {
         const geoCandidates = buildGeoCandidates(venue);
         point = await geocodeForWard(geoCandidates, HACHIOJI_SOURCE);
-        // GSIが「八王子市」の代表点を返した場合は未解決とみなす
-        if (point && Math.abs(point.lat - HACHIOJI_GENERIC_LAT) < 0.001
-            && Math.abs(point.lng - HACHIOJI_GENERIC_LNG) < 0.001) {
-          point = null;
-        }
         point = resolveEventPoint(HACHIOJI_SOURCE, venue, point, `八王子市 ${venue}`);
       }
       results.push({
