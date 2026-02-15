@@ -67,11 +67,8 @@ function createCollectHachiojiEvents(deps) {
       const venue = ev.venue_name;
       let point = null;
       if (venue) {
-        point = await resolveEventPoint(
-          venue,
-          HACHIOJI_SOURCE.key,
-          () => geocodeForWard(`八王子市 ${venue}`, HACHIOJI_SOURCE),
-        );
+        point = await geocodeForWard([`八王子市 ${venue}`], HACHIOJI_SOURCE);
+        point = resolveEventPoint(HACHIOJI_SOURCE, venue, point, `八王子市 ${venue}`);
       }
       results.push({
         id: `${source}:${ev.url}:${ev.title}:${ev.starts_at.slice(0, 10).replace(/-/g, "")}`,

@@ -61,7 +61,7 @@ function createGeoHelpers(deps) {
 
   function isLikelyTokyoPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    return point.lat >= 35.45 && point.lat <= 35.9 && point.lng >= 139.5 && point.lng <= 140.0;
+    return point.lat >= 35.45 && point.lat <= 35.9 && point.lng >= 139.0 && point.lng <= 140.0;
   }
 
   function isNearWardCenter(point, wardCenter, maxKm) {
@@ -95,6 +95,7 @@ function createGeoHelpers(deps) {
       adachi: 12,
       katsushika: 12,
       edogawa: 12,
+      hachioji: 20,
     };
     return overrides[key] || 10;
   }
