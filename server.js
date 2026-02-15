@@ -14,6 +14,7 @@ const { createCollectChuoAkachanTengokuEvents } = require("./src/server/collecto
 const { createCollectKitaJidokanEvents } = require("./src/server/collectors/kita");
 const { createCollectWardGenericEvents } = require("./src/server/collectors/ward-generic");
 const { createCollectAdditionalWardsEvents } = require("./src/server/collectors/additional-wards");
+const { createCollectHachiojiEvents } = require("./src/server/collectors/hachioji");
 const { createGetEvents } = require("./src/server/events-service");
 const { CACHE_TTL_MS } = require("./src/config/wards");
 
@@ -62,6 +63,7 @@ const collectWardGenericEvents = createCollectWardGenericEvents({
   getFacilityAddressFromMaster,
   haversineKm,
 });
+const collectHachiojiEvents = createCollectHachiojiEvents(geoDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -83,6 +85,7 @@ const getEvents = createGetEvents({
   collectSetagayaJidokanEvents,
   collectShibuyaJidokanEvents,
   collectShinagawaJidokanEvents,
+  collectHachiojiEvents,
 });
 
 // --- HTTP server ---

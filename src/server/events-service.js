@@ -25,6 +25,7 @@ const {
   KATSUSHIKA_SOURCE,
   EDOGAWA_SOURCE,
   SHINJUKU_SOURCE,
+  HACHIOJI_SOURCE,
 } = require("../config/wards");
 
 function loadSnapshot(snapshotPath) {
@@ -61,6 +62,7 @@ function createGetEvents(deps) {
     collectSetagayaJidokanEvents,
     collectShibuyaJidokanEvents,
     collectShinagawaJidokanEvents,
+    collectHachiojiEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -103,7 +105,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional] = await Promise.all([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji] = await Promise.all([
     collectSetagayaJidokanEvents(days),
     collectOtaJidokanEvents(days),
     collectShinagawaJidokanEvents(days),
@@ -112,6 +114,7 @@ function createGetEvents(deps) {
     collectMinatoJidokanEvents(days),
     collectChiyodaJidokanEvents(days),
     collectAdditionalWardsEvents(days),
+    collectHachiojiEvents(days),
   ]);
   const {
     chuo,
@@ -155,6 +158,7 @@ function createGetEvents(deps) {
     ...katsushika,
     ...edogawa,
     ...shinjuku,
+    ...hachioji,
   ];
   const items = rawItems
     .map((ev) => {
@@ -209,6 +213,7 @@ function createGetEvents(deps) {
         ward_katsushika: katsushika.length,
         ward_edogawa: edogawa.length,
         ward_shinjuku: shinjuku.length,
+        city_hachioji: hachioji.length,
       },
       filtered: {
         ward_setagaya: setagaya.length,
@@ -234,6 +239,7 @@ function createGetEvents(deps) {
         ward_katsushika: katsushika.length,
         ward_edogawa: edogawa.length,
         ward_shinjuku: shinjuku.length,
+        city_hachioji: hachioji.length,
       },
       implemented_wards: [
         SETAGAYA_SOURCE.label,
@@ -259,6 +265,7 @@ function createGetEvents(deps) {
         KATSUSHIKA_SOURCE.label,
         EDOGAWA_SOURCE.label,
         SHINJUKU_SOURCE.label,
+        HACHIOJI_SOURCE.label,
       ],
     },
     items,

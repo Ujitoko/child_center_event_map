@@ -43,6 +43,7 @@ const TOKYO_23_WARDS = [
   "足立区",
   "葛飾区",
   "江戸川区",
+  "八王子市",
 ];
 const SOURCE_WARD_MAP = {
   chiyoda: "千代田区",
@@ -69,6 +70,7 @@ const SOURCE_WARD_MAP = {
   adachi_odekake: "足立区",
   katsushika: "葛飾区",
   edogawa: "江戸川区",
+  hachioji: "八王子市",
 };
 const selectedWards = new Set();
 let searchQuery = "";

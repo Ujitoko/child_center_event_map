@@ -167,6 +167,13 @@ const MEGURO_SOURCE = {
   center: { lat: 35.6415, lng: 139.6982 },
 };
 
+const HACHIOJI_SOURCE = {
+  key: "hachioji",
+  label: "八王子市",
+  baseUrl: "https://kosodate.city.hachioji.tokyo.jp",
+  center: { lat: 35.6554, lng: 139.3388 },
+};
+
 const SHINAGAWA_POCKET_BASE = "https://shinagawa-pocket.city-hc.jp";
 
 const JIDOKAN_HINTS = [
@@ -219,10 +226,12 @@ const WARD_LABEL_BY_KEY = {
   edogawa: EDOGAWA_SOURCE.label,
   shinjuku: SHINJUKU_SOURCE.label,
   meguro: MEGURO_SOURCE.label,
+  hachioji: HACHIOJI_SOURCE.label,
 };
 
 module.exports = {
   ADACHI_SOURCE,
+  HACHIOJI_SOURCE,
   ARAKAWA_SOURCE,
   BUNKYO_SOURCE,
   CACHE_TTL_MS,
