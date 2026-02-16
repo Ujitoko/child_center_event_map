@@ -1619,6 +1619,41 @@ const MIZUHO_SOURCE = {
   center: { lat: 35.7706, lng: 139.3516 },
 };
 
+const NINOMIYA_SOURCE = {
+  key: "ninomiya",
+  label: "二宮町",
+  baseUrl: "https://www.town.ninomiya.kanagawa.jp",
+  center: { lat: 35.3022, lng: 139.2558 },
+};
+
+const OI_SOURCE = {
+  key: "oi",
+  label: "大井町",
+  baseUrl: "https://www.town.oi.kanagawa.jp",
+  center: { lat: 35.3456, lng: 139.1661 },
+};
+
+const YUGAWARA_SOURCE = {
+  key: "yugawara",
+  label: "湯河原町",
+  baseUrl: "https://www.town.yugawara.kanagawa.jp",
+  center: { lat: 35.1478, lng: 139.1028 },
+};
+
+const MATSUDA_SOURCE = {
+  key: "matsuda",
+  label: "松田町",
+  baseUrl: "https://town.matsuda.kanagawa.jp",
+  center: { lat: 35.3461, lng: 139.1458 },
+};
+
+const MANAZURU_SOURCE = {
+  key: "manazuru",
+  label: "真鶴町",
+  baseUrl: "https://www.town.manazuru.kanagawa.jp",
+  center: { lat: 35.1575, lng: 139.1350 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -1758,4 +1793,9 @@ module.exports = {
   NAKAI_SOURCE,
   KIYOKAWA_SOURCE,
   MIZUHO_SOURCE,
+  NINOMIYA_SOURCE,
+  OI_SOURCE,
+  YUGAWARA_SOURCE,
+  MATSUDA_SOURCE,
+  MANAZURU_SOURCE,
 };

@@ -38,6 +38,9 @@ const { createCollectIseharaEvents } = require("./src/server/collectors/isehara"
 const { createCollectMinamiashigaraEvents } = require("./src/server/collectors/minamiashigara");
 const { createCalendarJsonCollector } = require("./src/server/collectors/calendar-json-collector");
 const { createCollectFujisawaEvents } = require("./src/server/collectors/fujisawa");
+const { createCollectNinomiyaEvents } = require("./src/server/collectors/ninomiya");
+const { createMunicipalCalendarCollector } = require("./src/server/collectors/municipal-calendar-collector");
+const { createCollectMatsudaEvents } = require("./src/server/collectors/matsuda");
 const { createCollectMizuhoEvents } = require("./src/server/collectors/mizuho");
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createGetEvents } = require("./src/server/events-service");
@@ -84,6 +87,8 @@ const {
   SAMUKAWA_SOURCE, AIKAWA_SOURCE, MIURA_SOURCE,
   OISO_SOURCE, HAYAMA_SOURCE,
   NAKAI_SOURCE, KIYOKAWA_SOURCE,
+  NINOMIYA_SOURCE, OI_SOURCE, YUGAWARA_SOURCE,
+  MATSUDA_SOURCE, MANAZURU_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -333,6 +338,11 @@ const collectOisoEvents = createCalendarJsonCollector({ source: OISO_SOURCE }, g
 const collectHayamaEvents = createCalendarJsonCollector({ source: HAYAMA_SOURCE }, geoFmDeps);
 const collectNakaiEvents = createCalendarJsonCollector({ source: NAKAI_SOURCE }, geoFmDeps);
 const collectKiyokawaEvents = createCalendarJsonCollector({ source: KIYOKAWA_SOURCE }, geoFmDeps);
+const collectNinomiyaEvents = createCollectNinomiyaEvents(geoFmDeps);
+const collectOiEvents = createMunicipalCalendarCollector({ source: OI_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectYugawaraEvents = createMunicipalCalendarCollector({ source: YUGAWARA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectMatsudaEvents = createCollectMatsudaEvents(geoFmDeps);
+const collectManazuruEvents = createCalendarJsonCollector({ source: MANAZURU_SOURCE }, geoFmDeps);
 const collectMizuhoEvents = createCollectMizuhoEvents(geoFmDeps);
 const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
@@ -450,6 +460,11 @@ const getEvents = createGetEvents({
   collectHayamaEvents,
   collectNakaiEvents,
   collectKiyokawaEvents,
+  collectNinomiyaEvents,
+  collectOiEvents,
+  collectYugawaraEvents,
+  collectMatsudaEvents,
+  collectManazuruEvents,
   collectMizuhoEvents,
 });
 
