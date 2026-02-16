@@ -59,6 +59,15 @@ const { createTableCalendarCollector } = require("./src/server/collectors/table-
 const { createRdfEventCollector } = require("./src/server/collectors/rdf-event-collector");
 const { createCollectIchinomiyaEvents } = require("./src/server/collectors/ichinomiya");
 const { createCollectChoshiEvents } = require("./src/server/collectors/choshi");
+const {
+  createCollectMobaraEvents, createCollectTateyamaEvents,
+  createCollectMinamibosoEvents, createCollectOamishirasatoEvents,
+  createCollectShisuiEvents, createCollectKozakiEvents,
+  createCollectTakoEvents, createCollectShibayamaEvents,
+  createCollectMutsuzawaEvents, createCollectChoseiEvents,
+  createCollectNagaraEvents, createCollectOnjukuEvents,
+  createCollectChonanEvents,
+} = require("./src/server/collectors/chiba-remaining");
 const { createEvent2CalendarCollector } = require("./src/server/collectors/event2-calendar-collector");
 const { createCollectSaitamaEvents } = require("./src/server/collectors/saitama");
 const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshigaya");
@@ -138,6 +147,10 @@ const {
   SAKURA_SOURCE, FUTTSU_SOURCE, INZAI_SOURCE,
   KATORI_SOURCE, TOGANE_SOURCE, ICHIHARA_SOURCE,
   SOSA_SOURCE, SAMMU_SOURCE, SAKAE_CHIBA_SOURCE,
+  MOBARA_SOURCE, TATEYAMA_SOURCE, MINAMIBOSO_SOURCE,
+  OAMISHIRASATO_SOURCE, SHISUI_SOURCE, KOZAKI_SOURCE,
+  TAKO_SOURCE, SHIBAYAMA_SOURCE, MUTSUZAWA_SOURCE,
+  CHOSEI_SOURCE, NAGARA_SOURCE, ONJUKU_SOURCE, CHONAN_SOURCE,
   KAWAGUCHI_SOURCE, KASUKABE_SOURCE, FUJIMINO_SOURCE, MISATO_SOURCE,
   KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
@@ -598,6 +611,20 @@ const collectIchiharaEvents = createCalendarJsonCollector({ source: ICHIHARA_SOU
 const collectSosaEvents = createCalendarJsonCollector({ source: SOSA_SOURCE }, geoFmDeps);
 const collectSammuEvents = createCalendarJsonCollector({ source: SAMMU_SOURCE }, geoFmDeps);
 const collectSakaeChibaEvents = createCalendarJsonCollector({ source: SAKAE_CHIBA_SOURCE }, geoFmDeps);
+// --- 千葉県 残り13自治体 custom ---
+const collectMobaraEvents = createCollectMobaraEvents(geoFmDeps);
+const collectTateyamaEvents = createCollectTateyamaEvents(geoFmDeps);
+const collectMinamibosoEvents = createCollectMinamibosoEvents(geoFmDeps);
+const collectOamishirasatoEvents = createCollectOamishirasatoEvents(geoFmDeps);
+const collectShisuiEvents = createCollectShisuiEvents(geoFmDeps);
+const collectKozakiEvents = createCollectKozakiEvents(geoFmDeps);
+const collectTakoEvents = createCollectTakoEvents(geoFmDeps);
+const collectShibayamaEvents = createCollectShibayamaEvents(geoFmDeps);
+const collectMutsuzawaEvents = createCollectMutsuzawaEvents(geoFmDeps);
+const collectChoseiEvents = createCollectChoseiEvents(geoFmDeps);
+const collectNagaraEvents = createCollectNagaraEvents(geoFmDeps);
+const collectOnjukuEvents = createCollectOnjukuEvents(geoFmDeps);
+const collectChonanEvents = createCollectChonanEvents(geoFmDeps);
 // --- 埼玉県 calendar-json-collector ---
 const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE }, geoFmDeps);
 const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE }, geoFmDeps);
@@ -744,6 +771,19 @@ const getEvents = createGetEvents({
   collectSosaEvents,
   collectSammuEvents,
   collectSakaeChibaEvents,
+  collectMobaraEvents,
+  collectTateyamaEvents,
+  collectMinamibosoEvents,
+  collectOamishirasatoEvents,
+  collectShisuiEvents,
+  collectKozakiEvents,
+  collectTakoEvents,
+  collectShibayamaEvents,
+  collectMutsuzawaEvents,
+  collectChoseiEvents,
+  collectNagaraEvents,
+  collectOnjukuEvents,
+  collectChonanEvents,
   collectKawaguchiEvents,
   collectKasukabeEvents,
   collectFujiminoEvents,

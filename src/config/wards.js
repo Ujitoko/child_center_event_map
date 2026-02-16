@@ -2189,6 +2189,73 @@ const SAKAE_CHIBA_SOURCE = {
   center: { lat: 35.8422, lng: 140.2531 },
 };
 
+// --- 千葉県 残り13自治体 ---
+const MOBARA_SOURCE = {
+  key: "mobara", label: "茂原市",
+  baseUrl: "https://www.city.mobara.chiba.jp",
+  center: { lat: 35.4284, lng: 140.2880 },
+};
+const TATEYAMA_SOURCE = {
+  key: "tateyama", label: "館山市",
+  baseUrl: "https://www.city.tateyama.chiba.jp",
+  center: { lat: 34.9961, lng: 139.8695 },
+};
+const MINAMIBOSO_SOURCE = {
+  key: "minamiboso", label: "南房総市",
+  baseUrl: "https://www.city.minamiboso.chiba.jp",
+  center: { lat: 35.0425, lng: 139.8383 },
+};
+const OAMISHIRASATO_SOURCE = {
+  key: "oamishirasato", label: "大網白里市",
+  baseUrl: "https://www.city.oamishirasato.lg.jp",
+  center: { lat: 35.5192, lng: 140.3188 },
+};
+const SHISUI_SOURCE = {
+  key: "shisui", label: "酒々井町",
+  baseUrl: "https://www.town.shisui.chiba.jp",
+  center: { lat: 35.7250, lng: 140.2727 },
+};
+const KOZAKI_SOURCE = {
+  key: "kozaki", label: "神崎町",
+  baseUrl: "https://www.town.kozaki.chiba.jp",
+  center: { lat: 35.8940, lng: 140.4030 },
+};
+const TAKO_SOURCE = {
+  key: "tako", label: "多古町",
+  baseUrl: "https://www.town.tako.chiba.jp",
+  center: { lat: 35.7350, lng: 140.4710 },
+};
+const SHIBAYAMA_SOURCE = {
+  key: "shibayama", label: "芝山町",
+  baseUrl: "https://www.town.shibayama.lg.jp",
+  center: { lat: 35.6970, lng: 140.4160 },
+};
+const MUTSUZAWA_SOURCE = {
+  key: "mutsuzawa", label: "睦沢町",
+  baseUrl: "https://www.town.mutsuzawa.chiba.jp",
+  center: { lat: 35.3640, lng: 140.3220 },
+};
+const CHOSEI_SOURCE = {
+  key: "chosei", label: "長生村",
+  baseUrl: "https://www.vill.chosei.chiba.jp",
+  center: { lat: 35.4010, lng: 140.3580 },
+};
+const NAGARA_SOURCE = {
+  key: "nagara", label: "長柄町",
+  baseUrl: "https://www.town.nagara.chiba.jp",
+  center: { lat: 35.4170, lng: 140.2280 },
+};
+const ONJUKU_SOURCE = {
+  key: "onjuku", label: "御宿町",
+  baseUrl: "https://www.town.onjuku.chiba.jp",
+  center: { lat: 35.1862, lng: 140.3476 },
+};
+const CHONAN_SOURCE = {
+  key: "chonan", label: "長南町",
+  baseUrl: "https://www.town.chonan.chiba.jp",
+  center: { lat: 35.3730, lng: 140.2350 },
+};
+
 // --- 埼玉県 ---
 const KAWAGUCHI_SOURCE = {
   key: "kawaguchi", label: "川口市",
@@ -2520,6 +2587,19 @@ module.exports = {
   SOSA_SOURCE,
   SAMMU_SOURCE,
   SAKAE_CHIBA_SOURCE,
+  MOBARA_SOURCE,
+  TATEYAMA_SOURCE,
+  MINAMIBOSO_SOURCE,
+  OAMISHIRASATO_SOURCE,
+  SHISUI_SOURCE,
+  KOZAKI_SOURCE,
+  TAKO_SOURCE,
+  SHIBAYAMA_SOURCE,
+  MUTSUZAWA_SOURCE,
+  CHOSEI_SOURCE,
+  NAGARA_SOURCE,
+  ONJUKU_SOURCE,
+  CHONAN_SOURCE,
   KAWAGUCHI_SOURCE,
   KASUKABE_SOURCE,
   FUJIMINO_SOURCE,
