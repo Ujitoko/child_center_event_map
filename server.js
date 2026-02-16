@@ -37,6 +37,7 @@ const { createCollectAtsugiEvents } = require("./src/server/collectors/atsugi");
 const { createCollectIseharaEvents } = require("./src/server/collectors/isehara");
 const { createCollectMinamiashigaraEvents } = require("./src/server/collectors/minamiashigara");
 const { createCalendarJsonCollector } = require("./src/server/collectors/calendar-json-collector");
+const { createCollectFujisawaEvents } = require("./src/server/collectors/fujisawa");
 const { createCollectMizuhoEvents } = require("./src/server/collectors/mizuho");
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createGetEvents } = require("./src/server/events-service");
@@ -324,6 +325,7 @@ const collectAyaseEvents = createCollectAyaseEvents(geoFmDeps);
 const collectAtsugiEvents = createCollectAtsugiEvents(geoFmDeps);
 const collectIseharaEvents = createCollectIseharaEvents(geoFmDeps);
 const collectMinamiashigaraEvents = createCollectMinamiashigaraEvents(geoFmDeps);
+const collectFujisawaEvents = createCollectFujisawaEvents(geoFmDeps);
 const collectSamukawaEvents = createCalendarJsonCollector({ source: SAMUKAWA_SOURCE }, geoFmDeps);
 const collectAikawaEvents = createCalendarJsonCollector({ source: AIKAWA_SOURCE }, geoFmDeps);
 const collectMiuraEvents = createCalendarJsonCollector({ source: MIURA_SOURCE }, geoFmDeps);
@@ -440,6 +442,7 @@ const getEvents = createGetEvents({
   collectAtsugiEvents,
   collectIseharaEvents,
   collectMinamiashigaraEvents,
+  collectFujisawaEvents,
   collectSamukawaEvents,
   collectAikawaEvents,
   collectMiuraEvents,

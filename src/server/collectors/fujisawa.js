@@ -1,0 +1,230 @@
+const { fetchText } = require("../fetch-utils");
+const { stripTags } = require("../html-utils");
+const {
+  inRangeJst,
+  parseYmdFromJst,
+  parseTimeRangeFromText,
+  buildStartsEndsForDate,
+} = require("../date-utils");
+const { normalizeJaDigits } = require("../text-utils");
+const { WARD_CHILD_HINT_RE } = require("../../config/wards");
+
+/**
+ * 藤沢市公民館・市民センターのイベントページから子育てイベントを収集
+ *
+ * 各センターのHTMLは構造が異なるため、複数のパーサーでベストエフォート抽出。
+ * 日付がHTMLに含まれるセンターのみ対象。
+ */
+
+const CHILD_RE =
+  /子育て|子ども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|おはなし|リトミック|ママ|パパ|保育|離乳食|未就園|未就学/;
+
+// 公民館リスト (住所はジオコーディング用に固定)
+const CENTERS = [
+  { name: "御所見市民センター", path: "/gosho-c/goshomi_events.html", address: "藤沢市打戻1760-1" },
+  { name: "村岡市民センター", path: "/mura-c/jigyou.html", address: "藤沢市弥勒寺1-3-7" },
+  { name: "長後市民センター", path: "/chougo-c/jigyouannai.html", address: "藤沢市長後513" },
+  { name: "辻堂市民センター", path: "/tsuji-c/kouminkannibento.html", address: "藤沢市辻堂東海岸1-1-41" },
+  { name: "六会市民センター", path: "/mutsu-c/documents/kouminkannjigyou.html", address: "藤沢市亀井野4-8-1" },
+  { name: "片瀬市民センター", path: "/kata-c/kouminkan/top.html", address: "藤沢市片瀬3-9-6" },
+  { name: "善行市民センター", path: "/zengyo-c/jigyouannai.html", address: "藤沢市善行1-2-3" },
+  { name: "湘南大庭市民センター", path: "/snooba-c/kyoiku/shogai/kominkan/kominkan/shonanoba/jigyouannai.html", address: "藤沢市大庭5406-4" },
+  { name: "藤沢市民センター", path: "/fuji-c/kouminkanjigyo/kouza.html", address: "藤沢市朝日町10" },
+  { name: "湘南台市民センター", path: "/sndai-c/sndaijigyouannnai.html", address: "藤沢市湘南台1-8" },
+  { name: "鵠沼市民センター", path: "/kuge-c/kouminkan/kugenuma.html", address: "藤沢市鵠沼海岸2-10-34" },
+  { name: "明治市民センター", path: "/meiji-c/kurashi/shimin/chiiki/meji/zigyouannai/kouminkan.html", address: "藤沢市辻堂新町1-11-23" },
+  { name: "遠藤市民センター", path: "/endou-c/endo_kouminkan.html", address: "藤沢市遠藤2984-3" },
+];
+
+/**
+ * HTMLから日付+イベント名のペアを抽出 (複数パターン対応)
+ */
+function extractEvents(html, baseUrl, centerName) {
+  const text = normalizeJaDigits(stripTags(html));
+  const events = [];
+  const now = parseYmdFromJst(new Date());
+  const defaultYear = now.y;
+
+  // パターン1: テーブル行「YYYY年M月D日(曜日)」+ イベント名
+  const fullDateRe = /(\d{4})年(\d{1,2})月(\d{1,2})日/g;
+  let fm;
+  while ((fm = fullDateRe.exec(text)) !== null) {
+    const y = Number(fm[1]);
+    const mo = Number(fm[2]);
+    const d = Number(fm[3]);
+    // 日付の前後100文字からイベント名を探す
+    const ctx = text.slice(Math.max(0, fm.index - 100), fm.index + fm[0].length + 200);
+    const titleMatch = findEventTitle(ctx, html, fm.index);
+    if (titleMatch) {
+      events.push({ y, mo, d, title: titleMatch, center: centerName });
+    }
+  }
+
+  // パターン2: 「M月D日(曜日) 時刻」「日時：M月D日」など (年なし)
+  const shortDateRe = /(?:日時[：:]?\s*)?(\d{1,2})月(\d{1,2})日\s*[(（][^)）]*[)）]/g;
+  let sm;
+  while ((sm = shortDateRe.exec(text)) !== null) {
+    const mo = Number(sm[1]);
+    const d = Number(sm[2]);
+    // 年を推定: 現在月より2ヶ月以上前なら来年
+    let y = defaultYear;
+    if (mo < now.m - 2) y = defaultYear + 1;
+    const ctx = text.slice(Math.max(0, sm.index - 150), sm.index + sm[0].length + 200);
+    const titleMatch = findEventTitle(ctx, html, sm.index);
+    if (titleMatch) {
+      // 重複チェック (同じ日付+タイトル)
+      const dup = events.find(e => e.y === y && e.mo === mo && e.d === d && e.title === titleMatch);
+      if (!dup) {
+        events.push({ y, mo, d, title: titleMatch, center: centerName });
+      }
+    }
+  }
+
+  // パターン3: HTMLリンク付きイベント + 近接する日付
+  const linkEvents = extractLinkedEvents(html, baseUrl, centerName, defaultYear, now.m);
+  for (const le of linkEvents) {
+    const dup = events.find(e => e.y === le.y && e.mo === le.mo && e.d === le.d && e.title === le.title);
+    if (!dup) events.push(le);
+  }
+
+  return events;
+}
+
+/**
+ * コンテキスト文字列からイベントタイトルを推定
+ */
+function findEventTitle(contextText, fullHtml, dateIndex) {
+  // 「事業名」列やリンクテキストを探す
+  // まず近接するリンクテキストを探す
+  const nearHtml = fullHtml.slice(Math.max(0, dateIndex - 500), dateIndex + 500);
+  const linkRe = /<a\s+[^>]*>([^<]{3,80})<\/a>/gi;
+  let lm;
+  const links = [];
+  while ((lm = linkRe.exec(nearHtml)) !== null) {
+    const t = stripTags(lm[1]).trim().replace(/\(PDF[^)]*\)/gi, "").trim();
+    if (t.length >= 3 && !/(一覧|トップ|ホーム|詳細|こちら)/.test(t)) {
+      links.push(t);
+    }
+  }
+  if (links.length > 0) return links[0];
+
+  // テキストから「●タイトル」を探す
+  const bulletMatch = contextText.match(/[●■▶]([^\n●■▶]{3,60})/);
+  if (bulletMatch) return bulletMatch[1].trim();
+
+  return null;
+}
+
+/**
+ * HTML内のリンクと近接日付からイベントを抽出
+ */
+function extractLinkedEvents(html, baseUrl, centerName, defaultYear, currentMonth) {
+  const events = [];
+  // リンクと子育てキーワードのマッチ
+  const linkRe = /<a\s+[^>]*href="([^"]*)"[^>]*>([^<]+)<\/a>/gi;
+  let m;
+  while ((m = linkRe.exec(html)) !== null) {
+    const title = stripTags(m[2]).trim().replace(/\(PDF[^)]*\)/gi, "").trim();
+    if (title.length < 3) continue;
+    if (!CHILD_RE.test(title) && !WARD_CHILD_HINT_RE.test(title)) continue;
+
+    // このリンク周辺から日付を探す
+    const ctx = html.slice(Math.max(0, m.index - 300), m.index + m[0].length + 500);
+    const ctxText = normalizeJaDigits(stripTags(ctx));
+
+    // 完全日付
+    const fullMatch = ctxText.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if (fullMatch) {
+      events.push({
+        y: Number(fullMatch[1]),
+        mo: Number(fullMatch[2]),
+        d: Number(fullMatch[3]),
+        title,
+        center: centerName,
+      });
+      continue;
+    }
+
+    // 短い日付
+    const shortMatch = ctxText.match(/(\d{1,2})月(\d{1,2})日/);
+    if (shortMatch) {
+      const mo = Number(shortMatch[1]);
+      const d = Number(shortMatch[2]);
+      let y = defaultYear;
+      if (mo < currentMonth - 2) y = defaultYear + 1;
+      events.push({ y, mo, d, title, center: centerName });
+    }
+  }
+  return events;
+}
+
+function createCollectFujisawaEvents(deps) {
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+
+  return async function collectFujisawaEvents(maxDays) {
+    const srcKey = "ward_fujisawa";
+    const label = "藤沢市";
+    const baseUrl = "https://www.city.fujisawa.kanagawa.jp";
+
+    const allEvents = [];
+    for (const center of CENTERS) {
+      const url = `${baseUrl}${center.path}`;
+      try {
+        const html = await fetchText(url);
+        const rawText = normalizeJaDigits(stripTags(html));
+        const timeRange = parseTimeRangeFromText(rawText);
+        const evts = extractEvents(html, baseUrl, center.name);
+        for (const ev of evts) {
+          allEvents.push({ ...ev, centerAddress: center.address, url, timeRange });
+        }
+      } catch (e) {
+        console.warn(`[${label}] ${center.name} fetch failed:`, e.message || e);
+      }
+    }
+
+    // 子育て関連フィルタ (extractLinkedEvents は既にフィルタ済みだが、他パターンは未フィルタ)
+    const childEvents = allEvents.filter(
+      (ev) => CHILD_RE.test(ev.title) || WARD_CHILD_HINT_RE.test(ev.title)
+    );
+
+    // 重複除去 + 範囲フィルタ
+    const byId = new Map();
+    for (const ev of childEvents) {
+      if (!inRangeJst(ev.y, ev.mo, ev.d, maxDays)) continue;
+      const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
+
+      // ジオコーディング (公民館住所を使用)
+      const geoCandidates = [`神奈川県${ev.centerAddress}`, `神奈川県藤沢市 ${ev.center}`];
+      const source = { key: "fujisawa", label, baseUrl, center: { lat: 35.3388, lng: 139.4900 } };
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), source);
+      point = resolveEventPoint(source, ev.center, point, `神奈川県${ev.centerAddress}`);
+      const address = resolveEventAddress(source, ev.center, `神奈川県${ev.centerAddress}`, point);
+
+      const { startsAt, endsAt } = buildStartsEndsForDate(
+        { y: ev.y, mo: ev.mo, d: ev.d },
+        ev.timeRange
+      );
+      const id = `${srcKey}:${ev.url}:${ev.title}:${dateKey}`;
+      if (byId.has(id)) continue;
+      byId.set(id, {
+        id,
+        source: srcKey,
+        source_label: label,
+        title: ev.title,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        venue_name: ev.center,
+        address: address || `神奈川県${ev.centerAddress}`,
+        url: ev.url,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
+      });
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectFujisawaEvents };

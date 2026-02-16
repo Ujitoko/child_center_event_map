@@ -1591,6 +1591,13 @@ const HAYAMA_SOURCE = {
   center: { lat: 35.2686, lng: 139.5878 },
 };
 
+const FUJISAWA_SOURCE = {
+  key: "fujisawa",
+  label: "藤沢市",
+  baseUrl: "https://www.city.fujisawa.kanagawa.jp",
+  center: { lat: 35.3388, lng: 139.4900 },
+};
+
 const NAKAI_SOURCE = {
   key: "nakai",
   label: "中井町",
@@ -1747,6 +1754,7 @@ module.exports = {
   MIURA_SOURCE,
   OISO_SOURCE,
   HAYAMA_SOURCE,
+  FUJISAWA_SOURCE,
   NAKAI_SOURCE,
   KIYOKAWA_SOURCE,
   MIZUHO_SOURCE,

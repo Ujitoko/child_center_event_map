@@ -79,6 +79,7 @@ function createGetEvents(deps) {
     collectAtsugiEvents,
     collectIseharaEvents,
     collectMinamiashigaraEvents,
+    collectFujisawaEvents,
     collectSamukawaEvents,
     collectAikawaEvents,
     collectMiuraEvents,
@@ -129,7 +130,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, samukawa, aikawa, miura, oiso, hayama, nakai, kiyokawa, mizuho] = await batchCollect([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, fujisawa, samukawa, aikawa, miura, oiso, hayama, nakai, kiyokawa, mizuho] = await batchCollect([
     () => collectSetagayaJidokanEvents(days),
     () => collectOtaJidokanEvents(days),
     () => collectShinagawaJidokanEvents(days),
@@ -172,6 +173,7 @@ function createGetEvents(deps) {
     () => collectAtsugiEvents(days),
     () => collectIseharaEvents(days),
     () => collectMinamiashigaraEvents(days),
+    () => collectFujisawaEvents(days),
     () => collectSamukawaEvents(days),
     () => collectAikawaEvents(days),
     () => collectMiuraEvents(days),
@@ -275,6 +277,7 @@ function createGetEvents(deps) {
     ...atsugi,
     ...isehara,
     ...minamiashigara,
+    ...fujisawa,
     ...samukawa,
     ...aikawa,
     ...miura,
@@ -381,6 +384,7 @@ function createGetEvents(deps) {
         city_atsugi: atsugi.length,
         city_isehara: isehara.length,
         city_minamiashigara: minamiashigara.length,
+        city_fujisawa: fujisawa.length,
         town_samukawa: samukawa.length,
         town_aikawa: aikawa.length,
         city_miura: miura.length,
