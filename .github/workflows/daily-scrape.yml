@@ -22,10 +22,21 @@ jobs:
           BASE_URL="${{ secrets.RENDER_URL }}"
           BASE_URL="${BASE_URL%/}"
           echo "Requesting refresh..."
+          set +e
           HTTP_CODE=$(curl -s --retry 3 --retry-delay 30 --retry-all-errors --max-time 300 \
             "${BASE_URL}/api/events?refresh=1" \
             -o /dev/null -w "%{http_code}")
+          CURL_EXIT=$?
+          set -e
+          echo "curl exit code: ${CURL_EXIT}"
           echo "HTTP ${HTTP_CODE}"
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "::warning::curl failed with exit code ${CURL_EXIT}, checking service health..."
+            HEALTH=$(curl -sf --max-time 30 "${BASE_URL}/api/health" 2>&1 || true)
+            echo "Health: ${HEALTH}"
+            echo "::error::Refresh request failed (curl exit ${CURL_EXIT})"
+            exit 1
+          fi
           if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
             echo "::error::Refresh failed with HTTP ${HTTP_CODE}"
             exit 1
