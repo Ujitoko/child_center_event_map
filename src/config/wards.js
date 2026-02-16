@@ -2158,6 +2158,36 @@ const INZAI_SOURCE = {
   baseUrl: "https://www.city.inzai.lg.jp",
   center: { lat: 35.8310, lng: 140.1460 },
 };
+const KATORI_SOURCE = {
+  key: "katori", label: "香取市",
+  baseUrl: "https://www.city.katori.lg.jp",
+  center: { lat: 35.8977, lng: 140.4991 },
+};
+const TOGANE_SOURCE = {
+  key: "togane", label: "東金市",
+  baseUrl: "https://www.city.togane.chiba.jp",
+  center: { lat: 35.5603, lng: 140.3656 },
+};
+const ICHIHARA_SOURCE = {
+  key: "ichihara", label: "市原市",
+  baseUrl: "https://www.city.ichihara.chiba.jp",
+  center: { lat: 35.4980, lng: 140.1155 },
+};
+const SOSA_SOURCE = {
+  key: "sosa", label: "匝瑳市",
+  baseUrl: "https://www.city.sosa.lg.jp",
+  center: { lat: 35.7100, lng: 140.5636 },
+};
+const SAMMU_SOURCE = {
+  key: "sammu", label: "山武市",
+  baseUrl: "https://www.city.sammu.lg.jp",
+  center: { lat: 35.6060, lng: 140.4148 },
+};
+const SAKAE_CHIBA_SOURCE = {
+  key: "sakae_chiba", label: "栄町",
+  baseUrl: "https://www.town.sakae.chiba.jp",
+  center: { lat: 35.8422, lng: 140.2531 },
+};
 
 // --- 埼玉県 ---
 const KAWAGUCHI_SOURCE = {
@@ -2484,6 +2514,12 @@ module.exports = {
   SAKURA_SOURCE,
   FUTTSU_SOURCE,
   INZAI_SOURCE,
+  KATORI_SOURCE,
+  TOGANE_SOURCE,
+  ICHIHARA_SOURCE,
+  SOSA_SOURCE,
+  SAMMU_SOURCE,
+  SAKAE_CHIBA_SOURCE,
   KAWAGUCHI_SOURCE,
   KASUKABE_SOURCE,
   FUJIMINO_SOURCE,

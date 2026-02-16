@@ -136,6 +136,8 @@ const {
   YACHIMATA_SOURCE, SODEGAURA_SOURCE,
   ICHINOMIYA_SOURCE, CHOSHI_SOURCE,
   SAKURA_SOURCE, FUTTSU_SOURCE, INZAI_SOURCE,
+  KATORI_SOURCE, TOGANE_SOURCE, ICHIHARA_SOURCE,
+  SOSA_SOURCE, SAMMU_SOURCE, SAKAE_CHIBA_SOURCE,
   KAWAGUCHI_SOURCE, KASUKABE_SOURCE, FUJIMINO_SOURCE, MISATO_SOURCE,
   KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
@@ -590,6 +592,12 @@ const collectChoshiEvents = createCollectChoshiEvents(geoFmDeps);
 const collectSakuraEvents = createCalendarJsonCollector({ source: SAKURA_SOURCE }, geoFmDeps);
 const collectFuttsuEvents = createEvent2CalendarCollector({ source: FUTTSU_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
 const collectInzaiEvents = createEvent2CalendarCollector({ source: INZAI_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
+const collectKatoriEvents = createListCalendarCollector({ source: KATORI_SOURCE, calendarPath: "/yotei/kosodate/calendar/", fallbackPath: "/yotei/calendar/" }, geoFmDeps);
+const collectToganeEvents = createEvent2CalendarCollector({ source: TOGANE_SOURCE, childIconAlts: [] }, geoFmDeps);
+const collectIchiharaEvents = createCalendarJsonCollector({ source: ICHIHARA_SOURCE }, geoFmDeps);
+const collectSosaEvents = createCalendarJsonCollector({ source: SOSA_SOURCE }, geoFmDeps);
+const collectSammuEvents = createCalendarJsonCollector({ source: SAMMU_SOURCE }, geoFmDeps);
+const collectSakaeChibaEvents = createCalendarJsonCollector({ source: SAKAE_CHIBA_SOURCE }, geoFmDeps);
 // --- 埼玉県 calendar-json-collector ---
 const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE }, geoFmDeps);
 const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE }, geoFmDeps);
@@ -730,6 +738,12 @@ const getEvents = createGetEvents({
   collectSakuraEvents,
   collectFuttsuEvents,
   collectInzaiEvents,
+  collectKatoriEvents,
+  collectToganeEvents,
+  collectIchiharaEvents,
+  collectSosaEvents,
+  collectSammuEvents,
+  collectSakaeChibaEvents,
   collectKawaguchiEvents,
   collectKasukabeEvents,
   collectFujiminoEvents,
