@@ -6,7 +6,9 @@ _diag.js
 _nerima_investigate.js
 audit_noise.js
 *_diag.js
-data/
+data/*
+!data/events_snapshot.json
+!data/geo_cache.json
 *.log
 .env
 nul
