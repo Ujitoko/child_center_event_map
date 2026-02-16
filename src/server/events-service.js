@@ -84,6 +84,8 @@ function createGetEvents(deps) {
     collectMiuraEvents,
     collectOisoEvents,
     collectHayamaEvents,
+    collectNakaiEvents,
+    collectKiyokawaEvents,
     collectMizuhoEvents,
   } = deps;
 
@@ -127,7 +129,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, samukawa, aikawa, miura, oiso, hayama, mizuho] = await batchCollect([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, samukawa, aikawa, miura, oiso, hayama, nakai, kiyokawa, mizuho] = await batchCollect([
     () => collectSetagayaJidokanEvents(days),
     () => collectOtaJidokanEvents(days),
     () => collectShinagawaJidokanEvents(days),
@@ -175,6 +177,8 @@ function createGetEvents(deps) {
     () => collectMiuraEvents(days),
     () => collectOisoEvents(days),
     () => collectHayamaEvents(days),
+    () => collectNakaiEvents(days),
+    () => collectKiyokawaEvents(days),
     () => collectMizuhoEvents(days),
   ], 5);
   const {
@@ -276,6 +280,8 @@ function createGetEvents(deps) {
     ...miura,
     ...oiso,
     ...hayama,
+    ...nakai,
+    ...kiyokawa,
     ...mizuho,
   ];
   const items = rawItems
@@ -380,6 +386,8 @@ function createGetEvents(deps) {
         city_miura: miura.length,
         town_oiso: oiso.length,
         town_hayama: hayama.length,
+        town_nakai: nakai.length,
+        village_kiyokawa: kiyokawa.length,
         town_mizuho: mizuho.length,
       },
     },

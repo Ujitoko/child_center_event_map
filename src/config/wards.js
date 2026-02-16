@@ -1591,6 +1591,20 @@ const HAYAMA_SOURCE = {
   center: { lat: 35.2686, lng: 139.5878 },
 };
 
+const NAKAI_SOURCE = {
+  key: "nakai",
+  label: "中井町",
+  baseUrl: "https://www.town.nakai.kanagawa.jp",
+  center: { lat: 35.3408, lng: 139.2133 },
+};
+
+const KIYOKAWA_SOURCE = {
+  key: "kiyokawa",
+  label: "清川村",
+  baseUrl: "https://www.town.kiyokawa.kanagawa.jp",
+  center: { lat: 35.4744, lng: 139.2844 },
+};
+
 const MIZUHO_SOURCE = {
   key: "mizuho",
   label: "瑞穂町",
@@ -1733,5 +1747,7 @@ module.exports = {
   MIURA_SOURCE,
   OISO_SOURCE,
   HAYAMA_SOURCE,
+  NAKAI_SOURCE,
+  KIYOKAWA_SOURCE,
   MIZUHO_SOURCE,
 };

@@ -82,6 +82,7 @@ const {
   ISEHARA_SOURCE, MINAMIASHIGARA_SOURCE,
   SAMUKAWA_SOURCE, AIKAWA_SOURCE, MIURA_SOURCE,
   OISO_SOURCE, HAYAMA_SOURCE,
+  NAKAI_SOURCE, KIYOKAWA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -328,6 +329,8 @@ const collectAikawaEvents = createCalendarJsonCollector({ source: AIKAWA_SOURCE 
 const collectMiuraEvents = createCalendarJsonCollector({ source: MIURA_SOURCE }, geoFmDeps);
 const collectOisoEvents = createCalendarJsonCollector({ source: OISO_SOURCE }, geoFmDeps);
 const collectHayamaEvents = createCalendarJsonCollector({ source: HAYAMA_SOURCE }, geoFmDeps);
+const collectNakaiEvents = createCalendarJsonCollector({ source: NAKAI_SOURCE }, geoFmDeps);
+const collectKiyokawaEvents = createCalendarJsonCollector({ source: KIYOKAWA_SOURCE }, geoFmDeps);
 const collectMizuhoEvents = createCollectMizuhoEvents(geoFmDeps);
 const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
@@ -442,6 +445,8 @@ const getEvents = createGetEvents({
   collectMiuraEvents,
   collectOisoEvents,
   collectHayamaEvents,
+  collectNakaiEvents,
+  collectKiyokawaEvents,
   collectMizuhoEvents,
 });
 
