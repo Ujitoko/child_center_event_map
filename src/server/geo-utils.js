@@ -59,9 +59,10 @@ function createGeoHelpers(deps) {
     return 6371 * c;
   }
 
-  function isLikelyTokyoPoint(point) {
+  function isLikelyLocalPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    return point.lat >= 35.45 && point.lat <= 35.9 && point.lng >= 139.0 && point.lng <= 140.0;
+    // 東京都 + 神奈川県全域をカバー (湯河原町 35.14 ～ 奥多摩 35.9)
+    return point.lat >= 35.1 && point.lat <= 35.9 && point.lng >= 139.0 && point.lng <= 140.0;
   }
 
   function isNearWardCenter(point, wardCenter, maxKm) {
@@ -121,6 +122,38 @@ function createGeoHelpers(deps) {
       kunitachi: 8,
       ome: 25,
       hamura: 8,
+      // 神奈川県
+      kawasaki: 15,
+      yokohama: 20,
+      sagamihara: 25,
+      ebina: 8,
+      kamakura: 12,
+      yokosuka: 15,
+      chigasaki: 10,
+      zama: 8,
+      zushi: 8,
+      yamato: 8,
+      hiratsuka: 10,
+      odawara: 12,
+      hadano: 15,
+      ayase: 8,
+      atsugi: 12,
+      isehara: 12,
+      minamiashigara: 15,
+      fujisawa: 10,
+      samukawa: 8,
+      aikawa: 12,
+      miura: 12,
+      oiso: 8,
+      hayama: 8,
+      nakai: 8,
+      kiyokawa: 15,
+      ninomiya: 8,
+      oi: 10,
+      yugawara: 10,
+      matsuda: 10,
+      manazuru: 8,
+      mizuho: 8,
     };
     return overrides[key] || 10;
   }
@@ -131,7 +164,7 @@ function createGeoHelpers(deps) {
     const lng = Number(point.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
     const normalized = { lat, lng, address: sanitizeAddressText(point.address || "") };
-    if (!isLikelyTokyoPoint(normalized)) return null;
+    if (!isLikelyLocalPoint(normalized)) return null;
     const center = sourceOrCenter?.center || sourceOrCenter || null;
     if (center) {
       const maxKm = Number(maxKmOverride || getWardGeoMaxKm(sourceOrCenter?.key));
@@ -143,7 +176,11 @@ function createGeoHelpers(deps) {
   function isGenericMunicipalityGeocode(point) {
     if (!point || !point.address) return false;
     const addr = String(point.address).trim();
-    return /^東京都[^\s\d丁番号区市]+[区市]$/.test(addr);
+    // 東京都の区市のみ (「東京都世田谷区」のような市区単位の結果を除外)
+    if (/^東京都[^\s\d丁番号区市]+[区市]$/.test(addr)) return true;
+    // 神奈川県の市町村のみ (「神奈川県鎌倉市」「神奈川県中郡二宮町」のような自治体単位の結果を除外)
+    if (/^神奈川県[^\s\d丁番号]+[市町村]$/.test(addr)) return true;
+    return false;
   }
 
   async function geocodeForWard(candidates, sourceOrCenter, maxKmOverride) {

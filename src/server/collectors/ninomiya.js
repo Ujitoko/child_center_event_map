@@ -101,7 +101,17 @@ function createCollectNinomiyaEvents(deps) {
         batch.map(async (url) => {
           const html = await fetchText(url);
           const meta = parseDetailMeta(html);
-          const timeRange = parseTimeRangeFromText(stripTags(html));
+          const plainText = stripTags(html);
+          const timeRange = parseTimeRangeFromText(plainText);
+          // テキストベースの会場抽出フォールバック
+          if (!meta.venue) {
+            const placeMatch = plainText.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              v = v.replace(/\s*(?:住所|郵便番号|駐車|大きな地図|対象|定員|電話|内容|持ち物|日時|費用|備考|協力|おはなし|についてのお知らせ).*$/, "").trim();
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) meta.venue = v;
+            }
+          }
           return { url, meta, timeRange };
         })
       );

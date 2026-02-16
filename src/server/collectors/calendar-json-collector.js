@@ -26,6 +26,12 @@ function isChildEvent(entry) {
   if (entry.event) {
     const typeName = entry.event.event_type_name || "";
     if (/子育て|子ども/.test(typeName)) return true;
+    const fields = entry.event.event_fields;
+    if (fields && typeof fields === "object" && !Array.isArray(fields)) {
+      for (const val of Object.values(fields)) {
+        if (/子育て|子ども/.test(val)) return true;
+      }
+    }
   }
   return false;
 }
@@ -53,12 +59,15 @@ function expandDateRange(startStr, endStr) {
 
 /**
  * ジオコーディング候補リストを構築
- * calendar.json を利用する自治体はすべて神奈川県
  */
 function buildGeoCandidates(venue, address, source) {
   const candidates = [];
   const cityName = source.label;
-  const pref = "神奈川県";
+  const pref = /tokyo\.jp/.test(source.baseUrl || "") ? "東京都"
+    : /chiba\.(jp|lg\.jp)/.test(source.baseUrl || "") ? "千葉県"
+    : /saitama\.jp/.test(source.baseUrl || "") ? "埼玉県"
+    : /市$/.test(source.label || "") && /kawaguchi|kasukabe|misato/.test(source.key || "") ? "埼玉県"
+    : "神奈川県";
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;
     candidates.push(`${pref}${full}`);
@@ -166,7 +175,20 @@ function createCalendarJsonCollector(config, deps) {
         batch.map(async (url) => {
           const html = await fetchText(url);
           const meta = parseDetailMeta(html);
-          const timeRange = parseTimeRangeFromText(stripTags(html));
+          const plainText = stripTags(html);
+          const timeRange = parseTimeRangeFromText(plainText);
+          // テキストベースの会場抽出 (parseDetailMeta が空の場合のフォールバック)
+          if (!meta.venue) {
+            const placeMatch = plainText.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              // 余計な後続テキストを除去
+              v = v.replace(/\s*(?:住所|郵便番号|駐車|大きな地図|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考|注意|詳細|についてのお知らせ).*$/, "").trim();
+              v = v.replace(/[（(][^）)]*(?:駅|バス停|徒歩)[^）)]*[）)]$/g, "").trim();
+              // 「場所にお越しの上」等のゴミ除外
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) meta.venue = v;
+            }
+          }
           return { url, meta, timeRange };
         })
       );
@@ -185,7 +207,9 @@ function createCalendarJsonCollector(config, deps) {
       // 会場: JSON の event_place を優先、なければ詳細ページから
       const jsonVenue = sanitizeVenueText(item.eventPlace || "");
       const detailVenue = sanitizeVenueText((detail && detail.meta && detail.meta.venue) || "");
-      const venue = jsonVenue || detailVenue;
+      let venue = jsonVenue || detailVenue;
+      // 部屋名・階数を除去
+      venue = venue.replace(/\s*\d*階.*$/, "").replace(/[（(][^）)]*(?:衛生|教育室|会議室|和室|講堂|研修室)[^）)]*[）)]/g, "").trim();
 
       const rawAddress = sanitizeAddressText((detail && detail.meta && detail.meta.address) || "");
       const timeRange = detail ? detail.timeRange : null;
@@ -195,7 +219,10 @@ function createCalendarJsonCollector(config, deps) {
       if (getFacilityAddressFromMaster && venue) {
         const fmAddr = getFacilityAddressFromMaster(source.key, venue);
         if (fmAddr) {
-          const full = /神奈川県/.test(fmAddr) ? fmAddr : `神奈川県${fmAddr}`;
+          const fmPref = /tokyo\.jp/.test(source.baseUrl || "") ? "東京都"
+            : /chiba\.(jp|lg\.jp)/.test(source.baseUrl || "") ? "千葉県"
+            : "神奈川県";
+          const full = new RegExp(fmPref).test(fmAddr) ? fmAddr : `${fmPref}${fmAddr}`;
           geoCandidates.unshift(full);
         }
       }

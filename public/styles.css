@@ -55,8 +55,7 @@ header {
   z-index: 2;
   padding: 14px 18px 12px;
   border-bottom: 1px solid var(--line);
-  background: var(--panel);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
   animation: riseIn 0.45s ease both;
 }
@@ -98,8 +97,7 @@ h1 {
 
 .side {
   border: 1px solid var(--line);
-  background: var(--panel-strong);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.96);
   border-radius: 18px;
   box-shadow: var(--shadow);
   overflow: auto;
@@ -466,7 +464,6 @@ button:active {
   width: 28px;
   height: 40px;
   display: block;
-  filter: drop-shadow(0 6px 8px rgba(16, 36, 61, 0.35));
 }
 
 .ward-section {
@@ -550,8 +547,7 @@ button:active {
   font-size: 13px;
   font-weight: 800;
   color: var(--accent);
-  background: rgba(246, 238, 225, 0.92);
-  backdrop-filter: blur(6px);
+  background: rgba(246, 238, 225, 0.98);
   border-bottom: 1px solid var(--line);
 }
 

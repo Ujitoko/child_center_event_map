@@ -87,21 +87,21 @@ function parseCalendarPage(html, baseUrl, pageYear, pageMonth, childCategoryInde
   const events = [];
 
   // 各日の <dl class="calendar_day"> を抽出
-  const dayBlockRe = /<dl\s+class="calendar_day[^"]*">([\s\S]*?)<\/dl>/gi;
-  let dayMatch;
-  while ((dayMatch = dayBlockRe.exec(html)) !== null) {
-    const dayBlock = dayMatch[1];
+  // 内部に <dl> メタデータがネストされるため、split で分割する
+  const dayParts = html.split(/<dl\s+class="calendar_day[^"]*">/i);
+  for (let i = 1; i < dayParts.length; i++) {
+    // 次の calendar_day の手前 or ページ末尾まで
+    const dayBlock = dayParts[i];
 
     // 日付を抽出: <span class="t_day"><span>16</span>日</span>
     const dayNumMatch = dayBlock.match(/<span\s+class="t_day">\s*<span>(\d{1,2})<\/span>\s*日\s*<\/span>/);
     if (!dayNumMatch) continue;
     const dayNum = Number(dayNumMatch[1]);
 
-    // 各イベントボックスを抽出
-    const eventBoxRe = /<div\s+class="cal_event_box">([\s\S]*?)<\/div>\s*(?=<div\s+class="cal_event_box">|<\/dd>|$)/gi;
-    let eventMatch;
-    while ((eventMatch = eventBoxRe.exec(dayBlock)) !== null) {
-      const eventBox = eventMatch[1];
+    // 各イベントボックスを抽出 (ネストされた div があるため split で分割)
+    const eventParts = dayBlock.split(/<div\s+class="cal_event_box">/i);
+    for (let j = 1; j < eventParts.length; j++) {
+      const eventBox = eventParts[j];
       const parsed = parseEventBox(eventBox, baseUrl, childCategoryIndex);
       if (!parsed) continue;
 
@@ -193,10 +193,18 @@ function parseEventBox(eventBox, baseUrl, childCategoryIndex) {
  * @param {Object} source - ソース定義
  * @returns {string[]}
  */
+function detectPrefecture(source) {
+  if (/chiba\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "千葉県";
+  if (/tokyo\.jp/.test(source.baseUrl || "")) return "東京都";
+  if (/saitama\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "埼玉県";
+  if (/ageo|niiza|asaka|shiki/.test(source.key || "")) return "埼玉県";
+  return "神奈川県";
+}
+
 function buildGeoCandidates(venue, address, source) {
   const candidates = [];
   const cityName = source.label;
-  const pref = "神奈川県";
+  const pref = detectPrefecture(source);
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;
     candidates.push(`${pref}${full}`);
@@ -331,7 +339,8 @@ function createMunicipalCalendarCollector(config, deps) {
       if (getFacilityAddressFromMaster && venue) {
         const fmAddr = getFacilityAddressFromMaster(source.key, venue);
         if (fmAddr) {
-          const full = /神奈川県/.test(fmAddr) ? fmAddr : `神奈川県${fmAddr}`;
+          const fmPref = detectPrefecture(source);
+          const full = new RegExp(fmPref).test(fmAddr) ? fmAddr : `${fmPref}${fmAddr}`;
           geoCandidates.unshift(full);
         }
       }

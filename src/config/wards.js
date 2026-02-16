@@ -1457,13 +1457,33 @@ const EBINA_SOURCE = {
   center: { lat: 35.4461, lng: 139.3906 },
 };
 
-const KNOWN_EBINA_FACILITIES = {};
+const KNOWN_EBINA_FACILITIES = {
+  "えびなこどもセンター": "神奈川県海老名市中新田377",
+  "海老名市立図書館": "神奈川県海老名市上郷474-4",
+  "海老名市文化会館": "神奈川県海老名市めぐみ町6-1",
+  "えびな市民活動センター": "神奈川県海老名市さつき町51-2",
+  "海老名市役所": "神奈川県海老名市勝瀬175-1",
+  "北部公園体育館": "神奈川県海老名市杉久保北5-3-1",
+};
 
 const KAMAKURA_SOURCE = {
   key: "kamakura",
   label: "鎌倉市",
   baseUrl: "https://www.city.kamakura.kanagawa.jp",
   center: { lat: 35.3192, lng: 139.5467 },
+};
+
+const KNOWN_KAMAKURA_FACILITIES = {
+  "鎌倉青少年会館": "神奈川県鎌倉市二階堂912-1",
+  "シルバー人材センター": "神奈川県鎌倉市岩瀬549",
+  "鎌倉市役所": "神奈川県鎌倉市御成町18-10",
+  "福祉センター": "神奈川県鎌倉市御成町20-21",
+  "腰越学習センター": "神奈川県鎌倉市腰越864",
+  "玉縄学習センター": "神奈川県鎌倉市岡本2-16-3",
+  "深沢学習センター": "神奈川県鎌倉市常盤111-3",
+  "大船学習センター": "神奈川県鎌倉市大船2-1-26",
+  "鎌倉体育館": "神奈川県鎌倉市笛田6-3",
+  "鎌倉生涯学習センター": "神奈川県鎌倉市小町1-10-5",
 };
 
 const YOKOSUKA_SOURCE = {
@@ -1473,6 +1493,24 @@ const YOKOSUKA_SOURCE = {
   center: { lat: 35.2814, lng: 139.6722 },
 };
 
+const KNOWN_YOKOSUKA_FACILITIES = {
+  "久里浜コミュニティセンター": "神奈川県横須賀市久里浜6-14-2",
+  "北健康福祉センター": "神奈川県横須賀市船越町6-77",
+  "衣笠コミュニティセンター": "神奈川県横須賀市公郷町2-11",
+  "追浜コミュニティセンター": "神奈川県横須賀市夏島町11",
+  "中央健康福祉センター": "神奈川県横須賀市西逸見町1-38-11",
+  "ウェルシティ市民プラザ": "神奈川県横須賀市西逸見町1-38-11",
+  "北下浦コミュニティセンター": "神奈川県横須賀市長沢2-7-7",
+  "南健康福祉センター": "神奈川県横須賀市久里浜6-14-2",
+  "西健康福祉センター": "神奈川県横須賀市長坂1-2-2",
+  "逸見コミュニティセンター": "神奈川県横須賀市東逸見町2-29",
+  "大津コミュニティセンター": "神奈川県横須賀市大津町3-34-40",
+  "田浦コミュニティセンター": "神奈川県横須賀市船越町6-77",
+  "横須賀市役所": "神奈川県横須賀市小川町11",
+  "横須賀市立中央図書館": "神奈川県横須賀市上町1-61",
+  "総合福祉会館": "神奈川県横須賀市本町2-1",
+};
+
 const CHIGASAKI_SOURCE = {
   key: "chigasaki",
   label: "茅ヶ崎市",
@@ -1480,7 +1518,19 @@ const CHIGASAKI_SOURCE = {
   center: { lat: 35.3339, lng: 139.4036 },
 };
 
-const KNOWN_CHIGASAKI_FACILITIES = {};
+const KNOWN_CHIGASAKI_FACILITIES = {
+  "市民ふれあいプラザ": "神奈川県茅ヶ崎市新栄町13-32",
+  "青少年会館": "神奈川県茅ヶ崎市十間坂3-5-37",
+  "本庁舎": "神奈川県茅ヶ崎市茅ヶ崎1-1-1",
+  "本館": "神奈川県茅ヶ崎市茅ヶ崎1-1-1",
+  "松林公民館": "神奈川県茅ヶ崎市室田1-3-2",
+  "小和田公民館": "神奈川県茅ヶ崎市小和田1-18-19",
+  "鶴嶺公民館": "神奈川県茅ヶ崎市萩園2028-55",
+  "茅ヶ崎公園体験学習センター": "神奈川県茅ヶ崎市中海岸3-3-9",
+  "茅ヶ崎市立図書館": "神奈川県茅ヶ崎市東海岸北1-4-55",
+  "ハマミーナまなびプラザ": "神奈川県茅ヶ崎市浜見平11-1",
+  "香川公民館": "神奈川県茅ヶ崎市香川5-2-31",
+};
 
 const ZAMA_SOURCE = {
   key: "zama",
@@ -1489,7 +1539,20 @@ const ZAMA_SOURCE = {
   center: { lat: 35.4886, lng: 139.4082 },
 };
 
-const KNOWN_ZAMA_FACILITIES = {};
+const KNOWN_ZAMA_FACILITIES = {
+  "サニープレイス座間": "神奈川県座間市相模が丘1-23-1",
+  "座間市民健康センター": "神奈川県座間市緑ケ丘1-1-3",
+  "市民健康センター": "神奈川県座間市緑ケ丘1-1-3",
+  "子育て支援センターざまりんのおうち": "神奈川県座間市入谷西2-50-18",
+  "ざまりんのおうち": "神奈川県座間市入谷西2-50-18",
+  "市役所": "神奈川県座間市緑ケ丘1-1-1",
+  "市公民館": "神奈川県座間市入谷西3-8-1",
+  "東地区文化センター": "神奈川県座間市栗原中央4-16-25",
+  "座間市立図書館": "神奈川県座間市入谷西3-8-1",
+  "図書館": "神奈川県座間市入谷西3-8-1",
+  "北地区文化センター": "神奈川県座間市栗原中央3-1-24",
+  "県立座間谷戸山公園": "神奈川県座間市入谷東1-6-1",
+};
 
 const ZUSHI_SOURCE = {
   key: "zushi",
@@ -1498,7 +1561,16 @@ const ZUSHI_SOURCE = {
   center: { lat: 35.2955, lng: 139.5803 },
 };
 
-const KNOWN_ZUSHI_FACILITIES = {};
+const KNOWN_ZUSHI_FACILITIES = {
+  "体験学習施設（スマイル）": "神奈川県逗子市池子1-11-2",
+  "体験学習施設スマイル": "神奈川県逗子市池子1-11-2",
+  "逗子アリーナ": "神奈川県逗子市池子1-11-1",
+  "逗子文化プラザ市民交流センター": "神奈川県逗子市逗子4-2-10",
+  "逗子文化プラザ": "神奈川県逗子市逗子4-2-10",
+  "小坪コミュニティセンター": "神奈川県逗子市小坪5-21-17",
+  "市民交流センター": "神奈川県逗子市逗子4-2-10",
+  "逗子市役所": "神奈川県逗子市逗子5-2-16",
+};
 
 const YAMATO_SOURCE = {
   key: "yamato",
@@ -1512,6 +1584,21 @@ const HIRATSUKA_SOURCE = {
   label: "平塚市",
   baseUrl: "https://www.city.hiratsuka.kanagawa.jp",
   center: { lat: 35.3297, lng: 139.3499 },
+};
+
+const KNOWN_HIRATSUKA_FACILITIES = {
+  "平塚市中央図書館": "神奈川県平塚市浅間町12-41",
+  "ラスカ平塚": "神奈川県平塚市宝町1-1",
+  "平塚市消防署": "神奈川県平塚市浅間町9-1",
+  "平塚市北図書館": "神奈川県平塚市田村3-12-5",
+  "平塚市役所": "神奈川県平塚市浅間町9-1",
+  "中央公民館": "神奈川県平塚市追分1-20",
+  "平塚市美術館": "神奈川県平塚市西八幡1-3-3",
+  "ひらつか市民活動センター": "神奈川県平塚市見附町1-8",
+  "総合公園": "神奈川県平塚市大原1-1",
+  "平塚市教育会館": "神奈川県平塚市浅間町12-41",
+  "勤労会館": "神奈川県平塚市追分1-24",
+  "神田公民館": "神奈川県平塚市田村3-12-5",
 };
 
 const ODAWARA_SOURCE = {
@@ -1563,6 +1650,17 @@ const SAMUKAWA_SOURCE = {
   center: { lat: 35.3737, lng: 139.3856 },
 };
 
+const KNOWN_SAMUKAWA_FACILITIES = {
+  "寒川町健康管理センター": "神奈川県高座郡寒川町宮山165",
+  "健康管理センター": "神奈川県高座郡寒川町宮山165",
+  "寒川町民センター": "神奈川県高座郡寒川町宮山165",
+  "南部文化福祉会館": "神奈川県高座郡寒川町一之宮1-9-1",
+  "北部文化福祉会館": "神奈川県高座郡寒川町宮山2832-1",
+  "寒川総合図書館": "神奈川県高座郡寒川町宮山135-1",
+  "寒川町役場": "神奈川県高座郡寒川町宮山165",
+  "寒川学校給食センター": "神奈川県高座郡寒川町宮山4018",
+};
+
 const AIKAWA_SOURCE = {
   key: "aikawa",
   label: "愛川町",
@@ -1570,11 +1668,30 @@ const AIKAWA_SOURCE = {
   center: { lat: 35.5278, lng: 139.3217 },
 };
 
+const KNOWN_AIKAWA_FACILITIES = {
+  "愛川町文化会館": "神奈川県愛甲郡愛川町角田286-2",
+  "レディースプラザ": "神奈川県愛甲郡愛川町角田286-2",
+  "愛川町役場": "神奈川県愛甲郡愛川町角田251-1",
+  "愛川町図書館": "神奈川県愛甲郡愛川町角田286-2",
+  "ラビンプラザ": "神奈川県愛甲郡愛川町中津4064-1",
+  "健康プラザ": "神奈川県愛甲郡愛川町角田286-2",
+};
+
 const MIURA_SOURCE = {
   key: "miura",
   label: "三浦市",
   baseUrl: "https://www.city.miura.kanagawa.jp",
   center: { lat: 35.1781, lng: 139.6283 },
+};
+
+const KNOWN_MIURA_FACILITIES = {
+  "三浦市民ホール": "神奈川県三浦市城山町1-1",
+  "三浦市役所": "神奈川県三浦市城山町1-1",
+  "三浦市立図書館": "神奈川県三浦市城山町1-1",
+  "潮風アリーナ": "神奈川県三浦市初声町入江274-2",
+  "南下浦市民センター": "神奈川県三浦市南下浦町上宮田3274",
+  "初声市民センター": "神奈川県三浦市初声町下宮田60",
+  "三浦合同庁舎": "神奈川県三浦市三崎町六合32",
 };
 
 const OISO_SOURCE = {
@@ -1596,6 +1713,24 @@ const FUJISAWA_SOURCE = {
   label: "藤沢市",
   baseUrl: "https://www.city.fujisawa.kanagawa.jp",
   center: { lat: 35.3388, lng: 139.4900 },
+};
+
+const KNOWN_FUJISAWA_FACILITIES = {
+  "御所見市民センター": "神奈川県藤沢市打戻1760-1",
+  "村岡市民センター": "神奈川県藤沢市弥勒寺1-3-7",
+  "長後市民センター": "神奈川県藤沢市長後513",
+  "辻堂市民センター": "神奈川県藤沢市辻堂東海岸1-1-41",
+  "六会市民センター": "神奈川県藤沢市亀井野4-8-1",
+  "片瀬市民センター": "神奈川県藤沢市片瀬3-9-6",
+  "善行市民センター": "神奈川県藤沢市善行1-2-3",
+  "湘南大庭市民センター": "神奈川県藤沢市大庭5406-4",
+  "藤沢市民センター": "神奈川県藤沢市朝日町10",
+  "湘南台市民センター": "神奈川県藤沢市湘南台1-8",
+  "鵠沼市民センター": "神奈川県藤沢市鵠沼海岸2-10-34",
+  "明治市民センター": "神奈川県藤沢市辻堂新町1-11-23",
+  "遠藤市民センター": "神奈川県藤沢市遠藤2984-3",
+  "藤沢市役所": "神奈川県藤沢市朝日町1-1",
+  "藤沢市民会館": "神奈川県藤沢市鵠沼東8-1",
 };
 
 const NAKAI_SOURCE = {
@@ -1626,6 +1761,16 @@ const NINOMIYA_SOURCE = {
   center: { lat: 35.3022, lng: 139.2558 },
 };
 
+const KNOWN_NINOMIYA_FACILITIES = {
+  "ラディアン": "神奈川県中郡二宮町二宮1410",
+  "二宮町生涯学習センター": "神奈川県中郡二宮町二宮1410",
+  "二宮町役場": "神奈川県中郡二宮町二宮961",
+  "二宮町保健センター": "神奈川県中郡二宮町二宮1410",
+  "百合が丘子育てサロン": "神奈川県中郡二宮町百合が丘2-1-1",
+  "ふれあいの家": "神奈川県中郡二宮町二宮872",
+  "二宮町図書館": "神奈川県中郡二宮町二宮1240-10",
+};
+
 const OI_SOURCE = {
   key: "oi",
   label: "大井町",
@@ -1647,11 +1792,490 @@ const MATSUDA_SOURCE = {
   center: { lat: 35.3461, lng: 139.1458 },
 };
 
+const KNOWN_ODAWARA_FACILITIES = {
+  "小田原市尊徳記念館": "神奈川県小田原市栢山2065-1",
+  "尊徳記念館": "神奈川県小田原市栢山2065-1",
+  "川東タウンセンターマロニエ": "神奈川県小田原市中里273-6",
+  "マロニエ": "神奈川県小田原市中里273-6",
+  "おだわら市民交流センターUMECO": "神奈川県小田原市栄町1-1-27",
+  "UMECO": "神奈川県小田原市栄町1-1-27",
+  "小田原アリーナ": "神奈川県小田原市中曽根263",
+  "小田原市保健センター": "神奈川県小田原市酒匂2-32-16",
+  "保健センター": "神奈川県小田原市酒匂2-32-16",
+  "小田原市役所": "神奈川県小田原市荻窪300",
+  "生涯学習センターけやき": "神奈川県小田原市荻窪300",
+  "けやき": "神奈川県小田原市荻窪300",
+  "川東タウンセンターこゆるぎ": "神奈川県小田原市前川120",
+  "こゆるぎ": "神奈川県小田原市前川120",
+  "いずみ": "神奈川県小田原市南鴨宮1-5-30",
+  "小田原市立中央図書館": "神奈川県小田原市南鴨宮1-5-30",
+};
+
+const KNOWN_YAMATO_FACILITIES = {
+  "保健福祉センター": "神奈川県大和市鶴間1-31-7",
+  "大和市保健福祉センター": "神奈川県大和市鶴間1-31-7",
+  "シリウス": "神奈川県大和市大和南1-8-1",
+  "大和市文化創造拠点シリウス": "神奈川県大和市大和南1-8-1",
+  "渋谷学習センター": "神奈川県大和市渋谷5-22",
+  "つきみ野学習センター": "神奈川県大和市つきみ野5-3-5",
+  "桜丘学習センター": "神奈川県大和市福田1-30-1",
+  "林間学習センター": "神奈川県大和市林間2-21-7",
+  "勤労福祉会館": "神奈川県大和市鶴間1-25-15",
+  "大和市役所": "神奈川県大和市下鶴間1-1-1",
+  "ポラリス": "神奈川県大和市中央林間1-3-1",
+  "大和市子育て支援センター": "神奈川県大和市中央林間2-13-13",
+};
+
+const KNOWN_HADANO_FACILITIES = {
+  "秦野市保健福祉センター": "神奈川県秦野市緑町16-3",
+  "保健福祉センター": "神奈川県秦野市緑町16-3",
+  "秦野市文化会館": "神奈川県秦野市平沢82",
+  "秦野市立図書館": "神奈川県秦野市平沢94-1",
+  "はだのこども館": "神奈川県秦野市入船町12-2",
+  "本町公民館": "神奈川県秦野市入船町12-2",
+  "秦野市役所": "神奈川県秦野市桜町1-3-2",
+  "鶴巻公民館": "神奈川県秦野市鶴巻南3-1-7",
+  "渋沢公民館": "神奈川県秦野市渋沢上2-9-1",
+};
+
+const KNOWN_ATSUGI_FACILITIES = {
+  "厚木市子ども科学館": "神奈川県厚木市中町1-1-3",
+  "子ども科学館": "神奈川県厚木市中町1-1-3",
+  "あつぎ市民交流プラザ": "神奈川県厚木市中町2-12-15",
+  "アミューあつぎ": "神奈川県厚木市中町2-12-15",
+  "厚木市保健福祉センター": "神奈川県厚木市中町1-4-1",
+  "厚木市役所": "神奈川県厚木市中町3-17-17",
+  "荻野運動公園": "神奈川県厚木市中荻野1500",
+};
+
+const KNOWN_AYASE_FACILITIES = {
+  "綾瀬市保健福祉プラザ": "神奈川県綾瀬市深谷中1-3-1",
+  "保健福祉プラザ": "神奈川県綾瀬市深谷中1-3-1",
+  "オーエンス文化会館": "神奈川県綾瀬市深谷中4-4-1",
+  "綾瀬市役所": "神奈川県綾瀬市早川550",
+};
+
+const KNOWN_ISEHARA_FACILITIES = {
+  "伊勢原市保健福祉センター": "神奈川県伊勢原市田中348",
+  "子ども科学館": "神奈川県伊勢原市田中76",
+  "中央公民館": "神奈川県伊勢原市田中348",
+  "伊勢原市役所": "神奈川県伊勢原市田中348",
+};
+
 const MANAZURU_SOURCE = {
   key: "manazuru",
   label: "真鶴町",
   baseUrl: "https://www.town.manazuru.kanagawa.jp",
   center: { lat: 35.1575, lng: 139.1350 },
+};
+
+const KAISEI_SOURCE = {
+  key: "kaisei",
+  label: "開成町",
+  baseUrl: "https://www.town.kaisei.kanagawa.jp",
+  center: { lat: 35.3378, lng: 139.1283 },
+};
+
+const YAMAKITA_SOURCE = {
+  key: "yamakita",
+  label: "山北町",
+  baseUrl: "https://www.town.yamakita.kanagawa.jp",
+  center: { lat: 35.3642, lng: 139.0833 },
+};
+
+const KNOWN_YAMAKITA_FACILITIES = {
+  "健康福祉センター": "神奈川県足柄上郡山北町山北1301番地4",
+  "山北町健康福祉センター": "神奈川県足柄上郡山北町山北1301番地4",
+};
+
+const OKUTAMA_SOURCE = {
+  key: "okutama",
+  label: "奥多摩町",
+  baseUrl: "https://www.town.okutama.tokyo.jp/gyosei",
+  center: { lat: 35.8098, lng: 139.0966 },
+};
+
+const HINODE_SOURCE = {
+  key: "hinode",
+  label: "日の出町",
+  baseUrl: "https://www.town.hinode.tokyo.jp",
+  center: { lat: 35.7441, lng: 139.2594 },
+};
+
+const HINOHARA_SOURCE = {
+  key: "hinohara",
+  label: "檜原村",
+  baseUrl: "https://www.vill.hinohara.tokyo.jp",
+  center: { lat: 35.7272, lng: 139.1497 },
+};
+
+// --- 千葉県 ---
+
+const NAGAREYAMA_SOURCE = {
+  key: "nagareyama",
+  label: "流山市",
+  baseUrl: "https://www.city.nagareyama.chiba.jp",
+  center: { lat: 35.8564, lng: 139.9027 },
+};
+const KNOWN_NAGAREYAMA_FACILITIES = {};
+
+const URAYASU_SOURCE = {
+  key: "urayasu",
+  label: "浦安市",
+  baseUrl: "https://www.city.urayasu.lg.jp",
+  center: { lat: 35.6536, lng: 139.9019 },
+};
+const KNOWN_URAYASU_FACILITIES = {};
+
+const NODA_SOURCE = {
+  key: "noda",
+  label: "野田市",
+  baseUrl: "https://www.city.noda.chiba.jp",
+  center: { lat: 35.9550, lng: 139.8745 },
+};
+const KNOWN_NODA_FACILITIES = {};
+
+const NARASHINO_SOURCE = {
+  key: "narashino",
+  label: "習志野市",
+  baseUrl: "https://www.city.narashino.lg.jp",
+  center: { lat: 35.6808, lng: 140.0268 },
+};
+
+const SHIROI_SOURCE = {
+  key: "shiroi",
+  label: "白井市",
+  baseUrl: "https://www.city.shiroi.chiba.jp",
+  center: { lat: 35.7914, lng: 140.0572 },
+};
+
+const KISARAZU_SOURCE = {
+  key: "kisarazu",
+  label: "木更津市",
+  baseUrl: "https://www.city.kisarazu.lg.jp",
+  center: { lat: 35.3764, lng: 139.9168 },
+};
+
+const ISUMI_SOURCE = {
+  key: "isumi",
+  label: "いすみ市",
+  baseUrl: "https://www.city.isumi.lg.jp",
+  center: { lat: 35.2531, lng: 140.3828 },
+};
+
+const TOHNOSHO_SOURCE = {
+  key: "tohnosho",
+  label: "東庄町",
+  baseUrl: "https://www.town.tohnosho.chiba.jp",
+  center: { lat: 35.8278, lng: 140.6706 },
+};
+
+const OTAKI_SOURCE = {
+  key: "otaki",
+  label: "大多喜町",
+  baseUrl: "https://www.town.otaki.chiba.jp",
+  center: { lat: 35.2833, lng: 140.2444 },
+};
+
+const FUNABASHI_SOURCE = {
+  key: "funabashi",
+  label: "船橋市",
+  baseUrl: "https://www.city.funabashi.lg.jp",
+  center: { lat: 35.6947, lng: 139.9828 },
+};
+const KNOWN_FUNABASHI_FACILITIES = {};
+
+const NARITA_SOURCE = {
+  key: "narita",
+  label: "成田市",
+  baseUrl: "https://www.city.narita.chiba.jp",
+  center: { lat: 35.7768, lng: 140.3182 },
+};
+const KNOWN_NARITA_FACILITIES = {};
+
+const CHIBA_CITY_SOURCE = {
+  key: "chiba",
+  label: "千葉市",
+  baseUrl: "https://www.city.chiba.jp",
+  center: { lat: 35.6073, lng: 140.1063 },
+};
+const KNOWN_CHIBA_CITY_FACILITIES = {};
+
+const KASHIWA_SOURCE = {
+  key: "kashiwa",
+  label: "柏市",
+  baseUrl: "https://www.city.kashiwa.lg.jp",
+  center: { lat: 35.8676, lng: 139.9756 },
+};
+const KNOWN_KASHIWA_FACILITIES = {};
+
+const YACHIYO_SOURCE = {
+  key: "yachiyo",
+  label: "八千代市",
+  baseUrl: "https://www.city.yachiyo.lg.jp",
+  center: { lat: 35.7225, lng: 140.0997 },
+};
+
+const ASAHI_SOURCE = {
+  key: "asahi",
+  label: "旭市",
+  baseUrl: "https://www.city.asahi.lg.jp",
+  center: { lat: 35.7199, lng: 140.6478 },
+};
+
+const KAMOGAWA_SOURCE = {
+  key: "kamogawa",
+  label: "鴨川市",
+  baseUrl: "https://www.city.kamogawa.lg.jp",
+  center: { lat: 35.1147, lng: 140.0992 },
+};
+
+const YOKOSHIBAHIKARI_SOURCE = {
+  key: "yokoshibahikari",
+  label: "横芝光町",
+  baseUrl: "https://www.town.yokoshibahikari.chiba.jp",
+  center: { lat: 35.6622, lng: 140.5075 },
+};
+
+const ICHIKAWA_SOURCE = {
+  key: "ichikawa",
+  label: "市川市",
+  baseUrl: "https://event.city.ichikawa.lg.jp",
+  center: { lat: 35.7218, lng: 139.9312 },
+};
+
+const KATSUURA_SOURCE = {
+  key: "katsuura",
+  label: "勝浦市",
+  baseUrl: "https://www.city.katsuura.lg.jp",
+  center: { lat: 35.1526, lng: 140.3196 },
+};
+
+const KIMITSU_SOURCE = {
+  key: "kimitsu",
+  label: "君津市",
+  baseUrl: "https://www.city.kimitsu.lg.jp",
+  center: { lat: 35.3305, lng: 139.9025 },
+};
+
+const KYONAN_SOURCE = {
+  key: "kyonan",
+  label: "鋸南町",
+  baseUrl: "https://www.town.kyonan.chiba.jp",
+  center: { lat: 35.1044, lng: 139.8344 },
+};
+
+const YOTSUKAIDO_SOURCE = {
+  key: "yotsukaido",
+  label: "四街道市",
+  baseUrl: "https://www.city.yotsukaido.chiba.jp",
+  center: { lat: 35.6699, lng: 140.1696 },
+};
+
+const MATSUDO_SOURCE = {
+  key: "matsudo",
+  label: "松戸市",
+  baseUrl: "https://www.city.matsudo.chiba.jp",
+  center: { lat: 35.7878, lng: 139.9032 },
+};
+
+const ABIKO_SOURCE = {
+  key: "abiko",
+  label: "我孫子市",
+  baseUrl: "https://www.city.abiko.chiba.jp",
+  center: { lat: 35.8644, lng: 140.0283 },
+};
+
+const KAMAGAYA_SOURCE = {
+  key: "kamagaya",
+  label: "鎌ケ谷市",
+  baseUrl: "https://www.city.kamagaya.chiba.jp",
+  center: { lat: 35.7769, lng: 140.0008 },
+};
+
+const TOMISATO_SOURCE = {
+  key: "tomisato",
+  label: "富里市",
+  baseUrl: "https://www.city.tomisato.lg.jp",
+  center: { lat: 35.7321, lng: 140.3424 },
+};
+
+const SHIRAKO_SOURCE = {
+  key: "shirako",
+  label: "白子町",
+  baseUrl: "https://www.town.shirako.lg.jp",
+  center: { lat: 35.4408, lng: 140.3706 },
+};
+
+const KUJUKURI_SOURCE = {
+  key: "kujukuri",
+  label: "九十九里町",
+  baseUrl: "https://www.town.kujukuri.chiba.jp",
+  center: { lat: 35.5325, lng: 140.4500 },
+};
+
+const YACHIMATA_SOURCE = {
+  key: "yachimata",
+  label: "八街市",
+  baseUrl: "https://www.city.yachimata.lg.jp",
+  center: { lat: 35.6647, lng: 140.3186 },
+};
+
+const SODEGAURA_SOURCE = {
+  key: "sodegaura",
+  label: "袖ケ浦市",
+  baseUrl: "https://www.city.sodegaura.lg.jp",
+  center: { lat: 35.4310, lng: 139.9527 },
+};
+
+const ICHINOMIYA_SOURCE = {
+  key: "ichinomiya",
+  label: "一宮町",
+  baseUrl: "https://www.town.ichinomiya.chiba.jp",
+  center: { lat: 35.3700, lng: 140.3700 },
+};
+
+const CHOSHI_SOURCE = {
+  key: "choshi",
+  label: "銚子市",
+  baseUrl: "https://www.city.choshi.chiba.jp",
+  center: { lat: 35.7346, lng: 140.8267 },
+};
+
+// --- 千葉県追加 ---
+const SAKURA_SOURCE = {
+  key: "sakura", label: "佐倉市",
+  baseUrl: "https://www.city.sakura.lg.jp",
+  center: { lat: 35.7240, lng: 140.2190 },
+};
+const FUTTSU_SOURCE = {
+  key: "futtsu", label: "富津市",
+  baseUrl: "https://www.city.futtsu.lg.jp",
+  center: { lat: 35.3028, lng: 139.8567 },
+};
+const INZAI_SOURCE = {
+  key: "inzai", label: "印西市",
+  baseUrl: "https://www.city.inzai.lg.jp",
+  center: { lat: 35.8310, lng: 140.1460 },
+};
+
+// --- 埼玉県 ---
+const KAWAGUCHI_SOURCE = {
+  key: "kawaguchi", label: "川口市",
+  baseUrl: "https://www.city.kawaguchi.lg.jp",
+  center: { lat: 35.8078, lng: 139.7241 },
+};
+const KASUKABE_SOURCE = {
+  key: "kasukabe", label: "春日部市",
+  baseUrl: "https://www.city.kasukabe.lg.jp",
+  center: { lat: 35.9753, lng: 139.7525 },
+};
+const FUJIMINO_SOURCE = {
+  key: "fujimino", label: "ふじみ野市",
+  baseUrl: "https://www.city.fujimino.saitama.jp",
+  center: { lat: 35.8594, lng: 139.5198 },
+};
+const MISATO_SOURCE = {
+  key: "misato", label: "三郷市",
+  baseUrl: "https://www.city.misato.lg.jp",
+  center: { lat: 35.8311, lng: 139.8643 },
+};
+const KAWAGOE_SOURCE = {
+  key: "kawagoe", label: "川越市",
+  baseUrl: "https://www.city.kawagoe.saitama.jp",
+  center: { lat: 35.9250, lng: 139.4856 },
+};
+const KNOWN_KAWAGOE_FACILITIES = {
+  "児童センターこどもの城": "川越市石原町1-41-2",
+  "高階児童館": "川越市藤間27-1",
+  "川越駅東口児童館": "川越市菅原町23-10",
+  "ウェスタ川越": "川越市新宿町1-17-17",
+  "総合保健センター": "川越市小仙波町2-50",
+  "中央公民館": "川越市三久保町18-3",
+  "南公民館": "川越市新宿町1-17-17",
+  "北公民館": "川越市日の出町2-9-82",
+};
+const WAKO_SOURCE = {
+  key: "wako", label: "和光市",
+  baseUrl: "https://www.city.wako.lg.jp",
+  center: { lat: 35.7812, lng: 139.6056 },
+};
+const KNOWN_WAKO_FACILITIES = {
+  "中央公民館": "和光市中央1-7-27",
+  "坂下公民館": "和光市新倉3-4-18",
+  "和光市図書館": "和光市広沢1-5-54",
+  "市民文化センター": "和光市広沢1-5-51",
+  "サンアゼリア": "和光市広沢1-5-51",
+  "健康増進センター": "和光市広沢1-5-51",
+  "下新倉児童館": "和光市下新倉5-21-1",
+  "和光市役所": "和光市広沢1-5",
+};
+const WARABI_SOURCE = {
+  key: "warabi", label: "蕨市",
+  baseUrl: "https://www.city.warabi.saitama.jp",
+  center: { lat: 35.8256, lng: 139.6797 },
+};
+const KNOWN_WARABI_FACILITIES = {
+  "錦町児童館": "蕨市錦町3-3-27",
+  "塚越児童館": "蕨市塚越3-8-1",
+  "北町児童館": "蕨市北町2-12-28",
+  "南町児童館": "蕨市南町3-26-12",
+  "福祉・児童センター": "蕨市中央4-21-29",
+  "中央公民館": "蕨市中央4-21-29",
+  "東公民館": "蕨市中央5-17-22",
+  "西公民館": "蕨市北町3-3-24",
+  "南公民館": "蕨市南町3-26-12",
+  "交流プラザさくら": "蕨市南町3-26-12",
+};
+const AGEO_SOURCE = {
+  key: "ageo", label: "上尾市",
+  baseUrl: "https://www.city.ageo.lg.jp",
+  center: { lat: 35.9775, lng: 139.5933 },
+};
+const NIIZA_SOURCE = {
+  key: "niiza", label: "新座市",
+  baseUrl: "https://www.city.niiza.lg.jp",
+  center: { lat: 35.7933, lng: 139.5650 },
+};
+const ASAKA_SOURCE = {
+  key: "asaka", label: "朝霞市",
+  baseUrl: "https://www.city.asaka.lg.jp",
+  center: { lat: 35.7972, lng: 139.5931 },
+};
+const TODA_SOURCE = {
+  key: "toda", label: "戸田市",
+  baseUrl: "https://www.city.toda.saitama.jp",
+  center: { lat: 35.8175, lng: 139.6778 },
+};
+const SHIKI_SOURCE = {
+  key: "shiki", label: "志木市",
+  baseUrl: "https://www.city.shiki.lg.jp",
+  center: { lat: 35.8383, lng: 139.5800 },
+};
+const FUJIMI_SOURCE = {
+  key: "fujimi", label: "富士見市",
+  baseUrl: "https://www.city.fujimi.saitama.jp",
+  center: { lat: 35.8572, lng: 139.5494 },
+};
+const SAYAMA_SOURCE = {
+  key: "sayama", label: "狭山市",
+  baseUrl: "https://www.city.sayama.saitama.jp",
+  center: { lat: 35.8528, lng: 139.4122 },
+};
+const YASHIO_SOURCE = {
+  key: "yashio", label: "八潮市",
+  baseUrl: "https://www.city.yashio.lg.jp",
+  center: { lat: 35.8228, lng: 139.8392 },
+};
+const SAITAMA_CITY_SOURCE = {
+  key: "saitamashi", label: "さいたま市",
+  baseUrl: "https://www.city.saitama.lg.jp",
+  center: { lat: 35.8617, lng: 139.6455 },
+};
+const KOSHIGAYA_SOURCE = {
+  key: "koshigaya", label: "越谷市",
+  baseUrl: "https://www.city.koshigaya.saitama.jp",
+  center: { lat: 35.8911, lng: 139.7906 },
 };
 
 module.exports = {
@@ -1769,7 +2393,9 @@ module.exports = {
   EBINA_SOURCE,
   KNOWN_EBINA_FACILITIES,
   KAMAKURA_SOURCE,
+  KNOWN_KAMAKURA_FACILITIES,
   YOKOSUKA_SOURCE,
+  KNOWN_YOKOSUKA_FACILITIES,
   CHIGASAKI_SOURCE,
   KNOWN_CHIGASAKI_FACILITIES,
   ZAMA_SOURCE,
@@ -1777,25 +2403,102 @@ module.exports = {
   ZUSHI_SOURCE,
   KNOWN_ZUSHI_FACILITIES,
   YAMATO_SOURCE,
+  KNOWN_YAMATO_FACILITIES,
   HIRATSUKA_SOURCE,
+  KNOWN_HIRATSUKA_FACILITIES,
   ODAWARA_SOURCE,
+  KNOWN_ODAWARA_FACILITIES,
   HADANO_SOURCE,
+  KNOWN_HADANO_FACILITIES,
   AYASE_SOURCE,
+  KNOWN_AYASE_FACILITIES,
   ATSUGI_SOURCE,
+  KNOWN_ATSUGI_FACILITIES,
   ISEHARA_SOURCE,
+  KNOWN_ISEHARA_FACILITIES,
   MINAMIASHIGARA_SOURCE,
   SAMUKAWA_SOURCE,
+  KNOWN_SAMUKAWA_FACILITIES,
   AIKAWA_SOURCE,
+  KNOWN_AIKAWA_FACILITIES,
   MIURA_SOURCE,
+  KNOWN_MIURA_FACILITIES,
   OISO_SOURCE,
   HAYAMA_SOURCE,
   FUJISAWA_SOURCE,
+  KNOWN_FUJISAWA_FACILITIES,
   NAKAI_SOURCE,
   KIYOKAWA_SOURCE,
   MIZUHO_SOURCE,
   NINOMIYA_SOURCE,
+  KNOWN_NINOMIYA_FACILITIES,
   OI_SOURCE,
   YUGAWARA_SOURCE,
   MATSUDA_SOURCE,
   MANAZURU_SOURCE,
+  KAISEI_SOURCE,
+  YAMAKITA_SOURCE,
+  KNOWN_YAMAKITA_FACILITIES,
+  OKUTAMA_SOURCE,
+  HINODE_SOURCE,
+  HINOHARA_SOURCE,
+  NAGAREYAMA_SOURCE,
+  KNOWN_NAGAREYAMA_FACILITIES,
+  URAYASU_SOURCE,
+  KNOWN_URAYASU_FACILITIES,
+  NODA_SOURCE,
+  KNOWN_NODA_FACILITIES,
+  NARASHINO_SOURCE,
+  SHIROI_SOURCE,
+  KISARAZU_SOURCE,
+  ISUMI_SOURCE,
+  TOHNOSHO_SOURCE,
+  OTAKI_SOURCE,
+  FUNABASHI_SOURCE,
+  KNOWN_FUNABASHI_FACILITIES,
+  NARITA_SOURCE,
+  KNOWN_NARITA_FACILITIES,
+  CHIBA_CITY_SOURCE,
+  KNOWN_CHIBA_CITY_FACILITIES,
+  KASHIWA_SOURCE,
+  KNOWN_KASHIWA_FACILITIES,
+  YACHIYO_SOURCE,
+  ASAHI_SOURCE,
+  KAMOGAWA_SOURCE,
+  YOKOSHIBAHIKARI_SOURCE,
+  ICHIKAWA_SOURCE,
+  KATSUURA_SOURCE,
+  KIMITSU_SOURCE,
+  KYONAN_SOURCE,
+  YOTSUKAIDO_SOURCE,
+  MATSUDO_SOURCE,
+  ABIKO_SOURCE,
+  KAMAGAYA_SOURCE,
+  TOMISATO_SOURCE,
+  SHIRAKO_SOURCE,
+  KUJUKURI_SOURCE,
+  YACHIMATA_SOURCE,
+  SODEGAURA_SOURCE,
+  ICHINOMIYA_SOURCE,
+  CHOSHI_SOURCE,
+  SAKURA_SOURCE,
+  FUTTSU_SOURCE,
+  INZAI_SOURCE,
+  KAWAGUCHI_SOURCE,
+  KASUKABE_SOURCE,
+  FUJIMINO_SOURCE,
+  MISATO_SOURCE,
+  KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
+  WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
+  WARABI_SOURCE, KNOWN_WARABI_FACILITIES,
+  AGEO_SOURCE,
+  NIIZA_SOURCE,
+  ASAKA_SOURCE,
+  TODA_SOURCE,
+  SHIKI_SOURCE,
+  FUJIMI_SOURCE,
+  SAYAMA_SOURCE,
+  YASHIO_SOURCE,
+  SAITAMA_CITY_SOURCE,
+  KOSHIGAYA_SOURCE,
 };

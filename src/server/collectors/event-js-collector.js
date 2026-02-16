@@ -2,6 +2,7 @@ const vm = require("vm");
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText } = require("../date-utils");
 const { isJunkVenueName } = require("../venue-utils");
+const { WARD_CHILD_HINT_RE } = require("../../config/wards");
 
 /**
  * place2 をパース: 施設名と住所候補を抽出 (汎用)
@@ -94,6 +95,9 @@ function parsePlace2(raw, cityLabel) {
  */
 function detectPrefecture(cityLabel) {
   if (/^(横浜市|川崎市|相模原市|海老名市|鎌倉市|横須賀市|茅ヶ崎市|座間市|逗子市|大和市|平塚市|小田原市|秦野市|綾瀬市|厚木市|伊勢原市|南足柄市)/.test(cityLabel)) return "神奈川県";
+  if (/^(千葉市|船橋市|松戸市|市川市|柏市|市原市|八千代市|流山市|習志野市|浦安市|野田市|成田市|木更津市|白井市|四街道市|袖ケ浦市|鎌ケ谷市|我孫子市|印西市|富津市|君津市|佐倉市|東金市|旭市|銚子市|香取市|匝瑳市|山武市|勝浦市|鴨川市|南房総市|富里市|大網白里市|いすみ市|茂原市)/.test(cityLabel)) return "千葉県";
+  if (/^(東庄町|大多喜町|酒々井町|栄町|神崎町|多古町|九十九里町|芝山町|横芝光町|一宮町|白子町|長柄町|長南町|長生村|睦沢町|御宿町)/.test(cityLabel)) return "千葉県";
+  if (/^(さいたま市|川口市|所沢市|越谷市|川越市|草加市|春日部市|上尾市|新座市|朝霞市|戸田市|和光市|志木市|富士見市|ふじみ野市|三郷市|八潮市|蕨市|狭山市|入間市)/.test(cityLabel)) return "埼玉県";
   return "東京都";
 }
 
@@ -128,7 +132,7 @@ function buildGeoCandidates(venue, address, cityLabel, knownFacilities) {
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createEventJsCollector(config, deps) {
-  const { source, jsFile, childCategoryIds, childCategory2Ids, knownFacilities } = config;
+  const { source, jsFile, childCategoryIds, childCategory2Ids, knownFacilities, placeIdMap, useKeywordFilter } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -161,8 +165,9 @@ function createEventJsCollector(config, deps) {
     const childEvents = eventData.events.filter((ev) => {
       const cats = Array.isArray(ev.category) ? ev.category : [];
       const tags = Array.isArray(ev.hashtag) ? ev.hashtag : [];
-      if (childCategoryIds.some((id) => cats.includes(id) || tags.includes(id))) return true;
+      if (childCategoryIds.length > 0 && childCategoryIds.some((id) => cats.includes(id) || tags.includes(id))) return true;
       if (childCategory2Ids && childCategory2Ids.length > 0 && childCategory2Ids.includes(ev.category2)) return true;
+      if (useKeywordFilter && ev.eventtitle && WARD_CHILD_HINT_RE.test(ev.eventtitle)) return true;
       return false;
     });
 
@@ -171,6 +176,13 @@ function createEventJsCollector(config, deps) {
       if (!item.eventtitle || !Array.isArray(item.opendays)) continue;
 
       let { venue, address } = parsePlace2(item.place2 || "", label);
+      // placeIdMap がある場合、place フィールドのIDから施設名を取得（部屋名のみの場合も上書き）
+      if (placeIdMap && item.place) {
+        const mapped = placeIdMap[String(item.place)];
+        if (mapped && (!venue || /^(大?会議室|第?\d*会議室|講義室|実習室|集会室|講座室|保育室|和室|多目的室|研修室|美工室|学習室|子ども室)$/.test(venue))) {
+          venue = mapped;
+        }
+      }
       // place2 が空の場合、タイトルから施設名を抽出
       if (!venue) {
         // 【施設名】形式
@@ -263,7 +275,8 @@ function createEventJsCollector(config, deps) {
         if (getFacilityAddressFromMaster) {
           const fmAddr = getFacilityAddressFromMaster(source.key, ev.venue_name);
           if (fmAddr && !geoCandidates.some(c => c.includes(fmAddr))) {
-            const fullAddr = /東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`;
+            const pref = detectPrefecture(label);
+            const fullAddr = new RegExp(pref).test(fmAddr) ? fmAddr : `${pref}${fmAddr}`;
             geoCandidates.unshift(fullAddr);
           }
         }

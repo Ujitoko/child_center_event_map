@@ -116,11 +116,27 @@ function createCollectHiratsukaEvents(deps) {
         eventUrl = `${baseUrl}/events/index.html`;
       }
 
-      // 会場
-      const venue = stripTags(item.place || "").trim();
+      // 会場: venue+address が連結されている場合がある
+      let rawPlace = stripTags(item.place || "").trim();
+      // 余分な注釈を除去
+      rawPlace = rawPlace.replace(/【[^】]*】.*$/, "").trim();
+      // "施設名 平塚市XXX" の形式 → 施設名と住所に分離
+      let venue = rawPlace;
+      let placeAddress = "";
+      const addrMatch = rawPlace.match(/平塚市[^\s（(]+\d+[^\s]*/);
+      if (addrMatch) {
+        placeAddress = addrMatch[0];
+        venue = rawPlace.slice(0, addrMatch.index).replace(/[（(][^）)]*[）)]$/g, "").trim();
+        if (!venue) venue = rawPlace;
+      }
+      // 括弧内の部屋名を除去
+      venue = venue.replace(/[（(][^）)]*(?:階|会議室|和室|講堂|ホール|プレイルーム)[^）)]*[）)]/g, "").trim();
+      // 括弧外の階数・部屋名を除去
+      venue = venue.replace(/\s*\d*階.*$/, "").trim();
+      venue = venue.replace(/\s+(大ホール|小ホール|会議室|講堂|和室|調理室|多目的室|視聴覚室).*$/, "").trim();
 
       // 会場から住所候補を構築
-      let geoCandidates = buildGeoCandidates(venue, "");
+      let geoCandidates = buildGeoCandidates(venue, placeAddress);
       if (getFacilityAddressFromMaster && venue) {
         const fmAddr = getFacilityAddressFromMaster(HIRATSUKA_SOURCE.key, venue);
         if (fmAddr) {
