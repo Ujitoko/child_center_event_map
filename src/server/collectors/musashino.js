@@ -71,7 +71,7 @@ function buildGeoCandidates(venue, address) {
 }
 
 function createCollectMusashinoEvents(deps) {
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, getFacilityAddressFromMaster } = deps;
 
   return async function collectMusashinoEvents(maxDays) {
     const source = `ward_${MUSASHINO_SOURCE.key}`;
@@ -182,7 +182,13 @@ function createCollectMusashinoEvents(deps) {
       let point = null;
       if (ev.venue_name) {
         const geoCandidates = buildGeoCandidates(ev.venue_name, ev.address_hint);
-        point = await geocodeForWard(geoCandidates, MUSASHINO_SOURCE);
+        if (getFacilityAddressFromMaster) {
+          const fmAddr = getFacilityAddressFromMaster(MUSASHINO_SOURCE.key, ev.venue_name);
+          if (fmAddr && !geoCandidates.some(c => c.includes(fmAddr))) {
+            geoCandidates.unshift(/東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`);
+          }
+        }
+        point = await geocodeForWard(geoCandidates.slice(0, 7), MUSASHINO_SOURCE);
         point = resolveEventPoint(MUSASHINO_SOURCE, ev.venue_name, point, `武蔵野市 ${ev.venue_name}`);
       }
       results.push({

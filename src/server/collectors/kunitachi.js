@@ -46,7 +46,7 @@ function extractAddressFromDetail(html) {
 }
 
 function createCollectKunitachiEvents(deps) {
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, getFacilityAddressFromMaster } = deps;
   const source = KUNITACHI_SOURCE;
   const knownFacilities = KNOWN_KUNITACHI_FACILITIES;
   const label = source.label;
@@ -143,7 +143,13 @@ function createCollectKunitachiEvents(deps) {
       let point = null;
       if (venue) {
         const geoCandidates = buildGeoCandidates(venue, knownFacilities);
-        point = await geocodeForWard(geoCandidates, source);
+        if (getFacilityAddressFromMaster) {
+          const fmAddr = getFacilityAddressFromMaster(source.key, venue);
+          if (fmAddr && !geoCandidates.some(c => c.includes(fmAddr))) {
+            geoCandidates.unshift(/東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`);
+          }
+        }
+        point = await geocodeForWard(geoCandidates.slice(0, 7), source);
         point = resolveEventPoint(source, venue, point, `${label} ${venue}`);
       }
       results.push({
@@ -156,9 +162,8 @@ function createCollectKunitachiEvents(deps) {
         venue_name: venue,
         address: venue ? `${label} ${venue}` : "",
         url: ev.url,
-        lat: point ? point.lat : source.center.lat,
-        lng: point ? point.lng : source.center.lng,
-        point: point || source.center,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
       });
     }
 

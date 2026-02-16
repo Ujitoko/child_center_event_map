@@ -48,7 +48,7 @@ function buildGeoCandidates(venue) {
 }
 
 function createCollectHachiojiEvents(deps) {
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, getFacilityAddressFromMaster } = deps;
 
   return async function collectHachiojiEvents(maxDays) {
     const source = `ward_${HACHIOJI_SOURCE.key}`;
@@ -113,7 +113,13 @@ function createCollectHachiojiEvents(deps) {
       let point = null;
       if (venue) {
         const geoCandidates = buildGeoCandidates(venue);
-        point = await geocodeForWard(geoCandidates, HACHIOJI_SOURCE);
+        if (getFacilityAddressFromMaster) {
+          const fmAddr = getFacilityAddressFromMaster(HACHIOJI_SOURCE.key, venue);
+          if (fmAddr && !geoCandidates.some(c => c.includes(fmAddr))) {
+            geoCandidates.unshift(/東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`);
+          }
+        }
+        point = await geocodeForWard(geoCandidates.slice(0, 7), HACHIOJI_SOURCE);
         point = resolveEventPoint(HACHIOJI_SOURCE, venue, point, `八王子市 ${venue}`);
       }
       results.push({

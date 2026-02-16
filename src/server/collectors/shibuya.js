@@ -1,4 +1,5 @@
 const { normalizeText, normalizeJaDigits, sanitizeVenueText } = require("../text-utils");
+const { isJunkVenueName } = require("../venue-utils");
 const { fetchText } = require("../fetch-utils");
 const { stripTags, parseAnchors } = require("../html-utils");
 const {
@@ -140,7 +141,7 @@ function parseShibuyaBlocksFromKodomoHtml(html) {
 }
 
 function createCollectShibuyaJidokanEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
 
   async function collectShibuyaJidokanEvents(maxDays) {
     const rows = [];
@@ -190,10 +191,23 @@ function createCollectShibuyaJidokanEvents(deps) {
       if (!keepHint.test(`${title} ${meta.bodyText || ""} ${row.author || ""}`)) continue;
       if (!meta.dates || meta.dates.length === 0) continue;
 
-      const venueName = sanitizeVenueText(meta.venue_name) || row.author || "渋谷区子育てイベント";
-      const rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      let venueName = sanitizeVenueText(meta.venue_name) || row.author || "渋谷区子育てイベント";
+      if (isJunkVenueName(venueName)) venueName = "渋谷区子育てイベント";
+      let rawAddress = meta.address || extractTokyoAddress(meta.bodyText || "");
+      if (!rawAddress && getFacilityAddressFromMaster) {
+        rawAddress = getFacilityAddressFromMaster(SHIBUYA_SOURCE.key, venueName);
+      }
       const geoCandidates = buildShibuyaGeoCandidates(title, venueName, rawAddress);
-      let point = await geocodeForWard(geoCandidates, SHIBUYA_SOURCE);
+      if (getFacilityAddressFromMaster) {
+        const fmAddr = getFacilityAddressFromMaster(SHIBUYA_SOURCE.key, venueName);
+        if (fmAddr && fmAddr !== rawAddress) {
+          const fmCands = buildShibuyaGeoCandidates("", venueName, fmAddr);
+          for (let ci = fmCands.length - 1; ci >= 0; ci--) {
+            if (!geoCandidates.includes(fmCands[ci])) geoCandidates.unshift(fmCands[ci]);
+          }
+        }
+      }
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), SHIBUYA_SOURCE);
       point = resolveEventPoint(SHIBUYA_SOURCE, venueName, point, rawAddress);
       const address = resolveEventAddress(SHIBUYA_SOURCE, venueName, rawAddress, point);
 

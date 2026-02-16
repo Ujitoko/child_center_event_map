@@ -260,6 +260,32 @@ function isJunkVenueName(venueName) {
   if (/^(?:学童保育|防災|安心・安全|コミュニティ|くらし・観光|平和・人権|子ども・教育)$/.test(v)) return true;
   // Date strings extracted as venue (chofu pattern: "2025年12月24日...")
   if (/^\d{4}年\d{1,2}月\d{1,2}日/.test(v)) return true;
+  // Bare date references ("2月7日", "3月15日")
+  if (/^\d{1,2}月\d{1,2}日$/.test(v)) return true;
+  // Parsing artifacts ("会」と共催", "区では", "現在の市")
+  if (/^[」）)）]/.test(v)) return true;
+  if (/^(?:区では|現在の市|市では)$/.test(v)) return true;
+  // Administrative text extracted as venue
+  if (/申請書類|マイナンバー|令和\d+年度$/.test(v)) return true;
+  // "3階ホール" without facility name
+  if (/^(?:\d+階.*(?:ホール|会議室|展示室|研修室)|工作室・図書室|遊戯室・工作室)$/.test(v)) return true;
+  // Online-only events
+  if (/^(?:オンライン開催|Zoom開催|Web開催)$/.test(v)) return true;
+  // Venue text that is actually a junk description
+  if (/(?:はじめての保育園|ペアレンツセミナー|青少年育成プラン|（仮称）)/.test(v)) return true;
+  if (/^(?:市内各図書館|区内各公衆浴場|市内各所|児童館の前庭|幼稚園・保育園|幼稚園|保育園)$/.test(v)) return true;
+  // Generic "区の保育園" or "児童館で実施する子育てひろば"
+  if (/^(?:江東区の保育園|児童館で実施する|都内企業を中心)/.test(v)) return true;
+  // "区立幼稚園では" pattern (sumida)
+  if (/^(?:区立|市立|都立)(?:幼稚園|保育園|小学校|中学校)(?:では|で|の|に)/.test(v)) return true;
+  // Parsing artifacts with "と共催"
+  if (/共催$/.test(v) && v.length <= 10) return true;
+  // Text starting with venue-unrelated words
+  if (/^(?:第\d+回[…・]|JR[^\s]+駅[^\s]+集合)/.test(v)) return true;
+  // Date strings mistakenly extracted as venue names
+  if (/^\d{1,2}月\d{1,2}日/.test(v)) return true;
+  // Very long text that looks like a description
+  if (v.length > 60) return true;
   return false;
 }
 

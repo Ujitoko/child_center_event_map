@@ -1,6 +1,7 @@
 const vm = require("vm");
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText } = require("../date-utils");
+const { isJunkVenueName } = require("../venue-utils");
 
 /**
  * place2 をパース: 施設名と住所候補を抽出 (汎用)
@@ -118,11 +119,11 @@ function buildGeoCandidates(venue, address, cityLabel, knownFacilities) {
  * @param {string} config.jsFile - JS ファイル名 (例: "event.js", "event_m.js")
  * @param {string[]} config.childCategoryIds - 子育てカテゴリID配列
  * @param {Object} config.knownFacilities - 既知施設マップ
- * @param {Object} deps - { geocodeForWard, resolveEventPoint }
+ * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createEventJsCollector(config, deps) {
   const { source, jsFile, childCategoryIds, knownFacilities } = config;
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
 
@@ -185,7 +186,7 @@ function createEventJsCollector(config, deps) {
           }
         }
       }
-      if (!venue) continue;
+      if (!venue || isJunkVenueName(venue)) continue;
 
       let timeRange = null;
       if (Array.isArray(item.times) && item.times.length > 0) {
@@ -251,9 +252,24 @@ function createEventJsCollector(config, deps) {
       let point = null;
       if (ev.venue_name) {
         const geoCandidates = buildGeoCandidates(ev.venue_name, ev.address_hint, label, knownFacilities);
-        point = await geocodeForWard(geoCandidates, source);
+        if (getFacilityAddressFromMaster) {
+          const fmAddr = getFacilityAddressFromMaster(source.key, ev.venue_name);
+          if (fmAddr && !geoCandidates.some(c => c.includes(fmAddr))) {
+            const fullAddr = /東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`;
+            geoCandidates.unshift(fullAddr);
+          }
+        }
+        point = await geocodeForWard(geoCandidates.slice(0, 7), source);
         point = resolveEventPoint(source, ev.venue_name, point, `${label} ${ev.venue_name}`);
       }
+      let address = ev.address_hint || "";
+      if (!address && getFacilityAddressFromMaster && ev.venue_name) {
+        address = getFacilityAddressFromMaster(source.key, ev.venue_name);
+      }
+      if (resolveEventAddress) {
+        address = resolveEventAddress(source, ev.venue_name, address || `${label} ${ev.venue_name}`, point);
+      }
+      if (!address) address = ev.venue_name ? `${label} ${ev.venue_name}` : "";
       results.push({
         id: `${srcKey}:${ev.url}:${ev.title}:${ev.dateKey}`,
         source: srcKey,
@@ -262,11 +278,10 @@ function createEventJsCollector(config, deps) {
         starts_at: ev.starts_at,
         ends_at: ev.ends_at,
         venue_name: ev.venue_name,
-        address: ev.venue_name ? `${label} ${ev.venue_name}` : "",
+        address,
         url: ev.url,
-        lat: point ? point.lat : source.center.lat,
-        lng: point ? point.lng : source.center.lng,
-        point: point || source.center,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
       });
     }
 

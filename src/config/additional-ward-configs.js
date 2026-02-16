@@ -87,7 +87,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: false,
       titleDenyRe:
-        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|ページID検索|表紙[・、]目次|^表紙$|^目次$|^本文$|参考資料[（(]|報告書|答申|計画[（(].*PDF|概要版|プラン[）)）].*PDF|会議録|議事要旨|議事録|条例|規則|要綱|ルールとマナー|民間学童クラブ|検討部会|設立の手引き|あり方に関する|やさしい日本語|子ども110番|^やん\s*ぐ$|アフタースクール|^1月の予定$|^おたより$|令和\s*\d+\s*年度.*文京区|令\s*\(\s*れい\s*\)\s*和)/i,
+        /(サイトマップ|ウェブアクセシビリティ|個人情報保護|このサイトについて|ご利用にあたって|お問い合わせ一覧|組織から探す|よくある質問|携帯サイト|ページID検索|表紙[・、]目次|^表紙$|^目次$|^本文$|参考資料[（(]|報告書|答申|計画[（(].*PDF|概要版|プラン[）)）].*PDF|会議録|議事要旨|議事録|条例|規則|要綱|ルールとマナー|民間学童クラブ|検討部会|設立の手引き|あり方に関する|やさしい日本語|子ども110番|^やん\s*ぐ$|アフタースクール|^1月の予定$|^おたより$|令和\s*\d+\s*年度.*文京区|令\s*\(\s*れい\s*\)\s*和|指定管理者.*募集|不動産.*募集|^育成室.*について$|過去に開催された|^児童に関すること$)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -258,7 +258,7 @@ function buildAdditionalWardConfigs(deps) {
       requirePreHint: false,
       relaxChildFilter: true,
       titleDenyRe:
-        /(介護に関する入門的研修|コミュニティ大学|発達障害講演会|ヒアリングフレイル|男女共同参画.*宣言)/i,
+        /(介護に関する入門的研修|コミュニティ大学|発達障害講演会|ヒアリングフレイル|男女共同参画.*宣言|コールセンター.*案内|相続登記|空き家セミナー|ひきこもり相談|女性起業家|マンション管理セミナー|IKEBUS)/i,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
@@ -496,7 +496,7 @@ function buildAdditionalWardConfigs(deps) {
       allowRowFallbackOnDetailError: true,
       allowPdfDetail: true,
       maxRows: 900,
-      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|入札・契約|パブリック・コメント|附属機関等の会議|交通規制)/i,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|入札・契約|パブリック・コメント|附属機関等の会議|交通規制|子宮頸がん|市民公開講座)/i,
       skipOnlineOnlyWithoutPlace: true,
     },
     fuchu: {
@@ -542,7 +542,7 @@ function buildAdditionalWardConfigs(deps) {
       ],
       parseOpts: {
         urlAllow: /city\.nishitokyo\.lg\.jp\/.+\.html?(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$|\/aboutweb\/|\/siseizyoho\/|\/event\/[^/]+\/calendar\/list_calendar\.html/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
@@ -551,7 +551,8 @@ function buildAdditionalWardConfigs(deps) {
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       maxRows: 500,
-      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+      titleDenyRe:
+        /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|^検索の使い方$|^子育て・保育|^歴史・文化$|^スポーツ$|^発表会|^健康・安全$|^創作|^体験・散策$|^事前申込必要$|^申込終了$|^学ぶ・考える|^有料$|^中高生年代$|^市役所の案内$|^お問い合わせ$|障害者.*養成研修|介護者の会|薬湯|占い入門|平和.*サミット|戦跡を探る|ディスコ$|卓球大会$)/i,
     },
     machida: {
       source: MACHIDA_SOURCE,
@@ -633,7 +634,7 @@ function buildAdditionalWardConfigs(deps) {
         return [`${KOMAE_SOURCE.baseUrl}/events/index.cfm/view.4.${m.year}${ms}.2035.html`];
       },
       parseOpts: {
-        blockRe: /<article[^>]*id="eventbox"[^>]*>([\s\S]*?)<\/article>/i,
+        blockRe: /<div[^>]*id="main(?:contents?|_contents?|_body)?"[^>]*>([\s\S]*?)<\/div>\s*(?:<div[^>]*id="(?:sub|foot))/i,
         urlAllow: /city\.komae\.tokyo\.jp\/events\/index\.cfm\/detail\.\d+\.\d+\.html/i,
         urlDeny: /\/(?:index|sitemap|404)\.html$/i,
         useAnchorFallback: true,

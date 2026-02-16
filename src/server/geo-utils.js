@@ -143,7 +143,7 @@ function createGeoHelpers(deps) {
   function isGenericMunicipalityGeocode(point) {
     if (!point || !point.address) return false;
     const addr = String(point.address).trim();
-    return /^東京都[^\s\d丁番号]+[区市]$/.test(addr);
+    return /^東京都[^\s\d丁番号区市]+[区市]$/.test(addr);
   }
 
   async function geocodeForWard(candidates, sourceOrCenter, maxKmOverride) {

@@ -50,7 +50,7 @@ function buildGeoCandidates(title, venue, address) {
 }
 
 function createCollectSetagayaJidokanEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
 
   async function collectSetagayaJidokanEvents(maxDays) {
     const months = getMonthsForRange(maxDays);
@@ -88,7 +88,12 @@ function createCollectSetagayaJidokanEvents(deps) {
       const rawAddressText = isLikelyWardOfficeAddress(SETAGAYA_SOURCE.key, rawAddressCandidate) ? "" : rawAddressCandidate;
       const rowTimeRange = detailMeta.timeRange || parseTimeRangeFromText(`${row.title} ${row.dateText}`);
       const geoVenue = normalizeText(String(venueName || "").replace(/^世田谷区/, ""));
-      const geoCandidates = buildGeoCandidates(row.title, geoVenue || venueName, rawAddressText);
+      // Check facility address master for address if detail page didn't provide one
+      let geoAddress = rawAddressText;
+      if (!geoAddress && getFacilityAddressFromMaster && venueName) {
+        geoAddress = getFacilityAddressFromMaster(SETAGAYA_SOURCE.key, venueName);
+      }
+      const geoCandidates = buildGeoCandidates(row.title, geoVenue || venueName, geoAddress);
       let point = await geocodeForWard(geoCandidates, SETAGAYA_SOURCE);
       point = resolveEventPoint(SETAGAYA_SOURCE, venueName, point, rawAddressText);
       const addressText = resolveEventAddress(SETAGAYA_SOURCE, venueName, rawAddressText, point);

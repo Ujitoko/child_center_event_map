@@ -177,6 +177,9 @@ function createCollectWardGenericEvents(deps) {
       (source?.key === "nerima" && /ねりまのじどうかん|練馬区立児童館/.test(venue_name || ""));
 
     let address = sanitizeAddressText(meta.address || "");
+    // Reject garbage addresses (corrupted HTML fragments, non-address text)
+    if (address && !hasConcreteAddressToken(address)) address = "";
+    if (address && /[）｜|]/.test(address)) address = "";
     if (isLikelyWardOfficeAddress(source?.key, address)) address = "";
     if (address && source?.label && !address.includes(source.label)) {
       const wardInAddress = (address.match(/([^\s\u3000]{2,8}\u533a)/u) || [])[1] || "";
@@ -204,8 +207,18 @@ function createCollectWardGenericEvents(deps) {
       const fk = `${fallbackDate.y}-${fallbackDate.mo}-${fallbackDate.d}`;
       if (!dates.some((d) => `${d.y}-${d.mo}-${d.d}` === fk)) dates.push(fallbackDate);
     }
-    let point = await geocodeForWard(buildWardGeoCandidates(source.label, title, venue_name, address).slice(0, 5), source);
-    const nearCenter = point && source?.center ? haversineKm(point.lat, point.lng, source.center.lat, source.center.lng) <= 0.35 : false;
+    // Try facility master address as additional high-priority candidate when available
+    const facilityMasterAddr = (source?.key && venue_name) ? getFacilityAddressFromMaster(source.key, venue_name) : "";
+    const geoCandidates = buildWardGeoCandidates(source.label, title, venue_name, address);
+    if (facilityMasterAddr && facilityMasterAddr !== address) {
+      // Prepend clean facility master address as top-priority candidates
+      const fmCands = buildWardGeoCandidates(source.label, "", "", facilityMasterAddr);
+      for (let ci = fmCands.length - 1; ci >= 0; ci--) {
+        if (!geoCandidates.includes(fmCands[ci])) geoCandidates.unshift(fmCands[ci]);
+      }
+    }
+    let point = await geocodeForWard(geoCandidates.slice(0, 7), source);
+    const nearCenter = point && source?.center ? haversineKm(point.lat, point.lng, source.center.lat, source.center.lng) <= 0.5 : false;
     if (nearCenter && address && hasConcreteAddressToken(address)) {
       const strictPoint = await geocodeForWard(buildWardGeoCandidates(source.label, "", "", address).slice(0, 3), source);
       if (strictPoint && haversineKm(strictPoint.lat, strictPoint.lng, point.lat, point.lng) > 0.3) point = strictPoint;

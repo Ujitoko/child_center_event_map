@@ -36,7 +36,7 @@ function buildGeoCandidates(venue, knownFacilities) {
 }
 
 function createCollectKodairaEvents(deps) {
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, getFacilityAddressFromMaster } = deps;
   const source = KODAIRA_SOURCE;
   const knownFacilities = KNOWN_KODAIRA_FACILITIES;
   const label = source.label;
@@ -113,7 +113,13 @@ function createCollectKodairaEvents(deps) {
       let point = facilityPoint;
       if (!point && venue) {
         const candidates = buildGeoCandidates(venue, knownFacilities);
-        point = await geocodeForWard(candidates, source);
+        if (getFacilityAddressFromMaster) {
+          const fmAddr = getFacilityAddressFromMaster(source.key, venue);
+          if (fmAddr && !candidates.some(c => c.includes(fmAddr))) {
+            candidates.unshift(/東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`);
+          }
+        }
+        point = await geocodeForWard(candidates.slice(0, 7), source);
         point = resolveEventPoint(source, venue, point, `${label} ${venue}`);
       }
 
@@ -141,9 +147,8 @@ function createCollectKodairaEvents(deps) {
             venue_name: venue,
             address: venue ? `${label} ${venue}` : "",
             url: eventUrl,
-            lat: point ? point.lat : source.center.lat,
-            lng: point ? point.lng : source.center.lng,
-            point: point || source.center,
+            lat: point ? point.lat : null,
+            lng: point ? point.lng : null,
           });
         } else {
           // Multi-day: expand but cap at 30 days

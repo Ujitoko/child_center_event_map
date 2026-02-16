@@ -28,7 +28,7 @@ const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
   KNOWN_NAKANO_FACILITIES, KNOWN_CHIYODA_FACILITIES, KNOWN_CHUO_FACILITIES,
-  KNOWN_KOGANEI_FACILITIES,
+  KNOWN_KOGANEI_FACILITIES, KNOWN_FUCHU_FACILITIES,
   KNOWN_ARAKAWA_FACILITIES, KNOWN_CHOFU_FACILITIES, KNOWN_MUSASHIMURAYAMA_FACILITIES,
   KNOWN_KOMAE_FACILITIES,
   KNOWN_MUSASHINO_FACILITIES, KNOWN_TACHIKAWA_FACILITIES,
@@ -36,7 +36,11 @@ const {
   KNOWN_TOSHIMA_FACILITIES, KNOWN_MEGURO_FACILITIES,
   KNOWN_KITA_FACILITIES, KNOWN_ITABASHI_FACILITIES,
   KNOWN_BUNKYO_FACILITIES, KNOWN_AKIRUNO_FACILITIES,
-  KNOWN_NISHITOKYO_FACILITIES,
+  KNOWN_NISHITOKYO_FACILITIES, KNOWN_SHINJUKU_FACILITIES,
+  KNOWN_EDOGAWA_FACILITIES, KNOWN_ADACHI_FACILITIES,
+  KNOWN_KOTO_FACILITIES, KNOWN_SETAGAYA_FACILITIES, KNOWN_TAITO_FACILITIES,
+  KNOWN_SHIBUYA_FACILITIES, KNOWN_NERIMA_FACILITIES, KNOWN_KATSUSHIKA_FACILITIES,
+  KNOWN_SUMIDA_FACILITIES, KNOWN_SUGINAMI_FACILITIES, KNOWN_FUSSA_FACILITIES,
   AKISHIMA_SOURCE, KNOWN_AKISHIMA_FACILITIES,
   HIGASHIYAMATO_SOURCE, KNOWN_HIGASHIYAMATO_FACILITIES,
   KIYOSE_SOURCE, KNOWN_KIYOSE_FACILITIES,
@@ -66,6 +70,12 @@ const facilityPointMaster = new Map();
 
 // --- Load persisted geoCache ---
 loadGeoCache(GEO_CACHE_PATH, geoCache);
+// Purge stale null entries so improved logic can re-geocode
+let nullCount = 0;
+for (const [k, v] of geoCache.entries()) {
+  if (v === null) { geoCache.delete(k); nullCount++; }
+}
+if (nullCount > 0) console.log(`[geo] purged ${nullCount} stale null entries`);
 
 // --- Geo helpers (depends on geoCache) ---
 const { geocodeForWard, haversineKm, sanitizeWardPoint } = createGeoHelpers({ geoCache });
@@ -178,68 +188,109 @@ for (const [name, address] of Object.entries(KNOWN_AKIRUNO_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_NISHITOKYO_FACILITIES)) {
   setFacilityAddressToMaster("nishitokyo", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_SHINJUKU_FACILITIES)) {
+  setFacilityAddressToMaster("shinjuku", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_EDOGAWA_FACILITIES)) {
+  setFacilityAddressToMaster("edogawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ADACHI_FACILITIES)) {
+  setFacilityAddressToMaster("adachi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KOTO_FACILITIES)) {
+  setFacilityAddressToMaster("koto", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SETAGAYA_FACILITIES)) {
+  setFacilityAddressToMaster("setagaya", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TAITO_FACILITIES)) {
+  setFacilityAddressToMaster("taito", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SHIBUYA_FACILITIES)) {
+  setFacilityAddressToMaster("shibuya", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NERIMA_FACILITIES)) {
+  setFacilityAddressToMaster("nerima", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KATSUSHIKA_FACILITIES)) {
+  setFacilityAddressToMaster("katsushika", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SUMIDA_FACILITIES)) {
+  setFacilityAddressToMaster("sumida", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SUGINAMI_FACILITIES)) {
+  setFacilityAddressToMaster("suginami", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_FUSSA_FACILITIES)) {
+  setFacilityAddressToMaster("fussa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_FUCHU_FACILITIES)) {
+  setFacilityAddressToMaster("fuchu", name, address);
+}
 
 // --- Shared deps for collectors ---
 const geoDeps = { geocodeForWard, resolveEventPoint, resolveEventAddress };
 
 // --- Ward-specific collectors ---
-const collectSetagayaJidokanEvents = createCollectSetagayaJidokanEvents(geoDeps);
+const collectSetagayaJidokanEvents = createCollectSetagayaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectOtaJidokanEvents = createCollectOtaJidokanEvents({ ...geoDeps, setFacilityAddressToMaster, getFacilityAddressFromMaster });
 const collectShinagawaJidokanEvents = createCollectShinagawaJidokanEvents({ ...geoDeps, setFacilityAddressToMaster });
 const collectMeguroJidokanEvents = createCollectMeguroJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
-const collectShibuyaJidokanEvents = createCollectShibuyaJidokanEvents(geoDeps);
+const collectShibuyaJidokanEvents = createCollectShibuyaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectMinatoJidokanEvents = createCollectMinatoJidokanEvents({ ...geoDeps, sanitizeWardPoint, getFacilityAddressFromMaster });
 const collectChiyodaJidokanEvents = createCollectChiyodaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 
 // --- Generic + specialized collectors ---
-const collectChuoAkachanTengokuEvents = createCollectChuoAkachanTengokuEvents(geoDeps);
+const collectChuoAkachanTengokuEvents = createCollectChuoAkachanTengokuEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectKitaJidokanEvents = createCollectKitaJidokanEvents({ ...geoDeps, getFacilityAddressFromMaster });
 const collectWardGenericEvents = createCollectWardGenericEvents({
   ...geoDeps,
   getFacilityAddressFromMaster,
   haversineKm,
 });
-const collectHachiojiEvents = createCollectHachiojiEvents(geoDeps);
-const collectMusashinoEvents = createCollectMusashinoEvents(geoDeps);
-const collectTachikawaEvents = createCollectTachikawaEvents(geoDeps);
-const collectMitakaEvents = createCollectMitakaEvents(geoDeps);
-const collectKodairaEvents = createCollectKodairaEvents(geoDeps);
-const collectHigashimurayamaEvents = createCollectHigashimurayamaEvents(geoDeps);
-const collectKunitachiEvents = createCollectKunitachiEvents(geoDeps);
-const collectOmeEvents = createCollectOmeEvents(geoDeps);
-const collectHamuraEvents = createCollectHamuraEvents(geoDeps);
+const geoFmDeps = { ...geoDeps, getFacilityAddressFromMaster };
+const collectHachiojiEvents = createCollectHachiojiEvents(geoFmDeps);
+const collectMusashinoEvents = createCollectMusashinoEvents(geoFmDeps);
+const collectTachikawaEvents = createCollectTachikawaEvents(geoFmDeps);
+const collectMitakaEvents = createCollectMitakaEvents(geoFmDeps);
+const collectKodairaEvents = createCollectKodairaEvents(geoFmDeps);
+const collectHigashimurayamaEvents = createCollectHigashimurayamaEvents(geoFmDeps);
+const collectKunitachiEvents = createCollectKunitachiEvents(geoFmDeps);
+const collectOmeEvents = createCollectOmeEvents(geoFmDeps);
+const collectHamuraEvents = createCollectHamuraEvents(geoFmDeps);
+const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
   source: AKISHIMA_SOURCE, jsFile: "event.js",
   childCategoryIds: ["10"], knownFacilities: KNOWN_AKISHIMA_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectHigashiyamatoEvents = createEventJsCollector({
   source: HIGASHIYAMATO_SOURCE, jsFile: "event.js",
   childCategoryIds: ["20"], knownFacilities: KNOWN_HIGASHIYAMATO_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectKiyoseEvents = createEventJsCollector({
   source: KIYOSE_SOURCE, jsFile: "event.js",
   childCategoryIds: ["60"], knownFacilities: KNOWN_KIYOSE_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectTamaEvents = createEventJsCollector({
   source: TAMA_SOURCE, jsFile: "event.js",
   childCategoryIds: ["70"], knownFacilities: KNOWN_TAMA_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectInagiEvents = createEventJsCollector({
   source: INAGI_SOURCE, jsFile: "event.js",
   childCategoryIds: ["40"], knownFacilities: KNOWN_INAGI_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectHinoEvents = createEventJsCollector({
   source: HINO_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["1"], knownFacilities: KNOWN_HINO_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectKokubunjiEvents = createEventJsCollector({
   source: KOKUBUNJI_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["6"], knownFacilities: KNOWN_KOKUBUNJI_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectHigashikurumeEvents = createEventJsCollector({
   source: HIGASHIKURUME_SOURCE, jsFile: "event_d.js",
   childCategoryIds: ["6", "7"], knownFacilities: KNOWN_HIGASHIKURUME_FACILITIES,
-}, geoDeps);
+}, eventJsDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,

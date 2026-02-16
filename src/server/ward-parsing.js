@@ -67,11 +67,15 @@ function extractEmbeddedAddress(text, wardLabel) {
 /** 会場名を簡略化（階数・部屋名・括弧を除去） */
 function cleanVenueForGeo(venue) {
   if (!venue) return "";
-  return venue
+  // Split comma-separated venues, take first
+  let text = venue.split(/[、,]/)[0].trim();
+  return text
     .replace(/[（(][^）)]*[）)]/g, "")
     .replace(/\d+階.*$/, "")
+    .replace(/地下?\d*階.*$/, "")
     .replace(/\s*(地下|地上).*$/, "")
-    .replace(/\s*(第?\d+\s*(?:学習室|会議室|集会室|研修室|多目的室|ホール|スタジオ|体育室|遊戯室|工作室|活動室|音楽室)).*$/i, "")
+    .replace(/\s*(第?\d+\s*(?:学習室|会議室|集会室|研修室|多目的室|ホール|スタジオ|体育室|遊戯室|工作室|活動室|音楽室|展示室|プレイルーム|プレイホール|子ども室)).*$/i, "")
+    .replace(/\s+(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|子ども室|環境実習室|団体室|講堂).*$/, "")
     .trim();
 }
 
@@ -100,7 +104,13 @@ function buildWardGeoCandidates(wardLabel, title, venue, address) {
       if (hasWard) {
         add(`東京都${cleanAddress}`);
       } else {
-        add(`${tokyoWard}${cleanAddress}`);
+        // If address already contains a different ward/city name, prefix with just 東京都
+        const hasOtherMunicipality = /^[^\d]{2,8}[区市]/.test(cleanAddress);
+        if (hasOtherMunicipality) {
+          add(`東京都${cleanAddress}`);
+        } else {
+          add(`${tokyoWard}${cleanAddress}`);
+        }
       }
     } else if (!hasWard) {
       const noTokyo = cleanAddress.replace(/^東京都\s*/, "");

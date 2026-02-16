@@ -20,6 +20,9 @@ function normalizeJaDigits(text) {
 
 function sanitizeVenueText(value) {
   let text = clipByFieldDelimiter(value).replace(/https?:\/\/\S+/gi, "");
+  // Split comma-separated venues: take first item
+  const commaParts = text.split(/[、,]/).filter(s => s.trim().length > 2);
+  if (commaParts.length > 1 && commaParts[0].trim().length >= 3) text = commaParts[0];
   text = text
     .replace(/\s*組織詳細へ\s*/g, " ")
     .replace(/\s*(?:ページ番号|法人番号)[:：]?\s*[0-9\-]+\s*/gi, " ")
@@ -146,6 +149,7 @@ function sanitizeGeoQueryText(value) {
   if (!text) return "";
   text = text
     .replace(/〒\s*\d{3}\s*-\s*\d{4}/g, " ")
+    .replace(/^\d{3}-?\d{4}\s*/, "")
     .replace(/\s*(?:電話|tel|お問い合わせ|問い合わせ|問合せ|対象|定員|費用|料金|持ち物|URL|https?:\/\/).*/i, "")
     .replace(/[（(](?:注|※|対象|定員|費用|料金|持ち物|問い合わせ|問合せ)[^）)]{0,80}[）)]/g, " ")
     .replace(/\s+/g, " ")
@@ -161,8 +165,26 @@ function sanitizeAddressText(value) {
   text = text.replace(/郵便番号\s*/g, "");
   // Strip postal codes (〒123-4567 or 〒1234567)
   text = text.replace(/〒\s*\d{3}-?\d{4}\s*/g, "");
+  // Strip bare postal codes at start (123-0851足立区... → 足立区...)
+  text = text.replace(/^\d{3}-?\d{4}\s*/, "");
+  // Strip annotations after address (※..., 交通アクセス..., 電話...)
+  text = text.replace(/\s*※.*/g, "");
+  text = text.replace(/\s*交通アクセス.*/g, "");
+  text = text.replace(/\s*(?:電話|TEL|tel)[:：]?\s*\d.*/gi, "");
   // Strip trailing "Map" (品川区 pattern)
   text = text.replace(/\s+Map\s*$/i, "");
+  // Strip venue name prefix before actual address (e.g., "東京都豊島区立郷土資料館 豊島区西池袋2-37-4" → "豊島区西池袋2-37-4")
+  const addrRestart = text.match(/^(?:東京都)?[^\s\u3000]{2,8}[区市][^\s\u3000]*?\s+([^\s\u3000]{2,8}[区市][\u4E00-\u9FFF]+\d)/u);
+  if (addrRestart) {
+    text = text.slice(text.indexOf(addrRestart[1]));
+  }
+  // Strip building/facility name appended directly after address numbers
+  // e.g., "西池袋2-37-4としま産業振興プラザ(IKE・Biz)7階" → "西池袋2-37-4"
+  // e.g., "堀留町一丁目1番1号日本橋保健センター複合施設6階" → "堀留町一丁目1番1号"
+  text = text.replace(
+    /((?:\d+[-ー－]\d+(?:[-ー－]\d+)?|\d+番地?\d*号?))\s*(?!丁目|番|号|先)[\u3041-\u30FF\u4E00-\u9FFFＡ-Ｚａ-ｚA-Za-z].{3,}$/u,
+    "$1"
+  );
   // Strip floor/room prefix mixed into addresses (e.g., "中野区1階（江古田4丁目...")
   text = text.replace(/([区市])\s*(?:地下)?[0-9０-９]+階[（(]/u, "$1");
   // Strip stray opening paren between ward label and address (e.g., "中野区（江古田4丁目...")

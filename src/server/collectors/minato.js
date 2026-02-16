@@ -225,6 +225,12 @@ function createCollectMinatoJidokanEvents(deps) {
           point = sanitizeWardPoint({ lat: Number(ev.lat), lng: Number(ev.lng) }, MINATO_SOURCE);
         } else {
           const cands = buildMinatoGeoCandidates(ev.title, ev.venue_name, ev.address || "");
+          if (getFacilityAddressFromMaster) {
+            const fmAddr = getFacilityAddressFromMaster(MINATO_SOURCE.key, ev.venue_name || "");
+            if (fmAddr && !cands.some(c => c.includes(fmAddr))) {
+              cands.unshift(/\u6771\u4EAC\u90FD/.test(fmAddr) ? fmAddr : `\u6771\u4EAC\u90FD\u6E2F\u533A${fmAddr.replace(/^\s*\u6E2F\u533A/, "")}`);
+            }
+          }
           point = await geocodeForWard(cands, MINATO_SOURCE);
         }
         const venueName = ev.venue_name || "\u6E2F\u533A\u5B50\u80B2\u3066\u652F\u63F4\u65BD\u8A2D";
@@ -340,7 +346,16 @@ function createCollectMinatoJidokanEvents(deps) {
         rawAddress = getFacilityAddressFromMaster(MINATO_SOURCE.key, venueName) || "";
       }
       const geoCandidates = buildMinatoGeoCandidates(title, venueName, rawAddress);
-      let point = await geocodeForWard(geoCandidates, MINATO_SOURCE);
+      if (getFacilityAddressFromMaster) {
+        const fmAddr = getFacilityAddressFromMaster(MINATO_SOURCE.key, venueName);
+        if (fmAddr && fmAddr !== rawAddress) {
+          const fmCands = buildMinatoGeoCandidates("", venueName, fmAddr);
+          for (let ci = fmCands.length - 1; ci >= 0; ci--) {
+            if (!geoCandidates.includes(fmCands[ci])) geoCandidates.unshift(fmCands[ci]);
+          }
+        }
+      }
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), MINATO_SOURCE);
       point = resolveEventPoint(MINATO_SOURCE, venueName, point, rawAddress);
       const address = resolveEventAddress(MINATO_SOURCE, venueName, rawAddress, point);
 

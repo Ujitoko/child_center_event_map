@@ -8,7 +8,7 @@ function reiwaToWestern(reiwaYear) {
 }
 
 function createCollectHamuraEvents(deps) {
-  const { geocodeForWard, resolveEventPoint } = deps;
+  const { geocodeForWard, resolveEventPoint, getFacilityAddressFromMaster } = deps;
   const source = HAMURA_SOURCE;
   const knownFacilities = KNOWN_HAMURA_FACILITIES;
   const label = source.label;
@@ -150,10 +150,20 @@ function createCollectHamuraEvents(deps) {
     for (const ev of unique) {
       let point = null;
       const addr = knownFacilities[ev.venue];
+      const candidates = [];
       if (addr) {
-        const tokyoAddr = /東京都/.test(addr) ? addr : `東京都${addr}`;
-        point = await geocodeForWard([tokyoAddr, `東京都羽村市 ${ev.venue}`], source);
-        point = resolveEventPoint(source, ev.venue, point, addr);
+        candidates.push(/東京都/.test(addr) ? addr : `東京都${addr}`);
+      }
+      if (getFacilityAddressFromMaster) {
+        const fmAddr = getFacilityAddressFromMaster(source.key, ev.venue);
+        if (fmAddr && !candidates.some(c => c.includes(fmAddr))) {
+          candidates.unshift(/東京都/.test(fmAddr) ? fmAddr : `東京都${fmAddr}`);
+        }
+      }
+      candidates.push(`東京都羽村市 ${ev.venue}`);
+      if (candidates.length > 0) {
+        point = await geocodeForWard(candidates.slice(0, 7), source);
+        point = resolveEventPoint(source, ev.venue, point, addr || `${label} ${ev.venue}`);
       }
 
       const eventUrl = `${source.baseUrl}/prsite/0000019227.html`;
@@ -167,9 +177,8 @@ function createCollectHamuraEvents(deps) {
         venue_name: ev.venue,
         address: addr || "",
         url: eventUrl,
-        lat: point ? point.lat : source.center.lat,
-        lng: point ? point.lng : source.center.lng,
-        point: point || source.center,
+        lat: point ? point.lat : null,
+        lng: point ? point.lng : null,
       });
     }
 

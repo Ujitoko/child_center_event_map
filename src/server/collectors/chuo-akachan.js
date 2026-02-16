@@ -12,6 +12,7 @@ function createCollectChuoAkachanTengokuEvents(deps) {
     geocodeForWard,
     resolveEventAddress,
     resolveEventPoint,
+    getFacilityAddressFromMaster,
   } = deps;
 
   function parseChuoAkachanTengokuRows(html, pageUrl) {
@@ -77,8 +78,21 @@ function createCollectChuoAkachanTengokuEvents(deps) {
     const byId = new Map();
     for (const row of rows) {
       const venueName = row.facility || `${CHUO_SOURCE.label}\u5150\u7ae5\u9928`;
-      const rawAddress = extractTokyoAddress(`${row.bodyText || ""} ${row.facility || ""}`);
-      let point = await geocodeForWard(buildWardGeoCandidates(CHUO_SOURCE.label, row.title, venueName, rawAddress).slice(0, 3), CHUO_SOURCE);
+      let rawAddress = extractTokyoAddress(`${row.bodyText || ""} ${row.facility || ""}`);
+      if (!rawAddress && getFacilityAddressFromMaster) {
+        rawAddress = getFacilityAddressFromMaster(CHUO_SOURCE.key, venueName);
+      }
+      const geoCandidates = buildWardGeoCandidates(CHUO_SOURCE.label, row.title, venueName, rawAddress);
+      if (getFacilityAddressFromMaster) {
+        const fmAddr = getFacilityAddressFromMaster(CHUO_SOURCE.key, venueName);
+        if (fmAddr && fmAddr !== rawAddress) {
+          const fmCands = buildWardGeoCandidates(CHUO_SOURCE.label, "", "", fmAddr);
+          for (let ci = fmCands.length - 1; ci >= 0; ci--) {
+            if (!geoCandidates.includes(fmCands[ci])) geoCandidates.unshift(fmCands[ci]);
+          }
+        }
+      }
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), CHUO_SOURCE);
       point = resolveEventPoint(CHUO_SOURCE, venueName, point, rawAddress);
       const address = resolveEventAddress(CHUO_SOURCE, venueName, rawAddress, point);
 

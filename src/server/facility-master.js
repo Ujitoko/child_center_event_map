@@ -30,13 +30,31 @@ function createFacilityMaster(deps) {
     if (!key) return "";
     const exact = facilityAddressMaster.get(key);
     if (exact) return exact;
-    // Fallback: partial match — venue contains a known facility name (荒川区 room suffix pattern)
     const venueNorm = normalizeFacilityName(venueName);
     const prefix = `${String(sourceKey || "").trim()}:`;
+    // Strip room/floor suffixes for retry: "○○児童館 プレイルーム" → "○○児童館"
+    const roomSuffixRe = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室)$/;
+    const venueStripped = venueNorm
+      .replace(roomSuffixRe, "")
+      .replace(/\d+階.*$/, "")
+      .replace(/地下?\d*階.*$/, "");
     for (const [mk, addr] of facilityAddressMaster.entries()) {
       if (!mk.startsWith(prefix)) continue;
       const facName = mk.slice(prefix.length);
-      if (facName.length >= 3 && venueNorm.includes(facName)) return addr;
+      if (facName.length < 3) continue;
+      // Forward: venue contains facility name
+      if (venueNorm.includes(facName)) return addr;
+      // Reverse: facility name contains venue (short venue name matched to longer registered name)
+      if (venueNorm.length >= 3 && facName.includes(venueNorm)) return addr;
+      // Stripped venue match (room/floor suffix removed)
+      if (venueStripped !== venueNorm && venueStripped.length >= 3) {
+        if (venueStripped.includes(facName) || facName.includes(venueStripped)) return addr;
+      }
+      // Bracket-removed match: strip (...) from facility name then retry
+      const facNameNoParen = facName.replace(/[（()）)]/g, "").replace(/[^a-z0-9\u3000-\u9fff\uff00-\uffef]/g, "");
+      if (facNameNoParen !== facName && facNameNoParen.length >= 3) {
+        if (venueNorm.includes(facNameNoParen) || facNameNoParen.includes(venueNorm)) return addr;
+      }
     }
     return "";
   }
@@ -44,20 +62,36 @@ function createFacilityMaster(deps) {
   function getFacilityPointFromMaster(sourceKey, venueName) {
     const key = buildFacilityMasterKey(sourceKey, venueName);
     if (!key) return null;
-    const point = facilityPointMaster.get(key);
-    if (!point) return null;
-    return { lat: Number(point.lat), lng: Number(point.lng) };
+    const exact = facilityPointMaster.get(key);
+    if (exact) return { lat: Number(exact.lat), lng: Number(exact.lng) };
+    // Partial match with room/floor suffix stripping
+    const venueNorm = normalizeFacilityName(venueName);
+    const prefix = `${String(sourceKey || "").trim()}:`;
+    const roomSuffixRe2 = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室)$/;
+    const venueStripped = venueNorm
+      .replace(roomSuffixRe2, "")
+      .replace(/\d+階.*$/, "")
+      .replace(/地下?\d*階.*$/, "");
+    for (const [mk, pt] of facilityPointMaster.entries()) {
+      if (!mk.startsWith(prefix)) continue;
+      const facName = mk.slice(prefix.length);
+      if (facName.length < 3) continue;
+      if (venueNorm.includes(facName) || (venueNorm.length >= 3 && facName.includes(venueNorm))) {
+        return { lat: Number(pt.lat), lng: Number(pt.lng) };
+      }
+      if (venueStripped !== venueNorm && venueStripped.length >= 3) {
+        if (venueStripped.includes(facName) || facName.includes(venueStripped)) {
+          return { lat: Number(pt.lat), lng: Number(pt.lng) };
+        }
+      }
+    }
+    return null;
   }
 
   function setFacilityAddressToMaster(sourceKey, venueName, address) {
     const key = buildFacilityMasterKey(sourceKey, venueName);
     const addr = sanitizeAddressText(address);
     if (!key || !addr) return;
-    const label = WARD_LABEL_BY_KEY[String(sourceKey || "")] || "";
-    if (label) {
-      const ward = (addr.match(/([^\s\u3000]{2,8}区)/u) || [])[1] || "";
-      if (ward && ward !== label) return;
-    }
     if (!facilityAddressMaster.has(key)) facilityAddressMaster.set(key, addr);
   }
 
