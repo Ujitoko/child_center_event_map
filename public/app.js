@@ -23,146 +23,6 @@ const MAX_LIST_RENDER = 250;
 let lastFetchedItems = [];
 let lastDateText = "";
 let lastWarningText = "";
-const TOKYO_23_WARDS = [
-  "千代田区",
-  "中央区",
-  "港区",
-  "新宿区",
-  "文京区",
-  "台東区",
-  "墨田区",
-  "江東区",
-  "品川区",
-  "目黒区",
-  "大田区",
-  "世田谷区",
-  "渋谷区",
-  "中野区",
-  "杉並区",
-  "豊島区",
-  "北区",
-  "荒川区",
-  "板橋区",
-  "練馬区",
-  "足立区",
-  "葛飾区",
-  "江戸川区",
-  "八王子市",
-  "調布市",
-  "武蔵野市",
-  "立川市",
-  "昭島市",
-  "東大和市",
-  "清瀬市",
-  "多摩市",
-  "稲城市",
-  "日野市",
-  "国分寺市",
-  "東久留米市",
-  "府中市",
-  "小金井市",
-  "西東京市",
-  "町田市",
-  "福生市",
-  "武蔵村山市",
-  "あきる野市",
-  "狛江市",
-  "三鷹市",
-  "小平市",
-  "東村山市",
-  "国立市",
-  "青梅市",
-  "羽村市",
-  "川崎市",
-  "横浜市",
-  "相模原市",
-  "海老名市",
-  "鎌倉市",
-  "横須賀市",
-  "茅ヶ崎市",
-  "座間市",
-  "逗子市",
-  "大和市",
-  "平塚市",
-  "小田原市",
-  "秦野市",
-  "綾瀬市",
-  "厚木市",
-  "伊勢原市",
-  "南足柄市",
-  "藤沢市",
-  "寒川町",
-  "愛川町",
-  "三浦市",
-  "大磯町",
-  "葉山町",
-  "中井町",
-  "清川村",
-  "二宮町",
-  "大井町",
-  "湯河原町",
-  "松田町",
-  "真鶴町",
-  "箱根町",
-  "開成町",
-  "山北町",
-  "瑞穂町",
-  "奥多摩町",
-  "日の出町",
-  "檜原村",
-  "千葉市",
-  "船橋市",
-  "柏市",
-  "流山市",
-  "浦安市",
-  "野田市",
-  "習志野市",
-  "白井市",
-  "成田市",
-  "木更津市",
-  "いすみ市",
-  "東庄町",
-  "大多喜町",
-  "八千代市",
-  "旭市",
-  "鴨川市",
-  "横芝光町",
-  "市川市",
-  "勝浦市",
-  "君津市",
-  "鋸南町",
-  "四街道市",
-  "松戸市",
-  "我孫子市",
-  "鎌ケ谷市",
-  "富里市",
-  "白子町",
-  "九十九里町",
-  "八街市",
-  "袖ケ浦市",
-  "一宮町",
-  "銚子市",
-  "佐倉市",
-  "富津市",
-  "印西市",
-  "さいたま市",
-  "川口市",
-  "春日部市",
-  "ふじみ野市",
-  "三郷市",
-  "川越市",
-  "和光市",
-  "蕨市",
-  "上尾市",
-  "新座市",
-  "朝霞市",
-  "戸田市",
-  "志木市",
-  "富士見市",
-  "狭山市",
-  "八潮市",
-  "越谷市",
-];
 const SOURCE_WARD_MAP = {
   chiyoda: "千代田区",
   chuo: "中央区",
@@ -323,7 +183,7 @@ const SOURCE_WARD_MAP = {
   yashio: "八潮市",
   koshigaya: "越谷市",
 };
-const selectedWards = new Set();
+const selectedPrefs = new Set();
 let searchQuery = "";
 let searchDebounceTimer = null;
 let userLocation = null;
@@ -475,6 +335,11 @@ const WARD_GROUPS = [
   },
 ];
 
+const WARD_TO_PREF = new Map();
+for (const group of WARD_GROUPS) {
+  for (const w of group.wards) WARD_TO_PREF.set(w, group.label);
+}
+
 const wardGroupCheckboxes = new Map();
 const wardGroupCountSpans = new Map();
 
@@ -485,15 +350,12 @@ function initWardFilters() {
     row.className = "ward-option";
     const cb = document.createElement("input");
     cb.type = "checkbox";
-    const allSelected = group.wards.every(w => selectedWards.has(w));
-    const someSelected = group.wards.some(w => selectedWards.has(w));
-    cb.checked = allSelected;
-    cb.indeterminate = !allSelected && someSelected;
+    cb.checked = selectedPrefs.has(group.label);
     cb.addEventListener("change", () => {
       if (cb.checked) {
-        for (const w of group.wards) selectedWards.add(w);
+        selectedPrefs.add(group.label);
       } else {
-        for (const w of group.wards) selectedWards.delete(w);
+        selectedPrefs.delete(group.label);
       }
       applyFiltersAndRender({ autoFit: false });
     });
@@ -517,10 +379,7 @@ function updateWardCounts(wardCounts) {
     if (span) span.textContent = `${group.label} (${prefTotal})`;
     const cb = wardGroupCheckboxes.get(group.label);
     if (cb) {
-      const allSelected = group.wards.every(w => selectedWards.has(w));
-      const someSelected = group.wards.some(w => selectedWards.has(w));
-      cb.checked = allSelected;
-      cb.indeterminate = !allSelected && someSelected;
+      cb.checked = selectedPrefs.has(group.label);
     }
   }
 }
@@ -758,20 +617,33 @@ function parseDateValue(val) {
 
 function saveWardsToStorage() {
   try {
-    if (selectedWards.size > 0) {
-      localStorage.setItem("selectedWards", JSON.stringify([...selectedWards]));
+    if (selectedPrefs.size > 0) {
+      localStorage.setItem("selectedPrefs", JSON.stringify([...selectedPrefs]));
     } else {
-      localStorage.removeItem("selectedWards");
+      localStorage.removeItem("selectedPrefs");
     }
+    localStorage.removeItem("selectedWards");
   } catch (_) {}
 }
 
+const VALID_PREFS = new Set(WARD_GROUPS.map(g => g.label));
+
 function restoreWardsFromStorage() {
   try {
-    const saved = localStorage.getItem("selectedWards");
+    const saved = localStorage.getItem("selectedPrefs");
     if (saved) {
-      for (const w of JSON.parse(saved)) {
-        if (TOKYO_23_WARDS.includes(w)) selectedWards.add(w);
+      for (const p of JSON.parse(saved)) {
+        if (VALID_PREFS.has(p)) selectedPrefs.add(p);
+      }
+    } else {
+      // 旧形式からのマイグレーション
+      const oldSaved = localStorage.getItem("selectedWards");
+      if (oldSaved) {
+        for (const w of JSON.parse(oldSaved)) {
+          const pref = WARD_TO_PREF.get(w);
+          if (pref) selectedPrefs.add(pref);
+        }
+        localStorage.removeItem("selectedWards");
       }
     }
   } catch (_) {}
@@ -786,7 +658,7 @@ function syncUrlParams() {
   const defaultUntil = formatDateValue(new Date(todayStart.getTime() + 30 * 86400000));
   if (fromVal && fromVal !== defaultFrom) params.set("from", fromVal);
   if (untilVal && untilVal !== defaultUntil) params.set("until", untilVal);
-  if (selectedWards.size > 0) params.set("wards", Array.from(selectedWards).join(","));
+  if (selectedPrefs.size > 0) params.set("prefs", Array.from(selectedPrefs).join(","));
   if (searchQuery) params.set("q", searchQuery);
   const qs = params.toString();
   const newUrl = qs ? `${location.pathname}?${qs}` : location.pathname;
@@ -797,10 +669,17 @@ function restoreFromUrl() {
   const params = new URLSearchParams(location.search);
   if (params.has("from")) document.getElementById("fromDate").value = params.get("from");
   if (params.has("until")) document.getElementById("untilDate").value = params.get("until");
-  if (params.has("wards")) {
-    selectedWards.clear();
+  if (params.has("prefs")) {
+    selectedPrefs.clear();
+    for (const p of params.get("prefs").split(",")) {
+      if (VALID_PREFS.has(p)) selectedPrefs.add(p);
+    }
+  } else if (params.has("wards")) {
+    // 旧形式URLからのマイグレーション
+    selectedPrefs.clear();
     for (const w of params.get("wards").split(",")) {
-      if (TOKYO_23_WARDS.includes(w)) selectedWards.add(w);
+      const pref = WARD_TO_PREF.get(w);
+      if (pref) selectedPrefs.add(pref);
     }
   }
   if (params.has("q")) {
@@ -842,11 +721,13 @@ function applyFiltersAndRender(options = {}) {
   // 区カウントは日数フィルタ済みデータで計算
   updateWardCounts(countByWard(items));
 
-  // 区フィルタ
-  if (selectedWards.size > 0) {
+  // 都道府県フィルタ
+  if (selectedPrefs.size > 0) {
     items = items.filter((e) => {
       const ward = getWardLabel(e);
-      return !ward || selectedWards.has(ward);
+      if (!ward) return true;
+      const pref = WARD_TO_PREF.get(ward);
+      return pref ? selectedPrefs.has(pref) : true;
     });
   }
 
@@ -912,12 +793,11 @@ searchInputEl.addEventListener("input", () => {
 
 initWardFilters();
 selectAllWardsBtnEl.addEventListener("click", () => {
-  selectedWards.clear();
-  for (const ward of TOKYO_23_WARDS) selectedWards.add(ward);
+  for (const group of WARD_GROUPS) selectedPrefs.add(group.label);
   applyFiltersAndRender({ autoFit: false });
 });
 clearAllWardsBtnEl.addEventListener("click", () => {
-  selectedWards.clear();
+  selectedPrefs.clear();
   applyFiltersAndRender({ autoFit: false });
 });
 const nearbyBtn = document.getElementById("nearbyBtn");
@@ -1093,7 +973,7 @@ if (isMobile()) {
 
 // リセットボタン
 document.getElementById("resetBtn").addEventListener("click", () => {
-  selectedWards.clear();
+  selectedPrefs.clear();
   searchQuery = "";
   document.getElementById("searchInput").value = "";
   sortByDistance = false;
