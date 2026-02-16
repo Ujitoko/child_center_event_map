@@ -96,6 +96,7 @@ function parseDetailMeta(html) {
 }
 
 module.exports = {
+  decodeHtmlEntities,
   parseAnchors,
   parseDetailMeta,
   stripTags,

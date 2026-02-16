@@ -62,6 +62,8 @@ function createGetEvents(deps) {
     collectKunitachiEvents,
     collectOmeEvents,
     collectHamuraEvents,
+    collectKawasakiEvents,
+    collectYokohamaEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -104,7 +106,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura] = await batchCollect([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama] = await batchCollect([
     () => collectSetagayaJidokanEvents(days),
     () => collectOtaJidokanEvents(days),
     () => collectShinagawaJidokanEvents(days),
@@ -130,6 +132,8 @@ function createGetEvents(deps) {
     () => collectKunitachiEvents(days),
     () => collectOmeEvents(days),
     () => collectHamuraEvents(days),
+    () => collectKawasakiEvents(days),
+    () => collectYokohamaEvents(days),
   ], 5);
   const {
     chuo,
@@ -208,6 +212,8 @@ function createGetEvents(deps) {
     ...kunitachi,
     ...ome,
     ...hamura,
+    ...kawasaki,
+    ...yokohama,
   ];
   const items = rawItems
     .map((ev) => {
@@ -289,6 +295,8 @@ function createGetEvents(deps) {
         city_kunitachi: kunitachi.length,
         city_ome: ome.length,
         city_hamura: hamura.length,
+        city_kawasaki: kawasaki.length,
+        city_yokohama: yokohama.length,
       },
     },
     items,

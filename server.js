@@ -24,6 +24,8 @@ const { createCollectHigashimurayamaEvents } = require("./src/server/collectors/
 const { createCollectKunitachiEvents } = require("./src/server/collectors/kunitachi");
 const { createCollectOmeEvents } = require("./src/server/collectors/ome");
 const { createCollectHamuraEvents } = require("./src/server/collectors/hamura");
+const { createCollectKawasakiEvents } = require("./src/server/collectors/kawasaki");
+const { createCollectYokohamaEvents } = require("./src/server/collectors/yokohama");
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const {
@@ -270,6 +272,8 @@ const collectHigashimurayamaEvents = createCollectHigashimurayamaEvents(geoFmDep
 const collectKunitachiEvents = createCollectKunitachiEvents(geoFmDeps);
 const collectOmeEvents = createCollectOmeEvents(geoFmDeps);
 const collectHamuraEvents = createCollectHamuraEvents(geoFmDeps);
+const collectKawasakiEvents = createCollectKawasakiEvents();
+const collectYokohamaEvents = createCollectYokohamaEvents();
 const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
   source: AKISHIMA_SOURCE, jsFile: "event.js",
@@ -341,6 +345,8 @@ const getEvents = createGetEvents({
   collectKunitachiEvents,
   collectOmeEvents,
   collectHamuraEvents,
+  collectKawasakiEvents,
+  collectYokohamaEvents,
 });
 
 // --- HTTP server ---

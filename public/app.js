@@ -73,6 +73,8 @@ const TOKYO_23_WARDS = [
   "国立市",
   "青梅市",
   "羽村市",
+  "川崎市",
+  "横浜市",
 ];
 const SOURCE_WARD_MAP = {
   chiyoda: "千代田区",
@@ -125,6 +127,8 @@ const SOURCE_WARD_MAP = {
   kunitachi: "国立市",
   ome: "青梅市",
   hamura: "羽村市",
+  kawasaki: "川崎市",
+  yokohama: "横浜市",
 };
 const selectedWards = new Set();
 let searchQuery = "";
@@ -160,26 +164,29 @@ function clearMarkers() {
   markerLayer.clearLayers();
 }
 
+const fmtDateTime = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const fmtDate = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  month: "2-digit",
+  day: "2-digit",
+});
+
 function formatJst(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "不明";
-  return new Intl.DateTimeFormat("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
+  return fmtDateTime.format(d);
 }
 
 function formatJstDate(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(d);
+  return fmtDate.format(d);
 }
 
 function formatStartLabel(eventItem) {
@@ -197,13 +204,7 @@ function formatStartForPopup(eventItem) {
   }
   const d = new Date(eventItem?.starts_at);
   if (Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
+  return fmtDateTime.format(d);
 }
 
 function parseFiniteCoord(value) {
@@ -253,26 +254,72 @@ function countByWard(items) {
   return counts;
 }
 
-function renderWardFilters(wardCounts = new Map()) {
+const WARD_GROUPS = [
+  {
+    label: "東京都",
+    wards: [
+      "千代田区", "中央区", "港区", "新宿区", "文京区", "台東区", "墨田区", "江東区",
+      "品川区", "目黒区", "大田区", "世田谷区", "渋谷区", "中野区", "杉並区", "豊島区",
+      "北区", "荒川区", "板橋区", "練馬区", "足立区", "葛飾区", "江戸川区",
+      "八王子市", "調布市", "武蔵野市", "立川市", "昭島市", "東大和市", "清瀬市",
+      "多摩市", "稲城市", "日野市", "国分寺市", "東久留米市", "府中市", "小金井市",
+      "西東京市", "町田市", "福生市", "武蔵村山市", "あきる野市", "狛江市", "三鷹市",
+      "小平市", "東村山市", "国立市", "青梅市", "羽村市",
+    ],
+  },
+  {
+    label: "神奈川県",
+    wards: ["川崎市", "横浜市"],
+  },
+];
+
+const wardGroupCheckboxes = new Map();
+const wardGroupCountSpans = new Map();
+
+function initWardFilters() {
   wardFiltersEl.innerHTML = "";
-  for (const ward of TOKYO_23_WARDS) {
+  for (const group of WARD_GROUPS) {
     const row = document.createElement("label");
     row.className = "ward-option";
     const cb = document.createElement("input");
     cb.type = "checkbox";
-    cb.value = ward;
-    cb.checked = selectedWards.has(ward);
+    const allSelected = group.wards.every(w => selectedWards.has(w));
+    const someSelected = group.wards.some(w => selectedWards.has(w));
+    cb.checked = allSelected;
+    cb.indeterminate = !allSelected && someSelected;
     cb.addEventListener("change", () => {
-      if (cb.checked) selectedWards.add(ward);
-      else selectedWards.delete(ward);
+      if (cb.checked) {
+        for (const w of group.wards) selectedWards.add(w);
+      } else {
+        for (const w of group.wards) selectedWards.delete(w);
+      }
       applyFiltersAndRender({ autoFit: false });
     });
     const text = document.createElement("span");
-    const count = wardCounts.get(ward) || 0;
-    text.textContent = `${ward} (${count})`;
+    text.textContent = `${group.label} (0)`;
     row.appendChild(cb);
     row.appendChild(text);
     wardFiltersEl.appendChild(row);
+    wardGroupCheckboxes.set(group.label, cb);
+    wardGroupCountSpans.set(group.label, text);
+  }
+}
+
+function updateWardCounts(wardCounts) {
+  for (const group of WARD_GROUPS) {
+    let prefTotal = 0;
+    for (const ward of group.wards) {
+      prefTotal += wardCounts.get(ward) || 0;
+    }
+    const span = wardGroupCountSpans.get(group.label);
+    if (span) span.textContent = `${group.label} (${prefTotal})`;
+    const cb = wardGroupCheckboxes.get(group.label);
+    if (cb) {
+      const allSelected = group.wards.every(w => selectedWards.has(w));
+      const someSelected = group.wards.some(w => selectedWards.has(w));
+      cb.checked = allSelected;
+      cb.indeterminate = !allSelected && someSelected;
+    }
   }
 }
 
@@ -314,47 +361,60 @@ function getDistanceGroupKey(km) {
   return `${DISTANCE_BRACKETS[DISTANCE_BRACKETS.length - 1]}km以上`;
 }
 
+let lastMarkerIds = "";
+let globalMarkerMap = new Map();
+
 function render(items, options = {}) {
   const autoFit = options.autoFit === true;
-  clearMarkers();
+  const distCache = options.distCache || null;
   listEl.innerHTML = "";
 
   if (items.length === 0) {
+    clearMarkers();
+    globalMarkerMap = new Map();
+    lastMarkerIds = "";
     listEl.innerHTML = '<p class="meta">条件に合うイベントは見つかりませんでした。</p>';
     return;
   }
 
+  const currentMarkerIds = items.map(e => e.id).join("|");
+  const skipMarkers = currentMarkerIds === lastMarkerIds;
   const bounds = [];
-  const markerMap = new Map();
-  const markers = [];
-  for (let i = 0; i < items.length; i += 1) {
-    const e = items[i];
-    const lat = parseFiniteCoord(e.lat);
-    const lng = parseFiniteCoord(e.lng);
-    if (lat !== null && lng !== null) {
-      const marker = L.marker([lat, lng], { icon: eventPinIcon });
-      const popupEl = document.createElement("div");
-      popupEl.className = "popup-content";
-      const shareAttr = navigator.share ? `<button type="button" class="popup-share-btn" data-popup-share="${i}">共有</button>` : "";
-      popupEl.innerHTML = `<div class="popup-title">${e.title}</div><div class="popup-meta">${formatStartForPopup(e)}</div><div class="popup-meta">${e.venue_name || "会場未設定"}</div><div class="popup-actions"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>${shareAttr}</div>`;
-      const popupShareBtn = popupEl.querySelector(".popup-share-btn");
-      if (popupShareBtn) {
-        popupShareBtn.addEventListener("click", () => {
-          navigator.share({
-            title: e.title,
-            text: `${e.title}\n${formatStartForPopup(e)} ${e.venue_name || ""}\n`,
-            url: e.url,
-          }).catch(() => {});
-        });
+
+  if (!skipMarkers) {
+    clearMarkers();
+    globalMarkerMap = new Map();
+    const markers = [];
+    for (let i = 0; i < items.length; i += 1) {
+      const e = items[i];
+      const lat = parseFiniteCoord(e.lat);
+      const lng = parseFiniteCoord(e.lng);
+      if (lat !== null && lng !== null) {
+        const marker = L.marker([lat, lng], { icon: eventPinIcon });
+        const popupEl = document.createElement("div");
+        popupEl.className = "popup-content";
+        const shareAttr = navigator.share ? `<button type="button" class="popup-share-btn" data-popup-share="${i}">共有</button>` : "";
+        popupEl.innerHTML = `<div class="popup-title">${e.title}</div><div class="popup-meta">${formatStartForPopup(e)}</div><div class="popup-meta">${e.venue_name || "会場未設定"}</div><div class="popup-actions"><a href="${e.url}" target="_blank" rel="noopener noreferrer">詳細ページ</a>${shareAttr}</div>`;
+        const popupShareBtn = popupEl.querySelector(".popup-share-btn");
+        if (popupShareBtn) {
+          popupShareBtn.addEventListener("click", () => {
+            navigator.share({
+              title: e.title,
+              text: `${e.title}\n${formatStartForPopup(e)} ${e.venue_name || ""}\n`,
+              url: e.url,
+            }).catch(() => {});
+          });
+        }
+        marker.bindPopup(popupEl, { maxWidth: 280, minWidth: 200 });
+        marker._eventIdx = i;
+        bounds.push([lat, lng]);
+        globalMarkerMap.set(i, { marker, lat, lng });
+        markers.push(marker);
       }
-      marker.bindPopup(popupEl, { maxWidth: 280, minWidth: 200 });
-      marker._eventIdx = i;
-      bounds.push([lat, lng]);
-      markerMap.set(i, { marker, lat, lng });
-      markers.push(marker);
     }
+    markerLayer.addLayers(markers);
+    lastMarkerIds = currentMarkerIds;
   }
-  markerLayer.addLayers(markers);
 
   const frag = document.createDocumentFragment();
   const listLimit = Math.min(items.length, MAX_LIST_RENDER);
@@ -365,9 +425,15 @@ function render(items, options = {}) {
     // グループヘッダー挿入
     let groupKey = "";
     if (sortByDistance && userLocation) {
-      const eLat = parseFiniteCoord(e.lat);
-      const eLng = parseFiniteCoord(e.lng);
-      const km = eLat !== null && eLng !== null ? haversineDist(userLocation.lat, userLocation.lng, eLat, eLng) : null;
+      let km = null;
+      if (distCache) {
+        const dist = distCache.get(e.id);
+        km = dist !== Infinity ? dist : null;
+      } else {
+        const eLat = parseFiniteCoord(e.lat);
+        const eLng = parseFiniteCoord(e.lng);
+        km = eLat !== null && eLng !== null ? haversineDist(userLocation.lat, userLocation.lng, eLat, eLng) : null;
+      }
       groupKey = getDistanceGroupKey(km);
     } else {
       groupKey = getDateGroupKey(e.starts_at);
@@ -385,12 +451,16 @@ function render(items, options = {}) {
     card.style.setProperty("--i", String(i));
     let distHtml = "";
     if (userLocation) {
-      const eLat = parseFiniteCoord(e.lat);
-      const eLng = parseFiniteCoord(e.lng);
-      if (eLat !== null && eLng !== null) {
-        const km = haversineDist(userLocation.lat, userLocation.lng, eLat, eLng);
-        distHtml = `<div class="meta">距離: ${distanceLabel(km)}</div>`;
+      let km = null;
+      if (distCache && distCache.has(e.id)) {
+        const dist = distCache.get(e.id);
+        if (dist !== Infinity) km = dist;
+      } else {
+        const eLat = parseFiniteCoord(e.lat);
+        const eLng = parseFiniteCoord(e.lng);
+        if (eLat !== null && eLng !== null) km = haversineDist(userLocation.lat, userLocation.lng, eLat, eLng);
       }
+      if (km !== null) distHtml = `<div class="meta">距離: ${distanceLabel(km)}</div>`;
     }
     const badge = getDayBadge(e.starts_at);
     const badgeHtml = badge === "today" ? '<span class="day-badge today">今日</span>' : badge === "tomorrow" ? '<span class="day-badge tomorrow">明日</span>' : "";
@@ -425,7 +495,7 @@ function render(items, options = {}) {
     const idx = i;
     card.addEventListener("click", (ev) => {
       if (ev.target.tagName === "A" || ev.target.closest(".share-btn")) return;
-      const entry = markerMap.get(idx);
+      const entry = globalMarkerMap.get(idx);
       if (entry) {
         if (isMobile()) switchTab("map");
         map.setView(entry.marker.getLatLng(), 16);
@@ -565,9 +635,10 @@ function applyFiltersAndRender(options = {}) {
     const d = new Date(e.starts_at);
     return !Number.isNaN(d.getTime()) && d >= fromDate && d < cutoff;
   });
+  const totalInRange = items.length;
 
   // 区カウントは日数フィルタ済みデータで計算
-  renderWardFilters(countByWard(items));
+  updateWardCounts(countByWard(items));
 
   // 区フィルタ
   if (selectedWards.size > 0) {
@@ -587,29 +658,24 @@ function applyFiltersAndRender(options = {}) {
   }
 
   // 距離ソート
+  let distCache = null;
   if (sortByDistance && userLocation) {
-    items.sort((a, b) => {
-      const aLat = parseFiniteCoord(a.lat);
-      const aLng = parseFiniteCoord(a.lng);
-      const bLat = parseFiniteCoord(b.lat);
-      const bLng = parseFiniteCoord(b.lng);
-      const aDist = aLat !== null && aLng !== null ? haversineDist(userLocation.lat, userLocation.lng, aLat, aLng) : Infinity;
-      const bDist = bLat !== null && bLng !== null ? haversineDist(userLocation.lat, userLocation.lng, bLat, bLng) : Infinity;
-      return aDist - bDist;
-    });
+    distCache = new Map();
+    for (const e of items) {
+      const lat = parseFiniteCoord(e.lat);
+      const lng = parseFiniteCoord(e.lng);
+      distCache.set(e.id, lat !== null && lng !== null ? haversineDist(userLocation.lat, userLocation.lng, lat, lng) : Infinity);
+    }
+    items.sort((a, b) => distCache.get(a.id) - distCache.get(b.id));
   }
 
   // ステータス表示
-  const totalInRange = lastFetchedItems.filter((e) => {
-    const d = new Date(e.starts_at);
-    return !Number.isNaN(d.getTime()) && d >= fromDate && d < cutoff;
-  }).length;
   const days = Math.round((cutoff - fromDate) / 86400000);
   const warning = lastWarningText ? ` / ${lastWarningText}` : "";
   dateEl.textContent = `${lastDateText} (JST) のイベント ${lastFetchedItems.length}件取得`;
   setStatus(`表示件数: ${items.length}/${totalInRange}件（${days}日間）${warning}`);
   updateTabBadge(items.length);
-  render(items, { autoFit });
+  render(items, { autoFit, distCache });
   syncUrlParams();
   saveWardsToStorage();
 }
@@ -642,7 +708,7 @@ searchInputEl.addEventListener("input", () => {
   }, 250);
 });
 
-renderWardFilters();
+initWardFilters();
 selectAllWardsBtnEl.addEventListener("click", () => {
   selectedWards.clear();
   for (const ward of TOKYO_23_WARDS) selectedWards.add(ward);

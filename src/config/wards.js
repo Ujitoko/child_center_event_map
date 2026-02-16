@@ -1,3 +1,17 @@
+const KAWASAKI_SOURCE = {
+  key: "kawasaki",
+  label: "川崎市",
+  baseUrl: "https://eventapp.city.kawasaki.jp",
+  center: { lat: 35.5309, lng: 139.7022 },
+};
+
+const YOKOHAMA_SOURCE = {
+  key: "yokohama",
+  label: "横浜市",
+  baseUrl: "https://cgi.city.yokohama.lg.jp/common/event2",
+  center: { lat: 35.4437, lng: 139.6380 },
+};
+
 const SETAGAYA_SOURCE = {
   key: "setagaya",
   label: "世田谷区",
@@ -1429,6 +1443,8 @@ const KNOWN_FUSSA_FACILITIES = {
 
 module.exports = {
   ADACHI_SOURCE,
+  KAWASAKI_SOURCE,
+  YOKOHAMA_SOURCE,
   HACHIOJI_SOURCE,
   ARAKAWA_SOURCE,
   KNOWN_NAKANO_FACILITIES,
