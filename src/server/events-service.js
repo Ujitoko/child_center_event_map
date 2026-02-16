@@ -21,6 +21,15 @@ function saveSnapshot(snapshotPath, data) {
   }
 }
 
+async function batchCollect(fns, size) {
+  const results = [];
+  for (let i = 0; i < fns.length; i += size) {
+    const batch = await Promise.all(fns.slice(i, i + size).map(f => f()));
+    results.push(...batch);
+  }
+  return results;
+}
+
 function createGetEvents(deps) {
   const {
     CACHE_TTL_MS,
@@ -95,33 +104,33 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura] = await Promise.all([
-    collectSetagayaJidokanEvents(days),
-    collectOtaJidokanEvents(days),
-    collectShinagawaJidokanEvents(days),
-    collectMeguroJidokanEvents(days),
-    collectShibuyaJidokanEvents(days),
-    collectMinatoJidokanEvents(days),
-    collectChiyodaJidokanEvents(days),
-    collectAdditionalWardsEvents(days),
-    collectHachiojiEvents(days),
-    collectMusashinoEvents(days),
-    collectTachikawaEvents(days),
-    collectAkishimaEvents(days),
-    collectHigashiyamatoEvents(days),
-    collectKiyoseEvents(days),
-    collectTamaEvents(days),
-    collectInagiEvents(days),
-    collectHinoEvents(days),
-    collectKokubunjiEvents(days),
-    collectHigashikurumeEvents(days),
-    collectMitakaEvents(days),
-    collectKodairaEvents(days),
-    collectHigashimurayamaEvents(days),
-    collectKunitachiEvents(days),
-    collectOmeEvents(days),
-    collectHamuraEvents(days),
-  ]);
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura] = await batchCollect([
+    () => collectSetagayaJidokanEvents(days),
+    () => collectOtaJidokanEvents(days),
+    () => collectShinagawaJidokanEvents(days),
+    () => collectMeguroJidokanEvents(days),
+    () => collectShibuyaJidokanEvents(days),
+    () => collectMinatoJidokanEvents(days),
+    () => collectChiyodaJidokanEvents(days),
+    () => collectAdditionalWardsEvents(days),
+    () => collectHachiojiEvents(days),
+    () => collectMusashinoEvents(days),
+    () => collectTachikawaEvents(days),
+    () => collectAkishimaEvents(days),
+    () => collectHigashiyamatoEvents(days),
+    () => collectKiyoseEvents(days),
+    () => collectTamaEvents(days),
+    () => collectInagiEvents(days),
+    () => collectHinoEvents(days),
+    () => collectKokubunjiEvents(days),
+    () => collectHigashikurumeEvents(days),
+    () => collectMitakaEvents(days),
+    () => collectKodairaEvents(days),
+    () => collectHigashimurayamaEvents(days),
+    () => collectKunitachiEvents(days),
+    () => collectOmeEvents(days),
+    () => collectHamuraEvents(days),
+  ], 5);
   const {
     chuo,
     bunkyo,

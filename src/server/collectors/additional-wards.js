@@ -49,6 +49,40 @@ async function collectAdditionalWardsEvents(maxDays) {
   const configs = buildAdditionalWardConfigs({
     fetchBunkyoJidokanSeedUrls,
   });
+  const BATCH = 5;
+  const fns = [
+    () => collectWardGenericEvents(configs.chuo.source, maxDays, configs.chuo),
+    () => collectChuoAkachanTengokuEvents(maxDays),
+    () => collectWardGenericEvents(configs.bunkyo.source, maxDays, configs.bunkyo),
+    () => collectWardGenericEvents(configs.taito.source, maxDays, configs.taito),
+    () => collectWardGenericEvents(configs.sumida.source, maxDays, configs.sumida),
+    () => collectWardGenericEvents(configs.koto.source, maxDays, configs.koto),
+    () => collectWardGenericEvents(configs.nakano.source, maxDays, configs.nakano),
+    () => collectWardGenericEvents(configs.suginami.source, maxDays, configs.suginami),
+    () => collectWardGenericEvents(configs.toshima.source, maxDays, configs.toshima),
+    () => collectKitaJidokanEvents(maxDays),
+    () => collectWardGenericEvents(configs.arakawa.source, maxDays, configs.arakawa),
+    () => collectWardGenericEvents(configs.itabashi.source, maxDays, configs.itabashi),
+    () => collectWardGenericEvents(configs.nerima.source, maxDays, configs.nerima),
+    () => collectWardGenericEvents(configs.adachi.source, maxDays, configs.adachi),
+    () => collectWardGenericEvents(configs.katsushika.source, maxDays, configs.katsushika),
+    () => collectWardGenericEvents(configs.edogawa.source, maxDays, configs.edogawa),
+    () => collectWardGenericEvents(configs.shinjuku.source, maxDays, configs.shinjuku),
+    () => collectWardGenericEvents(configs.chofu.source, maxDays, configs.chofu),
+    () => collectWardGenericEvents(configs.fuchu.source, maxDays, configs.fuchu),
+    () => collectWardGenericEvents(configs.koganei.source, maxDays, configs.koganei),
+    () => collectWardGenericEvents(configs.nishitokyo.source, maxDays, configs.nishitokyo),
+    () => collectWardGenericEvents(configs.machida.source, maxDays, configs.machida),
+    () => collectWardGenericEvents(configs.fussa.source, maxDays, configs.fussa),
+    () => collectWardGenericEvents(configs.musashimurayama.source, maxDays, configs.musashimurayama),
+    () => collectWardGenericEvents(configs.akiruno.source, maxDays, configs.akiruno),
+    () => collectWardGenericEvents(configs.komae.source, maxDays, configs.komae),
+  ];
+  const allResults = [];
+  for (let i = 0; i < fns.length; i += BATCH) {
+    const batch = await Promise.all(fns.slice(i, i + BATCH).map(f => f()));
+    allResults.push(...batch);
+  }
   const [
     chuoBase,
     chuoAkachan,
@@ -76,34 +110,7 @@ async function collectAdditionalWardsEvents(maxDays) {
     musashimurayama,
     akiruno,
     komae,
-  ] = await Promise.all([
-    collectWardGenericEvents(configs.chuo.source, maxDays, configs.chuo),
-    collectChuoAkachanTengokuEvents(maxDays),
-    collectWardGenericEvents(configs.bunkyo.source, maxDays, configs.bunkyo),
-    collectWardGenericEvents(configs.taito.source, maxDays, configs.taito),
-    collectWardGenericEvents(configs.sumida.source, maxDays, configs.sumida),
-    collectWardGenericEvents(configs.koto.source, maxDays, configs.koto),
-    collectWardGenericEvents(configs.nakano.source, maxDays, configs.nakano),
-    collectWardGenericEvents(configs.suginami.source, maxDays, configs.suginami),
-    collectWardGenericEvents(configs.toshima.source, maxDays, configs.toshima),
-    collectKitaJidokanEvents(maxDays),
-    collectWardGenericEvents(configs.arakawa.source, maxDays, configs.arakawa),
-    collectWardGenericEvents(configs.itabashi.source, maxDays, configs.itabashi),
-    collectWardGenericEvents(configs.nerima.source, maxDays, configs.nerima),
-    collectWardGenericEvents(configs.adachi.source, maxDays, configs.adachi),
-    collectWardGenericEvents(configs.katsushika.source, maxDays, configs.katsushika),
-    collectWardGenericEvents(configs.edogawa.source, maxDays, configs.edogawa),
-    collectWardGenericEvents(configs.shinjuku.source, maxDays, configs.shinjuku),
-    collectWardGenericEvents(configs.chofu.source, maxDays, configs.chofu),
-    collectWardGenericEvents(configs.fuchu.source, maxDays, configs.fuchu),
-    collectWardGenericEvents(configs.koganei.source, maxDays, configs.koganei),
-    collectWardGenericEvents(configs.nishitokyo.source, maxDays, configs.nishitokyo),
-    collectWardGenericEvents(configs.machida.source, maxDays, configs.machida),
-    collectWardGenericEvents(configs.fussa.source, maxDays, configs.fussa),
-    collectWardGenericEvents(configs.musashimurayama.source, maxDays, configs.musashimurayama),
-    collectWardGenericEvents(configs.akiruno.source, maxDays, configs.akiruno),
-    collectWardGenericEvents(configs.komae.source, maxDays, configs.komae),
-  ]);
+  ] = allResults;
 
   const chuo = [];
   const seenChuo = new Set();
