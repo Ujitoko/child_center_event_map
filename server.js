@@ -1,3 +1,4 @@
+const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const { sendFile, sendJson } = require("./src/server/http-utils");
@@ -64,6 +65,17 @@ const GEO_CACHE_PATH = path.join(__dirname, "data", "geo_cache.json");
 
 // --- Mutable state ---
 const cache = { key: "", data: null, savedAt: 0 };
+
+// --- Pre-load snapshot on startup ---
+try {
+  const raw = fs.readFileSync(SNAPSHOT_PATH, "utf8");
+  const snapshot = JSON.parse(raw);
+  cache.key = "jidokan:90";
+  cache.data = snapshot;
+  cache.savedAt = Date.now();
+  console.log(`[snapshot] pre-loaded ${snapshot.items?.length || 0} items`);
+} catch {}
+
 const geoCache = new Map();
 const facilityAddressMaster = new Map();
 const facilityPointMaster = new Map();
