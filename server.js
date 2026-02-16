@@ -68,6 +68,7 @@ const {
   createCollectNagaraEvents, createCollectOnjukuEvents,
   createCollectChonanEvents,
 } = require("./src/server/collectors/chiba-remaining");
+const { createCollectHakoneEvents } = require("./src/server/collectors/hakone");
 const { createEvent2CalendarCollector } = require("./src/server/collectors/event2-calendar-collector");
 const { createCollectSaitamaEvents } = require("./src/server/collectors/saitama");
 const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshigaya");
@@ -125,7 +126,7 @@ const {
   NAKAI_SOURCE, KIYOKAWA_SOURCE,
   NINOMIYA_SOURCE, KNOWN_NINOMIYA_FACILITIES,
   OI_SOURCE, YUGAWARA_SOURCE,
-  MATSUDA_SOURCE, MANAZURU_SOURCE,
+  MATSUDA_SOURCE, MANAZURU_SOURCE, HAKONE_SOURCE,
   OKUTAMA_SOURCE, HINODE_SOURCE, HINOHARA_SOURCE,
   NAGAREYAMA_SOURCE, KNOWN_NAGAREYAMA_FACILITIES,
   URAYASU_SOURCE, KNOWN_URAYASU_FACILITIES,
@@ -487,6 +488,7 @@ const collectOiEvents = createMunicipalCalendarCollector({ source: OI_SOURCE, ch
 const collectYugawaraEvents = createMunicipalCalendarCollector({ source: YUGAWARA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectMatsudaEvents = createCollectMatsudaEvents(geoFmDeps);
 const collectManazuruEvents = createCalendarJsonCollector({ source: MANAZURU_SOURCE }, geoFmDeps);
+const collectHakoneEvents = createCollectHakoneEvents(geoFmDeps);
 const collectKaiseiEvents = createCollectKaiseiEvents(geoFmDeps);
 const collectYamakitaEvents = createCollectYamakitaEvents(geoFmDeps);
 const collectMizuhoEvents = createCollectMizuhoEvents(geoFmDeps);
@@ -724,6 +726,7 @@ const getEvents = createGetEvents({
   collectYugawaraEvents,
   collectMatsudaEvents,
   collectManazuruEvents,
+  collectHakoneEvents,
   collectKaiseiEvents,
   collectYamakitaEvents,
   collectMizuhoEvents,

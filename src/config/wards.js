@@ -1072,6 +1072,7 @@ const WARD_LABEL_BY_KEY = {
   kunitachi: KUNITACHI_SOURCE.label,
   ome: OME_SOURCE.label,
   hamura: HAMURA_SOURCE.label,
+  hakone: "箱根町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -1933,6 +1934,13 @@ const MANAZURU_SOURCE = {
   center: { lat: 35.1575, lng: 139.1350 },
 };
 
+const HAKONE_SOURCE = {
+  key: "hakone",
+  label: "箱根町",
+  baseUrl: "https://www.town.hakone.kanagawa.jp",
+  center: { lat: 35.2326, lng: 139.1069 },
+};
+
 const KAISEI_SOURCE = {
   key: "kaisei",
   label: "開成町",
@@ -2597,6 +2605,7 @@ module.exports = {
   YUGAWARA_SOURCE,
   MATSUDA_SOURCE,
   MANAZURU_SOURCE,
+  HAKONE_SOURCE,
   KAISEI_SOURCE,
   YAMAKITA_SOURCE,
   KNOWN_YAMAKITA_FACILITIES,
