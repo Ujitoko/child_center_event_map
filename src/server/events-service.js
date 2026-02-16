@@ -79,6 +79,12 @@ function createGetEvents(deps) {
     collectAtsugiEvents,
     collectIseharaEvents,
     collectMinamiashigaraEvents,
+    collectSamukawaEvents,
+    collectAikawaEvents,
+    collectMiuraEvents,
+    collectOisoEvents,
+    collectHayamaEvents,
+    collectMizuhoEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -121,7 +127,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara] = await batchCollect([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, samukawa, aikawa, miura, oiso, hayama, mizuho] = await batchCollect([
     () => collectSetagayaJidokanEvents(days),
     () => collectOtaJidokanEvents(days),
     () => collectShinagawaJidokanEvents(days),
@@ -164,6 +170,12 @@ function createGetEvents(deps) {
     () => collectAtsugiEvents(days),
     () => collectIseharaEvents(days),
     () => collectMinamiashigaraEvents(days),
+    () => collectSamukawaEvents(days),
+    () => collectAikawaEvents(days),
+    () => collectMiuraEvents(days),
+    () => collectOisoEvents(days),
+    () => collectHayamaEvents(days),
+    () => collectMizuhoEvents(days),
   ], 5);
   const {
     chuo,
@@ -259,6 +271,12 @@ function createGetEvents(deps) {
     ...atsugi,
     ...isehara,
     ...minamiashigara,
+    ...samukawa,
+    ...aikawa,
+    ...miura,
+    ...oiso,
+    ...hayama,
+    ...mizuho,
   ];
   const items = rawItems
     .map((ev) => {
@@ -357,6 +375,12 @@ function createGetEvents(deps) {
         city_atsugi: atsugi.length,
         city_isehara: isehara.length,
         city_minamiashigara: minamiashigara.length,
+        town_samukawa: samukawa.length,
+        town_aikawa: aikawa.length,
+        city_miura: miura.length,
+        town_oiso: oiso.length,
+        town_hayama: hayama.length,
+        town_mizuho: mizuho.length,
       },
     },
     items,

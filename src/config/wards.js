@@ -1556,6 +1556,48 @@ const MINAMIASHIGARA_SOURCE = {
   center: { lat: 35.3300, lng: 139.1103 },
 };
 
+const SAMUKAWA_SOURCE = {
+  key: "samukawa",
+  label: "寒川町",
+  baseUrl: "https://www.town.samukawa.kanagawa.jp",
+  center: { lat: 35.3737, lng: 139.3856 },
+};
+
+const AIKAWA_SOURCE = {
+  key: "aikawa",
+  label: "愛川町",
+  baseUrl: "https://www.town.aikawa.kanagawa.jp",
+  center: { lat: 35.5278, lng: 139.3217 },
+};
+
+const MIURA_SOURCE = {
+  key: "miura",
+  label: "三浦市",
+  baseUrl: "https://www.city.miura.kanagawa.jp",
+  center: { lat: 35.1781, lng: 139.6283 },
+};
+
+const OISO_SOURCE = {
+  key: "oiso",
+  label: "大磯町",
+  baseUrl: "https://www.town.oiso.kanagawa.jp",
+  center: { lat: 35.3100, lng: 139.3150 },
+};
+
+const HAYAMA_SOURCE = {
+  key: "hayama",
+  label: "葉山町",
+  baseUrl: "https://www.town.hayama.lg.jp",
+  center: { lat: 35.2686, lng: 139.5878 },
+};
+
+const MIZUHO_SOURCE = {
+  key: "mizuho",
+  label: "瑞穂町",
+  baseUrl: "https://www.town.mizuho.tokyo.jp",
+  center: { lat: 35.7706, lng: 139.3516 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -1686,4 +1728,10 @@ module.exports = {
   ATSUGI_SOURCE,
   ISEHARA_SOURCE,
   MINAMIASHIGARA_SOURCE,
+  SAMUKAWA_SOURCE,
+  AIKAWA_SOURCE,
+  MIURA_SOURCE,
+  OISO_SOURCE,
+  HAYAMA_SOURCE,
+  MIZUHO_SOURCE,
 };
