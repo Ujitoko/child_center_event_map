@@ -26,6 +26,16 @@ const { createCollectOmeEvents } = require("./src/server/collectors/ome");
 const { createCollectHamuraEvents } = require("./src/server/collectors/hamura");
 const { createCollectKawasakiEvents } = require("./src/server/collectors/kawasaki");
 const { createCollectYokohamaEvents } = require("./src/server/collectors/yokohama");
+const { createCollectKamakuraEvents } = require("./src/server/collectors/kamakura");
+const { createCollectYokosukaEvents } = require("./src/server/collectors/yokosuka");
+const { createCollectYamatoEvents } = require("./src/server/collectors/yamato");
+const { createCollectHiratsukaEvents } = require("./src/server/collectors/hiratsuka");
+const { createCollectOdawaraEvents } = require("./src/server/collectors/odawara");
+const { createCollectHadanoEvents } = require("./src/server/collectors/hadano");
+const { createCollectAyaseEvents } = require("./src/server/collectors/ayase");
+const { createCollectAtsugiEvents } = require("./src/server/collectors/atsugi");
+const { createCollectIseharaEvents } = require("./src/server/collectors/isehara");
+const { createCollectMinamiashigaraEvents } = require("./src/server/collectors/minamiashigara");
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const {
@@ -58,6 +68,16 @@ const {
   KUNITACHI_SOURCE, KNOWN_KUNITACHI_FACILITIES,
   OME_SOURCE, KNOWN_OME_FACILITIES,
   HAMURA_SOURCE, KNOWN_HAMURA_FACILITIES,
+  SAGAMIHARA_SOURCE, KNOWN_SAGAMIHARA_FACILITIES,
+  EBINA_SOURCE, KNOWN_EBINA_FACILITIES,
+  KAMAKURA_SOURCE, YOKOSUKA_SOURCE,
+  CHIGASAKI_SOURCE, KNOWN_CHIGASAKI_FACILITIES,
+  ZAMA_SOURCE, KNOWN_ZAMA_FACILITIES,
+  ZUSHI_SOURCE, KNOWN_ZUSHI_FACILITIES,
+  YAMATO_SOURCE, HIRATSUKA_SOURCE,
+  ODAWARA_SOURCE, HADANO_SOURCE,
+  AYASE_SOURCE, ATSUGI_SOURCE,
+  ISEHARA_SOURCE, MINAMIASHIGARA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -241,6 +261,21 @@ for (const [name, address] of Object.entries(KNOWN_FUSSA_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_FUCHU_FACILITIES)) {
   setFacilityAddressToMaster("fuchu", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_SAGAMIHARA_FACILITIES)) {
+  setFacilityAddressToMaster("sagamihara", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_EBINA_FACILITIES)) {
+  setFacilityAddressToMaster("ebina", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_CHIGASAKI_FACILITIES)) {
+  setFacilityAddressToMaster("chigasaki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ZAMA_FACILITIES)) {
+  setFacilityAddressToMaster("zama", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ZUSHI_FACILITIES)) {
+  setFacilityAddressToMaster("zushi", name, address);
+}
 
 // --- Shared deps for collectors ---
 const geoDeps = { geocodeForWard, resolveEventPoint, resolveEventAddress };
@@ -274,6 +309,16 @@ const collectOmeEvents = createCollectOmeEvents(geoFmDeps);
 const collectHamuraEvents = createCollectHamuraEvents(geoFmDeps);
 const collectKawasakiEvents = createCollectKawasakiEvents();
 const collectYokohamaEvents = createCollectYokohamaEvents();
+const collectKamakuraEvents = createCollectKamakuraEvents(geoFmDeps);
+const collectYokosukaEvents = createCollectYokosukaEvents(geoFmDeps);
+const collectYamatoEvents = createCollectYamatoEvents(geoFmDeps);
+const collectHiratsukaEvents = createCollectHiratsukaEvents(geoFmDeps);
+const collectOdawaraEvents = createCollectOdawaraEvents(geoFmDeps);
+const collectHadanoEvents = createCollectHadanoEvents(geoFmDeps);
+const collectAyaseEvents = createCollectAyaseEvents(geoFmDeps);
+const collectAtsugiEvents = createCollectAtsugiEvents(geoFmDeps);
+const collectIseharaEvents = createCollectIseharaEvents(geoFmDeps);
+const collectMinamiashigaraEvents = createCollectMinamiashigaraEvents(geoFmDeps);
 const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
   source: AKISHIMA_SOURCE, jsFile: "event.js",
@@ -306,6 +351,26 @@ const collectKokubunjiEvents = createEventJsCollector({
 const collectHigashikurumeEvents = createEventJsCollector({
   source: HIGASHIKURUME_SOURCE, jsFile: "event_d.js",
   childCategoryIds: ["6", "7"], knownFacilities: KNOWN_HIGASHIKURUME_FACILITIES,
+}, eventJsDeps);
+const collectSagamiharaEvents = createEventJsCollector({
+  source: SAGAMIHARA_SOURCE, jsFile: "event_j.js",
+  childCategoryIds: ["5", "6", "13"], knownFacilities: KNOWN_SAGAMIHARA_FACILITIES,
+}, eventJsDeps);
+const collectEbinaEvents = createEventJsCollector({
+  source: EBINA_SOURCE, jsFile: "event_data.js",
+  childCategoryIds: ["6", "7"], knownFacilities: KNOWN_EBINA_FACILITIES,
+}, eventJsDeps);
+const collectChigasakiEvents = createEventJsCollector({
+  source: CHIGASAKI_SOURCE, jsFile: "event_d.js",
+  childCategoryIds: [], childCategory2Ids: ["1"], knownFacilities: KNOWN_CHIGASAKI_FACILITIES,
+}, eventJsDeps);
+const collectZamaEvents = createEventJsCollector({
+  source: ZAMA_SOURCE, jsFile: "event.js",
+  childCategoryIds: ["60"], knownFacilities: KNOWN_ZAMA_FACILITIES,
+}, eventJsDeps);
+const collectZushiEvents = createEventJsCollector({
+  source: ZUSHI_SOURCE, jsFile: "event.js",
+  childCategoryIds: ["20"], knownFacilities: KNOWN_ZUSHI_FACILITIES,
 }, eventJsDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
@@ -347,6 +412,21 @@ const getEvents = createGetEvents({
   collectHamuraEvents,
   collectKawasakiEvents,
   collectYokohamaEvents,
+  collectSagamiharaEvents,
+  collectEbinaEvents,
+  collectKamakuraEvents,
+  collectYokosukaEvents,
+  collectChigasakiEvents,
+  collectZamaEvents,
+  collectZushiEvents,
+  collectYamatoEvents,
+  collectHiratsukaEvents,
+  collectOdawaraEvents,
+  collectHadanoEvents,
+  collectAyaseEvents,
+  collectAtsugiEvents,
+  collectIseharaEvents,
+  collectMinamiashigaraEvents,
 });
 
 // --- HTTP server ---

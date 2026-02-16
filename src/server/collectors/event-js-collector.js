@@ -25,7 +25,7 @@ function parsePlace2(raw, cityLabel) {
   // 「各〜」(不特定多数の場所)はスキップ
   if (/各(歯科|医院|施設|店舗|学校)/.test(text)) return { venue: "", address: "" };
   // 県外会場はスキップ
-  if (/^(岩手県|新潟県|鳥取県|静岡県|福島県|神奈川県)/.test(text)) return { venue: "", address: "" };
+  if (/^(岩手県|新潟県|鳥取県|静岡県|福島県)/.test(text)) return { venue: "", address: "" };
   // 複数施設の列挙はスキップ
   if (/【クイズポイント】|【スタンプ/.test(text)) return { venue: "", address: "" };
   // "(1)A (2)B" 形式 → 最初の会場のみ
@@ -92,22 +92,28 @@ function parsePlace2(raw, cityLabel) {
  * @param {string} cityLabel - 市名
  * @param {Object} knownFacilities - 既知施設マップ
  */
+function detectPrefecture(cityLabel) {
+  if (/^(横浜市|川崎市|相模原市|海老名市|鎌倉市|横須賀市|茅ヶ崎市|座間市|逗子市|大和市|平塚市|小田原市|秦野市|綾瀬市|厚木市|伊勢原市|南足柄市)/.test(cityLabel)) return "神奈川県";
+  return "東京都";
+}
+
 function buildGeoCandidates(venue, address, cityLabel, knownFacilities) {
+  const pref = detectPrefecture(cityLabel);
   const candidates = [];
   const normalized = venue.replace(/[\s　・･]/g, "");
   for (const [name, addr] of Object.entries(knownFacilities)) {
     const normName = name.replace(/[\s　・･]/g, "");
     if (normalized.includes(normName)) {
-      candidates.unshift(/東京都/.test(addr) ? addr : `東京都${addr}`);
+      candidates.unshift(new RegExp(pref).test(addr) ? addr : `${pref}${addr}`);
       break;
     }
   }
   if (address) {
     const cityAddr = address.includes(cityLabel) ? address : `${cityLabel}${address}`;
-    candidates.push(/東京都/.test(cityAddr) ? cityAddr : `東京都${cityAddr}`);
+    candidates.push(new RegExp(pref).test(cityAddr) ? cityAddr : `${pref}${cityAddr}`);
   }
   if (venue) {
-    candidates.push(`東京都${cityLabel} ${venue}`);
+    candidates.push(`${pref}${cityLabel} ${venue}`);
   }
   return [...new Set(candidates)];
 }
@@ -122,7 +128,7 @@ function buildGeoCandidates(venue, address, cityLabel, knownFacilities) {
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createEventJsCollector(config, deps) {
-  const { source, jsFile, childCategoryIds, knownFacilities } = config;
+  const { source, jsFile, childCategoryIds, childCategory2Ids, knownFacilities } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -155,7 +161,9 @@ function createEventJsCollector(config, deps) {
     const childEvents = eventData.events.filter((ev) => {
       const cats = Array.isArray(ev.category) ? ev.category : [];
       const tags = Array.isArray(ev.hashtag) ? ev.hashtag : [];
-      return childCategoryIds.some((id) => cats.includes(id) || tags.includes(id));
+      if (childCategoryIds.some((id) => cats.includes(id) || tags.includes(id))) return true;
+      if (childCategory2Ids && childCategory2Ids.length > 0 && childCategory2Ids.includes(ev.category2)) return true;
+      return false;
     });
 
     const candidates = [];

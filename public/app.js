@@ -75,6 +75,21 @@ const TOKYO_23_WARDS = [
   "羽村市",
   "川崎市",
   "横浜市",
+  "相模原市",
+  "海老名市",
+  "鎌倉市",
+  "横須賀市",
+  "茅ヶ崎市",
+  "座間市",
+  "逗子市",
+  "大和市",
+  "平塚市",
+  "小田原市",
+  "秦野市",
+  "綾瀬市",
+  "厚木市",
+  "伊勢原市",
+  "南足柄市",
 ];
 const SOURCE_WARD_MAP = {
   chiyoda: "千代田区",
@@ -129,6 +144,21 @@ const SOURCE_WARD_MAP = {
   hamura: "羽村市",
   kawasaki: "川崎市",
   yokohama: "横浜市",
+  sagamihara: "相模原市",
+  ebina: "海老名市",
+  kamakura: "鎌倉市",
+  yokosuka: "横須賀市",
+  chigasaki: "茅ヶ崎市",
+  zama: "座間市",
+  zushi: "逗子市",
+  yamato: "大和市",
+  hiratsuka: "平塚市",
+  odawara: "小田原市",
+  hadano: "秦野市",
+  ayase: "綾瀬市",
+  atsugi: "厚木市",
+  isehara: "伊勢原市",
+  minamiashigara: "南足柄市",
 };
 const selectedWards = new Set();
 let searchQuery = "";
@@ -269,7 +299,7 @@ const WARD_GROUPS = [
   },
   {
     label: "神奈川県",
-    wards: ["川崎市", "横浜市"],
+    wards: ["川崎市", "横浜市", "相模原市", "海老名市", "鎌倉市", "横須賀市", "茅ヶ崎市", "座間市", "逗子市", "大和市", "平塚市", "小田原市", "秦野市", "綾瀬市", "厚木市", "伊勢原市", "南足柄市"],
   },
 ];
 

@@ -1441,6 +1441,121 @@ const KNOWN_FUSSA_FACILITIES = {
   "福生市民会館": "福生市本町5",
 };
 
+const SAGAMIHARA_SOURCE = {
+  key: "sagamihara",
+  label: "相模原市",
+  baseUrl: "https://www.city.sagamihara.kanagawa.jp",
+  center: { lat: 35.5714, lng: 139.3728 },
+};
+
+const KNOWN_SAGAMIHARA_FACILITIES = {};
+
+const EBINA_SOURCE = {
+  key: "ebina",
+  label: "海老名市",
+  baseUrl: "https://www.city.ebina.kanagawa.jp",
+  center: { lat: 35.4461, lng: 139.3906 },
+};
+
+const KNOWN_EBINA_FACILITIES = {};
+
+const KAMAKURA_SOURCE = {
+  key: "kamakura",
+  label: "鎌倉市",
+  baseUrl: "https://www.city.kamakura.kanagawa.jp",
+  center: { lat: 35.3192, lng: 139.5467 },
+};
+
+const YOKOSUKA_SOURCE = {
+  key: "yokosuka",
+  label: "横須賀市",
+  baseUrl: "https://www.city.yokosuka.kanagawa.jp",
+  center: { lat: 35.2814, lng: 139.6722 },
+};
+
+const CHIGASAKI_SOURCE = {
+  key: "chigasaki",
+  label: "茅ヶ崎市",
+  baseUrl: "https://www.city.chigasaki.kanagawa.jp",
+  center: { lat: 35.3339, lng: 139.4036 },
+};
+
+const KNOWN_CHIGASAKI_FACILITIES = {};
+
+const ZAMA_SOURCE = {
+  key: "zama",
+  label: "座間市",
+  baseUrl: "https://www.city.zama.kanagawa.jp",
+  center: { lat: 35.4886, lng: 139.4082 },
+};
+
+const KNOWN_ZAMA_FACILITIES = {};
+
+const ZUSHI_SOURCE = {
+  key: "zushi",
+  label: "逗子市",
+  baseUrl: "https://www.city.zushi.kanagawa.jp",
+  center: { lat: 35.2955, lng: 139.5803 },
+};
+
+const KNOWN_ZUSHI_FACILITIES = {};
+
+const YAMATO_SOURCE = {
+  key: "yamato",
+  label: "大和市",
+  baseUrl: "https://www.city.yamato.lg.jp",
+  center: { lat: 35.4872, lng: 139.4615 },
+};
+
+const HIRATSUKA_SOURCE = {
+  key: "hiratsuka",
+  label: "平塚市",
+  baseUrl: "https://www.city.hiratsuka.kanagawa.jp",
+  center: { lat: 35.3297, lng: 139.3499 },
+};
+
+const ODAWARA_SOURCE = {
+  key: "odawara",
+  label: "小田原市",
+  baseUrl: "https://www.city.odawara.kanagawa.jp",
+  center: { lat: 35.2644, lng: 139.1522 },
+};
+
+const HADANO_SOURCE = {
+  key: "hadano",
+  label: "秦野市",
+  baseUrl: "https://www.city.hadano.kanagawa.jp",
+  center: { lat: 35.3739, lng: 139.2228 },
+};
+
+const AYASE_SOURCE = {
+  key: "ayase",
+  label: "綾瀬市",
+  baseUrl: "https://www.city.ayase.kanagawa.jp",
+  center: { lat: 35.4372, lng: 139.4267 },
+};
+
+const ATSUGI_SOURCE = {
+  key: "atsugi",
+  label: "厚木市",
+  baseUrl: "https://www.city.atsugi.kanagawa.jp",
+  center: { lat: 35.4430, lng: 139.3616 },
+};
+
+const ISEHARA_SOURCE = {
+  key: "isehara",
+  label: "伊勢原市",
+  baseUrl: "https://www.city.isehara.kanagawa.jp",
+  center: { lat: 35.3978, lng: 139.3140 },
+};
+
+const MINAMIASHIGARA_SOURCE = {
+  key: "minamiashigara",
+  label: "南足柄市",
+  baseUrl: "https://www.city.minamiashigara.kanagawa.jp",
+  center: { lat: 35.3300, lng: 139.1103 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -1551,4 +1666,24 @@ module.exports = {
   WARD_CHILD_URL_HINT_RE,
   WARD_EVENT_WORD_RE,
   WARD_LABEL_BY_KEY,
+  SAGAMIHARA_SOURCE,
+  KNOWN_SAGAMIHARA_FACILITIES,
+  EBINA_SOURCE,
+  KNOWN_EBINA_FACILITIES,
+  KAMAKURA_SOURCE,
+  YOKOSUKA_SOURCE,
+  CHIGASAKI_SOURCE,
+  KNOWN_CHIGASAKI_FACILITIES,
+  ZAMA_SOURCE,
+  KNOWN_ZAMA_FACILITIES,
+  ZUSHI_SOURCE,
+  KNOWN_ZUSHI_FACILITIES,
+  YAMATO_SOURCE,
+  HIRATSUKA_SOURCE,
+  ODAWARA_SOURCE,
+  HADANO_SOURCE,
+  AYASE_SOURCE,
+  ATSUGI_SOURCE,
+  ISEHARA_SOURCE,
+  MINAMIASHIGARA_SOURCE,
 };
