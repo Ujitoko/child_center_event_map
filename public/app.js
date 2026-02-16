@@ -4,7 +4,11 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-const markerLayer = L.layerGroup().addTo(map);
+const markerLayer = L.markerClusterGroup({
+  maxClusterRadius: 40,
+  spiderfyOnMaxZoom: true,
+  disableClusteringAtZoom: 16,
+}).addTo(map);
 const eventPinIcon = L.divIcon({
   className: "event-pin-wrap",
   html: `<svg class="event-pin" viewBox="0 0 28 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -322,12 +326,13 @@ function render(items, options = {}) {
 
   const bounds = [];
   const markerMap = new Map();
+  const markers = [];
   for (let i = 0; i < items.length; i += 1) {
     const e = items[i];
     const lat = parseFiniteCoord(e.lat);
     const lng = parseFiniteCoord(e.lng);
     if (lat !== null && lng !== null) {
-      const marker = L.marker([lat, lng], { icon: eventPinIcon }).addTo(markerLayer);
+      const marker = L.marker([lat, lng], { icon: eventPinIcon });
       const popupEl = document.createElement("div");
       popupEl.className = "popup-content";
       const shareAttr = navigator.share ? `<button type="button" class="popup-share-btn" data-popup-share="${i}">共有</button>` : "";
@@ -346,8 +351,10 @@ function render(items, options = {}) {
       marker._eventIdx = i;
       bounds.push([lat, lng]);
       markerMap.set(i, { marker, lat, lng });
+      markers.push(marker);
     }
   }
+  markerLayer.addLayers(markers);
 
   const frag = document.createDocumentFragment();
   const listLimit = Math.min(items.length, MAX_LIST_RENDER);

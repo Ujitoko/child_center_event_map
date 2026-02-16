@@ -56,7 +56,10 @@ function sendFile(res, filePath, req) {
       ".jpeg": "image/jpeg",
       ".svg": "image/svg+xml",
     };
-    const headers = { "Content-Type": typeMap[ext] || "application/octet-stream" };
+    const headers = {
+      "Content-Type": typeMap[ext] || "application/octet-stream",
+      "Cache-Control": "public, max-age=3600",
+    };
     if (COMPRESSIBLE.has(ext)) {
       sendGzip(res, 200, headers, data, req);
     } else {
