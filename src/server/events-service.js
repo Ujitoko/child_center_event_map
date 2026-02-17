@@ -24,7 +24,14 @@ function saveSnapshot(snapshotPath, data) {
 async function batchCollect(fns, size) {
   const results = [];
   for (let i = 0; i < fns.length; i += size) {
-    const batch = await Promise.all(fns.slice(i, i + size).map(f => f()));
+    const batch = await Promise.all(fns.slice(i, i + size).map(async (f, j) => {
+      try {
+        return await f();
+      } catch (e) {
+        console.error(`[batchCollect] collector #${i + j} failed:`, e.message, e.stack?.split("\n")[1]);
+        return [];
+      }
+    }));
     results.push(...batch);
   }
   return results;

@@ -109,7 +109,7 @@ function buildGeoCandidates(venue, address, cityLabel, knownFacilities) {
   const pref = detectPrefecture(cityLabel);
   const candidates = [];
   const normalized = venue.replace(/[\s　・･]/g, "");
-  for (const [name, addr] of Object.entries(knownFacilities)) {
+  for (const [name, addr] of Object.entries(knownFacilities || {})) {
     const normName = name.replace(/[\s　・･]/g, "");
     if (normalized.includes(normName)) {
       candidates.unshift(new RegExp(pref).test(addr) ? addr : `${pref}${addr}`);
