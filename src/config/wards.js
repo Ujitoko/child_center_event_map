@@ -1115,6 +1115,7 @@ const WARD_LABEL_BY_KEY = {
   ogawa: "小川町",
   yoshimi: "吉見町",
   kamikawa: "神川町",
+  kamisato: "上里町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2627,6 +2628,12 @@ const KAMIKAWA_SOURCE = {
   center: { lat: 36.1661, lng: 139.1250 },
 };
 
+const KAMISATO_SOURCE = {
+  key: "kamisato", label: "上里町",
+  baseUrl: "https://www.town.kamisato.saitama.jp",
+  center: { lat: 36.2460, lng: 139.1477 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2895,4 +2902,5 @@ module.exports = {
   OGAWA_SOURCE,
   YOSHIMI_SOURCE,
   KAMIKAWA_SOURCE,
+  KAMISATO_SOURCE,
 };

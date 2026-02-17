@@ -75,6 +75,7 @@ const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshig
 const { createCollectSokaEvents } = require("./src/server/collectors/soka");
 const { createCollectTsurugashimaEvents } = require("./src/server/collectors/tsurugashima");
 const { createCollectHasudaEvents } = require("./src/server/collectors/hasuda");
+const { createCollectKamisatoEvents } = require("./src/server/collectors/kamisato");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -171,6 +172,7 @@ const {
   IRUMA_SOURCE, KAZO_SOURCE,
   FUKAYA_SOURCE, OKEGAWA_SOURCE,
   OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
+  KAMISATO_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -703,6 +705,7 @@ const collectOgoseEvents = createCalendarJsonCollector({ source: OGOSE_SOURCE },
 const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE }, geoFmDeps);
 const collectYoshimiEvents = createCalendarJsonCollector({ source: YOSHIMI_SOURCE }, geoFmDeps);
 const collectKamikawaEvents = createCalendarJsonCollector({ source: KAMIKAWA_SOURCE }, geoFmDeps);
+const collectKamisatoEvents = createCollectKamisatoEvents({ ...geoFmDeps, source: KAMISATO_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -874,6 +877,7 @@ const getEvents = createGetEvents({
   collectOgawaEvents,
   collectYoshimiEvents,
   collectKamikawaEvents,
+  collectKamisatoEvents,
 });
 
 // --- HTTP server ---
