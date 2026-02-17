@@ -88,6 +88,8 @@ const { createCollectMiyoshiEvents } = require("./src/server/collectors/miyoshi"
 const { createCollectHatoyamaEvents } = require("./src/server/collectors/hatoyama");
 const { createCollectMiyashiroEvents } = require("./src/server/collectors/miyashiro");
 const { createCollectChichibuEvents } = require("./src/server/collectors/chichibu");
+const { createCollectRanzanEvents } = require("./src/server/collectors/ranzan");
+const { createCollectMatsubushiEvents } = require("./src/server/collectors/matsubushi");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -190,6 +192,7 @@ const {
   KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE, NAGATORO_SOURCE,
   MIYOSHI_SAITAMA_SOURCE, HATOYAMA_SOURCE, MIYASHIRO_SOURCE,
   CHICHIBU_SOURCE,
+  NAMEGAWA_SOURCE, RANZAN_SOURCE, MATSUBUSHI_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -735,6 +738,9 @@ const collectMiyoshiEvents = createCollectMiyoshiEvents({ ...geoFmDeps, source: 
 const collectHatoyamaEvents = createCollectHatoyamaEvents({ ...geoFmDeps, source: HATOYAMA_SOURCE });
 const collectMiyashiroEvents = createCollectMiyashiroEvents({ ...geoFmDeps, source: MIYASHIRO_SOURCE });
 const collectChichibuEvents = createCollectChichibuEvents({ ...geoFmDeps, source: CHICHIBU_SOURCE });
+const collectNamegawaEvents = createCalendarJsonCollector({ source: NAMEGAWA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php" }, geoFmDeps);
+const collectRanzanEvents = createCollectRanzanEvents({ ...geoFmDeps, source: RANZAN_SOURCE });
+const collectMatsubushiEvents = createCollectMatsubushiEvents({ ...geoFmDeps, source: MATSUBUSHI_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -919,6 +925,9 @@ const getEvents = createGetEvents({
   collectHatoyamaEvents,
   collectMiyashiroEvents,
   collectChichibuEvents,
+  collectNamegawaEvents,
+  collectRanzanEvents,
+  collectMatsubushiEvents,
 });
 
 // --- HTTP server ---

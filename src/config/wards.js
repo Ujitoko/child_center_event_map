@@ -2717,6 +2717,24 @@ const CHICHIBU_SOURCE = {
   center: { lat: 35.9917, lng: 139.0853 },
 };
 
+const NAMEGAWA_SOURCE = {
+  key: "namegawa", label: "滑川町",
+  baseUrl: "https://www.town.namegawa.saitama.jp",
+  center: { lat: 36.0600, lng: 139.3567 },
+};
+
+const RANZAN_SOURCE = {
+  key: "ranzan", label: "嵐山町",
+  baseUrl: "https://www.town.ranzan.saitama.jp",
+  center: { lat: 36.0533, lng: 139.3233 },
+};
+
+const MATSUBUSHI_SOURCE = {
+  key: "matsubushi", label: "松伏町",
+  baseUrl: "https://www.town.matsubushi.lg.jp",
+  center: { lat: 35.9267, lng: 139.8133 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2998,4 +3016,7 @@ module.exports = {
   HATOYAMA_SOURCE,
   MIYASHIRO_SOURCE,
   CHICHIBU_SOURCE,
+  NAMEGAWA_SOURCE,
+  RANZAN_SOURCE,
+  MATSUBUSHI_SOURCE,
 };
