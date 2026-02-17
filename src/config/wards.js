@@ -1104,6 +1104,9 @@ const WARD_LABEL_BY_KEY = {
   satte: "幸手市",
   yorii: "寄居町",
   sugito: "杉戸町",
+  soka: "草加市",
+  tsurugashima: "鶴ヶ島市",
+  hasuda: "蓮田市",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2550,6 +2553,24 @@ const SUGITO_SOURCE = {
   center: { lat: 36.0260, lng: 139.7357 },
 };
 
+const SOKA_SOURCE = {
+  key: "soka", label: "草加市",
+  baseUrl: "https://www.city.soka.saitama.jp",
+  center: { lat: 35.8265, lng: 139.8055 },
+};
+
+const TSURUGASHIMA_SOURCE = {
+  key: "tsurugashima", label: "鶴ヶ島市",
+  baseUrl: "https://www.city.tsurugashima.lg.jp",
+  center: { lat: 35.9328, lng: 139.3936 },
+};
+
+const HASUDA_SOURCE = {
+  key: "hasuda", label: "蓮田市",
+  baseUrl: "https://www.city.hasuda.saitama.jp",
+  center: { lat: 35.9925, lng: 139.6621 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2807,4 +2828,7 @@ module.exports = {
   SATTE_SOURCE,
   YORII_SOURCE,
   SUGITO_SOURCE,
+  SOKA_SOURCE,
+  TSURUGASHIMA_SOURCE,
+  HASUDA_SOURCE,
 };

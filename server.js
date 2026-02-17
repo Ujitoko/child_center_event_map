@@ -72,6 +72,9 @@ const { createCollectHakoneEvents } = require("./src/server/collectors/hakone");
 const { createEvent2CalendarCollector } = require("./src/server/collectors/event2-calendar-collector");
 const { createCollectSaitamaEvents } = require("./src/server/collectors/saitama");
 const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshigaya");
+const { createCollectSokaEvents } = require("./src/server/collectors/soka");
+const { createCollectTsurugashimaEvents } = require("./src/server/collectors/tsurugashima");
+const { createCollectHasudaEvents } = require("./src/server/collectors/hasuda");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -164,6 +167,7 @@ const {
   HIGASHIMATSUYAMA_SOURCE, GYODA_SOURCE, HONJO_SOURCE,
   HIDAKA_SOURCE, SHIRAOKA_SOURCE, SATTE_SOURCE,
   YORII_SOURCE, SUGITO_SOURCE,
+  SOKA_SOURCE, TSURUGASHIMA_SOURCE, HASUDA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -685,6 +689,9 @@ const collectSugitoEvents = createMunicipalCalendarCollector({ source: SUGITO_SO
 // --- 埼玉県 custom ---
 const collectSaitamaEvents = createCollectSaitamaEvents(geoFmDeps);
 const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
+const collectSokaEvents = createCollectSokaEvents({ ...geoFmDeps, source: SOKA_SOURCE });
+const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps, source: TSURUGASHIMA_SOURCE });
+const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -845,6 +852,9 @@ const getEvents = createGetEvents({
   collectSatteEvents,
   collectYoriiEvents,
   collectSugitoEvents,
+  collectSokaEvents,
+  collectTsurugashimaEvents,
+  collectHasudaEvents,
 });
 
 // --- HTTP server ---

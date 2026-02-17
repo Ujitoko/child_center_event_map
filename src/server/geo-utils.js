@@ -186,6 +186,9 @@ function createGeoHelpers(deps) {
       satte: 10,
       yorii: 15,
       sugito: 8,
+      soka: 10,
+      tsurugashima: 10,
+      hasuda: 10,
     };
     return overrides[key] || 10;
   }
