@@ -1073,6 +1073,35 @@ const WARD_LABEL_BY_KEY = {
   ome: OME_SOURCE.label,
   hamura: HAMURA_SOURCE.label,
   hakone: "箱根町",
+  kawaguchi: "川口市",
+  kasukabe: "春日部市",
+  fujimino: "ふじみ野市",
+  misato: "三郷市",
+  kawagoe: "川越市",
+  wako: "和光市",
+  warabi: "蕨市",
+  ageo: "上尾市",
+  niiza: "新座市",
+  asaka: "朝霞市",
+  toda: "戸田市",
+  shiki: "志木市",
+  fujimi: "富士見市",
+  sayama: "狭山市",
+  yashio: "八潮市",
+  saitamashi: "さいたま市",
+  koshigaya: "越谷市",
+  tokorozawa: "所沢市",
+  kuki: "久喜市",
+  kumagaya: "熊谷市",
+  kounosu: "鴻巣市",
+  sakado: "坂戸市",
+  hanno: "飯能市",
+  higashimatsuyama: "東松山市",
+  gyoda: "行田市",
+  honjo: "本庄市",
+  hidaka: "日高市",
+  shiraoka: "白岡市",
+  satte: "幸手市",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2446,6 +2475,66 @@ const KOSHIGAYA_SOURCE = {
   baseUrl: "https://www.city.koshigaya.saitama.jp",
   center: { lat: 35.8911, lng: 139.7906 },
 };
+const TOKOROZAWA_SOURCE = {
+  key: "tokorozawa", label: "所沢市",
+  baseUrl: "https://www.city.tokorozawa.saitama.jp",
+  center: { lat: 35.7990, lng: 139.4689 },
+};
+const KUKI_SOURCE = {
+  key: "kuki", label: "久喜市",
+  baseUrl: "https://www.city.kuki.lg.jp",
+  center: { lat: 36.0622, lng: 139.6669 },
+};
+const KUMAGAYA_SOURCE = {
+  key: "kumagaya", label: "熊谷市",
+  baseUrl: "https://www.city.kumagaya.lg.jp",
+  center: { lat: 36.1472, lng: 139.3886 },
+};
+const KOUNOSU_SOURCE = {
+  key: "kounosu", label: "鴻巣市",
+  baseUrl: "https://www.city.kounosu.saitama.jp",
+  center: { lat: 36.0656, lng: 139.5228 },
+};
+const SAKADO_SOURCE = {
+  key: "sakado", label: "坂戸市",
+  baseUrl: "https://www.city.sakado.lg.jp",
+  center: { lat: 35.9572, lng: 139.3886 },
+};
+const HANNO_SOURCE = {
+  key: "hanno", label: "飯能市",
+  baseUrl: "https://www.city.hanno.lg.jp",
+  center: { lat: 35.8558, lng: 139.3278 },
+};
+const HIGASHIMATSUYAMA_SOURCE = {
+  key: "higashimatsuyama", label: "東松山市",
+  baseUrl: "https://www.city.higashimatsuyama.lg.jp",
+  center: { lat: 36.0422, lng: 139.3994 },
+};
+const GYODA_SOURCE = {
+  key: "gyoda", label: "行田市",
+  baseUrl: "https://www.city.gyoda.lg.jp",
+  center: { lat: 36.1389, lng: 139.4556 },
+};
+const HONJO_SOURCE = {
+  key: "honjo", label: "本庄市",
+  baseUrl: "https://www.city.honjo.lg.jp",
+  center: { lat: 36.2439, lng: 139.1906 },
+};
+const HIDAKA_SOURCE = {
+  key: "hidaka", label: "日高市",
+  baseUrl: "https://www.city.hidaka.lg.jp",
+  center: { lat: 35.9072, lng: 139.3392 },
+};
+const SHIRAOKA_SOURCE = {
+  key: "shiraoka", label: "白岡市",
+  baseUrl: "https://www.city.shiraoka.lg.jp",
+  center: { lat: 36.0175, lng: 139.6767 },
+};
+const SATTE_SOURCE = {
+  key: "satte", label: "幸手市",
+  baseUrl: "https://www.city.satte.lg.jp",
+  center: { lat: 36.0783, lng: 139.7264 },
+};
 
 module.exports = {
   ADACHI_SOURCE,
@@ -2690,4 +2779,16 @@ module.exports = {
   YASHIO_SOURCE,
   SAITAMA_CITY_SOURCE,
   KOSHIGAYA_SOURCE,
+  TOKOROZAWA_SOURCE,
+  KUKI_SOURCE,
+  KUMAGAYA_SOURCE,
+  KOUNOSU_SOURCE,
+  SAKADO_SOURCE,
+  HANNO_SOURCE,
+  HIGASHIMATSUYAMA_SOURCE,
+  GYODA_SOURCE,
+  HONJO_SOURCE,
+  HIDAKA_SOURCE,
+  SHIRAOKA_SOURCE,
+  SATTE_SOURCE,
 };

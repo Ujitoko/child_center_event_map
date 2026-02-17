@@ -159,6 +159,10 @@ const {
   AGEO_SOURCE, NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, SHIKI_SOURCE,
   FUJIMI_SOURCE, SAYAMA_SOURCE, YASHIO_SOURCE,
   SAITAMA_CITY_SOURCE, KOSHIGAYA_SOURCE,
+  TOKOROZAWA_SOURCE, KUKI_SOURCE, KUMAGAYA_SOURCE,
+  KOUNOSU_SOURCE, SAKADO_SOURCE, HANNO_SOURCE,
+  HIGASHIMATSUYAMA_SOURCE, GYODA_SOURCE, HONJO_SOURCE,
+  HIDAKA_SOURCE, SHIRAOKA_SOURCE, SATTE_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -655,6 +659,25 @@ const collectShikiEvents = createMunicipalCalendarCollector({ source: SHIKI_SOUR
 const collectFujimiEvents = createListCalendarCollector({ source: FUJIMI_SOURCE, calendarPath: "/event/naiyo/kodomo_kosodate/calendar/", fallbackPath: "/event/naiyo/calendar/", useQueryParam: true }, geoFmDeps);
 const collectSayamaEvents = createListCalendarCollector({ source: SAYAMA_SOURCE, calendarPath: "/kankou/event/kyoiku/calendar/", fallbackPath: "/kankou/event/calendar/", useQueryParam: true }, geoFmDeps);
 const collectYashioEvents = createListCalendarCollector({ source: YASHIO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/", useQueryParam: true }, geoFmDeps);
+// --- 埼玉県 list-calendar-collector (追加) ---
+const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/kodomo/calendar/", fallbackPath: "/iitokoro/event/main/calendar/" }, geoFmDeps);
+const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/" }, geoFmDeps);
+// --- 埼玉県 event-js-collector (追加) ---
+const collectKukiEvents = createEventJsCollector({
+  source: KUKI_SOURCE, jsFile: "event.js",
+  childCategoryIds: ["50"],
+}, eventJsDeps);
+// --- 埼玉県 municipal-calendar-collector (追加) ---
+const collectKounosuEvents = createMunicipalCalendarCollector({ source: KOUNOSU_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectSakadoEvents = createMunicipalCalendarCollector({ source: SAKADO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectHigashimatsuyamaEvents = createMunicipalCalendarCollector({ source: HIGASHIMATSUYAMA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+// --- 埼玉県 calendar-json-collector (追加) ---
+const collectHannoEvents = createCalendarJsonCollector({ source: HANNO_SOURCE }, geoFmDeps);
+const collectGyodaEvents = createCalendarJsonCollector({ source: GYODA_SOURCE }, geoFmDeps);
+const collectHonjoEvents = createCalendarJsonCollector({ source: HONJO_SOURCE }, geoFmDeps);
+const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE }, geoFmDeps);
+const collectShiraokaEvents = createCalendarJsonCollector({ source: SHIRAOKA_SOURCE }, geoFmDeps);
+const collectSatteEvents = createCalendarJsonCollector({ source: SATTE_SOURCE }, geoFmDeps);
 // --- 埼玉県 custom ---
 const collectSaitamaEvents = createCollectSaitamaEvents(geoFmDeps);
 const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
@@ -804,6 +827,18 @@ const getEvents = createGetEvents({
   collectYashioEvents,
   collectSaitamaEvents,
   collectKoshigayaEvents,
+  collectTokorozawaEvents,
+  collectKukiEvents,
+  collectKumagayaEvents,
+  collectKounosuEvents,
+  collectSakadoEvents,
+  collectHannoEvents,
+  collectHigashimatsuyamaEvents,
+  collectGyodaEvents,
+  collectHonjoEvents,
+  collectHidakaEvents,
+  collectShiraokaEvents,
+  collectSatteEvents,
 });
 
 // --- HTTP server ---
