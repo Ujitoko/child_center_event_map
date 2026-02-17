@@ -79,6 +79,11 @@ const { createCollectKamisatoEvents } = require("./src/server/collectors/kamisat
 const { createCollectYoshikawaEvents } = require("./src/server/collectors/yoshikawa");
 const { createCollectOganoEvents } = require("./src/server/collectors/ogano");
 const { createCollectHigashichichibEvents } = require("./src/server/collectors/higashichichibu");
+const { createCollectKawajimaEvents } = require("./src/server/collectors/kawajima");
+const { createCollectKitamotoEvents } = require("./src/server/collectors/kitamoto");
+const { createCollectInaEvents } = require("./src/server/collectors/ina");
+const { createCollectYokozeEvents } = require("./src/server/collectors/yokoze");
+const { createCollectNagatoroEvents } = require("./src/server/collectors/nagatoro");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -177,6 +182,8 @@ const {
   OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
   KAMISATO_SOURCE,
   YOSHIKAWA_SOURCE, OGANO_SOURCE, HIGASHICHICHIBU_SOURCE,
+  KAWAJIMA_SOURCE,
+  KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE, NAGATORO_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -713,6 +720,11 @@ const collectKamisatoEvents = createCollectKamisatoEvents({ ...geoFmDeps, source
 const collectYoshikawaEvents = createCollectYoshikawaEvents({ ...geoFmDeps, source: YOSHIKAWA_SOURCE });
 const collectOganoEvents = createCollectOganoEvents({ ...geoFmDeps, source: OGANO_SOURCE });
 const collectHigashichichibEvents = createCollectHigashichichibEvents({ ...geoFmDeps, source: HIGASHICHICHIBU_SOURCE });
+const collectKawajimaEvents = createCollectKawajimaEvents({ ...geoFmDeps, source: KAWAJIMA_SOURCE });
+const collectKitamotoEvents = createCollectKitamotoEvents({ ...geoFmDeps, source: KITAMOTO_SOURCE });
+const collectInaEvents = createCollectInaEvents({ ...geoFmDeps, source: INA_SAITAMA_SOURCE });
+const collectYokozeEvents = createCollectYokozeEvents({ ...geoFmDeps, source: YOKOZE_SOURCE });
+const collectNagatoroEvents = createCollectNagatoroEvents({ ...geoFmDeps, source: NAGATORO_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -888,6 +900,11 @@ const getEvents = createGetEvents({
   collectYoshikawaEvents,
   collectOganoEvents,
   collectHigashichichibEvents,
+  collectKawajimaEvents,
+  collectKitamotoEvents,
+  collectInaEvents,
+  collectYokozeEvents,
+  collectNagatoroEvents,
 });
 
 // --- HTTP server ---

@@ -1119,6 +1119,11 @@ const WARD_LABEL_BY_KEY = {
   yoshikawa: "吉川市",
   ogano: "小鹿野町",
   higashichichibu: "東秩父村",
+  kawajima: "川島町",
+  kitamoto: "北本市",
+  ina_saitama: "伊奈町",
+  yokoze: "横瀬町",
+  nagatoro: "長瀞町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2655,6 +2660,36 @@ const HIGASHICHICHIBU_SOURCE = {
   center: { lat: 36.0500, lng: 139.1900 },
 };
 
+const KAWAJIMA_SOURCE = {
+  key: "kawajima", label: "川島町",
+  baseUrl: "https://www.town.kawajima.saitama.jp",
+  center: { lat: 35.9806, lng: 139.4814 },
+};
+
+const KITAMOTO_SOURCE = {
+  key: "kitamoto", label: "北本市",
+  baseUrl: "https://www.city.kitamoto.lg.jp",
+  center: { lat: 36.0270, lng: 139.5318 },
+};
+
+const INA_SAITAMA_SOURCE = {
+  key: "ina_saitama", label: "伊奈町",
+  baseUrl: "https://www.town.saitama-ina.lg.jp",
+  center: { lat: 35.9936, lng: 139.6219 },
+};
+
+const YOKOZE_SOURCE = {
+  key: "yokoze", label: "横瀬町",
+  baseUrl: "https://www.town.yokoze.saitama.jp",
+  center: { lat: 35.9797, lng: 139.0947 },
+};
+
+const NAGATORO_SOURCE = {
+  key: "nagatoro", label: "長瀞町",
+  baseUrl: "https://www.town.nagatoro.saitama.jp",
+  center: { lat: 36.1139, lng: 139.1083 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2927,4 +2962,9 @@ module.exports = {
   YOSHIKAWA_SOURCE,
   OGANO_SOURCE,
   HIGASHICHICHIBU_SOURCE,
+  KAWAJIMA_SOURCE,
+  KITAMOTO_SOURCE,
+  INA_SAITAMA_SOURCE,
+  YOKOZE_SOURCE,
+  NAGATORO_SOURCE,
 };
