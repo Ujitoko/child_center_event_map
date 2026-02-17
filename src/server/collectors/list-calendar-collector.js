@@ -156,7 +156,7 @@ function createListCalendarCollector(config, deps) {
             const k = stripTags(mm[1]);
             const v = stripTags(mm[2]);
             if (!k || !v) continue;
-            if (!venue && /(会場|開催場所|実施場所|場所)/.test(k)) venue = v;
+            if (!venue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) venue = v;
             if (!address && /(住所|所在地)/.test(k)) address = v;
           }
           if (!venue || !address) {
@@ -165,7 +165,7 @@ function createListCalendarCollector(config, deps) {
               const k = stripTags(mm[1]);
               const v = stripTags(mm[2]);
               if (!k || !v) continue;
-              if (!venue && /(会場|開催場所|実施場所|場所)/.test(k)) venue = v;
+              if (!venue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) venue = v;
               if (!address && /(住所|所在地)/.test(k)) address = v;
             }
           }

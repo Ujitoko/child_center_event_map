@@ -61,7 +61,7 @@ function parseAnchors(html, baseUrl) {
 function parseDetailMeta(html) {
   let venue = "";
   let address = "";
-  const venueKeyRe = /(会場|開催場所|実施場所|場所|会場名|施設名|名称)/;
+  const venueKeyRe = /(会場|開催場所|実施場所|場所|ところ|会場名|施設名|名称)/;
   const looksLikeVenue = (textRaw) => {
     const text = sanitizeVenueText(textRaw);
     if (!text) return false;

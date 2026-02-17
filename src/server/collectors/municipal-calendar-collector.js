@@ -291,7 +291,7 @@ function createMunicipalCalendarCollector(config, deps) {
             const k = stripTags(mm[1]);
             const v = stripTags(mm[2]);
             if (!k || !v) continue;
-            if (!detailVenue && /(会場|開催場所|実施場所|場所)/.test(k)) detailVenue = v;
+            if (!detailVenue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) detailVenue = v;
             if (!detailAddress && /(住所|所在地)/.test(k)) detailAddress = v;
           }
           // <table> の <th>/<td> パターンも確認
@@ -301,7 +301,7 @@ function createMunicipalCalendarCollector(config, deps) {
               const k = stripTags(mm[1]);
               const v = stripTags(mm[2]);
               if (!k || !v) continue;
-              if (!detailVenue && /(会場|開催場所|実施場所|場所)/.test(k)) detailVenue = v;
+              if (!detailVenue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) detailVenue = v;
               if (!detailAddress && /(住所|所在地)/.test(k)) detailAddress = v;
             }
           }
