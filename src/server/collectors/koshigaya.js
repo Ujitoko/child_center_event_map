@@ -196,15 +196,48 @@ function createCollectKoshigayaEvents(deps) {
               const k = stripTags(mm[1]);
               const v = stripTags(mm[2]);
               if (!k || !v) continue;
-              if (!venue && /(会場|開催場所|実施場所|場所)/.test(k)) venue = v;
+              if (!venue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) venue = v;
               if (!address && /(住所|所在地)/.test(k)) address = v;
             }
           }
-
-          // 会場パターン: "会場" + 空白 + テキスト
+          // td/td パターン (越谷市: <td>会場</td><td>施設名</td>)
           if (!venue) {
-            const venueMatch = text.match(/会場[\s\u3000]+(.+?)[\n\r]/);
-            if (venueMatch) venue = venueMatch[1].trim();
+            const tdRe = /<td[^>]*>([\s\S]*?)<\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/gi;
+            while ((mm = tdRe.exec(detailHtml)) !== null) {
+              const k = stripTags(mm[1]).trim();
+              const v = stripTags(mm[2]).trim();
+              if (!k || !v) continue;
+              if (!venue && /(会場|開催場所|場所|ところ)/.test(k) && v.length <= 60) venue = v;
+              if (!address && /(住所|所在地)/.test(k)) address = v;
+            }
+          }
+          // h2/h3/h4 見出しパターン (越谷市: <h2>会場</h2><p>施設名</p>)
+          if (!venue) {
+            const headingRe = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi;
+            let hm;
+            while ((hm = headingRe.exec(detailHtml)) !== null) {
+              const heading = stripTags(hm[1]).trim();
+              if (/(場所|会場|開催場所|ところ)/.test(heading)) {
+                const afterHeading = detailHtml.slice(hm.index + hm[0].length, hm.index + hm[0].length + 500);
+                const blockMatch = afterHeading.match(/<(?:p|div)[^>]*>([\s\S]*?)<\/(?:p|div)>/i);
+                const nextText = blockMatch
+                  ? stripTags(blockMatch[1]).trim()
+                  : stripTags(afterHeading).trim().split(/\n/)[0].trim();
+                if (nextText && nextText.length >= 2 && nextText.length <= 60) {
+                  venue = nextText;
+                  break;
+                }
+              }
+            }
+          }
+          // テキストベースのフォールバック
+          if (!venue) {
+            const placeMatch = text.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              v = v.replace(/\s*(?:住所|駐車|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考).*$/, "").trim();
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) venue = v;
+            }
           }
 
           // 住所パターン: 越谷市の住所 or 〒 郵便番号

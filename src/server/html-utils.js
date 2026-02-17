@@ -99,7 +99,10 @@ function parseDetailMeta(html) {
       const heading = stripTags(m[1]).trim();
       if (/(場所|会場|開催場所|ところ)/.test(heading)) {
         const afterHeading = html.slice(m.index + m[0].length, m.index + m[0].length + 500);
-        const nextText = stripTags(afterHeading).trim().split(/\n/)[0].trim();
+        const blockMatch = afterHeading.match(/<(?:p|div)[^>]*>([\s\S]*?)<\/(?:p|div)>/i);
+        const nextText = blockMatch
+          ? stripTags(blockMatch[1]).trim()
+          : stripTags(afterHeading).trim().split(/\n/)[0].trim();
         if (nextText && nextText.length >= 2 && nextText.length <= 60) {
           venue = nextText;
           break;

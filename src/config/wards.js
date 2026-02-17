@@ -2511,6 +2511,16 @@ const TODA_SOURCE = {
   baseUrl: "https://www.city.toda.saitama.jp",
   center: { lat: 35.8175, lng: 139.6778 },
 };
+const KNOWN_TODA_FACILITIES = {
+  "戸田市立中央図書館": "戸田市大字新曽1707",
+  "あいパル": "戸田市上戸田2-21-1",
+  "上戸田地域交流センター": "戸田市上戸田2-21-1",
+  "戸田市立市民医療センター": "戸田市美女木4-20-1",
+  "東部福祉センター": "戸田市下前1-2-20",
+  "下戸田公民館": "戸田市大字上戸田5-6",
+  "新曽公民館": "戸田市大字新曽1395",
+  "戸田公園駅前行政センター": "戸田市本町4-15-11",
+};
 const SHIKI_SOURCE = {
   key: "shiki", label: "志木市",
   baseUrl: "https://www.city.shiki.lg.jp",
@@ -3036,7 +3046,7 @@ module.exports = {
   AGEO_SOURCE, KNOWN_AGEO_FACILITIES,
   NIIZA_SOURCE,
   ASAKA_SOURCE,
-  TODA_SOURCE,
+  TODA_SOURCE, KNOWN_TODA_FACILITIES,
   SHIKI_SOURCE,
   FUJIMI_SOURCE,
   SAYAMA_SOURCE,

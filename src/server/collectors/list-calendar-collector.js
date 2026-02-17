@@ -177,7 +177,10 @@ function createListCalendarCollector(config, deps) {
               const heading = stripTags(hm[1]).trim();
               if (/(場所|会場|開催場所|ところ)/.test(heading)) {
                 const afterHeading = html.slice(hm.index + hm[0].length, hm.index + hm[0].length + 500);
-                const nextText = stripTags(afterHeading).trim().split(/\n/)[0].trim();
+                const blockMatch = afterHeading.match(/<(?:p|div)[^>]*>([\s\S]*?)<\/(?:p|div)>/i);
+                const nextText = blockMatch
+                  ? stripTags(blockMatch[1]).trim()
+                  : stripTags(afterHeading).trim().split(/\n/)[0].trim();
                 if (nextText && nextText.length >= 2 && nextText.length <= 60) {
                   venue = nextText;
                   break;
