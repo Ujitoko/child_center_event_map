@@ -68,14 +68,26 @@ function parseHasudaDetailPage(html) {
     const body = sm[2];
 
     if (/^開催場所$/.test(heading)) {
-      // dl/dt/dd パターン
-      const dtddRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
-      let dm;
-      while ((dm = dtddRe.exec(body)) !== null) {
-        const k = stripTags(dm[1]).trim();
-        const v = stripTags(dm[2]).trim();
+      // th/td テーブルパターン (<th><p>名称</p></th><td><p>施設名</p></td>)
+      const thTdRe = /<th[^>]*>([\s\S]*?)<\/th>\s*<td[^>]*>([\s\S]*?)<\/td>/gi;
+      let tm;
+      while ((tm = thTdRe.exec(body)) !== null) {
+        const k = stripTags(tm[1]).trim();
+        const v = stripTags(tm[2]).trim();
         if (!venue && /名称/.test(k)) venue = v;
         if (!address && /住所/.test(k)) address = v;
+      }
+
+      // dl/dt/dd パターン
+      if (!venue) {
+        const dtddRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
+        let dm;
+        while ((dm = dtddRe.exec(body)) !== null) {
+          const k = stripTags(dm[1]).trim();
+          const v = stripTags(dm[2]).trim();
+          if (!venue && /名称/.test(k)) venue = v;
+          if (!address && /住所/.test(k)) address = v;
+        }
       }
 
       // p タグパターン (名称：xxx)
@@ -86,8 +98,6 @@ function parseHasudaDetailPage(html) {
           const pText = stripTags(pm[1]).trim();
           if (!venue && /名称[：:]/.test(pText)) {
             venue = pText.replace(/名称[：:]\s*/, "").trim();
-          } else if (!venue && pText && !/電話|ファク|メール|ホーム/.test(pText)) {
-            venue = pText;
           }
           if (!address && /住所[：:]/.test(pText)) {
             address = pText.replace(/住所[：:]\s*/, "").trim();

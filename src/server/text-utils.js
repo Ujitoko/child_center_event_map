@@ -157,6 +157,9 @@ function sanitizeGeoQueryText(value) {
     .replace(/^\d{3}-?\d{4}\s*/, "")
     .replace(/\s*(?:電話|tel|お問い合わせ|問い合わせ|問合せ|対象|定員|費用|料金|持ち物|URL|https?:\/\/).*/i, "")
     .replace(/[（(](?:注|※|対象|定員|費用|料金|持ち物|問い合わせ|問合せ)[^）)]{0,80}[）)]/g, " ")
+    // Strip decorative brackets: 「愛称」, （説明）
+    .replace(/[「『][^」』]{1,20}[」』]/g, "")
+    .replace(/[（(][^）)]{5,}[）)]/g, "")
     .replace(/\s+/g, " ")
     .trim();
   if (text.length > 120) text = normalizeText(text.slice(0, 120));
