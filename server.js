@@ -87,6 +87,7 @@ const { createCollectNagatoroEvents } = require("./src/server/collectors/nagator
 const { createCollectMiyoshiEvents } = require("./src/server/collectors/miyoshi");
 const { createCollectHatoyamaEvents } = require("./src/server/collectors/hatoyama");
 const { createCollectMiyashiroEvents } = require("./src/server/collectors/miyashiro");
+const { createCollectChichibuEvents } = require("./src/server/collectors/chichibu");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -188,6 +189,7 @@ const {
   KAWAJIMA_SOURCE,
   KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE, NAGATORO_SOURCE,
   MIYOSHI_SAITAMA_SOURCE, HATOYAMA_SOURCE, MIYASHIRO_SOURCE,
+  CHICHIBU_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -732,6 +734,7 @@ const collectNagatoroEvents = createCollectNagatoroEvents({ ...geoFmDeps, source
 const collectMiyoshiEvents = createCollectMiyoshiEvents({ ...geoFmDeps, source: MIYOSHI_SAITAMA_SOURCE });
 const collectHatoyamaEvents = createCollectHatoyamaEvents({ ...geoFmDeps, source: HATOYAMA_SOURCE });
 const collectMiyashiroEvents = createCollectMiyashiroEvents({ ...geoFmDeps, source: MIYASHIRO_SOURCE });
+const collectChichibuEvents = createCollectChichibuEvents({ ...geoFmDeps, source: CHICHIBU_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -915,6 +918,7 @@ const getEvents = createGetEvents({
   collectMiyoshiEvents,
   collectHatoyamaEvents,
   collectMiyashiroEvents,
+  collectChichibuEvents,
 });
 
 // --- HTTP server ---

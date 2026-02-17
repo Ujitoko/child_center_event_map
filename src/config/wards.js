@@ -2711,6 +2711,12 @@ const MIYASHIRO_SOURCE = {
   center: { lat: 36.0238, lng: 139.7253 },
 };
 
+const CHICHIBU_SOURCE = {
+  key: "chichibu", label: "秩父市",
+  baseUrl: "https://www.city.chichibu.lg.jp",
+  center: { lat: 35.9917, lng: 139.0853 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2991,4 +2997,5 @@ module.exports = {
   MIYOSHI_SAITAMA_SOURCE,
   HATOYAMA_SOURCE,
   MIYASHIRO_SOURCE,
+  CHICHIBU_SOURCE,
 };
