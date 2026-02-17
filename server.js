@@ -76,6 +76,9 @@ const { createCollectSokaEvents } = require("./src/server/collectors/soka");
 const { createCollectTsurugashimaEvents } = require("./src/server/collectors/tsurugashima");
 const { createCollectHasudaEvents } = require("./src/server/collectors/hasuda");
 const { createCollectKamisatoEvents } = require("./src/server/collectors/kamisato");
+const { createCollectYoshikawaEvents } = require("./src/server/collectors/yoshikawa");
+const { createCollectOganoEvents } = require("./src/server/collectors/ogano");
+const { createCollectHigashichichibEvents } = require("./src/server/collectors/higashichichibu");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -173,6 +176,7 @@ const {
   FUKAYA_SOURCE, OKEGAWA_SOURCE,
   OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
   KAMISATO_SOURCE,
+  YOSHIKAWA_SOURCE, OGANO_SOURCE, HIGASHICHICHIBU_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -706,6 +710,9 @@ const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE },
 const collectYoshimiEvents = createCalendarJsonCollector({ source: YOSHIMI_SOURCE }, geoFmDeps);
 const collectKamikawaEvents = createCalendarJsonCollector({ source: KAMIKAWA_SOURCE }, geoFmDeps);
 const collectKamisatoEvents = createCollectKamisatoEvents({ ...geoFmDeps, source: KAMISATO_SOURCE });
+const collectYoshikawaEvents = createCollectYoshikawaEvents({ ...geoFmDeps, source: YOSHIKAWA_SOURCE });
+const collectOganoEvents = createCollectOganoEvents({ ...geoFmDeps, source: OGANO_SOURCE });
+const collectHigashichichibEvents = createCollectHigashichichibEvents({ ...geoFmDeps, source: HIGASHICHICHIBU_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -878,6 +885,9 @@ const getEvents = createGetEvents({
   collectYoshimiEvents,
   collectKamikawaEvents,
   collectKamisatoEvents,
+  collectYoshikawaEvents,
+  collectOganoEvents,
+  collectHigashichichibEvents,
 });
 
 // --- HTTP server ---

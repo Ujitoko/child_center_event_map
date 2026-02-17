@@ -1116,6 +1116,9 @@ const WARD_LABEL_BY_KEY = {
   yoshimi: "吉見町",
   kamikawa: "神川町",
   kamisato: "上里町",
+  yoshikawa: "吉川市",
+  ogano: "小鹿野町",
+  higashichichibu: "東秩父村",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2634,6 +2637,24 @@ const KAMISATO_SOURCE = {
   center: { lat: 36.2460, lng: 139.1477 },
 };
 
+const YOSHIKAWA_SOURCE = {
+  key: "yoshikawa", label: "吉川市",
+  baseUrl: "https://www.city.yoshikawa.saitama.jp",
+  center: { lat: 35.8917, lng: 139.8428 },
+};
+
+const OGANO_SOURCE = {
+  key: "ogano", label: "小鹿野町",
+  baseUrl: "https://www.town.ogano.lg.jp",
+  center: { lat: 36.0153, lng: 138.9833 },
+};
+
+const HIGASHICHICHIBU_SOURCE = {
+  key: "higashichichibu", label: "東秩父村",
+  baseUrl: "https://www.vill.higashichichibu.saitama.jp",
+  center: { lat: 36.0500, lng: 139.1900 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2903,4 +2924,7 @@ module.exports = {
   YOSHIMI_SOURCE,
   KAMIKAWA_SOURCE,
   KAMISATO_SOURCE,
+  YOSHIKAWA_SOURCE,
+  OGANO_SOURCE,
+  HIGASHICHICHIBU_SOURCE,
 };
