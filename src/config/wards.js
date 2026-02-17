@@ -2747,6 +2747,18 @@ const MOROYAMA_SOURCE = {
   center: { lat: 35.9417, lng: 139.3167 },
 };
 
+const HANYU_SOURCE = {
+  key: "hanyu", label: "羽生市",
+  baseUrl: "https://www.city.hanyu.lg.jp",
+  center: { lat: 36.1717, lng: 139.5483 },
+};
+
+const MISATO_SAITAMA_SOURCE = {
+  key: "misato_saitama", label: "美里町",
+  baseUrl: "https://www.town.saitama-misato.lg.jp",
+  center: { lat: 36.1267, lng: 139.2000 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -3033,4 +3045,6 @@ module.exports = {
   MATSUBUSHI_SOURCE,
   MINANO_SOURCE,
   MOROYAMA_SOURCE,
+  HANYU_SOURCE,
+  MISATO_SAITAMA_SOURCE,
 };

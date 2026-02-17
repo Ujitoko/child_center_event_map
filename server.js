@@ -92,6 +92,8 @@ const { createCollectRanzanEvents } = require("./src/server/collectors/ranzan");
 const { createCollectMatsubushiEvents } = require("./src/server/collectors/matsubushi");
 const { createCollectMinanoEvents } = require("./src/server/collectors/minano");
 const { createCollectMoroyamaEvents } = require("./src/server/collectors/moroyama");
+const { createCollectHanyuEvents } = require("./src/server/collectors/hanyu");
+const { createCollectMisatoSaitamaEvents } = require("./src/server/collectors/misato-saitama");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -196,6 +198,7 @@ const {
   CHICHIBU_SOURCE,
   NAMEGAWA_SOURCE, RANZAN_SOURCE, MATSUBUSHI_SOURCE,
   MINANO_SOURCE, MOROYAMA_SOURCE,
+  HANYU_SOURCE, MISATO_SAITAMA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -746,6 +749,8 @@ const collectRanzanEvents = createCollectRanzanEvents({ ...geoFmDeps, source: RA
 const collectMatsubushiEvents = createCollectMatsubushiEvents({ ...geoFmDeps, source: MATSUBUSHI_SOURCE });
 const collectMinanoEvents = createCollectMinanoEvents({ ...geoFmDeps, source: MINANO_SOURCE });
 const collectMoroyamaEvents = createCollectMoroyamaEvents({ ...geoFmDeps, source: MOROYAMA_SOURCE });
+const collectHanyuEvents = createCollectHanyuEvents({ ...geoFmDeps, source: HANYU_SOURCE });
+const collectMisatoSaitamaEvents = createCollectMisatoSaitamaEvents({ ...geoFmDeps, source: MISATO_SAITAMA_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -935,6 +940,8 @@ const getEvents = createGetEvents({
   collectMatsubushiEvents,
   collectMinanoEvents,
   collectMoroyamaEvents,
+  collectHanyuEvents,
+  collectMisatoSaitamaEvents,
 });
 
 // --- HTTP server ---
