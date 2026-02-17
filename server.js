@@ -168,6 +168,7 @@ const {
   HIDAKA_SOURCE, SHIRAOKA_SOURCE, SATTE_SOURCE,
   YORII_SOURCE, SUGITO_SOURCE,
   SOKA_SOURCE, TSURUGASHIMA_SOURCE, HASUDA_SOURCE,
+  IRUMA_SOURCE, KAZO_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -692,6 +693,8 @@ const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
 const collectSokaEvents = createCollectSokaEvents({ ...geoFmDeps, source: SOKA_SOURCE });
 const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps, source: TSURUGASHIMA_SOURCE });
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
+const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php" }, geoFmDeps);
+const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE }, geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -855,6 +858,8 @@ const getEvents = createGetEvents({
   collectSokaEvents,
   collectTsurugashimaEvents,
   collectHasudaEvents,
+  collectIrumaEvents,
+  collectKazoEvents,
 });
 
 // --- HTTP server ---

@@ -1107,6 +1107,8 @@ const WARD_LABEL_BY_KEY = {
   soka: "草加市",
   tsurugashima: "鶴ヶ島市",
   hasuda: "蓮田市",
+  iruma: "入間市",
+  kazo: "加須市",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2571,6 +2573,18 @@ const HASUDA_SOURCE = {
   center: { lat: 35.9925, lng: 139.6621 },
 };
 
+const IRUMA_SOURCE = {
+  key: "iruma", label: "入間市",
+  baseUrl: "https://www.city.iruma.saitama.jp",
+  center: { lat: 35.8358, lng: 139.3911 },
+};
+
+const KAZO_SOURCE = {
+  key: "kazo", label: "加須市",
+  baseUrl: "https://www.city.kazo.lg.jp",
+  center: { lat: 36.1314, lng: 139.6019 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2831,4 +2845,6 @@ module.exports = {
   SOKA_SOURCE,
   TSURUGASHIMA_SOURCE,
   HASUDA_SOURCE,
+  IRUMA_SOURCE,
+  KAZO_SOURCE,
 };

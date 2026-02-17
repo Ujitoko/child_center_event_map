@@ -87,7 +87,7 @@ function buildGeoCandidates(venue, address, source) {
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createCalendarJsonCollector(config, deps) {
-  const { source, childKeywords } = config;
+  const { source, childKeywords, jsonPath } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -99,7 +99,7 @@ function createCalendarJsonCollector(config, deps) {
   }
 
   return async function collectCalendarJsonEvents(maxDays) {
-    const calendarUrl = `${source.baseUrl}/calendar.json`;
+    const calendarUrl = jsonPath ? `${source.baseUrl}${jsonPath}` : `${source.baseUrl}/calendar.json`;
     let entries;
     try {
       const jsonText = await fetchText(calendarUrl);

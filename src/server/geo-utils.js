@@ -189,6 +189,8 @@ function createGeoHelpers(deps) {
       soka: 10,
       tsurugashima: 10,
       hasuda: 10,
+      iruma: 15,
+      kazo: 20,
     };
     return overrides[key] || 10;
   }

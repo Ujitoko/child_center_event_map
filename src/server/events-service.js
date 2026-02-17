@@ -187,6 +187,8 @@ function createGetEvents(deps) {
     collectSokaEvents,
     collectTsurugashimaEvents,
     collectHasudaEvents,
+    collectIrumaEvents,
+    collectKazoEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -229,7 +231,7 @@ function createGetEvents(deps) {
 
   // refresh=1 (cron only): actually scrape
 
-  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, fujisawa, samukawa, aikawa, miura, oiso, hayama, nakai, kiyokawa, ninomiya, oi, yugawara, matsuda, manazuru, hakone, kaisei, yamakita, mizuho, okutama, hinode, hinohara, nagareyama, urayasu, noda, narashino, shiroi, kisarazu, isumi, tohnosho, otaki, funabashi, narita, chibaCity, kashiwa, yachiyo, asahi, kamogawa, yokoshibahikari, ichikawa, katsuura, kimitsu, kyonan, yotsukaido, matsudo, abiko, kamagaya, tomisato, shirako, kujukuri, yachimata, sodegaura, ichinomiya, choshi, sakura, futtsu, inzai, katori, togane, ichihara, sosa, sammu, sakaeChiba, mobara, tateyama, minamiboso, oamishirasato, shisui, kozaki, tako, shibayama, mutsuzawa, chosei, nagara, onjuku, chonan, kawaguchi, kasukabe, fujimino, misato, kawagoe, wako, warabi, ageo, niiza, asaka, toda, shiki, fujimi, sayama, yashio, saitamaCity, koshigaya, tokorozawa, kuki, kumagaya, kounosu, sakado, hanno, higashimatsuyama, gyoda, honjo, hidaka, shiraoka, satte, yorii, sugito, soka, tsurugashima, hasuda] = await batchCollect([
+  const [setagaya, ota, shinagawa, meguro, shibuya, minato, chiyoda, additional, hachioji, musashino, tachikawa, akishima, higashiyamato, kiyose, tama, inagi, hino, kokubunji, higashikurume, mitaka, kodaira, higashimurayama, kunitachi, ome, hamura, kawasaki, yokohama, sagamihara, ebina, kamakura, yokosuka, chigasaki, zama, zushi, yamato, hiratsuka, odawara, hadano, ayase, atsugi, isehara, minamiashigara, fujisawa, samukawa, aikawa, miura, oiso, hayama, nakai, kiyokawa, ninomiya, oi, yugawara, matsuda, manazuru, hakone, kaisei, yamakita, mizuho, okutama, hinode, hinohara, nagareyama, urayasu, noda, narashino, shiroi, kisarazu, isumi, tohnosho, otaki, funabashi, narita, chibaCity, kashiwa, yachiyo, asahi, kamogawa, yokoshibahikari, ichikawa, katsuura, kimitsu, kyonan, yotsukaido, matsudo, abiko, kamagaya, tomisato, shirako, kujukuri, yachimata, sodegaura, ichinomiya, choshi, sakura, futtsu, inzai, katori, togane, ichihara, sosa, sammu, sakaeChiba, mobara, tateyama, minamiboso, oamishirasato, shisui, kozaki, tako, shibayama, mutsuzawa, chosei, nagara, onjuku, chonan, kawaguchi, kasukabe, fujimino, misato, kawagoe, wako, warabi, ageo, niiza, asaka, toda, shiki, fujimi, sayama, yashio, saitamaCity, koshigaya, tokorozawa, kuki, kumagaya, kounosu, sakado, hanno, higashimatsuyama, gyoda, honjo, hidaka, shiraoka, satte, yorii, sugito, soka, tsurugashima, hasuda, iruma, kazo] = await batchCollect([
     () => collectSetagayaJidokanEvents(days),
     () => collectOtaJidokanEvents(days),
     () => collectShinagawaJidokanEvents(days),
@@ -380,6 +382,8 @@ function createGetEvents(deps) {
     () => collectSokaEvents(days),
     () => collectTsurugashimaEvents(days),
     () => collectHasudaEvents(days),
+    () => collectIrumaEvents(days),
+    () => collectKazoEvents(days),
   ], 5);
   const {
     chuo,
@@ -583,6 +587,8 @@ function createGetEvents(deps) {
     ...soka,
     ...tsurugashima,
     ...hasuda,
+    ...iruma,
+    ...kazo,
   ];
   const items = rawItems
     .map((ev) => {
@@ -789,6 +795,8 @@ function createGetEvents(deps) {
         city_soka: soka.length,
         city_tsurugashima: tsurugashima.length,
         city_hasuda: hasuda.length,
+        city_iruma: iruma.length,
+        city_kazo: kazo.length,
       },
     },
     items,
