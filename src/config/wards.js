@@ -1109,6 +1109,12 @@ const WARD_LABEL_BY_KEY = {
   hasuda: "蓮田市",
   iruma: "入間市",
   kazo: "加須市",
+  fukaya: "深谷市",
+  okegawa: "桶川市",
+  ogose: "越生町",
+  ogawa: "小川町",
+  yoshimi: "吉見町",
+  kamikawa: "神川町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2585,6 +2591,42 @@ const KAZO_SOURCE = {
   center: { lat: 36.1314, lng: 139.6019 },
 };
 
+const FUKAYA_SOURCE = {
+  key: "fukaya", label: "深谷市",
+  baseUrl: "https://www.city.fukaya.saitama.jp",
+  center: { lat: 36.1975, lng: 139.2815 },
+};
+
+const OKEGAWA_SOURCE = {
+  key: "okegawa", label: "桶川市",
+  baseUrl: "https://www.city.okegawa.lg.jp",
+  center: { lat: 35.9967, lng: 139.5583 },
+};
+
+const OGOSE_SOURCE = {
+  key: "ogose", label: "越生町",
+  baseUrl: "https://www.town.ogose.saitama.jp",
+  center: { lat: 35.9633, lng: 139.2939 },
+};
+
+const OGAWA_SOURCE = {
+  key: "ogawa", label: "小川町",
+  baseUrl: "https://www.town.ogawa.saitama.jp",
+  center: { lat: 36.0567, lng: 139.2619 },
+};
+
+const YOSHIMI_SOURCE = {
+  key: "yoshimi", label: "吉見町",
+  baseUrl: "https://www.town.yoshimi.saitama.jp",
+  center: { lat: 36.0411, lng: 139.4531 },
+};
+
+const KAMIKAWA_SOURCE = {
+  key: "kamikawa", label: "神川町",
+  baseUrl: "https://www.town.kamikawa.saitama.jp",
+  center: { lat: 36.1661, lng: 139.1250 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2847,4 +2889,10 @@ module.exports = {
   HASUDA_SOURCE,
   IRUMA_SOURCE,
   KAZO_SOURCE,
+  FUKAYA_SOURCE,
+  OKEGAWA_SOURCE,
+  OGOSE_SOURCE,
+  OGAWA_SOURCE,
+  YOSHIMI_SOURCE,
+  KAMIKAWA_SOURCE,
 };

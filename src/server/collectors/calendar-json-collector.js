@@ -66,7 +66,7 @@ function buildGeoCandidates(venue, address, source) {
   const pref = /tokyo\.jp/.test(source.baseUrl || "") ? "東京都"
     : /chiba\.(jp|lg\.jp)/.test(source.baseUrl || "") ? "千葉県"
     : /saitama\.jp/.test(source.baseUrl || "") ? "埼玉県"
-    : /市$/.test(source.label || "") && /kawaguchi|kasukabe|misato/.test(source.key || "") ? "埼玉県"
+    : /kawaguchi|kasukabe|misato|okegawa|kazo/.test(source.key || "") ? "埼玉県"
     : "神奈川県";
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;

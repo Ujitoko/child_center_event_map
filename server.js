@@ -169,6 +169,8 @@ const {
   YORII_SOURCE, SUGITO_SOURCE,
   SOKA_SOURCE, TSURUGASHIMA_SOURCE, HASUDA_SOURCE,
   IRUMA_SOURCE, KAZO_SOURCE,
+  FUKAYA_SOURCE, OKEGAWA_SOURCE,
+  OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -695,6 +697,12 @@ const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
 const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php" }, geoFmDeps);
 const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE }, geoFmDeps);
+const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json" }, geoFmDeps);
+const collectOkegawaEvents = createCalendarJsonCollector({ source: OKEGAWA_SOURCE }, geoFmDeps);
+const collectOgoseEvents = createCalendarJsonCollector({ source: OGOSE_SOURCE }, geoFmDeps);
+const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE }, geoFmDeps);
+const collectYoshimiEvents = createCalendarJsonCollector({ source: YOSHIMI_SOURCE }, geoFmDeps);
+const collectKamikawaEvents = createCalendarJsonCollector({ source: KAMIKAWA_SOURCE }, geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -860,6 +868,12 @@ const getEvents = createGetEvents({
   collectHasudaEvents,
   collectIrumaEvents,
   collectKazoEvents,
+  collectFukayaEvents,
+  collectOkegawaEvents,
+  collectOgoseEvents,
+  collectOgawaEvents,
+  collectYoshimiEvents,
+  collectKamikawaEvents,
 });
 
 // --- HTTP server ---
