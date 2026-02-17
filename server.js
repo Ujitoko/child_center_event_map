@@ -94,6 +94,34 @@ const { createCollectMinanoEvents } = require("./src/server/collectors/minano");
 const { createCollectMoroyamaEvents } = require("./src/server/collectors/moroyama");
 const { createCollectHanyuEvents } = require("./src/server/collectors/hanyu");
 const { createCollectMisatoSaitamaEvents } = require("./src/server/collectors/misato-saitama");
+const {
+  createCollectUtsunomiyaEvents, createCollectAshikagaEvents,
+  createCollectKanumaEvents, createCollectOyamaEvents,
+  createCollectOhtawaraEvents, createCollectTochigiSakuraEvents,
+  createCollectNasukarasuyamaEvents, createCollectShimotsukeEvents,
+  createCollectKaminokawaEvents, createCollectMashikoEvents,
+  createCollectMotegiEvents, createCollectIchikaiEvents,
+  createCollectHagaEvents, createCollectMibuEvents,
+  createCollectNogiEvents, createCollectShioyaEvents,
+  createCollectTakanezawaEvents, createCollectNasuEvents,
+  createCollectTochigiNakagawaEvents,
+} = require("./src/server/collectors/tochigi-remaining");
+const {
+  createCollectKiryuEvents, createCollectNumataEvents,
+  createCollectTatebayashiEvents, createCollectShibukawaEvents,
+  createCollectTomiokaEvents, createCollectMidoriEvents,
+  createCollectShintoEvents, createCollectYoshiokaEvents,
+  createCollectUenoGunmaEvents, createCollectKannaEvents,
+  createCollectShimonitaEvents, createCollectNanmokuEvents,
+  createCollectKanraEvents, createCollectNaganoharaEvents,
+  createCollectTsumagoiEvents, createCollectKusatsuEvents,
+  createCollectTakayamaGunmaEvents, createCollectHigashiagatsumaEvents,
+  createCollectKatashinaEvents, createCollectKawabaEvents,
+  createCollectShowaGunmaEvents, createCollectMinakamiEvents,
+  createCollectTamamuraEvents, createCollectItakuraEvents,
+  createCollectMeiwaGunmaEvents, createCollectChiyodaGunmaEvents,
+  createCollectOizumiEvents, createCollectOraEvents,
+} = require("./src/server/collectors/gunma-remaining");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -153,17 +181,20 @@ const {
   NAGAREYAMA_SOURCE, KNOWN_NAGAREYAMA_FACILITIES,
   URAYASU_SOURCE, KNOWN_URAYASU_FACILITIES,
   NODA_SOURCE, KNOWN_NODA_FACILITIES,
-  NARASHINO_SOURCE, SHIROI_SOURCE, KISARAZU_SOURCE,
+  NARASHINO_SOURCE, KNOWN_NARASHINO_FACILITIES,
+  SHIROI_SOURCE, KISARAZU_SOURCE, KNOWN_KISARAZU_FACILITIES,
   ISUMI_SOURCE, TOHNOSHO_SOURCE, OTAKI_SOURCE,
   FUNABASHI_SOURCE, KNOWN_FUNABASHI_FACILITIES,
   NARITA_SOURCE, KNOWN_NARITA_FACILITIES,
   CHIBA_CITY_SOURCE, KNOWN_CHIBA_CITY_FACILITIES,
   KASHIWA_SOURCE, KNOWN_KASHIWA_FACILITIES,
-  YACHIYO_SOURCE, ASAHI_SOURCE, KAMOGAWA_SOURCE,
-  YOKOSHIBAHIKARI_SOURCE, ICHIKAWA_SOURCE,
-  KATSUURA_SOURCE, KIMITSU_SOURCE, KYONAN_SOURCE,
+  YACHIYO_SOURCE, KNOWN_YACHIYO_FACILITIES,
+  ASAHI_SOURCE, KNOWN_ASAHI_FACILITIES,
+  KAMOGAWA_SOURCE, KNOWN_KAMOGAWA_FACILITIES,
+  YOKOSHIBAHIKARI_SOURCE, ICHIKAWA_SOURCE, KNOWN_ICHIKAWA_FACILITIES,
+  KATSUURA_SOURCE, KIMITSU_SOURCE, KYONAN_SOURCE, KNOWN_KYONAN_FACILITIES,
   YOTSUKAIDO_SOURCE, MATSUDO_SOURCE,
-  ABIKO_SOURCE, KAMAGAYA_SOURCE,
+  ABIKO_SOURCE, KNOWN_ABIKO_FACILITIES, KAMAGAYA_SOURCE,
   TOMISATO_SOURCE, SHIRAKO_SOURCE, KUJUKURI_SOURCE,
   YACHIMATA_SOURCE, SODEGAURA_SOURCE,
   ICHINOMIYA_SOURCE, CHOSHI_SOURCE,
@@ -181,13 +212,17 @@ const {
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
   WARABI_SOURCE, KNOWN_WARABI_FACILITIES,
   AGEO_SOURCE, KNOWN_AGEO_FACILITIES,
-  NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, KNOWN_TODA_FACILITIES, SHIKI_SOURCE,
-  FUJIMI_SOURCE, SAYAMA_SOURCE, YASHIO_SOURCE,
-  SAITAMA_CITY_SOURCE, KOSHIGAYA_SOURCE,
-  TOKOROZAWA_SOURCE,
+  NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, KNOWN_TODA_FACILITIES,
+  SHIKI_SOURCE, KNOWN_SHIKI_FACILITIES,
+  FUJIMI_SOURCE, KNOWN_FUJIMI_FACILITIES,
+  SAYAMA_SOURCE, KNOWN_SAYAMA_FACILITIES,
+  YASHIO_SOURCE, KNOWN_YASHIO_FACILITIES,
+  SAITAMA_CITY_SOURCE,
+  KOSHIGAYA_SOURCE, KNOWN_KOSHIGAYA_FACILITIES,
+  TOKOROZAWA_SOURCE, KNOWN_TOKOROZAWA_FACILITIES,
   KUKI_SOURCE, KNOWN_KUKI_FACILITIES,
   KUMAGAYA_SOURCE,
-  KOUNOSU_SOURCE,
+  KOUNOSU_SOURCE, KNOWN_KOUNOSU_FACILITIES,
   SAKADO_SOURCE, KNOWN_SAKADO_FACILITIES,
   HANNO_SOURCE,
   HIGASHIMATSUYAMA_SOURCE,
@@ -196,20 +231,67 @@ const {
   HIDAKA_SOURCE, KNOWN_HIDAKA_FACILITIES,
   SHIRAOKA_SOURCE, SATTE_SOURCE,
   YORII_SOURCE, SUGITO_SOURCE,
-  SOKA_SOURCE, TSURUGASHIMA_SOURCE, HASUDA_SOURCE,
+  SOKA_SOURCE, KNOWN_SOKA_FACILITIES,
+  TSURUGASHIMA_SOURCE, KNOWN_TSURUGASHIMA_FACILITIES,
+  HASUDA_SOURCE, KNOWN_HASUDA_FACILITIES,
   IRUMA_SOURCE, KNOWN_IRUMA_FACILITIES,
   KAZO_SOURCE,
   FUKAYA_SOURCE, OKEGAWA_SOURCE,
   OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
   KAMISATO_SOURCE,
-  YOSHIKAWA_SOURCE, OGANO_SOURCE, HIGASHICHICHIBU_SOURCE,
+  YOSHIKAWA_SOURCE, KNOWN_YOSHIKAWA_FACILITIES,
+  OGANO_SOURCE, HIGASHICHICHIBU_SOURCE,
   KAWAJIMA_SOURCE,
-  KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE, NAGATORO_SOURCE,
-  MIYOSHI_SAITAMA_SOURCE, HATOYAMA_SOURCE, MIYASHIRO_SOURCE,
+  KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE,
+  NAGATORO_SOURCE, KNOWN_NAGATORO_FACILITIES,
+  MIYOSHI_SAITAMA_SOURCE, KNOWN_MIYOSHI_SAITAMA_FACILITIES,
+  HATOYAMA_SOURCE, KNOWN_HATOYAMA_FACILITIES,
+  MIYASHIRO_SOURCE,
   CHICHIBU_SOURCE,
   NAMEGAWA_SOURCE, RANZAN_SOURCE, MATSUBUSHI_SOURCE,
   MINANO_SOURCE, MOROYAMA_SOURCE,
   HANYU_SOURCE, MISATO_SAITAMA_SOURCE,
+  // Tochigi
+  SANO_SOURCE, NIKKO_SOURCE, MOKA_SOURCE, NASUSHIOBARA_SOURCE,
+  TOCHIGI_CITY_SOURCE, YAITA_SOURCE,
+  KNOWN_YAITA_FACILITIES, KNOWN_NIKKO_FACILITIES,
+  KNOWN_NASUSHIOBARA_FACILITIES, KNOWN_UTSUNOMIYA_FACILITIES,
+  // Gunma
+  MAEBASHI_SOURCE, KNOWN_MAEBASHI_FACILITIES,
+  TAKASAKI_SOURCE, KNOWN_TAKASAKI_FACILITIES,
+  ISESAKI_SOURCE, KNOWN_ISESAKI_FACILITIES,
+  OTA_GUNMA_SOURCE, KNOWN_OTA_GUNMA_FACILITIES,
+  FUJIOKA_GUNMA_SOURCE, KNOWN_FUJIOKA_GUNMA_FACILITIES,
+  ANNAKA_SOURCE, KNOWN_ANNAKA_FACILITIES,
+  NAKANOJO_SOURCE, KNOWN_NAKANOJO_FACILITIES,
+  KIRYU_SOURCE, KNOWN_KIRYU_FACILITIES,
+  NUMATA_SOURCE, KNOWN_NUMATA_FACILITIES,
+  TATEBAYASHI_SOURCE, KNOWN_TATEBAYASHI_FACILITIES,
+  SHIBUKAWA_SOURCE, KNOWN_SHIBUKAWA_FACILITIES,
+  TOMIOKA_SOURCE, KNOWN_TOMIOKA_FACILITIES,
+  MIDORI_SOURCE, KNOWN_MIDORI_FACILITIES,
+  SHINTO_SOURCE, KNOWN_SHINTO_FACILITIES,
+  YOSHIOKA_SOURCE, KNOWN_YOSHIOKA_FACILITIES,
+  UENO_GUNMA_SOURCE, KNOWN_UENO_GUNMA_FACILITIES,
+  KANNA_SOURCE, KNOWN_KANNA_FACILITIES,
+  SHIMONITA_SOURCE, KNOWN_SHIMONITA_FACILITIES,
+  NANMOKU_SOURCE, KNOWN_NANMOKU_FACILITIES,
+  KANRA_SOURCE, KNOWN_KANRA_FACILITIES,
+  NAGANOHARA_SOURCE, KNOWN_NAGANOHARA_FACILITIES,
+  TSUMAGOI_SOURCE, KNOWN_TSUMAGOI_FACILITIES,
+  KUSATSU_SOURCE, KNOWN_KUSATSU_FACILITIES,
+  TAKAYAMA_GUNMA_SOURCE, KNOWN_TAKAYAMA_GUNMA_FACILITIES,
+  HIGASHIAGATSUMA_SOURCE, KNOWN_HIGASHIAGATSUMA_FACILITIES,
+  KATASHINA_SOURCE, KNOWN_KATASHINA_FACILITIES,
+  KAWABA_SOURCE, KNOWN_KAWABA_FACILITIES,
+  SHOWA_GUNMA_SOURCE, KNOWN_SHOWA_GUNMA_FACILITIES,
+  MINAKAMI_SOURCE, KNOWN_MINAKAMI_FACILITIES,
+  TAMAMURA_SOURCE, KNOWN_TAMAMURA_FACILITIES,
+  ITAKURA_SOURCE, KNOWN_ITAKURA_FACILITIES,
+  MEIWA_SOURCE, KNOWN_MEIWA_FACILITIES,
+  CHIYODA_GUNMA_SOURCE, KNOWN_CHIYODA_GUNMA_FACILITIES,
+  OIZUMI_SOURCE, KNOWN_OIZUMI_FACILITIES,
+  ORA_SOURCE, KNOWN_ORA_FACILITIES,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -474,6 +556,30 @@ for (const [name, address] of Object.entries(KNOWN_CHIBA_CITY_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_KASHIWA_FACILITIES)) {
   setFacilityAddressToMaster("kashiwa", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_KISARAZU_FACILITIES)) {
+  setFacilityAddressToMaster("kisarazu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ICHIKAWA_FACILITIES)) {
+  setFacilityAddressToMaster("ichikawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KAMOGAWA_FACILITIES)) {
+  setFacilityAddressToMaster("kamogawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ABIKO_FACILITIES)) {
+  setFacilityAddressToMaster("abiko", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NARASHINO_FACILITIES)) {
+  setFacilityAddressToMaster("narashino", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ASAHI_FACILITIES)) {
+  setFacilityAddressToMaster("asahi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_YACHIYO_FACILITIES)) {
+  setFacilityAddressToMaster("yachiyo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KYONAN_FACILITIES)) {
+  setFacilityAddressToMaster("kyonan", name, address);
+}
 for (const [name, address] of Object.entries(KNOWN_KAWAGOE_FACILITIES)) {
   setFacilityAddressToMaster("kawagoe", name, address);
 }
@@ -512,6 +618,140 @@ for (const [name, address] of Object.entries(KNOWN_HIDAKA_FACILITIES)) {
 }
 for (const [name, address] of Object.entries(KNOWN_IRUMA_FACILITIES)) {
   setFacilityAddressToMaster("iruma", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SOKA_FACILITIES)) {
+  setFacilityAddressToMaster("soka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TSURUGASHIMA_FACILITIES)) {
+  setFacilityAddressToMaster("tsurugashima", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_YOSHIKAWA_FACILITIES)) {
+  setFacilityAddressToMaster("yoshikawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_YASHIO_FACILITIES)) {
+  setFacilityAddressToMaster("yashio", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_FUJIMI_FACILITIES)) {
+  setFacilityAddressToMaster("fujimi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SHIKI_FACILITIES)) {
+  setFacilityAddressToMaster("shiki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MIYOSHI_SAITAMA_FACILITIES)) {
+  setFacilityAddressToMaster("miyoshi_saitama", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KOSHIGAYA_FACILITIES)) {
+  setFacilityAddressToMaster("koshigaya", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HATOYAMA_FACILITIES)) {
+  setFacilityAddressToMaster("hatoyama", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NAGATORO_FACILITIES)) {
+  setFacilityAddressToMaster("nagatoro", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SAYAMA_FACILITIES)) {
+  setFacilityAddressToMaster("sayama", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KOUNOSU_FACILITIES)) {
+  setFacilityAddressToMaster("kounosu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TOKOROZAWA_FACILITIES)) {
+  setFacilityAddressToMaster("tokorozawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HASUDA_FACILITIES)) {
+  setFacilityAddressToMaster("hasuda", name, address);
+}
+// --- Gunma KNOWN_FACILITIES ---
+for (const [name, address] of Object.entries(KNOWN_MAEBASHI_FACILITIES)) {
+  setFacilityAddressToMaster("maebashi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TAKASAKI_FACILITIES)) {
+  setFacilityAddressToMaster("takasaki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KIRYU_FACILITIES)) {
+  setFacilityAddressToMaster("kiryu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ISESAKI_FACILITIES)) {
+  setFacilityAddressToMaster("isesaki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_OTA_GUNMA_FACILITIES)) {
+  setFacilityAddressToMaster("ota_gunma", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NUMATA_FACILITIES)) {
+  setFacilityAddressToMaster("numata", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TATEBAYASHI_FACILITIES)) {
+  setFacilityAddressToMaster("tatebayashi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SHIBUKAWA_FACILITIES)) {
+  setFacilityAddressToMaster("shibukawa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_FUJIOKA_GUNMA_FACILITIES)) {
+  setFacilityAddressToMaster("fujioka_gunma", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TOMIOKA_FACILITIES)) {
+  setFacilityAddressToMaster("tomioka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ANNAKA_FACILITIES)) {
+  setFacilityAddressToMaster("annaka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MIDORI_FACILITIES)) {
+  setFacilityAddressToMaster("midori", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SHINTO_FACILITIES)) {
+  setFacilityAddressToMaster("shinto", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_YOSHIOKA_FACILITIES)) {
+  setFacilityAddressToMaster("yoshioka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KANRA_FACILITIES)) {
+  setFacilityAddressToMaster("kanra", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NAKANOJO_FACILITIES)) {
+  setFacilityAddressToMaster("nakanojo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KUSATSU_FACILITIES)) {
+  setFacilityAddressToMaster("kusatsu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HIGASHIAGATSUMA_FACILITIES)) {
+  setFacilityAddressToMaster("higashiagatsuma", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MINAKAMI_FACILITIES)) {
+  setFacilityAddressToMaster("minakami", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TAMAMURA_FACILITIES)) {
+  setFacilityAddressToMaster("tamamura", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ITAKURA_FACILITIES)) {
+  setFacilityAddressToMaster("itakura", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MEIWA_FACILITIES)) {
+  setFacilityAddressToMaster("meiwa", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_CHIYODA_GUNMA_FACILITIES)) {
+  setFacilityAddressToMaster("chiyoda_gunma", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_OIZUMI_FACILITIES)) {
+  setFacilityAddressToMaster("oizumi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ORA_FACILITIES)) {
+  setFacilityAddressToMaster("ora", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SHIMONITA_FACILITIES)) {
+  setFacilityAddressToMaster("shimonita", name, address);
+}
+// Tochigi KNOWN_FACILITIES
+for (const [name, address] of Object.entries(KNOWN_YAITA_FACILITIES)) {
+  setFacilityAddressToMaster("yaita", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NIKKO_FACILITIES)) {
+  setFacilityAddressToMaster("nikko", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_NASUSHIOBARA_FACILITIES)) {
+  setFacilityAddressToMaster("nasushiobara", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_UTSUNOMIYA_FACILITIES)) {
+  setFacilityAddressToMaster("utsunomiya", name, address);
 }
 
 // --- Shared deps for collectors ---
@@ -792,6 +1032,75 @@ const collectMinanoEvents = createCollectMinanoEvents({ ...geoFmDeps, source: MI
 const collectMoroyamaEvents = createCollectMoroyamaEvents({ ...geoFmDeps, source: MOROYAMA_SOURCE });
 const collectHanyuEvents = createCollectHanyuEvents({ ...geoFmDeps, source: HANYU_SOURCE });
 const collectMisatoSaitamaEvents = createCollectMisatoSaitamaEvents({ ...geoFmDeps, source: MISATO_SAITAMA_SOURCE });
+// --- 栃木県 calendar-json-collector ---
+const collectSanoEvents = createCalendarJsonCollector({ source: SANO_SOURCE }, geoFmDeps);
+const collectNikkoEvents = createCalendarJsonCollector({ source: NIKKO_SOURCE }, geoFmDeps);
+const collectMokaEvents = createCalendarJsonCollector({ source: MOKA_SOURCE }, geoFmDeps);
+const collectNasushiobaraEvents = createCalendarJsonCollector({ source: NASUSHIOBARA_SOURCE }, geoFmDeps);
+// --- 栃木県 municipal-calendar-collector ---
+const collectTochigiCityEvents = createMunicipalCalendarCollector({ source: TOCHIGI_CITY_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectYaitaEvents = createMunicipalCalendarCollector({ source: YAITA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+// --- 栃木県 custom ---
+const collectUtsunomiyaEvents = createCollectUtsunomiyaEvents(geoFmDeps);
+const collectAshikagaEvents = createCollectAshikagaEvents(geoFmDeps);
+const collectKanumaEvents = createCollectKanumaEvents(geoFmDeps);
+const collectOyamaEvents = createCollectOyamaEvents(geoFmDeps);
+const collectOhtawaraEvents = createCollectOhtawaraEvents(geoFmDeps);
+const collectTochigiSakuraEvents = createCollectTochigiSakuraEvents(geoFmDeps);
+const collectNasukarasuyamaEvents = createCollectNasukarasuyamaEvents(geoFmDeps);
+const collectShimotsukeEvents = createCollectShimotsukeEvents(geoFmDeps);
+const collectKaminokawaEvents = createCollectKaminokawaEvents(geoFmDeps);
+const collectMashikoEvents = createCollectMashikoEvents(geoFmDeps);
+const collectMotegiEvents = createCollectMotegiEvents(geoFmDeps);
+const collectIchikaiEvents = createCollectIchikaiEvents(geoFmDeps);
+const collectHagaEvents = createCollectHagaEvents(geoFmDeps);
+const collectMibuEvents = createCollectMibuEvents(geoFmDeps);
+const collectNogiEvents = createCollectNogiEvents(geoFmDeps);
+const collectShioyaEvents = createCollectShioyaEvents(geoFmDeps);
+const collectTakanezawaEvents = createCollectTakanezawaEvents(geoFmDeps);
+const collectNasuEvents = createCollectNasuEvents(geoFmDeps);
+const collectTochigiNakagawaEvents = createCollectTochigiNakagawaEvents(geoFmDeps);
+// --- 群馬県 calendar-json-collector ---
+const collectMaebashiEvents = createCalendarJsonCollector({ source: MAEBASHI_SOURCE }, geoFmDeps);
+const collectIsesakiEvents = createCalendarJsonCollector({ source: ISESAKI_SOURCE }, geoFmDeps);
+const collectFujiokaGunmaEvents = createCalendarJsonCollector({ source: FUJIOKA_GUNMA_SOURCE }, geoFmDeps);
+// --- 群馬県 municipal-calendar-collector ---
+const collectTakasakiEvents = createMunicipalCalendarCollector({ source: TAKASAKI_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectOtaGunmaEvents = createMunicipalCalendarCollector({ source: OTA_GUNMA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectAnnakaEvents = createMunicipalCalendarCollector({ source: ANNAKA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectNakanojoEvents = createMunicipalCalendarCollector({ source: NAKANOJO_SOURCE, childCategoryIndex: null }, geoFmDeps);
+// --- 群馬県 custom ---
+const collectKiryuEvents = createEventJsCollector({
+  source: KIRYU_SOURCE, jsFile: "city_event.js",
+  useKeywordFilter: true, knownFacilities: KNOWN_KIRYU_FACILITIES,
+}, eventJsDeps);
+const collectNumataEvents = createCollectNumataEvents(geoFmDeps);
+const collectTatebayashiEvents = createCollectTatebayashiEvents(geoFmDeps);
+const collectShibukawaEvents = createCollectShibukawaEvents(geoFmDeps);
+const collectTomiokaEvents = createCollectTomiokaEvents(geoFmDeps);
+const collectMidoriEvents = createCollectMidoriEvents(geoFmDeps);
+const collectShintoEvents = createCollectShintoEvents(geoFmDeps);
+const collectYoshiokaEvents = createCollectYoshiokaEvents(geoFmDeps);
+const collectUenoGunmaEvents = createCollectUenoGunmaEvents(geoFmDeps);
+const collectKannaEvents = createCollectKannaEvents(geoFmDeps);
+const collectShimonitaEvents = createCollectShimonitaEvents(geoFmDeps);
+const collectNanmokuEvents = createCollectNanmokuEvents(geoFmDeps);
+const collectKanraEvents = createCollectKanraEvents(geoFmDeps);
+const collectNaganoharaEvents = createCollectNaganoharaEvents(geoFmDeps);
+const collectTsumagoiEvents = createCollectTsumagoiEvents(geoFmDeps);
+const collectKusatsuEvents = createCollectKusatsuEvents(geoFmDeps);
+const collectTakayamaGunmaEvents = createCollectTakayamaGunmaEvents(geoFmDeps);
+const collectHigashiagatsumaEvents = createCollectHigashiagatsumaEvents(geoFmDeps);
+const collectKatashinaEvents = createCollectKatashinaEvents(geoFmDeps);
+const collectKawabaEvents = createCollectKawabaEvents(geoFmDeps);
+const collectShowaGunmaEvents = createCollectShowaGunmaEvents(geoFmDeps);
+const collectMinakamiEvents = createCollectMinakamiEvents(geoFmDeps);
+const collectTamamuraEvents = createCollectTamamuraEvents(geoFmDeps);
+const collectItakuraEvents = createCollectItakuraEvents(geoFmDeps);
+const collectMeiwaGunmaEvents = createCollectMeiwaGunmaEvents(geoFmDeps);
+const collectChiyodaGunmaEvents = createCollectChiyodaGunmaEvents(geoFmDeps);
+const collectOizumiEvents = createCollectOizumiEvents(geoFmDeps);
+const collectOraEvents = createCollectOraEvents(geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -983,6 +1292,68 @@ const getEvents = createGetEvents({
   collectMoroyamaEvents,
   collectHanyuEvents,
   collectMisatoSaitamaEvents,
+  // Tochigi
+  collectSanoEvents,
+  collectNikkoEvents,
+  collectMokaEvents,
+  collectNasushiobaraEvents,
+  collectTochigiCityEvents,
+  collectYaitaEvents,
+  collectUtsunomiyaEvents,
+  collectAshikagaEvents,
+  collectKanumaEvents,
+  collectOyamaEvents,
+  collectOhtawaraEvents,
+  collectTochigiSakuraEvents,
+  collectNasukarasuyamaEvents,
+  collectShimotsukeEvents,
+  collectKaminokawaEvents,
+  collectMashikoEvents,
+  collectMotegiEvents,
+  collectIchikaiEvents,
+  collectHagaEvents,
+  collectMibuEvents,
+  collectNogiEvents,
+  collectShioyaEvents,
+  collectTakanezawaEvents,
+  collectNasuEvents,
+  collectTochigiNakagawaEvents,
+  // Gunma
+  collectMaebashiEvents,
+  collectIsesakiEvents,
+  collectFujiokaGunmaEvents,
+  collectTakasakiEvents,
+  collectOtaGunmaEvents,
+  collectAnnakaEvents,
+  collectNakanojoEvents,
+  collectKiryuEvents,
+  collectNumataEvents,
+  collectTatebayashiEvents,
+  collectShibukawaEvents,
+  collectTomiokaEvents,
+  collectMidoriEvents,
+  collectShintoEvents,
+  collectYoshiokaEvents,
+  collectUenoGunmaEvents,
+  collectKannaEvents,
+  collectShimonitaEvents,
+  collectNanmokuEvents,
+  collectKanraEvents,
+  collectNaganoharaEvents,
+  collectTsumagoiEvents,
+  collectKusatsuEvents,
+  collectTakayamaGunmaEvents,
+  collectHigashiagatsumaEvents,
+  collectKatashinaEvents,
+  collectKawabaEvents,
+  collectShowaGunmaEvents,
+  collectMinakamiEvents,
+  collectTamamuraEvents,
+  collectItakuraEvents,
+  collectMeiwaGunmaEvents,
+  collectChiyodaGunmaEvents,
+  collectOizumiEvents,
+  collectOraEvents,
 });
 
 // --- HTTP server ---

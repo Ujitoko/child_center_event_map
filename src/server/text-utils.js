@@ -55,6 +55,9 @@ function sanitizeVenueText(value) {
   text = text.replace(/\s*[（(](?:令和\d+年|20\d{2}年)\d{1,2}月.*/, "");
   // Truncate at parenthesized descriptions: （無料で...) etc.
   text = text.replace(/[（(](?:無料|有料|予約|申込|当日|詳細|参加)[^）)]{0,80}[）)].*/, "");
+  // Strip parenthesized sub-location/room suffixes: （サブイベントエリア）, （市民ホール）, （大ホール）
+  text = text.replace(/[（(](?:サブ|メイン|第?\d*)?(?:イベント)?(?:エリア|ホール|ルーム|スペース|ロビー|ギャラリー|スタジオ|フロア|アリーナ|コート|広場|アトリウム)[）)]/g, "");
+  text = text.replace(/[（(](?:市民|大|小|中|第?\d+)?(?:ホール|会議室|展示室|研修室|多目的室|和室|集会室|体育室|遊戯室|講堂)[）)]/g, "");
   // Strip floor+room suffixes (戸田市等: "あいパル2階 和室", "中央図書館2階視聴覚室")
   text = text.replace(/\d+階[\s\S]*$/, "").trim();
   // Strip room/floor suffixes after facility name (上尾市、川越市 etc.)
@@ -132,6 +135,8 @@ function sanitizeVenueText(value) {
   text = text.replace(/\s*(?:をご覧ください|をご利用ください|をご参照ください|をご用意ください|をご確認ください).*/, "");
   // Reject text that reads as instructions, not venue names
   if (/(?:ください|をご覧$|します[。]?$)/.test(text)) return "";
+  // Reject sentence fragments ending with verb/particle patterns (not venue names)
+  if (/(?:開催の|についての|についてを|による|に伴う|ための|に関する|からの|への|での|としての|における|ました|ません|しています|されています|されました|しました|いたします)$/.test(text)) return "";
   // Reject pure online/virtual venue text (no physical location)
   if (/^(?:オンライン|Zoom|YouTube|Web)$/i.test(text)) return "";
   if (/^(?:YouTubeを利用|Webオンライン|ハイブリ[ッ]?ト)/.test(text)) return "";

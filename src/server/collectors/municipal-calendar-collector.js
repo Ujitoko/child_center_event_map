@@ -197,14 +197,38 @@ function detectPrefecture(source) {
   if (/chiba\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "千葉県";
   if (/tokyo\.jp/.test(source.baseUrl || "")) return "東京都";
   if (/saitama\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "埼玉県";
-  if (/ageo|niiza|asaka|shiki/.test(source.key || "")) return "埼玉県";
+  if (/gunma\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "群馬県";
+  if (/tochigi\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "栃木県";
+  if (/ageo|niiza|asaka|shiki|sakado|sugito|higashimatsuyama|yorii|kounosu/.test(source.key || "")) return "埼玉県";
+  if (/yachiyo|asahi|kamogawa|katsuura|kimitsu|kyonan|yokoshibahikari/.test(source.key || "")) return "千葉県";
+  if (/takasaki|ota_gunma|annaka|nakanojo/.test(source.key || "")) return "群馬県";
+  if (/tochigi_city|yaita/.test(source.key || "")) return "栃木県";
   return "神奈川県";
+}
+
+function extractEmbeddedAddressFromVenue(venue, cityName, pref) {
+  if (!venue) return [];
+  const results = [];
+  const parenMatches = venue.match(/[（(]([^）)]{3,60})[）)]/g) || [];
+  for (const m of parenMatches) {
+    const inner = m.slice(1, -1);
+    if (/[0-9０-９]+[-ー－][0-9０-９]+|[0-9０-９]+番地|[0-9０-９]+丁目/.test(inner)) {
+      let addr = new RegExp(pref).test(inner) ? inner
+        : inner.includes(cityName) ? `${pref}${inner}`
+        : `${pref}${cityName}${inner}`;
+      results.push(addr);
+    }
+  }
+  return results;
 }
 
 function buildGeoCandidates(venue, address, source) {
   const candidates = [];
   const cityName = source.label;
   const pref = detectPrefecture(source);
+  // 会場テキスト内の括弧住所を抽出（最優先）
+  const embeddedAddrs = extractEmbeddedAddressFromVenue(venue, cityName, pref);
+  for (const ea of embeddedAddrs) candidates.push(ea);
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;
     candidates.push(`${pref}${full}`);
@@ -367,7 +391,17 @@ function createMunicipalCalendarCollector(config, deps) {
         }
       }
 
-      const rawAddress = sanitizeAddressText((detail && detail.address) || "");
+      // venue内の括弧住所パターンを抽出 (例: "旭市保健センター（旭市横根3520番地）")
+      let venueExtractedAddress = "";
+      if (venue) {
+        const parenAddr = venue.match(/[（(]([^）)]*(?:市|町|村|区)[^）)]*\d+[^）)]*)[）)]/);
+        if (parenAddr) {
+          venueExtractedAddress = parenAddr[1].replace(/番地/g, "").trim();
+          venue = venue.replace(/[（(][^）)]*[）)]/, "").trim();
+        }
+      }
+
+      const rawAddress = sanitizeAddressText((detail && detail.address) || venueExtractedAddress || "");
 
       // 時間: カレンダーページの開催時間を優先、なければ詳細ページから
       let timeRange = ev.timeText ? parseTimeRangeFromText(ev.timeText) : null;

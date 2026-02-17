@@ -61,8 +61,9 @@ function createGeoHelpers(deps) {
 
   function isLikelyLocalPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    // 東京都 + 神奈川県 + 千葉県 + 埼玉県全域をカバー (湯河原町 35.14 ～ 本庄市 36.25)
-    return point.lat >= 34.9 && point.lat <= 36.3 && point.lng >= 139.0 && point.lng <= 140.9;
+    // 東京都 + 神奈川県 + 千葉県 + 埼玉県 + 群馬県 + 栃木県全域をカバー
+    // (南: 湯河原町 35.14, 北: 那須町 37.12, 西: 嬬恋村 138.48, 東: 銚子市 140.87)
+    return point.lat >= 34.9 && point.lat <= 37.2 && point.lng >= 138.4 && point.lng <= 140.9;
   }
 
   function isNearWardCenter(point, wardCenter, maxKm) {
@@ -215,10 +216,13 @@ function createGeoHelpers(deps) {
     const addr = String(point.address).trim();
     // 東京都の区市のみ (「東京都世田谷区」のような市区単位の結果を除外)
     if (/^東京都[^\s\d丁番号区市]+[区市]$/.test(addr)) return true;
-    // 神奈川県の市町村のみ (「神奈川県鎌倉市」「神奈川県中郡二宮町」のような自治体単位の結果を除外)
-    if (/^神奈川県[^\s\d丁番号]+[市町村]$/.test(addr)) return true;
-    // 埼玉県の市町村のみ
-    if (/^埼玉県[^\s\d丁番号]+[市町村]$/.test(addr)) return true;
+    // 神奈川/埼玉/千葉/群馬/栃木の自治体単位のみ除外
+    // [^\s\d丁番号市町村] で市町村文字を除外し、「XX市YY町」のような町域結果を誤って除外しない
+    if (/^神奈川県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^埼玉県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^千葉県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^群馬県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^栃木県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     return false;
   }
 

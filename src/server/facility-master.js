@@ -33,11 +33,14 @@ function createFacilityMaster(deps) {
     const venueNorm = normalizeFacilityName(venueName);
     const prefix = `${String(sourceKey || "").trim()}:`;
     // Strip room/floor suffixes for retry: "○○児童館 プレイルーム" → "○○児童館"
-    const roomSuffixRe = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室)$/;
+    const roomSuffixRe = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室|幼児児童コーナー|フリースペース)$/;
     const venueStripped = venueNorm
       .replace(roomSuffixRe, "")
       .replace(/\d+階.*$/, "")
-      .replace(/地下?\d*階.*$/, "");
+      .replace(/地下?\d*階.*$/, "")
+      .replace(/[ぁ-んァ-ヶー]{2,6}のへや$/, "")  // "ぞうのへや", "ぱんだのへや" etc.
+      .replace(/内$/, "")  // "○○センター内" → "○○センター"
+      .replace(/[・]$/, "");  // trailing nakaguro
     for (const [mk, addr] of facilityAddressMaster.entries()) {
       if (!mk.startsWith(prefix)) continue;
       const facName = mk.slice(prefix.length);
@@ -67,11 +70,14 @@ function createFacilityMaster(deps) {
     // Partial match with room/floor suffix stripping
     const venueNorm = normalizeFacilityName(venueName);
     const prefix = `${String(sourceKey || "").trim()}:`;
-    const roomSuffixRe2 = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室)$/;
+    const roomSuffixRe2 = /(?:プレイルーム|プレイホール|遊戯室|工作室|体育室|図書室|会議室|集会室|講座室|保育室|和室|多目的室|研修室|料理室|活動室|ラウンジ|ホール|小ホール|大ホール|子ども室|環境実習室|団体室|講堂|第?\d+[・\d]*展示室|幼児児童コーナー|フリースペース)$/;
     const venueStripped = venueNorm
       .replace(roomSuffixRe2, "")
       .replace(/\d+階.*$/, "")
-      .replace(/地下?\d*階.*$/, "");
+      .replace(/地下?\d*階.*$/, "")
+      .replace(/[ぁ-んァ-ヶー]{2,6}のへや$/, "")
+      .replace(/内$/, "")
+      .replace(/[・]$/, "");
     for (const [mk, pt] of facilityPointMaster.entries()) {
       if (!mk.startsWith(prefix)) continue;
       const facName = mk.slice(prefix.length);
@@ -111,11 +117,8 @@ function createFacilityMaster(deps) {
     const label = sourceOrCenter?.label || WARD_LABEL_BY_KEY[sourceKey] || "";
     const addr = sanitizeAddressText(point?.address || "");
     if (!addr) return "";
-    if (!/東京都/.test(addr)) return "";
-    if (label) {
-      const ward = (addr.match(/([^\s\u3000]{2,8}区)/u) || [])[1] || "";
-      if (ward && ward !== label) return "";
-    }
+    if (!/^(?:東京都|神奈川県|埼玉県|千葉県|群馬県|栃木県)/.test(addr)) return "";
+    if (label && !addr.includes(label)) return "";
     return addr;
   }
 

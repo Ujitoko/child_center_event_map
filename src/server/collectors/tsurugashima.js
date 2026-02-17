@@ -69,6 +69,27 @@ function parseDetailBlock(html, evIndex) {
     }
   }
 
+  // dt/dd フォールバック
+  if (!venue) {
+    const ddRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
+    let dm;
+    while ((dm = ddRe.exec(block)) !== null) {
+      const k = stripTags(dm[1]).trim();
+      const v = stripTags(dm[2]).trim();
+      if (!k || !v) continue;
+      if (!venue && /^(?:会場|場所|開催場所|ところ)$/.test(k)) venue = v;
+    }
+  }
+  // テキストベースのフォールバック
+  if (!venue) {
+    const blockPlain = stripTags(block);
+    const placeMatch = blockPlain.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+    if (placeMatch) {
+      let v = placeMatch[1].trim().replace(/\s*(?:住所|駐車|参加|申込|持ち物|対象|定員|電話|内容|問い合わせ|日時|費用|備考).*$/, "").trim();
+      if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) venue = v;
+    }
+  }
+
   // 鶴ヶ島市の住所パターン
   const blockText = stripTags(block);
   const addrMatch = blockText.match(/鶴ヶ島市[^\s、。,）)]{2,30}/);

@@ -92,6 +92,33 @@ function parseDetailMeta(html) {
     }
   }
 
+  // td+strong パターン: ヘッダが <td><strong>場所</strong></td> の場合
+  if (!venue) {
+    const strongHeaderRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let headerCols = null;
+    let sm;
+    while ((sm = strongHeaderRe.exec(html)) !== null) {
+      const row = sm[1];
+      const tdRe = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+      const cells = [];
+      let cm;
+      while ((cm = tdRe.exec(row)) !== null) {
+        cells.push(stripTags(cm[1]).trim());
+      }
+      if (!headerCols && cells.some(c => venueKeyRe.test(c)) && /<strong>/.test(row)) {
+        headerCols = cells;
+        continue;
+      }
+      if (headerCols && cells.length === headerCols.length) {
+        const venueIdx = headerCols.findIndex(c => venueKeyRe.test(c));
+        if (venueIdx >= 0 && cells[venueIdx] && cells[venueIdx].length >= 2) {
+          venue = cells[venueIdx];
+          break;
+        }
+      }
+    }
+  }
+
   // h2/h3/h4 見出しパターン: 「場所」「会場」「ところ」の直後テキスト
   if (!venue) {
     const headingRe = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi;

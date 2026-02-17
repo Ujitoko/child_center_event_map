@@ -77,7 +77,7 @@ function hasNextPage(html) {
 }
 
 function createCollectIchikawaEvents(deps) {
-  const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const source = ICHIKAWA_SOURCE;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -114,10 +114,40 @@ function createCollectIchikawaEvents(deps) {
     for (const ev of uniqueEvents) {
       if (!inRangeJst(ev.y, ev.mo, ev.d, maxDays)) continue;
 
-      const venue = ev.venue;
+      let venue = ev.venue;
+      // 「保健センター・医療施設」等 → ・以降のカテゴリを切り捨て
+      if (venue && /・/.test(venue)) venue = venue.split("・")[0].trim();
+      // 非施設名パターンを除外
+      if (venue && /^(令和\d+年|子育て支援|子育て相談|育児相談)/.test(venue)) venue = "";
+      // 教室名・事業名は施設名ではないので除外
+      if (venue && /教室|相談|講座|健診|セミナー|イベント/.test(venue)) venue = "";
+
+      // venue空の場合、タイトルからfallback抽出
+      if (!venue && ev.title) {
+        // 1) 《施設名》ブラケットから抽出 (例: 《市川市保健センター》)
+        const angleBracket = ev.title.match(/《([^》]+)》/);
+        if (angleBracket) {
+          let v = angleBracket[1].trim();
+          // "市川市" prefix を除去してKNOWN_ICHIKAWAマッチしやすくする
+          v = v.replace(/^市川市/, "");
+          venue = sanitizeVenueText(v);
+        }
+        // 2) タイトルからこども館名を抽出 (例: "南八幡こども館 2月 あつまれ赤ちゃん")
+        if (!venue) {
+          const kodomokan = ev.title.match(/([\p{Script=Han}\p{Script=Hiragana}ー]+こども館)/u);
+          if (kodomokan) venue = kodomokan[1];
+        }
+      }
 
       // ジオコーディング
       const candidates = [];
+      if (getFacilityAddressFromMaster && venue) {
+        const fmAddr = getFacilityAddressFromMaster(source.key, venue);
+        if (fmAddr) {
+          const full = /千葉県/.test(fmAddr) ? fmAddr : `千葉県${fmAddr}`;
+          candidates.push(full);
+        }
+      }
       if (venue) {
         candidates.push(`千葉県${label} ${venue}`);
       }

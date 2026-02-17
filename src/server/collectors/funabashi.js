@@ -110,6 +110,11 @@ function createCollectFunabashiEvents(deps) {
       const detailVenue = sanitizeVenueText((detail && detail.meta && detail.meta.venue) || "");
       let venue = jsonVenue || detailVenue;
       venue = venue.replace(/\s*\d*階.*$/, "").trim();
+      // パンくずナビ「トップ > 施設 > …」等を除外
+      if (/トップ/.test(venue) || /^[>＞]/.test(venue)) venue = "";
+      venue = venue.replace(/^.*[>＞]\s*/, "").trim();
+      // breadcrumb除外後にvenueが空になった場合、detailVenueにfallback
+      if (!venue && detailVenue) venue = detailVenue;
 
       const rawAddress = sanitizeAddressText((detail && detail.meta && detail.meta.address) || "");
       const timeRange = detail ? detail.timeRange : null;

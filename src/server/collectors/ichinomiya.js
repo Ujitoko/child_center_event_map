@@ -1,5 +1,5 @@
 const { fetchText } = require("../fetch-utils");
-const { stripTags } = require("../html-utils");
+const { stripTags, parseDetailMeta } = require("../html-utils");
 const {
   inRangeJst,
   parseYmdFromJst,
@@ -128,16 +128,18 @@ function createCollectIchinomiyaEvents(deps) {
       const results = await Promise.allSettled(
         batch.map(async (url) => {
           const html = await fetchText(url);
-          let venue = "";
-          let address = "";
-          const metaRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
-          let mm;
-          while ((mm = metaRe.exec(html)) !== null) {
-            const k = stripTags(mm[1]);
-            const v = stripTags(mm[2]);
-            if (!k || !v) continue;
-            if (!venue && /(会場|開催場所|場所)/.test(k)) venue = v;
-            if (!address && /(住所|所在地)/.test(k)) address = v;
+          const meta = parseDetailMeta(html);
+          let venue = meta.venue || "";
+          let address = meta.address || "";
+          // テキストベースのフォールバック
+          if (!venue) {
+            const plainText = stripTags(html);
+            const placeMatch = plainText.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              v = v.replace(/\s*(?:住所|郵便番号|駐車|大きな地図|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考|注意|詳細).*$/, "").trim();
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) venue = v;
+            }
           }
           const timeRange = parseTimeRangeFromText(stripTags(html));
           return { url, venue, address, timeRange };

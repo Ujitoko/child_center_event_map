@@ -60,14 +60,42 @@ function expandDateRange(startStr, endStr) {
 /**
  * ジオコーディング候補リストを構築
  */
+function detectPrefecture(source) {
+  if (/tokyo\.jp/.test(source.baseUrl || "")) return "東京都";
+  if (/chiba\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "千葉県";
+  if (/saitama\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "埼玉県";
+  if (/gunma\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "群馬県";
+  if (/tochigi\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "栃木県";
+  if (/kawaguchi|kasukabe|misato|okegawa|kazo|hanno|gyoda|honjo|hidaka|shiraoka|satte|iruma|fukaya|ogose|ogawa|yoshimi|kamikawa|namegawa/.test(source.key || "")) return "埼玉県";
+  if (/narashino|kisarazu|isumi|sakura|sosa|sammu|shiroi|tohnosho|otaki|ichihara|sakae_chiba/.test(source.key || "")) return "千葉県";
+  if (/maebashi|isesaki|fujioka_gunma/.test(source.key || "")) return "群馬県";
+  if (/sano|nikko|moka|nasushiobara/.test(source.key || "")) return "栃木県";
+  return "神奈川県";
+}
+
+function extractEmbeddedAddressFromVenue(venue, cityName, pref) {
+  if (!venue) return [];
+  const results = [];
+  const parenMatches = venue.match(/[（(]([^）)]{3,60})[）)]/g) || [];
+  for (const m of parenMatches) {
+    const inner = m.slice(1, -1);
+    if (/[0-9０-９]+[-ー－][0-9０-９]+|[0-9０-９]+番地|[0-9０-９]+丁目/.test(inner)) {
+      let addr = new RegExp(pref).test(inner) ? inner
+        : inner.includes(cityName) ? `${pref}${inner}`
+        : `${pref}${cityName}${inner}`;
+      results.push(addr);
+    }
+  }
+  return results;
+}
+
 function buildGeoCandidates(venue, address, source) {
   const candidates = [];
   const cityName = source.label;
-  const pref = /tokyo\.jp/.test(source.baseUrl || "") ? "東京都"
-    : /chiba\.(jp|lg\.jp)/.test(source.baseUrl || "") ? "千葉県"
-    : /saitama\.jp/.test(source.baseUrl || "") ? "埼玉県"
-    : /kawaguchi|kasukabe|misato|okegawa|kazo/.test(source.key || "") ? "埼玉県"
-    : "神奈川県";
+  const pref = detectPrefecture(source);
+  // 会場テキスト内の括弧住所を抽出（最優先）
+  const embeddedAddrs = extractEmbeddedAddressFromVenue(venue, cityName, pref);
+  for (const ea of embeddedAddrs) candidates.push(ea);
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;
     candidates.push(`${pref}${full}`);
@@ -189,7 +217,7 @@ function createCalendarJsonCollector(config, deps) {
               if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) meta.venue = v;
             }
           }
-          return { url, meta, timeRange };
+          return { url, meta, timeRange, plainText };
         })
       );
       for (const r of results) {
@@ -211,6 +239,36 @@ function createCalendarJsonCollector(config, deps) {
       // 部屋名・階数を除去
       venue = venue.replace(/\s*\d*階.*$/, "").replace(/[（(][^）)]*(?:衛生|教育室|会議室|和室|講堂|研修室)[^）)]*[）)]/g, "").trim();
 
+      // venue空の場合、詳細ページテキストから再抽出 (parseDetailMetaがゴミを返した場合のフォールバック)
+      if (!venue && detail && detail.plainText) {
+        // 場所キーワード後のベニュー名を探す
+        const reMatch = detail.plainText.match(/(?:場所|会場|ところ)\s+(.+?)(?=\s+(?:その他|内容|対象|日時|時間|問い合わせ|関連|申込|定員|費用|参加費|連絡|主催|企業|託児)|$)/u);
+        if (reMatch) {
+          const candidate = sanitizeVenueText(reMatch[1].trim());
+          if (candidate) venue = candidate;
+        }
+      }
+
+      // venue空の場合、タイトルから施設名パターンを抽出
+      if (!venue && item.title) {
+        const facilityMatch = item.title.match(/([\p{Script=Han}\p{Script=Katakana}\p{Script=Hiragana}ー]+(?:公民館|センター|図書館|会館|児童館|体育館|ホール|こども園|保育園|幼稚園))/u);
+        if (facilityMatch) venue = sanitizeVenueText(facilityMatch[1]);
+      }
+
+      // venue空の場合、URLパスから施設名を推定
+      if (!venue && item.url) {
+        const urlFacilityMap = [
+          [/\/chuokominkan\//, "中央公民館"],
+          [/\/kominkan\//, "公民館"],
+          [/\/toshokan\//, "図書館"],
+          [/\/jidoukan?\//, "児童館"],
+          [/\/taiikukan\//, "体育館"],
+        ];
+        for (const [re, name] of urlFacilityMap) {
+          if (re.test(item.url)) { venue = name; break; }
+        }
+      }
+
       const rawAddress = sanitizeAddressText((detail && detail.meta && detail.meta.address) || "");
       const timeRange = detail ? detail.timeRange : null;
 
@@ -219,9 +277,7 @@ function createCalendarJsonCollector(config, deps) {
       if (getFacilityAddressFromMaster && venue) {
         const fmAddr = getFacilityAddressFromMaster(source.key, venue);
         if (fmAddr) {
-          const fmPref = /tokyo\.jp/.test(source.baseUrl || "") ? "東京都"
-            : /chiba\.(jp|lg\.jp)/.test(source.baseUrl || "") ? "千葉県"
-            : "神奈川県";
+          const fmPref = detectPrefecture(source);
           const full = new RegExp(fmPref).test(fmAddr) ? fmAddr : `${fmPref}${fmAddr}`;
           geoCandidates.unshift(full);
         }
