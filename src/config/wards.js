@@ -1124,6 +1124,9 @@ const WARD_LABEL_BY_KEY = {
   ina_saitama: "伊奈町",
   yokoze: "横瀬町",
   nagatoro: "長瀞町",
+  miyoshi_saitama: "三芳町",
+  hatoyama: "鳩山町",
+  miyashiro: "宮代町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2690,6 +2693,24 @@ const NAGATORO_SOURCE = {
   center: { lat: 36.1139, lng: 139.1083 },
 };
 
+const MIYOSHI_SAITAMA_SOURCE = {
+  key: "miyoshi_saitama", label: "三芳町",
+  baseUrl: "https://www.town.saitama-miyoshi.lg.jp",
+  center: { lat: 35.8278, lng: 139.5306 },
+};
+
+const HATOYAMA_SOURCE = {
+  key: "hatoyama", label: "鳩山町",
+  baseUrl: "https://www.town.hatoyama.saitama.jp",
+  center: { lat: 35.9500, lng: 139.3350 },
+};
+
+const MIYASHIRO_SOURCE = {
+  key: "miyashiro", label: "宮代町",
+  baseUrl: "https://www.town.miyashiro.lg.jp",
+  center: { lat: 36.0238, lng: 139.7253 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2967,4 +2988,7 @@ module.exports = {
   INA_SAITAMA_SOURCE,
   YOKOZE_SOURCE,
   NAGATORO_SOURCE,
+  MIYOSHI_SAITAMA_SOURCE,
+  HATOYAMA_SOURCE,
+  MIYASHIRO_SOURCE,
 };

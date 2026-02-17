@@ -84,6 +84,9 @@ const { createCollectKitamotoEvents } = require("./src/server/collectors/kitamot
 const { createCollectInaEvents } = require("./src/server/collectors/ina");
 const { createCollectYokozeEvents } = require("./src/server/collectors/yokoze");
 const { createCollectNagatoroEvents } = require("./src/server/collectors/nagatoro");
+const { createCollectMiyoshiEvents } = require("./src/server/collectors/miyoshi");
+const { createCollectHatoyamaEvents } = require("./src/server/collectors/hatoyama");
+const { createCollectMiyashiroEvents } = require("./src/server/collectors/miyashiro");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -184,6 +187,7 @@ const {
   YOSHIKAWA_SOURCE, OGANO_SOURCE, HIGASHICHICHIBU_SOURCE,
   KAWAJIMA_SOURCE,
   KITAMOTO_SOURCE, INA_SAITAMA_SOURCE, YOKOZE_SOURCE, NAGATORO_SOURCE,
+  MIYOSHI_SAITAMA_SOURCE, HATOYAMA_SOURCE, MIYASHIRO_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -725,6 +729,9 @@ const collectKitamotoEvents = createCollectKitamotoEvents({ ...geoFmDeps, source
 const collectInaEvents = createCollectInaEvents({ ...geoFmDeps, source: INA_SAITAMA_SOURCE });
 const collectYokozeEvents = createCollectYokozeEvents({ ...geoFmDeps, source: YOKOZE_SOURCE });
 const collectNagatoroEvents = createCollectNagatoroEvents({ ...geoFmDeps, source: NAGATORO_SOURCE });
+const collectMiyoshiEvents = createCollectMiyoshiEvents({ ...geoFmDeps, source: MIYOSHI_SAITAMA_SOURCE });
+const collectHatoyamaEvents = createCollectHatoyamaEvents({ ...geoFmDeps, source: HATOYAMA_SOURCE });
+const collectMiyashiroEvents = createCollectMiyashiroEvents({ ...geoFmDeps, source: MIYASHIRO_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -905,6 +912,9 @@ const getEvents = createGetEvents({
   collectInaEvents,
   collectYokozeEvents,
   collectNagatoroEvents,
+  collectMiyoshiEvents,
+  collectHatoyamaEvents,
+  collectMiyashiroEvents,
 });
 
 // --- HTTP server ---
