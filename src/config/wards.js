@@ -2741,6 +2741,12 @@ const MINANO_SOURCE = {
   center: { lat: 36.0567, lng: 139.1000 },
 };
 
+const MOROYAMA_SOURCE = {
+  key: "moroyama", label: "毛呂山町",
+  baseUrl: "https://www.town.moroyama.saitama.jp",
+  center: { lat: 35.9417, lng: 139.3167 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -3026,4 +3032,5 @@ module.exports = {
   RANZAN_SOURCE,
   MATSUBUSHI_SOURCE,
   MINANO_SOURCE,
+  MOROYAMA_SOURCE,
 };

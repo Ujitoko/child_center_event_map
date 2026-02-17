@@ -91,6 +91,7 @@ const { createCollectChichibuEvents } = require("./src/server/collectors/chichib
 const { createCollectRanzanEvents } = require("./src/server/collectors/ranzan");
 const { createCollectMatsubushiEvents } = require("./src/server/collectors/matsubushi");
 const { createCollectMinanoEvents } = require("./src/server/collectors/minano");
+const { createCollectMoroyamaEvents } = require("./src/server/collectors/moroyama");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -194,7 +195,7 @@ const {
   MIYOSHI_SAITAMA_SOURCE, HATOYAMA_SOURCE, MIYASHIRO_SOURCE,
   CHICHIBU_SOURCE,
   NAMEGAWA_SOURCE, RANZAN_SOURCE, MATSUBUSHI_SOURCE,
-  MINANO_SOURCE,
+  MINANO_SOURCE, MOROYAMA_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -744,6 +745,7 @@ const collectNamegawaEvents = createCalendarJsonCollector({ source: NAMEGAWA_SOU
 const collectRanzanEvents = createCollectRanzanEvents({ ...geoFmDeps, source: RANZAN_SOURCE });
 const collectMatsubushiEvents = createCollectMatsubushiEvents({ ...geoFmDeps, source: MATSUBUSHI_SOURCE });
 const collectMinanoEvents = createCollectMinanoEvents({ ...geoFmDeps, source: MINANO_SOURCE });
+const collectMoroyamaEvents = createCollectMoroyamaEvents({ ...geoFmDeps, source: MOROYAMA_SOURCE });
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -932,6 +934,7 @@ const getEvents = createGetEvents({
   collectRanzanEvents,
   collectMatsubushiEvents,
   collectMinanoEvents,
+  collectMoroyamaEvents,
 });
 
 // --- HTTP server ---
