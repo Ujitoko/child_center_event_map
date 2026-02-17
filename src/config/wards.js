@@ -2735,6 +2735,12 @@ const MATSUBUSHI_SOURCE = {
   center: { lat: 35.9267, lng: 139.8133 },
 };
 
+const MINANO_SOURCE = {
+  key: "minano", label: "皆野町",
+  baseUrl: "https://www.town.minano.saitama.jp",
+  center: { lat: 36.0567, lng: 139.1000 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -3019,4 +3025,5 @@ module.exports = {
   NAMEGAWA_SOURCE,
   RANZAN_SOURCE,
   MATSUBUSHI_SOURCE,
+  MINANO_SOURCE,
 };
