@@ -163,6 +163,7 @@ const {
   KOUNOSU_SOURCE, SAKADO_SOURCE, HANNO_SOURCE,
   HIGASHIMATSUYAMA_SOURCE, GYODA_SOURCE, HONJO_SOURCE,
   HIDAKA_SOURCE, SHIRAOKA_SOURCE, SATTE_SOURCE,
+  YORII_SOURCE, SUGITO_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -678,6 +679,9 @@ const collectHonjoEvents = createCalendarJsonCollector({ source: HONJO_SOURCE },
 const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE }, geoFmDeps);
 const collectShiraokaEvents = createCalendarJsonCollector({ source: SHIRAOKA_SOURCE }, geoFmDeps);
 const collectSatteEvents = createCalendarJsonCollector({ source: SATTE_SOURCE }, geoFmDeps);
+// --- 埼玉県 municipal-calendar-collector (町村) ---
+const collectYoriiEvents = createMunicipalCalendarCollector({ source: YORII_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectSugitoEvents = createMunicipalCalendarCollector({ source: SUGITO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 // --- 埼玉県 custom ---
 const collectSaitamaEvents = createCollectSaitamaEvents(geoFmDeps);
 const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
@@ -839,6 +843,8 @@ const getEvents = createGetEvents({
   collectHidakaEvents,
   collectShiraokaEvents,
   collectSatteEvents,
+  collectYoriiEvents,
+  collectSugitoEvents,
 });
 
 // --- HTTP server ---

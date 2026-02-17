@@ -184,6 +184,8 @@ function createGeoHelpers(deps) {
       hidaka: 15,
       shiraoka: 8,
       satte: 10,
+      yorii: 15,
+      sugito: 8,
     };
     return overrides[key] || 10;
   }

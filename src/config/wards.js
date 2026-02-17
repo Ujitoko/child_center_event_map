@@ -1102,6 +1102,8 @@ const WARD_LABEL_BY_KEY = {
   hidaka: "日高市",
   shiraoka: "白岡市",
   satte: "幸手市",
+  yorii: "寄居町",
+  sugito: "杉戸町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -2536,6 +2538,18 @@ const SATTE_SOURCE = {
   center: { lat: 36.0783, lng: 139.7264 },
 };
 
+const YORII_SOURCE = {
+  key: "yorii", label: "寄居町",
+  baseUrl: "https://www.town.yorii.saitama.jp",
+  center: { lat: 36.1164, lng: 139.1953 },
+};
+
+const SUGITO_SOURCE = {
+  key: "sugito", label: "杉戸町",
+  baseUrl: "https://www.town.sugito.lg.jp",
+  center: { lat: 36.0260, lng: 139.7357 },
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -2791,4 +2805,6 @@ module.exports = {
   HIDAKA_SOURCE,
   SHIRAOKA_SOURCE,
   SATTE_SOURCE,
+  YORII_SOURCE,
+  SUGITO_SOURCE,
 };
