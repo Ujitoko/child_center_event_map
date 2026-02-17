@@ -2398,10 +2398,20 @@ const FUJIMINO_SOURCE = {
   baseUrl: "https://www.city.fujimino.saitama.jp",
   center: { lat: 35.8594, lng: 139.5198 },
 };
+const KNOWN_FUJIMINO_FACILITIES = {
+  "ステラ・ウエスト": "ふじみ野市大井中央2-1-8",
+  "ステラ・ウェスト": "ふじみ野市大井中央2-1-8",
+  "ふじみ野ステラ・ウェストホール": "ふじみ野市大井中央2-1-8",
+  "保健センター": "ふじみ野市福岡1-2-5",
+};
 const MISATO_SOURCE = {
   key: "misato", label: "三郷市",
   baseUrl: "https://www.city.misato.lg.jp",
   center: { lat: 35.8311, lng: 139.8643 },
+};
+const KNOWN_MISATO_FACILITIES = {
+  "瑞沼市民センター": "三郷市上彦名870",
+  "北公民館": "三郷市上彦名870",
 };
 const KAWAGOE_SOURCE = {
   key: "kawagoe", label: "川越市",
@@ -2561,6 +2571,17 @@ const KUKI_SOURCE = {
   baseUrl: "https://www.city.kuki.lg.jp",
   center: { lat: 36.0622, lng: 139.6669 },
 };
+const KNOWN_KUKI_FACILITIES = {
+  "児童センター": "久喜市吉羽1-40-14",
+  "鷲宮地域子育て支援センター": "久喜市鷲宮2-6-19",
+  "つどいの広場「きらきら」": "久喜市本町2-5-1",
+  "栗橋地域子育て支援センターくぷる": "久喜市中里1048-1",
+  "中央図書館": "久喜市吉羽1-40-1",
+  "鷲宮児童館": "久喜市上内878",
+  "栗橋文化会館": "久喜市伊坂1557",
+  "菖蒲図書館": "久喜市菖蒲町菖蒲85-1",
+  "久喜中央コミュニティセンター": "久喜市久喜中央4-7-7",
+};
 const KUMAGAYA_SOURCE = {
   key: "kumagaya", label: "熊谷市",
   baseUrl: "https://www.city.kumagaya.lg.jp",
@@ -2575,6 +2596,9 @@ const SAKADO_SOURCE = {
   key: "sakado", label: "坂戸市",
   baseUrl: "https://www.city.sakado.lg.jp",
   center: { lat: 35.9572, lng: 139.3886 },
+};
+const KNOWN_SAKADO_FACILITIES = {
+  "坂戸児童センター": "坂戸市芦山町23",
 };
 const HANNO_SOURCE = {
   key: "hanno", label: "飯能市",
@@ -2591,15 +2615,35 @@ const GYODA_SOURCE = {
   baseUrl: "https://www.city.gyoda.lg.jp",
   center: { lat: 36.1389, lng: 139.4556 },
 };
+const KNOWN_GYODA_FACILITIES = {
+  "持田公民館": "行田市城西5-9-26",
+  "行田市持田公民館": "行田市城西5-9-26",
+};
 const HONJO_SOURCE = {
   key: "honjo", label: "本庄市",
   baseUrl: "https://www.city.honjo.lg.jp",
   center: { lat: 36.2439, lng: 139.1906 },
 };
+const KNOWN_HONJO_FACILITIES = {
+  "日の出児童センター": "本庄市日の出2-5-56",
+  "前原児童センター": "本庄市前原1-4-13",
+  "本庄公民館": "本庄市東台5-2-33",
+  "本庄市立図書館": "本庄市千代田4-1-9",
+  "児玉児童センター": "本庄市児玉町八幡山368",
+};
 const HIDAKA_SOURCE = {
   key: "hidaka", label: "日高市",
   baseUrl: "https://www.city.hidaka.lg.jp",
   center: { lat: 35.9072, lng: 139.3392 },
+};
+const KNOWN_HIDAKA_FACILITIES = {
+  "武蔵台公民館": "日高市武蔵台5-1-2",
+  "高萩北公民館": "日高市大字旭ケ丘997-1",
+  "高萩公民館": "日高市大字高萩802-3",
+  "高麗川公民館": "日高市大字南平沢1098-2",
+  "高麗川南公民館": "日高市大字中鹿山81-1",
+  "子育て総合支援センター「ぬくぬく」": "日高市大字楡木201",
+  "子育て総合支援センター": "日高市大字楡木201",
 };
 const SHIRAOKA_SOURCE = {
   key: "shiraoka", label: "白岡市",
@@ -2646,6 +2690,11 @@ const IRUMA_SOURCE = {
   key: "iruma", label: "入間市",
   baseUrl: "https://www.city.iruma.saitama.jp",
   center: { lat: 35.8358, lng: 139.3911 },
+};
+const KNOWN_IRUMA_FACILITIES = {
+  "入間市博物館アリット": "入間市二本木100",
+  "入間市博物館": "入間市二本木100",
+  "青少年活動センター": "入間市小谷田1681-1",
 };
 
 const KAZO_SOURCE = {
@@ -3038,8 +3087,8 @@ module.exports = {
   CHONAN_SOURCE,
   KAWAGUCHI_SOURCE,
   KASUKABE_SOURCE,
-  FUJIMINO_SOURCE,
-  MISATO_SOURCE,
+  FUJIMINO_SOURCE, KNOWN_FUJIMINO_FACILITIES,
+  MISATO_SOURCE, KNOWN_MISATO_FACILITIES,
   KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
   WARABI_SOURCE, KNOWN_WARABI_FACILITIES,
@@ -3054,15 +3103,15 @@ module.exports = {
   SAITAMA_CITY_SOURCE,
   KOSHIGAYA_SOURCE,
   TOKOROZAWA_SOURCE,
-  KUKI_SOURCE,
+  KUKI_SOURCE, KNOWN_KUKI_FACILITIES,
   KUMAGAYA_SOURCE,
   KOUNOSU_SOURCE,
-  SAKADO_SOURCE,
+  SAKADO_SOURCE, KNOWN_SAKADO_FACILITIES,
   HANNO_SOURCE,
   HIGASHIMATSUYAMA_SOURCE,
-  GYODA_SOURCE,
-  HONJO_SOURCE,
-  HIDAKA_SOURCE,
+  GYODA_SOURCE, KNOWN_GYODA_FACILITIES,
+  HONJO_SOURCE, KNOWN_HONJO_FACILITIES,
+  HIDAKA_SOURCE, KNOWN_HIDAKA_FACILITIES,
   SHIRAOKA_SOURCE,
   SATTE_SOURCE,
   YORII_SOURCE,
@@ -3070,7 +3119,7 @@ module.exports = {
   SOKA_SOURCE,
   TSURUGASHIMA_SOURCE,
   HASUDA_SOURCE,
-  IRUMA_SOURCE,
+  IRUMA_SOURCE, KNOWN_IRUMA_FACILITIES,
   KAZO_SOURCE,
   FUKAYA_SOURCE,
   OKEGAWA_SOURCE,

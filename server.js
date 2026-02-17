@@ -174,7 +174,9 @@ const {
   OAMISHIRASATO_SOURCE, SHISUI_SOURCE, KOZAKI_SOURCE,
   TAKO_SOURCE, SHIBAYAMA_SOURCE, MUTSUZAWA_SOURCE,
   CHOSEI_SOURCE, NAGARA_SOURCE, ONJUKU_SOURCE, CHONAN_SOURCE,
-  KAWAGUCHI_SOURCE, KASUKABE_SOURCE, FUJIMINO_SOURCE, MISATO_SOURCE,
+  KAWAGUCHI_SOURCE, KASUKABE_SOURCE,
+  FUJIMINO_SOURCE, KNOWN_FUJIMINO_FACILITIES,
+  MISATO_SOURCE, KNOWN_MISATO_FACILITIES,
   KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
   WARABI_SOURCE, KNOWN_WARABI_FACILITIES,
@@ -182,13 +184,21 @@ const {
   NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, KNOWN_TODA_FACILITIES, SHIKI_SOURCE,
   FUJIMI_SOURCE, SAYAMA_SOURCE, YASHIO_SOURCE,
   SAITAMA_CITY_SOURCE, KOSHIGAYA_SOURCE,
-  TOKOROZAWA_SOURCE, KUKI_SOURCE, KUMAGAYA_SOURCE,
-  KOUNOSU_SOURCE, SAKADO_SOURCE, HANNO_SOURCE,
-  HIGASHIMATSUYAMA_SOURCE, GYODA_SOURCE, HONJO_SOURCE,
-  HIDAKA_SOURCE, SHIRAOKA_SOURCE, SATTE_SOURCE,
+  TOKOROZAWA_SOURCE,
+  KUKI_SOURCE, KNOWN_KUKI_FACILITIES,
+  KUMAGAYA_SOURCE,
+  KOUNOSU_SOURCE,
+  SAKADO_SOURCE, KNOWN_SAKADO_FACILITIES,
+  HANNO_SOURCE,
+  HIGASHIMATSUYAMA_SOURCE,
+  GYODA_SOURCE, KNOWN_GYODA_FACILITIES,
+  HONJO_SOURCE, KNOWN_HONJO_FACILITIES,
+  HIDAKA_SOURCE, KNOWN_HIDAKA_FACILITIES,
+  SHIRAOKA_SOURCE, SATTE_SOURCE,
   YORII_SOURCE, SUGITO_SOURCE,
   SOKA_SOURCE, TSURUGASHIMA_SOURCE, HASUDA_SOURCE,
-  IRUMA_SOURCE, KAZO_SOURCE,
+  IRUMA_SOURCE, KNOWN_IRUMA_FACILITIES,
+  KAZO_SOURCE,
   FUKAYA_SOURCE, OKEGAWA_SOURCE,
   OGOSE_SOURCE, OGAWA_SOURCE, YOSHIMI_SOURCE, KAMIKAWA_SOURCE,
   KAMISATO_SOURCE,
@@ -479,6 +489,30 @@ for (const [name, address] of Object.entries(KNOWN_AGEO_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_TODA_FACILITIES)) {
   setFacilityAddressToMaster("toda", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_FUJIMINO_FACILITIES)) {
+  setFacilityAddressToMaster("fujimino", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MISATO_FACILITIES)) {
+  setFacilityAddressToMaster("misato", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KUKI_FACILITIES)) {
+  setFacilityAddressToMaster("kuki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SAKADO_FACILITIES)) {
+  setFacilityAddressToMaster("sakado", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_GYODA_FACILITIES)) {
+  setFacilityAddressToMaster("gyoda", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HONJO_FACILITIES)) {
+  setFacilityAddressToMaster("honjo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HIDAKA_FACILITIES)) {
+  setFacilityAddressToMaster("hidaka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_IRUMA_FACILITIES)) {
+  setFacilityAddressToMaster("iruma", name, address);
+}
 
 // --- Shared deps for collectors ---
 const geoDeps = { geocodeForWard, resolveEventPoint, resolveEventAddress };
@@ -708,7 +742,7 @@ const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOU
 // --- 埼玉県 event-js-collector (追加) ---
 const collectKukiEvents = createEventJsCollector({
   source: KUKI_SOURCE, jsFile: "event.js",
-  childCategoryIds: ["50"],
+  childCategoryIds: ["50"], knownFacilities: KNOWN_KUKI_FACILITIES,
 }, eventJsDeps);
 // --- 埼玉県 municipal-calendar-collector (追加) ---
 const collectKounosuEvents = createMunicipalCalendarCollector({ source: KOUNOSU_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
