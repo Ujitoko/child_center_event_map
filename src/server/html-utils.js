@@ -92,6 +92,22 @@ function parseDetailMeta(html) {
     }
   }
 
+  // h2/h3/h4 見出しパターン: 「場所」「会場」「ところ」の直後テキスト
+  if (!venue) {
+    const headingRe = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi;
+    while ((m = headingRe.exec(html)) !== null) {
+      const heading = stripTags(m[1]).trim();
+      if (/(場所|会場|開催場所|ところ)/.test(heading)) {
+        const afterHeading = html.slice(m.index + m[0].length, m.index + m[0].length + 500);
+        const nextText = stripTags(afterHeading).trim().split(/\n/)[0].trim();
+        if (nextText && nextText.length >= 2 && nextText.length <= 60) {
+          venue = nextText;
+          break;
+        }
+      }
+    }
+  }
+
   return { venue, address };
 }
 

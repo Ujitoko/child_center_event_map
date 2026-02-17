@@ -178,7 +178,8 @@ const {
   KAWAGOE_SOURCE, KNOWN_KAWAGOE_FACILITIES,
   WAKO_SOURCE, KNOWN_WAKO_FACILITIES,
   WARABI_SOURCE, KNOWN_WARABI_FACILITIES,
-  AGEO_SOURCE, NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, SHIKI_SOURCE,
+  AGEO_SOURCE, KNOWN_AGEO_FACILITIES,
+  NIIZA_SOURCE, ASAKA_SOURCE, TODA_SOURCE, SHIKI_SOURCE,
   FUJIMI_SOURCE, SAYAMA_SOURCE, YASHIO_SOURCE,
   SAITAMA_CITY_SOURCE, KOSHIGAYA_SOURCE,
   TOKOROZAWA_SOURCE, KUKI_SOURCE, KUMAGAYA_SOURCE,
@@ -471,6 +472,9 @@ for (const [name, address] of Object.entries(KNOWN_WAKO_FACILITIES)) {
 }
 for (const [name, address] of Object.entries(KNOWN_WARABI_FACILITIES)) {
   setFacilityAddressToMaster("warabi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_AGEO_FACILITIES)) {
+  setFacilityAddressToMaster("ageo", name, address);
 }
 
 // --- Shared deps for collectors ---

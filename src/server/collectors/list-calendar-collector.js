@@ -169,6 +169,32 @@ function createListCalendarCollector(config, deps) {
               if (!address && /(住所|所在地)/.test(k)) address = v;
             }
           }
+          // h2/h3/h4 見出しパターン: 「場所」「会場」「ところ」の直後テキスト (八潮市、富士見市、狭山市等)
+          if (!venue) {
+            const headingRe = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi;
+            let hm;
+            while ((hm = headingRe.exec(html)) !== null) {
+              const heading = stripTags(hm[1]).trim();
+              if (/(場所|会場|開催場所|ところ)/.test(heading)) {
+                const afterHeading = html.slice(hm.index + hm[0].length, hm.index + hm[0].length + 500);
+                const nextText = stripTags(afterHeading).trim().split(/\n/)[0].trim();
+                if (nextText && nextText.length >= 2 && nextText.length <= 60) {
+                  venue = nextText;
+                  break;
+                }
+              }
+            }
+          }
+          // テキストベースのフォールバック: 「場所：○○」「会場：○○」パターン
+          if (!venue) {
+            const plainText = stripTags(html);
+            const placeMatch = plainText.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              v = v.replace(/\s*(?:住所|駐車|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考).*$/, "").trim();
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) venue = v;
+            }
+          }
           const timeRange = parseTimeRangeFromText(stripTags(html));
           return { url, venue, address, timeRange };
         })

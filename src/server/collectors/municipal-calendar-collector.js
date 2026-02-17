@@ -305,6 +305,32 @@ function createMunicipalCalendarCollector(config, deps) {
               if (!detailAddress && /(住所|所在地)/.test(k)) detailAddress = v;
             }
           }
+          // h2/h3/h4 見出しパターン: 「場所」「会場」「ところ」の直後テキスト (志木市、朝霞市等)
+          if (!detailVenue) {
+            const headingRe = /<h[2-4][^>]*>([\s\S]*?)<\/h[2-4]>/gi;
+            let hm;
+            while ((hm = headingRe.exec(html)) !== null) {
+              const heading = stripTags(hm[1]).trim();
+              if (/(場所|会場|開催場所|ところ)/.test(heading)) {
+                const afterHeading = html.slice(hm.index + hm[0].length, hm.index + hm[0].length + 500);
+                const nextText = stripTags(afterHeading).trim().split(/\n/)[0].trim();
+                if (nextText && nextText.length >= 2 && nextText.length <= 60) {
+                  detailVenue = nextText;
+                  break;
+                }
+              }
+            }
+          }
+          // テキストベースのフォールバック: 「場所：○○」「会場：○○」パターン
+          if (!detailVenue) {
+            const plainText = stripTags(html);
+            const placeMatch = plainText.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim();
+              v = v.replace(/\s*(?:住所|駐車|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考).*$/, "").trim();
+              if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) detailVenue = v;
+            }
+          }
           const timeRange = parseTimeRangeFromText(stripTags(html));
           return { url, venue: detailVenue, address: detailAddress, timeRange };
         })
@@ -326,7 +352,17 @@ function createMunicipalCalendarCollector(config, deps) {
       // 会場: カレンダーページの開催場所を優先、なければ詳細ページから
       const calVenue = sanitizeVenueText(ev.venue || "");
       const detailVenue = sanitizeVenueText((detail && detail.venue) || "");
-      const venue = calVenue || detailVenue;
+      let venue = calVenue || detailVenue;
+      // タイトル括弧内の施設名をフォールバック (朝霞市等: 「講座名（施設名）」)
+      if (!venue && ev.title) {
+        const parenMatch = ev.title.match(/[（(]([^）)]{2,20})[）)]/);
+        if (parenMatch) {
+          const candidate = parenMatch[1].trim();
+          if (/(館|センター|公園|学校|ホール|プラザ|公民館|図書館|体育館|保育園|幼稚園|こども園|ひろば)/.test(candidate)) {
+            venue = candidate;
+          }
+        }
+      }
 
       const rawAddress = sanitizeAddressText((detail && detail.address) || "");
 

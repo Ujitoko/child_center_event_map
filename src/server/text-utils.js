@@ -55,6 +55,9 @@ function sanitizeVenueText(value) {
   text = text.replace(/\s*[（(](?:令和\d+年|20\d{2}年)\d{1,2}月.*/, "");
   // Truncate at parenthesized descriptions: （無料で...) etc.
   text = text.replace(/[（(](?:無料|有料|予約|申込|当日|詳細|参加)[^）)]{0,80}[）)].*/, "");
+  // Strip room/floor suffixes after facility name (上尾市、川越市 etc.)
+  text = text.replace(/\s+\d*(?:多目的室|会議室|講座室|講義室|集会室|保育室|研修室|和室|料理室|学習室|活動室).*$/, "");
+  text = text.replace(/\s+(?:おはなしの部屋|おはなしコーナー|おはなしのへや|児童室|児童コーナー|創作室|体験学習室|軽体育室|プレイルーム|ヤングアダルトコーナー|休養室|談話室).*$/, "");
   // Truncate at schedule/activity info after facility name
   text = text.replace(/\s+(?:時間|活動期間|活動時間|開催日|内容|職員が)[:：].*/, "");
   // Truncate at date info embedded after venue name (あきる野市 pattern)
