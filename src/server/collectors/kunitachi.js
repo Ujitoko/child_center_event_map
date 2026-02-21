@@ -3,7 +3,7 @@ const { parseYmdFromJst } = require("../date-utils");
 const { stripTags } = require("../html-utils");
 const { KUNITACHI_SOURCE, KNOWN_KUNITACHI_FACILITIES } = require("../../config/wards");
 
-const CHILD_KEYWORDS_RE = /子ども|こども|子育て|親子|キッズ|児童|乳幼児|幼児|赤ちゃん|ベビー|読み聞かせ|絵本|ファミリー|小学生|中学生|ひろば|離乳食|妊娠|出産|プレママ|パパママ/;
+const CHILD_KEYWORDS_RE = /子ども|こども|子育て|親子|キッズ|児童|乳幼児|幼児|赤ちゃん|ベビー|読み聞かせ|絵本|ファミリー|小学生|中学生|ひろば|離乳食|妊娠|出産|プレママ|パパママ|おはなし会|家庭の日/;
 
 function buildGeoCandidates(venue, knownFacilities) {
   const candidates = [];

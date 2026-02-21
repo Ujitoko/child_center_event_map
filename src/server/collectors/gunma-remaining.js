@@ -23,23 +23,27 @@ const {
   sanitizeAddressText,
 } = require("../text-utils");
 const { WARD_CHILD_HINT_RE } = require("../../config/wards");
-const { inferWardVenueFromTitle } = require("../venue-utils");
+const { inferWardVenueFromTitle, isJunkVenueName } = require("../venue-utils");
 
 const DETAIL_BATCH_SIZE = 5;
 
 // ---- 共通ユーティリティ ----
 
-/** 西暦・令和の日付をテキストから抽出 */
+/** 西暦・令和の日付をテキストから抽出（最新の日付を返す） */
 function parseDateFromText(text) {
+  let best = null;
   const isoMatch = text.match(/(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/);
   if (isoMatch) {
-    return { y: Number(isoMatch[1]), mo: Number(isoMatch[2]), d: Number(isoMatch[3]) };
+    best = { y: Number(isoMatch[1]), mo: Number(isoMatch[2]), d: Number(isoMatch[3]) };
   }
   const reMatch = text.match(/令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/);
   if (reMatch) {
-    return { y: 2018 + Number(reMatch[1]), mo: Number(reMatch[2]), d: Number(reMatch[3]) };
+    const reDate = { y: 2018 + Number(reMatch[1]), mo: Number(reMatch[2]), d: Number(reMatch[3]) };
+    if (!best || reDate.y > best.y || (reDate.y === best.y && (reDate.mo > best.mo || (reDate.mo === best.mo && reDate.d > best.d)))) {
+      best = reDate;
+    }
   }
-  return null;
+  return best;
 }
 
 /** 複数日付をテキストから抽出 */
@@ -50,7 +54,7 @@ function parseDatesFromText(text) {
   while ((m = isoRe.exec(text)) !== null) {
     dates.push({ y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
   }
-  if (dates.length > 0) return dates;
+  // 令和パターンも常に実行（YYYY形式の更新日だけでなく令和形式の日付も拾う）
   const reRe = /令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
   while ((m = reRe.exec(text)) !== null) {
     dates.push({ y: 2018 + Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
@@ -93,7 +97,7 @@ function parseRssFeed(xml) {
 /** 子育てイベント判定 */
 /** カテゴリページ・告知ページなど実際のイベントでないタイトルを除外 */
 const GENERIC_TITLE_RE = /^(?:子育て|子育て支援|妊娠・出産|子育て・健康・福祉|子ども・子育て|育児|教育|健康・福祉|出産・子育て|結婚・子育て|子育て・教育)$/;
-const ANNOUNCEMENT_TITLE_RE = /入所申込|入園申込|入所案内|民法改正|条例改正|計画策定|パブリックコメント|意見募集|公表します/;
+const ANNOUNCEMENT_TITLE_RE = /入所申込|入園申込|入所案内|民法改正|条例改正|計画策定|パブリック[・]?コメント|意見募集|公表します|測定結果|放射性物質|申請書について|実態調査|施設一覧|についてお知らせ|応援手当|助成事業|補助します|受験料|臨時休館|休館のお知らせ|特定健診|がん検診/;
 
 function isChildEvent(title, extra) {
   const t = title.trim();
@@ -101,7 +105,9 @@ function isChildEvent(title, extra) {
   if (ANNOUNCEMENT_TITLE_RE.test(t)) return false;
   const text = title + (extra || "");
   return WARD_CHILD_HINT_RE.test(text) ||
-    /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|赤ちゃん|ベビー|保育|マタニティ|妊婦/.test(text);
+    /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|赤ちゃん|ベビー|保育|マタニティ|妊婦|健診|予防接種/.test(text) ||
+    /\d+\s*(?:か月|歳|ヶ月|カ月)\s*児/.test(text) ||
+    /おはなし会|家庭の日|読み聞かせ|絵本/.test(text);
 }
 
 /** 詳細ページからイベント情報を抽出する汎用関数 */
@@ -202,8 +208,8 @@ function addEventRecord(byId, {
       }
     }
     let point = await geocodeForWard(geoCandidates.slice(0, 7), sourceObj);
-    point = resolveEventPoint(sourceObj, venue, point, rawAddress || `${label} ${venue}`);
-    const resolvedAddr = resolveEventAddress(sourceObj, venue, rawAddress || `${label} ${venue}`, point);
+    point = resolveEventPoint(sourceObj, venue, point, rawAddress);
+    const resolvedAddr = resolveEventAddress(sourceObj, venue, rawAddress, point);
 
     const { startsAt, endsAt } = buildStartsEndsForDate(
       { y: eventDate.y, mo: eventDate.mo, d: eventDate.d },
@@ -297,6 +303,7 @@ function createKosodatePageCollector(sourceObj, config, deps) {
         for (const eventDate of dates) {
           if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
           let venue = sanitizeVenueText(detail.venue || "");
+          if (venue && isJunkVenueName(venue)) venue = "";
           // タイトルから施設名を推定（会場空の場合）
           if (!venue) {
             const inferred = inferWardVenueFromTitle(link.title, sourceObj.label);
@@ -362,6 +369,7 @@ function createRssChildCollector(sourceObj, config, deps) {
         if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
 
         let venue = sanitizeVenueText((detail && detail.venue) || "");
+        if (venue && isJunkVenueName(venue)) venue = "";
         if (!venue) {
           const inferred = inferWardVenueFromTitle(item.title, sourceObj.label);
           if (inferred && inferred !== `${sourceObj.label}子ども関連施設`) venue = inferred;
@@ -396,6 +404,7 @@ function createCollectKiryuEvents(deps) {
     urls: [
       "https://www.city.kiryu.lg.jp/kosodate/index.html",
       "https://www.city.kiryu.lg.jp/kosodate/1009668/index.html",
+      "https://www.city.kiryu.lg.jp/kosodate/1018221/index.html",
       "https://www.city.kiryu.lg.jp/event/",
     ],
   }, deps);
@@ -406,7 +415,8 @@ function createCollectNumataEvents(deps) {
   return createKosodatePageCollector(NUMATA_SOURCE, {
     cityName: "沼田市", prefixLabel: "沼田市",
     urls: [
-      "https://www.city.numata.gunma.jp/event/",
+      "https://www.city.numata.gunma.jp/life/kosodate/kenko/",
+      "https://www.city.numata.gunma.jp/life/kosodate/hoiku/",
     ],
   }, deps);
 }
@@ -416,9 +426,10 @@ function createCollectTatebayashiEvents(deps) {
   return createKosodatePageCollector(TATEBAYASHI_SOURCE, {
     cityName: "館林市", prefixLabel: "館林市",
     urls: [
-      "https://www.city.tatebayashi.gunma.jp/calendar/index.html",
+      "https://www.city.tatebayashi.gunma.jp/li/kosodate/010/index.html",
+      "https://www.city.tatebayashi.gunma.jp/li/kenko/140/040/index.html",
+      "https://www.city.tatebayashi.gunma.jp/li/kenko/020/index.html",
       "https://www.city.tatebayashi.gunma.jp/event.html",
-      "https://www.city.tatebayashi.gunma.jp/li/kosodate/030/010/index.html",
     ],
   }, deps);
 }
@@ -428,8 +439,10 @@ function createCollectShibukawaEvents(deps) {
   return createKosodatePageCollector(SHIBUKAWA_SOURCE, {
     cityName: "渋川市", prefixLabel: "渋川市",
     urls: [
-      "https://www.city.shibukawa.lg.jp/kosodate/",
       "https://www.city.shibukawa.lg.jp/viewer/calendar-monthly.html",
+      "https://www.city.shibukawa.lg.jp/event/000341/index.html",
+      "https://www.city.shibukawa.lg.jp/kosodate-site/kosodate/000437/000446/000448/index.html",
+      "https://www.city.shibukawa.lg.jp/kosodate-site/kosodate/000437/000446/000447/p015021.html",
     ],
   }, deps);
 }
@@ -691,6 +704,348 @@ function createCollectOraEvents(deps) {
 }
 
 
+// ---- calendar-json/municipal-calendar 代替コレクター ----
+// カレンダーに子育てイベントが掲載されない自治体向け
+
+function createCollectOtaGunmaKosodateEvents(deps) {
+  const { OTA_GUNMA_SOURCE } = require("../../config/wards");
+  return createKosodatePageCollector(OTA_GUNMA_SOURCE, {
+    cityName: "太田市", prefixLabel: "太田市",
+    urls: [
+      "https://www.city.ota.gunma.jp/site/kosodate/",
+      "https://www.city.ota.gunma.jp/life/2/20/",
+      "https://www.city.ota.gunma.jp/site/boshi-kenko/",
+    ],
+  }, deps);
+}
+
+function createCollectFujiokaGunmaKosodateEvents(deps) {
+  const { FUJIOKA_GUNMA_SOURCE } = require("../../config/wards");
+  return createKosodatePageCollector(FUJIOKA_GUNMA_SOURCE, {
+    cityName: "藤岡市", prefixLabel: "藤岡市",
+    urls: [
+      "https://www.city.fujioka.gunma.jp/kodomo_kyoiku/index.html",
+      "https://www.city.fujioka.gunma.jp/kurashi_sagasu/kosodate/index.html",
+      "https://www.city.fujioka.gunma.jp/kodomo_kyoiku/ninshin_shussan/3047.html", // 両親学級 (日付あり)
+      "https://www.city.fujioka.gunma.jp/kodomo_kyoiku/ninshin_shussan/2951.html", // ママサロン (日付あり)
+    ],
+  }, deps);
+}
+
+function createCollectAnnakaKosodateEvents(deps) {
+  const { ANNAKA_SOURCE } = require("../../config/wards");
+  return createKosodatePageCollector(ANNAKA_SOURCE, {
+    cityName: "安中市", prefixLabel: "安中市",
+    urls: [
+      "https://www.city.annaka.lg.jp/life/3/19/",
+      "https://www.city.annaka.lg.jp/life/3/",
+    ],
+  }, deps);
+}
+
+
+// ---- 群馬県スケジュール表コレクター ----
+// 固定URLのスケジュール表ページからイベントを収集する汎用コレクター (群馬県版)
+
+function createGunmaScheduleTableCollector(sourceObj, config, deps) {
+  const {
+    geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+  } = deps;
+  const { cityName, prefixLabel, pages } = config;
+
+  function currentFiscalYear() {
+    const now = new Date();
+    const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const y = jst.getUTCFullYear();
+    const m = jst.getUTCMonth() + 1;
+    return m >= 4 ? y : y - 1;
+  }
+
+  function inferYear(text) {
+    const reiwaFy = text.match(/令和\s*(\d{1,2})\s*年度/);
+    if (reiwaFy) return 2018 + Number(reiwaFy[1]);
+    const westernFy = text.match(/(\d{4})\s*年度/);
+    if (westernFy) return Number(westernFy[1]);
+    const reiwa = text.match(/令和\s*(\d{1,2})\s*年/);
+    if (reiwa) return 2018 + Number(reiwa[1]);
+    return null;
+  }
+
+  function resolveMonthDay(month, day, fiscalYear) {
+    return month >= 4 ? { y: fiscalYear, mo: month, d: day } : { y: fiscalYear + 1, mo: month, d: day };
+  }
+
+  function extractDatesFromTable(tableHtml, fiscalYear) {
+    const dates = [];
+    const nText = tableHtml.normalize("NFKC");
+    const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    let trMatch;
+    while ((trMatch = trRe.exec(nText)) !== null) {
+      const rowHtml = trMatch[1];
+      const rowText = stripTags(rowHtml).trim();
+      if (!rowText) continue;
+      // 令和N年M月D日
+      const fullRe = /令和\s*(\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+      let fm;
+      while ((fm = fullRe.exec(rowText)) !== null) {
+        dates.push({ y: 2018 + Number(fm[1]), mo: Number(fm[2]), d: Number(fm[3]) });
+      }
+      // YYYY年M月D日
+      const isoRe = /(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+      let im;
+      while ((im = isoRe.exec(rowText)) !== null) {
+        const dup = dates.some(d => d.y === Number(im[1]) && d.mo === Number(im[2]) && d.d === Number(im[3]));
+        if (!dup) dates.push({ y: Number(im[1]), mo: Number(im[2]), d: Number(im[3]) });
+      }
+      // M月D日 (年なし → 年度推定) — セル単位でチェック (対象者列の「令和N年...生まれ」を回避)
+      const cellRe = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi;
+      let cellMatch;
+      while ((cellMatch = cellRe.exec(rowHtml)) !== null) {
+        const cellText = stripTags(cellMatch[1]).trim();
+        if (!cellText || /令和|年|生まれ/.test(cellText)) continue;
+        const mdRe = /(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+        let md;
+        while ((md = mdRe.exec(cellText)) !== null) {
+          const mo = Number(md[1]);
+          const d = Number(md[2]);
+          if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+            const resolved = resolveMonthDay(mo, d, fiscalYear);
+            const dup = dates.some(dd => dd.y === resolved.y && dd.mo === resolved.mo && dd.d === resolved.d);
+            if (!dup) dates.push(resolved);
+          }
+        }
+      }
+      // Fallback: row-level bare M月D日 when no cells have 令和/年
+      if (!/令和|年/.test(rowText)) {
+        const mdRe2 = /(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+        let md2;
+        while ((md2 = mdRe2.exec(rowText)) !== null) {
+          const mo = Number(md2[1]);
+          const d = Number(md2[2]);
+          if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+            const resolved = resolveMonthDay(mo, d, fiscalYear);
+            const dup = dates.some(dd => dd.y === resolved.y && dd.mo === resolved.mo && dd.d === resolved.d);
+            if (!dup) dates.push(resolved);
+          }
+        }
+      }
+    }
+    return dates;
+  }
+
+  /** ページテキストからも日付を抽出 (テーブル外の日付リスト対応) */
+  function extractDatesFromText(text, fiscalYear) {
+    const dates = [];
+    // 令和N年M月D日
+    const reRe = /令和\s*(\d{1,2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+    let m;
+    while ((m = reRe.exec(text)) !== null) {
+      dates.push({ y: 2018 + Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
+    }
+    // YYYY年M月D日
+    const isoRe = /(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+    while ((m = isoRe.exec(text)) !== null) {
+      const dup = dates.some(d => d.y === Number(m[1]) && d.mo === Number(m[2]) && d.d === Number(m[3]));
+      if (!dup) dates.push({ y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
+    }
+    // M月D日 (年なし → 年度推定) — 令和/年 を含まない行の裸のM月D日を拾う
+    const lines = text.split(/\n/);
+    for (const line of lines) {
+      if (/令和|年/.test(line)) continue;
+      const mdRe = /(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+      let md;
+      while ((md = mdRe.exec(line)) !== null) {
+        const mo = Number(md[1]);
+        const d = Number(md[2]);
+        if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+          const resolved = resolveMonthDay(mo, d, fiscalYear);
+          const dup = dates.some(dd => dd.y === resolved.y && dd.mo === resolved.mo && dd.d === resolved.d);
+          if (!dup) dates.push(resolved);
+        }
+      }
+    }
+    return dates;
+  }
+
+  function extractPageMeta(text) {
+    let venue = "";
+    const venueStopRe = /\s+(?:対象|内容|申し込み|申込|問い合わせ|日時|時間|持ち物|定員|費用|参加費|料金|備考|注意|その他|電話|TEL|ホーム|この記事|令和|お問い合わせ|連絡先|〒\d|受付)/;
+    const venueMatch = text.match(/(?:ところ|場所|会場|実施場所)\s*[：:]\s*(.{3,})/u);
+    if (venueMatch) {
+      let v = venueMatch[1];
+      const stopIdx = v.search(venueStopRe);
+      if (stopIdx > 0) v = v.substring(0, stopIdx);
+      if (v.length > 60) v = v.substring(0, 60);
+      v = sanitizeVenueText(v.trim());
+      if (v && v.length >= 2 && v.length <= 50 && !/トップページ|ホームページ|>/.test(v)) venue = v;
+    }
+    if (!venue) {
+      const venueMatch2 = text.match(/(?:ところ|場所|会場|実施場所)\s+(.{3,})/u);
+      if (venueMatch2) {
+        let v = venueMatch2[1];
+        const stopIdx = v.search(venueStopRe);
+        if (stopIdx > 0) v = v.substring(0, stopIdx);
+        if (v.length > 60) v = v.substring(0, 60);
+        v = sanitizeVenueText(v.trim());
+        if (v && v.length >= 2 && v.length <= 50 && !/トップページ|ホームページ|>/.test(v)) venue = v;
+      }
+    }
+    const timeRange = parseTimeRangeFromText(text);
+    return { venue, timeRange };
+  }
+
+  return async function collector(maxDays) {
+    const label = sourceObj.label;
+    const byId = new Map();
+
+    for (const page of pages) {
+      let html;
+      try {
+        html = await fetchText(page.url);
+      } catch (e) {
+        console.warn(`[${label}] schedule page fetch failed (${page.url}):`, e.message || e);
+        continue;
+      }
+
+      const nHtml = html.normalize("NFKC");
+      const text = stripTags(nHtml);
+      const fiscalYear = inferYear(text) || currentFiscalYear();
+
+      let pageTitle = page.title;
+      if (!pageTitle) {
+        const h1Match = nHtml.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+        if (h1Match) pageTitle = stripTags(h1Match[1]).trim();
+      }
+      if (!pageTitle) pageTitle = `${label}子育てイベント`;
+
+      const meta = extractPageMeta(text);
+      const venue = meta.venue || page.defaultVenue || "";
+      const timeRange = meta.timeRange || null;
+
+      // テーブルから日付抽出
+      const tableRe = /<table[^>]*>([\s\S]*?)<\/table>/gi;
+      let tableMatch;
+      const allDates = [];
+      while ((tableMatch = tableRe.exec(nHtml)) !== null) {
+        allDates.push(...extractDatesFromTable(tableMatch[1], fiscalYear));
+      }
+      // テーブル外の日付も抽出（dl/dd パターンやプレーンテキスト日付）
+      if (allDates.length === 0) {
+        allDates.push(...extractDatesFromText(text, fiscalYear));
+      }
+
+      // 重複除去
+      const uniqueDates = [];
+      const seen = new Set();
+      for (const d of allDates) {
+        const key = `${d.y}-${d.mo}-${d.d}`;
+        if (!seen.has(key)) { seen.add(key); uniqueDates.push(d); }
+      }
+
+      // 住所抽出
+      let rawAddress = "";
+      if (venue) {
+        const embedded = extractEmbeddedAddressFromVenue(venue, cityName);
+        if (embedded.length > 0) rawAddress = embedded[0];
+      }
+
+      const promises = [];
+      for (const eventDate of uniqueDates) {
+        if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
+        promises.push(addEventRecord(byId, {
+          sourceObj, eventDate, title: pageTitle, url: page.url,
+          venue: sanitizeVenueText(venue), rawAddress,
+          timeRange,
+          cityName, prefixLabel,
+          geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+        }));
+      }
+      await Promise.all(promises.filter(Boolean));
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected (schedule)`);
+    return results;
+  };
+}
+
+
+// ---- 前橋市スケジュール+カレンダー併用コレクター ----
+
+function createCollectMaebashiScheduleEvents(deps) {
+  const { MAEBASHI_SOURCE } = require("../../config/wards");
+  return createGunmaScheduleTableCollector(MAEBASHI_SOURCE, {
+    cityName: "前橋市", prefixLabel: "前橋市",
+    pages: [
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/47247.html", title: "ひよこクラス", defaultVenue: "前橋市第二コミュニティセンター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/12086.html", title: "離乳食講習会すてっぷ1", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/19040.html", title: "離乳食講習会すてっぷ2", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/38411.html", title: "離乳食講習会すてっぷ3", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/4/2/1/12087.html", title: "ハローベビークラス", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/37326.html", title: "プリミークラブ", defaultVenue: "前橋市第二コミュニティセンター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/27587.html", title: "のびのびあそぼう会", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/3/1/12077.html", title: "2歳児歯科健診", defaultVenue: "前橋市保健センター" },
+      { url: "https://www.city.maebashi.gunma.jp/kosodate_kyoiku/2/4/1/47262.html", title: "親子の絆づくりプログラム" },
+    ],
+  }, deps);
+}
+
+
+// ---- 伊勢崎市スケジュール表コレクター ----
+
+function createCollectIsesakiScheduleEvents(deps) {
+  const { ISESAKI_SOURCE } = require("../../config/wards");
+  return createGunmaScheduleTableCollector(ISESAKI_SOURCE, {
+    cityName: "伊勢崎市", prefixLabel: "伊勢崎市",
+    pages: [
+      { url: "https://www.city.isesaki.lg.jp/iryo_kenko_fukushi/iryo_kenko/kenshin_kenshin/kodomonokenshin/15521.html", title: "4か月児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.isesaki.lg.jp/iryo_kenko_fukushi/iryo_kenko/kenshin_kenshin/kodomonokenshin/15517.html", title: "10か月児健康相談", defaultVenue: "保健センター" },
+      { url: "https://www.city.isesaki.lg.jp/iryo_kenko_fukushi/iryo_kenko/kenshin_kenshin/kodomonokenshin/15518.html", title: "1歳6か月児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.isesaki.lg.jp/iryo_kenko_fukushi/iryo_kenko/kenshin_kenshin/kodomonokenshin/15520.html", title: "3歳児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.isesaki.lg.jp/iryo_kenko_fukushi/iryo_kenko/boshi_kenko/15547.html", title: "両親学級", defaultVenue: "保健センター" },
+    ],
+  }, deps);
+}
+
+
+// ---- 桐生市スケジュール表コレクター ----
+
+function createCollectKiryuScheduleEvents(deps) {
+  const { KIRYU_SOURCE } = require("../../config/wards");
+  return createGunmaScheduleTableCollector(KIRYU_SOURCE, {
+    cityName: "桐生市", prefixLabel: "桐生市",
+    pages: [
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1018526/1018527.html", title: "3か月児健康診査", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1018526/1018529.html", title: "10か月児健康診査", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1018526/1018531.html", title: "1歳6か月児健康診査", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1018526/1018532.html", title: "2歳児歯科健康診査", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1018526/1018533.html", title: "3歳児健康診査", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1008597/1000819.html", title: "もぐもぐ離乳食教室", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009668/1008597/1018461.html", title: "ステップアップ離乳食教室", defaultVenue: "桐生市保健福祉会館" },
+      { url: "https://www.city.kiryu.lg.jp/kosodate/1009666/1001432.html", title: "ママ&パパ教室", defaultVenue: "桐生市保健福祉会館" },
+    ],
+  }, deps);
+}
+
+
+// ---- 館林市スケジュール表コレクター ----
+
+function createCollectTatebayashiScheduleEvents(deps) {
+  const { TATEBAYASHI_SOURCE } = require("../../config/wards");
+  return createGunmaScheduleTableCollector(TATEBAYASHI_SOURCE, {
+    cityName: "館林市", prefixLabel: "館林市",
+    pages: [
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/080/010/20200107033000.html", title: "4か月児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/080/020/20200107032000.html", title: "10か月児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/080/030/20200107031000.html", title: "1歳6か月児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/080/040/20200107030000.html", title: "2歳児歯科健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/080/050/20200107025000.html", title: "3歳児健康診査", defaultVenue: "保健センター" },
+      { url: "https://www.city.tatebayashi.gunma.jp/s051/kenko/020/035/20210314145703.html", title: "離乳食教室", defaultVenue: "保健センター" },
+    ],
+  }, deps);
+}
+
+
 module.exports = {
   createCollectKiryuEvents,
   createCollectNumataEvents,
@@ -720,4 +1075,13 @@ module.exports = {
   createCollectChiyodaGunmaEvents,
   createCollectOizumiEvents,
   createCollectOraEvents,
+  // calendar代替コレクター
+  createCollectOtaGunmaKosodateEvents,
+  createCollectFujiokaGunmaKosodateEvents,
+  createCollectAnnakaKosodateEvents,
+  // スケジュール表コレクター
+  createCollectMaebashiScheduleEvents,
+  createCollectIsesakiScheduleEvents,
+  createCollectKiryuScheduleEvents,
+  createCollectTatebayashiScheduleEvents,
 };

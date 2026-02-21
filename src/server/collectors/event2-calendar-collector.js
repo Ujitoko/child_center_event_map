@@ -16,7 +16,7 @@ const DETAIL_BATCH_SIZE = 6;
 
 // 子育て関連キーワード (WARD_CHILD_HINT_RE を補完)
 const CHILD_KEYWORDS_RE =
-  /子育て|子ども|親子|乳幼児|幼児|離乳食|保育|キッズ/;
+  /子育て|子ども|親子|乳幼児|幼児|離乳食|保育|キッズ|おはなし会|家庭の日|読み聞かせ|絵本/;
 
 /**
  * event2/YYYYMM.html ページからイベントリンクを抽出

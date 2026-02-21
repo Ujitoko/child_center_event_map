@@ -12,24 +12,28 @@ const DETAIL_BATCH_SIZE = 6;
 
 // 子育て関連キーワード (WARD_CHILD_HINT_RE を補完)
 const CHILD_KEYWORDS_RE =
-  /子育て|子ども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|健康診査|マタニティ|プレママ|ママ|パパ/;
+  /子育て|子ども|こども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|健康診査|マタニティ|プレママ|ママ|パパ|おはなし会|家庭の日|読み聞かせ|絵本/;
 
 /**
  * イベントが子育て関連かどうか判定
  * @param {Object} entry - calendar.json のエントリ
  * @returns {boolean}
  */
-function isChildEvent(entry) {
+function isChildEvent(entry, childEventTypeNo) {
   const title = entry.page_name || "";
   if (WARD_CHILD_HINT_RE.test(title)) return true;
   if (CHILD_KEYWORDS_RE.test(title)) return true;
   if (entry.event) {
+    // childEventTypeNo による直接フィルタ (例: 前橋市 event_type_no: 1)
+    if (childEventTypeNo != null && entry.event.event_type_no === childEventTypeNo) return true;
     const typeName = entry.event.event_type_name || "";
-    if (/子育て|子ども/.test(typeName)) return true;
+    if (CHILD_KEYWORDS_RE.test(typeName)) return true;
+    if (WARD_CHILD_HINT_RE.test(typeName)) return true;
     const fields = entry.event.event_fields;
     if (fields && typeof fields === "object" && !Array.isArray(fields)) {
       for (const val of Object.values(fields)) {
-        if (/子育て|子ども/.test(val)) return true;
+        if (CHILD_KEYWORDS_RE.test(val)) return true;
+        if (WARD_CHILD_HINT_RE.test(val)) return true;
       }
     }
   }
@@ -115,7 +119,7 @@ function buildGeoCandidates(venue, address, source) {
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createCalendarJsonCollector(config, deps) {
-  const { source, childKeywords, jsonPath } = config;
+  const { source, childKeywords, jsonPath, childEventTypeNo } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -144,7 +148,7 @@ function createCalendarJsonCollector(config, deps) {
 
     // 子育て関連イベントをフィルタ
     const childEntries = entries.filter((entry) => {
-      if (isChildEvent(entry)) return true;
+      if (isChildEvent(entry, childEventTypeNo)) return true;
       if (extraKeywordsRe && extraKeywordsRe.test(entry.page_name || "")) return true;
       return false;
     });

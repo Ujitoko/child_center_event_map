@@ -5,6 +5,7 @@ const {
   parseTimeRangeFromText,
   buildStartsEndsForDate,
   getMonthsForRange,
+  parseDatesFromHtml,
 } = require("../date-utils");
 const {
   sanitizeVenueText,
@@ -20,59 +21,53 @@ const CHILD_RE = /子育て|子ども|親子|乳幼児|幼児|離乳食|保育|�
 /**
  * さいたま市イベント一覧ページからイベントリンクを抽出
  *
- * リンク: <a href="/004/...">タイトル</a>
- * 日付: 周辺テキストから YYYY年M月D日 または M月D日 を検出
+ * HTML構造: <div class="in_column_box"><a href="...">...block...</a></div>
+ * タイトル: <strong class="ttl_event">Title</strong>
+ * 日付: ブロック内 <span class="break"><span>M月D日...～M月D日...</span>
+ * 場所: <span class="place">区名：会場名</span>
  */
 function parseEventListPage(html, baseUrl) {
   const events = [];
 
-  // ページ全体から年月を取得（フォールバック用）
-  const ymMatch = html.match(/(\d{4})年\s*(\d{1,2})月/);
-  const fallbackYear = ymMatch ? Number(ymMatch[1]) : new Date().getFullYear();
-  const fallbackMonth = ymMatch ? Number(ymMatch[2]) : null;
+  // ページ全体から年を取得（フォールバック用）
+  const now = new Date();
+  const jstYear = new Date(now.getTime() + 9 * 3600000).getFullYear();
 
-  // イベントブロックを分割して処理
-  // リンクとその前後のテキストから日付を抽出
-  const linkRe = /<a\s+[^>]*href="(\/004\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  // in_column_box ブロックを分割して処理
+  const blockRe = /<div\s+class="in_column_box">\s*<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/div>/gi;
   let m;
-  while ((m = linkRe.exec(html)) !== null) {
+  while ((m = blockRe.exec(html)) !== null) {
     const href = m[1].replace(/&amp;/g, "&").trim();
-    const title = stripTags(m[2]).trim();
-    if (!title || !href) continue;
+    const blockHtml = m[2];
+
+    // タイトルを <strong class="ttl_event"> から抽出
+    const titleMatch = blockHtml.match(/<strong[^>]*class="ttl_event"[^>]*>([\s\S]*?)<\/strong>/i);
+    const title = titleMatch ? stripTags(titleMatch[1]).trim() : "";
+    if (!title) continue;
 
     // 子育て関連フィルタ
-    if (!WARD_CHILD_HINT_RE.test(title) && !CHILD_RE.test(title)) continue;
+    const fullText = stripTags(blockHtml);
+    if (!WARD_CHILD_HINT_RE.test(title) && !CHILD_RE.test(title) && !WARD_CHILD_HINT_RE.test(fullText) && !CHILD_RE.test(fullText)) continue;
 
-    // リンク前後のテキストブロック(500文字)から日付を検出
-    const pos = m.index;
-    const context = html.substring(Math.max(0, pos - 500), pos + m[0].length + 300);
-    const contextText = stripTags(context);
+    // 日付を <span class="break"> 内の最初の <span> から抽出
+    const breakMatch = blockHtml.match(/<span\s+class="break">\s*<span>([\s\S]*?)<\/span>/i);
+    const dateText = breakMatch ? stripTags(breakMatch[1]).trim() : "";
 
-    let y = null;
-    let mo = null;
-    let d = null;
+    let y = null, mo = null, d = null;
 
-    // YYYY年M月D日 パターン
-    const fullDateMatch = contextText.match(/(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/);
-    if (fullDateMatch) {
-      y = Number(fullDateMatch[1]);
-      mo = Number(fullDateMatch[2]);
-      d = Number(fullDateMatch[3]);
-    }
-
-    // M月D日 パターン (年はフォールバック)
-    if (!d) {
-      const mdMatch = contextText.match(/(\d{1,2})月\s*(\d{1,2})日/);
-      if (mdMatch) {
-        mo = Number(mdMatch[1]);
-        d = Number(mdMatch[2]);
-        y = fallbackYear;
-      }
+    // M月D日 パターン (開始日を使用)
+    const mdMatch = dateText.match(/(\d{1,2})月\s*(\d{1,2})日/);
+    if (mdMatch) {
+      mo = Number(mdMatch[1]);
+      d = Number(mdMatch[2]);
+      // 年の推定: 日付テキストにYYYY年があればそれを使用
+      const yearMatch = dateText.match(/(\d{4})年/);
+      y = yearMatch ? Number(yearMatch[1]) : jstYear;
     }
 
     // 令和N年M月D日 パターン
     if (!d) {
-      const reMatch = contextText.match(/令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/);
+      const reMatch = dateText.match(/令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/);
       if (reMatch) {
         y = 2018 + Number(reMatch[1]);
         mo = Number(reMatch[2]);
@@ -80,11 +75,22 @@ function parseEventListPage(html, baseUrl) {
       }
     }
 
-    // 日付が取れなければスキップ（詳細ページで補完する手もあるが、一覧で取れないものは対象外）
-    if (!y || !mo || !d) continue;
-
+    // 日付が取れなくても詳細ページで補完するため追加
     const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
-    events.push({ title, url: absUrl, y, mo, d });
+    events.push({ title, url: absUrl, y: y || 0, mo: mo || 0, d: d || 0, needDates: !d });
+  }
+
+  // フォールバック: in_column_box が見つからない場合、従来のリンクパターンも試す
+  if (events.length === 0) {
+    const linkRe = /<a\s+[^>]*href="(\/(?:004|003|001|006|chuo|urawa)\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    while ((m = linkRe.exec(html)) !== null) {
+      const href = m[1].replace(/&amp;/g, "&").trim();
+      const rawTitle = stripTags(m[2]).trim();
+      if (!rawTitle || !href) continue;
+      if (!WARD_CHILD_HINT_RE.test(rawTitle) && !CHILD_RE.test(rawTitle)) continue;
+      const absUrl = `${baseUrl}${href}`;
+      events.push({ title: rawTitle, url: absUrl, y: 0, mo: 0, d: 0, needDates: true });
+    }
   }
 
   return events;
@@ -158,17 +164,15 @@ function createCollectSaitamaEvents(deps) {
       return [];
     }
 
-    // 重複除去
-    const uniqueMap = new Map();
+    // URL単位で重複除去
+    const uniqueByUrl = new Map();
     for (const ev of rawEvents) {
-      const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
-      const key = `${ev.url}:${dateKey}`;
-      if (!uniqueMap.has(key)) uniqueMap.set(key, { ...ev, dateKey });
+      if (!uniqueByUrl.has(ev.url)) uniqueByUrl.set(ev.url, ev);
     }
-    const uniqueEvents = Array.from(uniqueMap.values());
+    const uniqueEvents = Array.from(uniqueByUrl.values());
 
-    // 詳細ページバッチ取得
-    const detailUrls = [...new Set(uniqueEvents.map((e) => e.url))].slice(0, 40);
+    // 詳細ページバッチ取得 (全イベント)
+    const detailUrls = [...new Set(uniqueEvents.map((e) => e.url))].slice(0, 60);
     const detailMap = new Map();
     for (let i = 0; i < detailUrls.length; i += DETAIL_BATCH_SIZE) {
       const batch = detailUrls.slice(i, i + DETAIL_BATCH_SIZE);
@@ -202,6 +206,15 @@ function createCollectSaitamaEvents(deps) {
             }
           }
 
+          // place span パターン (一覧ページ構造)
+          if (!venue) {
+            const placeMatch = text.match(/(?:場所|会場|ところ)[：:・\s]\s*([^\n]{2,60})/);
+            if (placeMatch) {
+              let v = placeMatch[1].trim().replace(/\s*(?:住所|郵便番号|駐車|対象|定員|電話|内容|費用|日時|申込).*$/, "").trim();
+              if (v.length >= 2) venue = v;
+            }
+          }
+
           // さいたま市X区 パターンでアドレス補完
           if (!address) {
             const addrMatch = text.match(/さいたま市[^\s、。,]{1,4}区[^\s、。,]{2,30}/);
@@ -217,9 +230,11 @@ function createCollectSaitamaEvents(deps) {
             }
           }
 
+          // 複数日付を取得
+          const dates = parseDatesFromHtml(html);
           const eventDate = parseDateFromDetail(text);
           const timeRange = parseTimeRangeFromText(text);
-          return { url, venue, address, eventDate, timeRange };
+          return { url, venue, address, eventDate, dates, timeRange };
         })
       );
       for (const r of results) {
@@ -232,15 +247,22 @@ function createCollectSaitamaEvents(deps) {
     for (const ev of uniqueEvents) {
       const detail = detailMap.get(ev.url);
 
-      // 詳細ページの日付で補完
-      let { y, mo, d } = ev;
-      if (detail && detail.eventDate) {
-        y = detail.eventDate.y;
-        mo = detail.eventDate.mo;
-        d = detail.eventDate.d;
+      // 日付リストの構築
+      let dateList = [];
+      if (ev.needDates && detail) {
+        // 詳細ページから取得した複数日付を使用
+        if (detail.dates && detail.dates.length > 0) {
+          dateList = detail.dates;
+        } else if (detail.eventDate) {
+          dateList = [detail.eventDate];
+        }
+      } else if (ev.y && ev.mo && ev.d) {
+        dateList = [{ y: ev.y, mo: ev.mo, d: ev.d }];
+      } else if (detail && detail.eventDate) {
+        dateList = [detail.eventDate];
       }
 
-      if (!inRangeJst(y, mo, d, maxDays)) continue;
+      if (dateList.length === 0) continue;
 
       const venue = sanitizeVenueText((detail && detail.venue) || "");
       const rawAddress = sanitizeAddressText((detail && detail.address) || "");
@@ -258,26 +280,28 @@ function createCollectSaitamaEvents(deps) {
       point = resolveEventPoint(SAITAMA_CITY_SOURCE, venue, point, rawAddress || `${label} ${venue}`);
       const resolvedAddr = resolveEventAddress(SAITAMA_CITY_SOURCE, venue, rawAddress || `${label} ${venue}`, point);
 
-      const dateKey = `${y}${String(mo).padStart(2, "0")}${String(d).padStart(2, "0")}`;
-      const { startsAt, endsAt } = buildStartsEndsForDate(
-        { y, mo, d },
-        timeRange
-      );
-      const id = `${source}:${ev.url}:${ev.title}:${dateKey}`;
-      if (byId.has(id)) continue;
-      byId.set(id, {
-        id,
-        source,
-        source_label: label,
-        title: ev.title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        venue_name: venue,
-        address: resolvedAddr || "",
-        url: ev.url,
-        lat: point ? point.lat : SAITAMA_CITY_SOURCE.center.lat,
-        lng: point ? point.lng : SAITAMA_CITY_SOURCE.center.lng,
-      });
+      for (const dd of dateList) {
+        const { y, mo, d } = dd;
+        if (!inRangeJst(y, mo, d, maxDays)) continue;
+
+        const dateKey = `${y}${String(mo).padStart(2, "0")}${String(d).padStart(2, "0")}`;
+        const { startsAt, endsAt } = buildStartsEndsForDate({ y, mo, d }, timeRange);
+        const id = `${source}:${ev.url}:${ev.title}:${dateKey}`;
+        if (byId.has(id)) continue;
+        byId.set(id, {
+          id,
+          source,
+          source_label: label,
+          title: ev.title,
+          starts_at: startsAt,
+          ends_at: endsAt,
+          venue_name: venue,
+          address: resolvedAddr || "",
+          url: ev.url,
+          lat: point ? point.lat : null,
+          lng: point ? point.lng : null,
+        });
+      }
     }
 
     const results = Array.from(byId.values());

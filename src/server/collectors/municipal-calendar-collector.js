@@ -14,7 +14,7 @@ const DETAIL_BATCH_SIZE = 6;
 
 // 子育て関連キーワード (WARD_CHILD_HINT_RE を補完)
 const CHILD_KEYWORDS_RE =
-  /子育て|子ども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|健康診査|マタニティ|プレママ|ママ|パパ/;
+  /子育て|子ども|こども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|健康診査|マタニティ|プレママ|ママ|パパ|おはなし会|家庭の日|読み聞かせ|絵本/;
 
 /**
  * カレンダーページHTMLから年月コンテキストを抽出
@@ -59,7 +59,9 @@ function parseDateRangeText(text) {
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return dates;
 
   const dayMs = 86400000;
-  const diffDays = Math.min(Math.floor((end - start) / dayMs), 90);
+  // 長期イベント（プラネタリウム等）でも今日以降の日付を生成するため、
+  // 上限を365日に拡大。inRangeJstで後ほどフィルタされる。
+  const diffDays = Math.min(Math.floor((end - start) / dayMs), 365);
 
   // 曜日フィルタ: "毎週X曜" があれば特定曜日のみ
   const weekdayMatch = normalized.match(/毎週([月火水木金土日])曜/);
@@ -133,7 +135,7 @@ function parseCalendarPage(html, baseUrl, pageYear, pageMonth, childCategoryInde
 function parseEventBox(eventBox, baseUrl, childCategoryIndex) {
   // タイトルとURLを抽出
   const titleMatch = eventBox.match(
-    /<span\s+class="article_title">\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/span>/
+    /<(?:span|div)\s+class="article_title">\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/(?:span|div)>/
   );
   if (!titleMatch) return null;
   const href = titleMatch[1].replace(/&amp;/g, "&").trim();
@@ -357,6 +359,18 @@ function createMunicipalCalendarCollector(config, deps) {
               v = v.replace(/\s*(?:住所|駐車|参加|申込|持ち物|対象|定員|電話|内容|ファクス|問い合わせ|日時|費用|備考).*$/, "").trim();
               if (v.length >= 2 && !/^[にでのをはがお]/.test(v)) detailVenue = v;
             }
+          }
+          // CMS連絡先セクションのフォールバック: <span class="sf_name">部署名</span> / <span class="sf_address">住所</span>
+          if (!detailVenue) {
+            const sfName = html.match(/<span\s+class="sf_name">([\s\S]*?)<\/span>/);
+            if (sfName) {
+              const deptName = stripTags(sfName[1]).trim();
+              if (deptName && deptName.length >= 2 && deptName.length <= 40) detailVenue = deptName;
+            }
+          }
+          if (!detailAddress) {
+            const sfAddr = html.match(/<span\s+class="sf_address">([\s\S]*?)<\/span>/);
+            if (sfAddr) detailAddress = stripTags(sfAddr[1]).trim();
           }
           const timeRange = parseTimeRangeFromText(stripTags(html));
           return { url, venue: detailVenue, address: detailAddress, timeRange };

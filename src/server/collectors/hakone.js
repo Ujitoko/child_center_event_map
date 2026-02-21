@@ -14,7 +14,7 @@ const {
 const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 const { WARD_CHILD_HINT_RE } = require("../../config/wards");
 
-const CHILD_RE = /子育て|子ども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|マタニティ|ママ|パパ/;
+const CHILD_RE = /子育て|子ども|子供|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|健診|マタニティ|ママ|パパ|おはなし会|家庭の日|読み聞かせ|絵本/;
 const CALENDAR_GENRE = "1001200000001";
 
 function createCollectHakoneEvents(deps) {

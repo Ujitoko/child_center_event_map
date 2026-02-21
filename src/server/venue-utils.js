@@ -32,6 +32,14 @@ function inferWardVenueFromTitle(title, sourceLabel) {
     const v = sanitizeVenueText(bracket[1]);
     if (v && v.length >= 2 && v.length <= 40 && !/^(お知らせ|注意|重要|中止|延期|開催|募集|変更|参加|無料|有料|予約|速報)/.test(v)) return v;
   }
+  // Non-start bracketed venue: 1歳6か月児健康診査【新里総合センター】
+  const midBracket = text.match(/【([^】]{2,40})】/u);
+  if (midBracket && midBracket.index > 0) {
+    const v = sanitizeVenueText(midBracket[1]);
+    if (v && v.length >= 3 && v.length <= 40
+      && /(?:センター|児童館|保健|ひろば|会館|ホール|プラザ|図書館|体育館|公民館|保育園|福祉|総合)/.test(v)
+      && !/^(お知らせ|注意|重要|中止|延期|開催|募集|変更|参加|無料|有料|予約|速報)/.test(v)) return v;
+  }
   const inline = text.match(
     new RegExp(`([^\\s]{2,100}${facilityPat})(?:[^\\s令和平成年月日0-9０-９]{0,10})`, "u")
   );
@@ -237,6 +245,7 @@ function isOnlineOnlyWithoutPlace(textRaw) {
 function isJunkVenueName(venueName) {
   const v = normalizeText(venueName);
   if (!v) return true;
+  if (v.length === 1) return true;
   if (v.length <= 3 && /^[\u3040-\u309F]+$/.test(v)) return true;
   if (/innerHTML|getElementById|getTracker|function\s*\(|\.php|\.js|UA-\d/i.test(v)) return true;
   if (/^(ホール|テナント|募集終了|例|募集案内|err)$/i.test(v)) return true;
@@ -286,6 +295,38 @@ function isJunkVenueName(venueName) {
   if (/^\d{1,2}月\d{1,2}日/.test(v)) return true;
   // Very long text that looks like a description
   if (v.length > 60) return true;
+  // Application/registration text extracted as venue
+  if (/^応募方法|^申込方法|^一時預かり場所|^展示場所$/.test(v)) return true;
+  // Dental/medical institutions (not a single venue)
+  if (/^(?:歯科)?医師会会員の/.test(v)) return true;
+  // Ward-level generic child facility references (区/市/町/村 variants)
+  if (/^[^\s]+(?:区|市|町|村)(?:子ども関連施設|子育て関連施設|子育て施設|子育てイベント|児童館)$/.test(v)) return true;
+  // "名称" (header text)
+  if (/^名称$/.test(v)) return true;
+  // Year-prefixed academic/fiscal text
+  if (/^年度冬期|^年度夏期/.test(v)) return true;
+  // "トップ > ..." breadcrumb text
+  if (/^トップ\s*>/.test(v)) return true;
+  // "寒川町健" (truncated), "添付の「令和..." (instruction text)
+  if (/^添付の[「『]/.test(v)) return true;
+  // Venue text that starts with date/schedule info
+  if (/^(?:毎月第\d|偶数月|奇数月)/.test(v)) return true;
+  // Description text mistakenly extracted as venue
+  if (/^養子縁組を|^育児休業復職/.test(v)) return true;
+  // Venue text with description-like phrases (受付時間, 必要なもの, etc.)
+  if (/受付時間|必要なもの|返送について|臨時休館/.test(v)) return true;
+  // Partial/truncated text ending with body part of word
+  if (/^(?:\d+日目|(?:1日目|（1日目))/.test(v)) return true;
+  // Room-only without facility (e.g. "講義室および保育室")
+  if (/^(?:講義室|保育室|集会室|会議室|和室|多目的室)(?:および|と|・)/.test(v)) return true;
+  // Date text extracted as venue (e.g. "30日 （月曜日")
+  if (/^\d{1,2}日\s*[（(]/.test(v)) return true;
+  // Itabashi CAP'S parsing artifacts: "応援児童館", "立西徳児童館", "立なります児童館", "子育て応援児童館"
+  if (/^(?:応援児童館|立[^\s]{1,6}児童館|子育て応援児童館)$/.test(v)) return true;
+  // Description text (キラキラきれいな..., お湯につけると...)
+  if (/^(?:キラキラ|お湯につけると|抽せん結果)/.test(v)) return true;
+  // Floor + room without facility name
+  if (/^\d+階\s*[^\s]+$/.test(v) && !/センター|館|プラザ|ホール/.test(v)) return true;
   return false;
 }
 

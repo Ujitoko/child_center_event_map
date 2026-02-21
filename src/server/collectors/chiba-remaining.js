@@ -90,7 +90,9 @@ function parseRssFeed(xml) {
 function isChildEvent(title, extra) {
   const text = title + (extra || "");
   return WARD_CHILD_HINT_RE.test(text) ||
-    /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|赤ちゃん|ベビー|保育|マタニティ|妊婦/.test(text);
+    /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|赤ちゃん|ベビー|保育|マタニティ|妊婦|健診|予防接種/.test(text) ||
+    /\d+\s*(?:か月|歳|ヶ月|カ月)\s*児/.test(text) ||
+    /おはなし会|家庭の日|読み聞かせ|絵本/.test(text);
 }
 
 /** 詳細ページからイベント情報を抽出する汎用関数 */

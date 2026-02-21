@@ -55,7 +55,13 @@ function createCollectIseharaEvents(deps) {
       const url = `${ISEHARA_SOURCE.baseUrl}/kosodate-portal/event-list/${ym.year}/${mm}/`;
       try {
         const html = await fetchText(url);
-        rawEvents.push(...parseListPage(html, ISEHARA_SOURCE.baseUrl));
+        const parsed = parseListPage(html, ISEHARA_SOURCE.baseUrl);
+        // 一覧ページの年月を保持（詳細ページから日付が取れない場合のフォールバック用）
+        for (const ev of parsed) {
+          ev.listYear = ym.year;
+          ev.listMonth = ym.month;
+        }
+        rawEvents.push(...parsed);
       } catch (e) {
         console.warn(`[${label}] month ${ym.year}/${ym.month} fetch failed:`, e.message || e);
       }
@@ -78,8 +84,9 @@ function createCollectIseharaEvents(deps) {
           const html = await fetchText(url);
           const meta = parseDetailMeta(html);
           const dates = parseDatesFromHtml(html);
-          const timeRange = parseTimeRangeFromText(stripTags(html));
-          return { url, meta, dates, timeRange };
+          const plainText = stripTags(html);
+          const timeRange = parseTimeRangeFromText(plainText);
+          return { url, meta, dates, timeRange, plainText };
         })
       );
       for (const r of results) {
@@ -93,6 +100,31 @@ function createCollectIseharaEvents(deps) {
     const byId = new Map();
     for (const ev of uniqueEvents) {
       const detail = detailMap.get(ev.url);
+      // 詳細ページから日付が取れない場合、一覧ページの年月で補完
+      if (detail && (!detail.dates || detail.dates.length === 0) && ev.listYear && ev.listMonth) {
+        // 詳細ページテキストから M月D日 パターンを探す
+        if (detail.meta) {
+          const text = detail.plainText || "";
+          const mdRe = /(\d{1,2})月\s*(\d{1,2})日/g;
+          let mdMatch;
+          const fallbackDates = [];
+          while ((mdMatch = mdRe.exec(text)) !== null) {
+            const fmo = Number(mdMatch[1]);
+            const fd = Number(mdMatch[2]);
+            if (fmo >= 1 && fmo <= 12 && fd >= 1 && fd <= 31) {
+              // 年度（令和N年度）を考慮: 4月以降は当年度、1-3月は翌年
+              const fy = fmo >= 4 ? ev.listYear : (ev.listMonth >= 4 ? ev.listYear + 1 : ev.listYear);
+              fallbackDates.push({ y: fy, mo: fmo, d: fd });
+            }
+          }
+          if (fallbackDates.length > 0) {
+            detail.dates = fallbackDates;
+          } else {
+            // 月の1日をフォールバック
+            detail.dates = [{ y: ev.listYear, mo: ev.listMonth, d: 1 }];
+          }
+        }
+      }
       if (!detail || !detail.dates || detail.dates.length === 0) continue;
       const venue = sanitizeVenueText((detail.meta && detail.meta.venue) || "");
       const rawAddress = sanitizeAddressText((detail.meta && detail.meta.address) || "");

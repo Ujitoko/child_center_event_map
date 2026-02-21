@@ -284,6 +284,30 @@ function createGetEvents(deps) {
     collectChiyodaGunmaEvents,
     collectOizumiEvents,
     collectOraEvents,
+    // Tochigi schedule supplement
+    collectNasuScheduleEvents,
+    collectTakanezawaScheduleEvents,
+    collectNikkoScheduleEvents,
+    collectNikkoSupportCenterEvents,
+    collectNasushiobaraScheduleEvents,
+    collectOyamaScheduleEvents,
+    collectOhtawaraScheduleEvents,
+    collectAshikagaScheduleEvents,
+    collectShimotsukeScheduleEvents,
+    collectTochigiSakuraScheduleEvents,
+    collectOhtawaraPdfScheduleEvents,
+    collectKanumaPdfScheduleEvents,
+    collectNasukarasuyamaPdfScheduleEvents,
+    // PDF schedule collectors
+    collectOtaGunmaPdfScheduleEvents,
+    collectShibukawaPdfScheduleEvents,
+    collectTomiokaPdfScheduleEvents,
+    collectAnnakaPdfScheduleEvents,
+    // Gunma schedule supplements
+    collectMaebashiScheduleEvents,
+    collectIsesakiScheduleEvents,
+    collectKiryuScheduleEvents,
+    collectTatebayashiScheduleEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -567,6 +591,30 @@ function createGetEvents(deps) {
     () => collectChiyodaGunmaEvents(days),
     () => collectOizumiEvents(days),
     () => collectOraEvents(days),
+    // Tochigi schedule supplement
+    () => collectNasuScheduleEvents(days),
+    () => collectTakanezawaScheduleEvents(days),
+    () => collectNikkoScheduleEvents(days),
+    () => collectNikkoSupportCenterEvents(days),
+    () => collectNasushiobaraScheduleEvents(days),
+    () => collectOyamaScheduleEvents(days),
+    () => collectOhtawaraScheduleEvents(days),
+    () => collectAshikagaScheduleEvents(days),
+    () => collectShimotsukeScheduleEvents(days),
+    () => collectTochigiSakuraScheduleEvents(days),
+    () => collectOhtawaraPdfScheduleEvents(days),
+    () => collectKanumaPdfScheduleEvents(days),
+    () => collectNasukarasuyamaPdfScheduleEvents(days),
+    // PDF schedule collectors
+    () => collectOtaGunmaPdfScheduleEvents(days),
+    () => collectShibukawaPdfScheduleEvents(days),
+    () => collectTomiokaPdfScheduleEvents(days),
+    () => collectAnnakaPdfScheduleEvents(days),
+    // Gunma schedule supplements
+    () => collectMaebashiScheduleEvents(days),
+    () => collectIsesakiScheduleEvents(days),
+    () => collectKiryuScheduleEvents(days),
+    () => collectTatebayashiScheduleEvents(days),
   ], 5);
   const {
     chuo,

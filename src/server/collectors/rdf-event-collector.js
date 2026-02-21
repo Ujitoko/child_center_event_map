@@ -97,7 +97,7 @@ function createRdfEventCollector(config, deps) {
     const filtered = items.filter(item => {
       const catText = item.categories.join(" ");
       return WARD_CHILD_HINT_RE.test(item.title) ||
-        /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|教室|講座/.test(item.title) ||
+        /子育て|子ども|子供|親子|乳幼児|幼児|キッズ|児童|教室|講座|おはなし会|家庭の日|読み聞かせ|絵本/.test(item.title) ||
         /子育て|子ども/.test(catText);
     });
 

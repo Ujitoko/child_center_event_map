@@ -11,7 +11,7 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 const BASE_URL = "https://www.vill.hinohara.tokyo.jp";
 
 const CHILD_KEYWORDS_RE =
-  /子育て|子ども|親子|乳幼児|幼児|赤ちゃん|ベビー|おはなし|リトミック|ママ|パパ|離乳食|健診|マタニティ|保育|児童|キッズ|読み聞かせ|予防接種/;
+  /子育て|子ども|親子|乳幼児|幼児|赤ちゃん|ベビー|おはなし|リトミック|ママ|パパ|離乳食|健診|マタニティ|保育|児童|キッズ|読み聞かせ|予防接種|おはなし会|家庭の日|絵本/;
 
 /**
  * ニュース一覧ページから子育て関連記事を抽出

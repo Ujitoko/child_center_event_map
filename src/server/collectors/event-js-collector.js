@@ -2,6 +2,7 @@ const vm = require("vm");
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText } = require("../date-utils");
 const { isJunkVenueName } = require("../venue-utils");
+const { stripTags, parseDetailMeta } = require("../html-utils");
 const { WARD_CHILD_HINT_RE } = require("../../config/wards");
 
 /**
@@ -215,7 +216,10 @@ function createEventJsCollector(config, deps) {
           }
         }
       }
-      if (!venue || isJunkVenueName(venue)) continue;
+      // venue が空でも詳細ページ URL があればスキップしない（後で詳細ページから取得）
+      if (venue && isJunkVenueName(venue)) venue = "";
+      // venue もURL もないイベントのみスキップ
+      if (!venue && !item.url) continue;
 
       let timeRange = null;
       if (Array.isArray(item.times) && item.times.length > 0) {
@@ -275,6 +279,38 @@ function createEventJsCollector(config, deps) {
       unique.push(c);
     }
 
+    // venue が空のイベント → 詳細ページから会場名を取得
+    const needDetailUrls = [...new Set(unique.filter(e => !e.venue_name).map(e => e.url))].slice(0, 30);
+    const detailCache = new Map();
+    for (let i = 0; i < needDetailUrls.length; i += 5) {
+      const batch = needDetailUrls.slice(i, i + 5);
+      const results = await Promise.allSettled(batch.map(async (url) => {
+        try {
+          const html = await fetchText(url);
+          const meta = parseDetailMeta(html);
+          const text = stripTags(html);
+          const placeMatch = text.match(/(?:場所|会場|開催場所|ところ)[：:・\s]\s*([^\n]{2,60})/);
+          if (!meta.venue && placeMatch) {
+            let v = placeMatch[1].trim();
+            v = v.replace(/\s*(?:住所|郵便番号|駐車|対象|定員|電話|内容|費用|日時|申込).*$/, "").trim();
+            if (v.length >= 2) meta.venue = v;
+          }
+          return { url, meta };
+        } catch { return { url, meta: {} }; }
+      }));
+      for (const r of results) {
+        if (r.status === "fulfilled") detailCache.set(r.value.url, r.value.meta);
+      }
+    }
+    // 詳細ページの結果を反映
+    for (const ev of unique) {
+      if (!ev.venue_name && detailCache.has(ev.url)) {
+        const meta = detailCache.get(ev.url);
+        if (meta.venue) ev.venue_name = meta.venue;
+        if (meta.address && !ev.address_hint) ev.address_hint = meta.address;
+      }
+    }
+
     // ジオコーディング
     const results = [];
     for (const ev of unique) {
@@ -299,7 +335,8 @@ function createEventJsCollector(config, deps) {
       if (resolveEventAddress) {
         address = resolveEventAddress(source, ev.venue_name, address || `${label} ${ev.venue_name}`, point);
       }
-      if (!address) address = ev.venue_name ? `${label} ${ev.venue_name}` : "";
+      if (!address) address = ev.venue_name ? `${label} ${ev.venue_name}` : label;
+      if (!point) point = source.center || null;
       results.push({
         id: `${srcKey}:${ev.url}:${ev.title}:${ev.dateKey}`,
         source: srcKey,

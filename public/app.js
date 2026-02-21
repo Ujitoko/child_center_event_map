@@ -201,6 +201,68 @@ const SOURCE_WARD_MAP = {
   hasuda: "蓮田市",
   iruma: "入間市",
   kazo: "加須市",
+  // 群馬県
+  maebashi: "前橋市",
+  takasaki: "高崎市",
+  kiryu: "桐生市",
+  isesaki: "伊勢崎市",
+  ota_gunma: "太田市",
+  numata: "沼田市",
+  tatebayashi: "館林市",
+  shibukawa: "渋川市",
+  fujioka_gunma: "藤岡市",
+  tomioka: "富岡市",
+  annaka: "安中市",
+  midori: "みどり市",
+  shinto: "榛東村",
+  yoshioka: "吉岡町",
+  ueno_gunma: "上野村",
+  kanna: "神流町",
+  shimonita: "下仁田町",
+  nanmoku: "南牧村",
+  kanra: "甘楽町",
+  nakanojo: "中之条町",
+  naganohara: "長野原町",
+  tsumagoi: "嬬恋村",
+  kusatsu: "草津町",
+  takayama_gunma: "高山村",
+  higashiagatsuma: "東吾妻町",
+  katashina: "片品村",
+  kawaba: "川場村",
+  showa_gunma: "昭和村",
+  minakami: "みなかみ町",
+  tamamura: "玉村町",
+  itakura: "板倉町",
+  meiwa: "明和町",
+  chiyoda_gunma: "千代田町",
+  oizumi: "大泉町",
+  ora: "邑楽町",
+  // 栃木県
+  utsunomiya: "宇都宮市",
+  ashikaga: "足利市",
+  tochigi_city: "栃木市",
+  sano: "佐野市",
+  kanuma: "鹿沼市",
+  nikko: "日光市",
+  oyama: "小山市",
+  moka: "真岡市",
+  ohtawara: "大田原市",
+  yaita: "矢板市",
+  nasushiobara: "那須塩原市",
+  tochigi_sakura: "さくら市",
+  nasukarasuyama: "那須烏山市",
+  shimotsuke: "下野市",
+  kaminokawa: "上三川町",
+  mashiko: "益子町",
+  motegi: "茂木町",
+  ichikai: "市貝町",
+  haga: "芳賀町",
+  mibu: "壬生町",
+  nogi: "野木町",
+  shioya: "塩谷町",
+  takanezawa: "高根沢町",
+  nasu: "那須町",
+  tochigi_nakagawa: "那珂川町",
 };
 const selectedPrefs = new Set();
 let searchQuery = "";
@@ -308,10 +370,10 @@ function getWardLabel(item) {
     if (SOURCE_WARD_MAP[key]) return SOURCE_WARD_MAP[key];
   }
   const sourceLabel = String(item.source_label || "");
-  const fromLabel = sourceLabel.match(/([^\s　]+[区市])/u);
+  const fromLabel = sourceLabel.match(/([^\s　]+[区市町村])/u);
   if (fromLabel) return fromLabel[1];
   const address = String(item.address || "");
-  const fromAddress = address.match(/([^\s　]+[区市])/u);
+  const fromAddress = address.match(/([^\s　]+[区市町村])/u);
   if (fromAddress) return fromAddress[1];
   return "";
 }
@@ -351,6 +413,14 @@ const WARD_GROUPS = [
   {
     label: "埼玉県",
     wards: ["さいたま市", "川口市", "川越市", "越谷市", "所沢市", "草加市", "春日部市", "熊谷市", "久喜市", "入間市", "加須市", "深谷市", "桶川市", "吉川市", "上尾市", "鴻巣市", "坂戸市", "飯能市", "東松山市", "行田市", "本庄市", "日高市", "白岡市", "幸手市", "鶴ヶ島市", "蓮田市", "秩父市", "寄居町", "杉戸町", "越生町", "小川町", "吉見町", "滑川町", "嵐山町", "神川町", "上里町", "美里町", "小鹿野町", "東秩父村", "川島町", "北本市", "伊奈町", "横瀬町", "皆野町", "長瀞町", "毛呂山町", "三芳町", "鳩山町", "宮代町", "松伏町", "新座市", "朝霞市", "戸田市", "和光市", "志木市", "富士見市", "ふじみ野市", "三郷市", "八潮市", "蕨市", "狭山市", "羽生市"],
+  },
+  {
+    label: "群馬県",
+    wards: ["前橋市", "高崎市", "桐生市", "伊勢崎市", "太田市", "沼田市", "館林市", "渋川市", "藤岡市", "富岡市", "安中市", "みどり市", "榛東村", "吉岡町", "上野村", "神流町", "下仁田町", "南牧村", "甘楽町", "中之条町", "長野原町", "嬬恋村", "草津町", "高山村", "東吾妻町", "片品村", "川場村", "昭和村", "みなかみ町", "玉村町", "板倉町", "明和町", "千代田町", "大泉町", "邑楽町"],
+  },
+  {
+    label: "栃木県",
+    wards: ["宇都宮市", "足利市", "栃木市", "佐野市", "鹿沼市", "日光市", "小山市", "真岡市", "大田原市", "矢板市", "那須塩原市", "さくら市", "那須烏山市", "下野市", "上三川町", "益子町", "茂木町", "市貝町", "芳賀町", "壬生町", "野木町", "塩谷町", "高根沢町", "那須町", "那珂川町"],
   },
 ];
 

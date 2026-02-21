@@ -541,6 +541,9 @@ const KNOWN_HINO_FACILITIES = {
   "しんめい児童館": "日野市神明2-13-1",
   "ひらやま保育園": "日野市平山4-18-1",
   "もぐさ台保育園": "日野市百草896-1",
+  "中央公民館": "日野市日野本町7-5-23",
+  "日野市中央公民館": "日野市日野本町7-5-23",
+  "ひの児童館": "日野市日野本町7-5-23",
 };
 
 const KOKUBUNJI_SOURCE = {
@@ -564,6 +567,14 @@ const KNOWN_KOKUBUNJI_FACILITIES = {
   "国分寺市立中央図書館": "国分寺市並木町2-12",
   "国分寺市民スポーツセンター": "国分寺市西元町2-11-21",
   "プレイステーション": "国分寺市西元町2-11-21",
+  "ひかり保育園": "国分寺市光町3-24-2",
+  "市民室内プール": "国分寺市西恋ヶ窪3-32-6",
+  "ひかりプラザ": "国分寺市光町1-46-8",
+  "児童発達支援センターつくしんぼ": "国分寺市戸倉3-1-24",
+  "ひがしこいがくぼ3丁目よくこう親子ひろば": "国分寺市東恋ヶ窪3-23-8",
+  "よくこう親子ひろば": "国分寺市東恋ヶ窪3-23-8",
+  "いずみひろば": "国分寺市泉町2-3-8",
+  "いずみプラザ": "国分寺市泉町2-3-8",
 };
 
 const HIGASHIKURUME_SOURCE = {
@@ -1629,7 +1640,13 @@ const SAGAMIHARA_SOURCE = {
   center: { lat: 35.5714, lng: 139.3728 },
 };
 
-const KNOWN_SAGAMIHARA_FACILITIES = {};
+const KNOWN_SAGAMIHARA_FACILITIES = {
+  "小原宿本陣": "神奈川県相模原市緑区小原698-1",
+  "小原の郷": "神奈川県相模原市緑区小原711-2",
+  "相模原市立博物館": "神奈川県相模原市中央区高根3-1-15",
+  "エコパークさがみはら": "神奈川県相模原市中央区富士見1-3-41",
+  "南区地域福祉交流ラウンジ": "神奈川県相模原市南区相模大野3-2-2",
+};
 
 const EBINA_SOURCE = {
   key: "ebina",
@@ -2149,6 +2166,17 @@ const KNOWN_URAYASU_FACILITIES = {
   "神明認定こども園": "千葉県浦安市猫実3-16-40",
   "見明川認定こども園": "千葉県浦安市弁天3-1-3",
   "みなみ認定こども園": "千葉県浦安市富岡1-24-1",
+  "こどもの広場": "千葉県浦安市高洲2-4-10",
+  "青少年交流活動センター": "千葉県浦安市日の出7-2-1",
+  "うら・らめーる": "千葉県浦安市日の出7-2-1",
+  "郷土博物館": "千葉県浦安市猫実1-2-7",
+  "中央図書館": "千葉県浦安市猫実1-2-1",
+  "子育て支援センター": "千葉県浦安市猫実1-12-38",
+  "総合福祉センター": "千葉県浦安市東野1-7-1",
+  "市民プラザWave101": "千葉県浦安市入船1-4-1",
+  "ビーナスプラザ": "千葉県浦安市千鳥15-2",
+  "東野児童センター": "千葉県浦安市東野1-7-1",
+  "高洲児童センター": "千葉県浦安市高洲5-3-2",
 };
 
 const NODA_SOURCE = {
@@ -2168,6 +2196,8 @@ const KNOWN_NODA_FACILITIES = {
   "ぽかぽかひろば": "千葉県野田市清水199-1",
   "コアラルーム": "千葉県野田市中根36-1",
   "さくらんぼルーム": "千葉県野田市木間ケ瀬4637",
+  "子育てサロン ゆう＆みい": "千葉県野田市中根193",
+  "乳児保育所": "千葉県野田市上花輪881",
 };
 
 const NARASHINO_SOURCE = {
@@ -2656,7 +2686,7 @@ const KNOWN_WARABI_FACILITIES = {
   "南町児童館": "蕨市南町3-26-12",
   "福祉・児童センター": "蕨市中央4-21-29",
   "中央公民館": "蕨市中央4-21-29",
-  "東公民館": "蕨市中央5-17-22",
+  "東公民館": "蕨市塚越3-19-13",
   "西公民館": "蕨市北町3-3-24",
   "南公民館": "蕨市南町3-26-12",
   "交流プラザさくら": "蕨市南町3-26-12",
@@ -2889,6 +2919,14 @@ const YORII_SOURCE = {
   key: "yorii", label: "寄居町",
   baseUrl: "https://www.town.yorii.saitama.jp",
   center: { lat: 36.1164, lng: 139.1953 },
+};
+const KNOWN_YORII_FACILITIES = {
+  "男衾子育て支援センター": "寄居町大字富田152-14",
+  "寄居保育所": "寄居町大字寄居898-1",
+  "寄居子育て支援センター": "寄居町大字寄居898-1",
+  "鉢形子育て支援センター": "寄居町大字鉢形2866-1",
+  "寄居町保健福祉総合センター": "寄居町大字寄居1215-1",
+  "保健福祉総合センター": "寄居町大字寄居1215-1",
 };
 
 const SUGITO_SOURCE = {
@@ -3142,6 +3180,7 @@ const KNOWN_MAEBASHI_FACILITIES = {
   "前橋プラザ元気21": "前橋市本町2-12-1",
   "こども図書館": "前橋市本町2-12-1",
   "前橋市総合福祉会館": "前橋市日吉町2-17-10",
+  "前橋市保健センター": "前橋市朝日町3-36-17",
   "中央公民館": "前橋市三河町1-18-6",
   "城南公民館": "前橋市二之宮町1320",
   "東公民館": "前橋市箱田町1549-1",
@@ -3179,6 +3218,9 @@ const KNOWN_TAKASAKI_FACILITIES = {
   "高崎市総合保健センター": "高崎市高松町5-28",
   "市民活動センター・ソシアス": "高崎市足門町1669-1",
   "ソシアス": "高崎市足門町1669-1",
+  "こども発達支援センター": "高崎市問屋町四丁目4番地1",
+  "こども発達支援課": "高崎市問屋町四丁目4番地1",
+  "高崎市少年科学館": "高崎市末広町23-1",
 };
 
 const KIRYU_SOURCE = {
@@ -3187,12 +3229,15 @@ const KIRYU_SOURCE = {
   center: { lat: 36.4053, lng: 139.3309 },
 };
 const KNOWN_KIRYU_FACILITIES = {
-  "桐生市保健福祉会館": "桐生市織姫町1-1",
+  "桐生市保健福祉会館": "桐生市末広町13-4",
+  "保健福祉会館": "桐生市末広町13-4",
   "美喜仁桐生文化会館": "桐生市織姫町2-5",
   "桐生市市民文化会館": "桐生市織姫町2-5",
   "中央公民館": "桐生市織姫町2-5",
   "新里公民館": "桐生市新里町武井693-1",
+  "新里総合センター": "桐生市新里町武井693-1",
   "黒保根公民館": "桐生市黒保根町水沼182-3",
+  "桐生市立図書館": "桐生市稲荷町1-4",
 };
 
 const ISESAKI_SOURCE = {
@@ -3210,6 +3255,8 @@ const KNOWN_ISESAKI_FACILITIES = {
   "境総合文化センター": "伊勢崎市境木島818",
   "赤堀芸術文化プラザ": "伊勢崎市五目牛町40-10",
   "いせさきプレ幼稚園": "伊勢崎市馬見塚町831-1",
+  "伊勢崎市健康管理センター": "伊勢崎市連取町1426",
+  "健康管理センター": "伊勢崎市連取町1426",
 };
 
 const OTA_GUNMA_SOURCE = {
@@ -3225,6 +3272,8 @@ const KNOWN_OTA_GUNMA_FACILITIES = {
   "尾島生涯学習センター": "太田市粕川町520",
   "新田文化会館（エアリスホール）": "太田市新田金井町607",
   "藪塚本町社会体育館": "太田市大原町505-1",
+  "太田市こども館": "太田市長手町480",
+  "太田市保健センター": "太田市新野町166-1",
 };
 
 const NUMATA_SOURCE = {
@@ -3283,6 +3332,8 @@ const KNOWN_FUJIOKA_GUNMA_FACILITIES = {
   "藤岡市子育て支援センター": "藤岡市藤岡1076",
   "藤岡市総合学習センター": "藤岡市藤岡1485",
   "藤岡市みかぼみらい館": "藤岡市藤岡2728",
+  "子育て・健康センター": "藤岡市藤岡1076",
+  "藤岡市保健センター": "藤岡市藤岡1076",
 };
 
 const TOMIOKA_SOURCE = {
@@ -3521,22 +3572,75 @@ const KNOWN_ORA_FACILITIES = {
 // Cities
 const UTSUNOMIYA_SOURCE = { key: "utsunomiya", label: "宇都宮市", baseUrl: "https://www.city.utsunomiya.lg.jp", center: { lat: 36.5551, lng: 139.8829 } };
 const ASHIKAGA_SOURCE = { key: "ashikaga", label: "足利市", baseUrl: "https://www.city.ashikaga.tochigi.jp", center: { lat: 36.3405, lng: 139.4498 } };
+const KNOWN_ASHIKAGA_FACILITIES = {
+  "足利市保健センター": "足利市本城3-2022-1",
+  "保健センター": "足利市本城3-2022-1",
+  "さいこう子育て支援センター": "足利市西宮町2838",
+  "にし子育て支援センター": "足利市板倉町395",
+  "やまがわ子育て支援センター": "足利市山川町84-2",
+  "さいこうふれあいセンター": "足利市西宮町2838",
+  "板倉ふれあい児童館": "足利市板倉町395",
+  "山川ふれあいセンター": "足利市山川町51",
+  "総合福祉センター": "足利市朝倉町264-1",
+  "地域子育て支援センター": "足利市西宮町2838",
+};
+const KNOWN_OYAMA_FACILITIES = {
+  "小山市健康管理センター": "小山市城東2-1-20",
+  "健康管理センター": "小山市城東2-1-20",
+  "小山市役所": "小山市中央町1-1-1",
+  "小山市役所 3階 保健センター": "小山市中央町1-1-1",
+  "小山市役所 3階 こども家庭センター": "小山市中央町1-1-1",
+  "小山市立中央図書館": "小山市城東1-19-40",
+  "ゆめまち": "小山市中央町3-7-1",
+  "小山市子育て支援センター": "小山市中央町3-7-1",
+  "保健センター": "小山市中央町1-1-1",
+  "小山市保健センター": "小山市中央町1-1-1",
+  "こども家庭センター": "小山市中央町1-1-1",
+};
 const TOCHIGI_CITY_SOURCE = { key: "tochigi_city", label: "栃木市", baseUrl: "https://www.city.tochigi.lg.jp", center: { lat: 36.3831, lng: 139.7332 } };
 const SANO_SOURCE = { key: "sano", label: "佐野市", baseUrl: "https://www.city.sano.lg.jp", center: { lat: 36.3141, lng: 139.5783 } };
-const KANUMA_SOURCE = { key: "kanuma", label: "鹿沼市", baseUrl: "https://www.city.kanuma.tochigi.jp", center: { lat: 36.5670, lng: 139.7448 } };
+const KANUMA_SOURCE = { key: "kanuma", label: "鹿沼市", baseUrl: "https://www.city.kanuma.tochigi.jp", center: { lat: 36.5725, lng: 139.7500 } };
 const NIKKO_SOURCE = { key: "nikko", label: "日光市", baseUrl: "https://www.city.nikko.lg.jp", center: { lat: 36.7198, lng: 139.6982 } };
-const OYAMA_SOURCE = { key: "oyama", label: "小山市", baseUrl: "https://www.city.oyama.tochigi.jp", center: { lat: 36.3145, lng: 139.8004 } };
+const OYAMA_SOURCE = { key: "oyama", label: "小山市", baseUrl: "https://www.city.oyama.tochigi.jp", center: { lat: 36.3198, lng: 139.7961 } };
 const MOKA_SOURCE = { key: "moka", label: "真岡市", baseUrl: "https://www.city.moka.lg.jp", center: { lat: 36.4405, lng: 140.0139 } };
 const OHTAWARA_SOURCE = { key: "ohtawara", label: "大田原市", baseUrl: "https://www.city.ohtawara.tochigi.jp", center: { lat: 36.8713, lng: 140.0166 } };
+const KNOWN_OHTAWARA_FACILITIES = {
+  "大田原市福祉センター": "大田原市浅香3-3578-747",
+  "大田原市役所": "大田原市本町1-4-1",
+  "那須赤十字病院": "大田原市中田原1081-4",
+  "大田原市総合文化会館": "大田原市本町1-2703-6",
+};
 const YAITA_SOURCE = { key: "yaita", label: "矢板市", baseUrl: "https://www.city.yaita.tochigi.jp", center: { lat: 36.8040, lng: 139.9293 } };
 const NASUSHIOBARA_SOURCE = { key: "nasushiobara", label: "那須塩原市", baseUrl: "https://www.city.nasushiobara.tochigi.jp", center: { lat: 36.9619, lng: 139.9928 } };
-const TOCHIGI_SAKURA_SOURCE = { key: "tochigi_sakura", label: "さくら市", baseUrl: "https://www.city.tochigi-sakura.lg.jp", center: { lat: 36.6864, lng: 139.9668 } };
+const TOCHIGI_SAKURA_SOURCE = { key: "tochigi_sakura", label: "さくら市", baseUrl: "https://www.city.tochigi-sakura.lg.jp", center: { lat: 36.6935, lng: 139.9690 } };
+const KNOWN_TOCHIGI_SAKURA_FACILITIES = {
+  "氏家保健センター": "さくら市氏家2265",
+  "喜連川保健センター": "さくら市喜連川4420-1",
+  "氏家児童センター": "さくら市氏家2310-1",
+};
 const NASUKARASUYAMA_SOURCE = { key: "nasukarasuyama", label: "那須烏山市", baseUrl: "https://www.city.nasukarasuyama.lg.jp", center: { lat: 36.6571, lng: 140.1528 } };
+const KNOWN_NASUKARASUYAMA_FACILITIES = {
+  "那須烏山市保健福祉センター": "那須烏山市田野倉85-1",
+  "保健福祉センター": "那須烏山市田野倉85-1",
+};
 const SHIMOTSUKE_SOURCE = { key: "shimotsuke", label: "下野市", baseUrl: "https://www.city.shimotsuke.lg.jp", center: { lat: 36.3882, lng: 139.8423 } };
+const KNOWN_SHIMOTSUKE_FACILITIES = {
+  "下野市役所": "下野市笹原26",
+  "下野市保健福祉センターきらら館": "下野市小金井789",
+  "きらら館": "下野市小金井789",
+  "ゆうゆう館": "下野市薬師寺3311-1",
+  "保健福祉センターゆうゆう館": "下野市薬師寺3311-1",
+  "下野市保健福祉センターゆうゆう館": "下野市薬師寺3311-1",
+  "南河内児童館": "下野市仁良川1114",
+};
 
 // Towns
 const KAMINOKAWA_SOURCE = { key: "kaminokawa", label: "上三川町", baseUrl: "https://www.town.kaminokawa.lg.jp", center: { lat: 36.4407, lng: 139.9093 } };
 const MASHIKO_SOURCE = { key: "mashiko", label: "益子町", baseUrl: "https://www.town.mashiko.lg.jp", center: { lat: 36.4650, lng: 140.0960 } };
+const KNOWN_MASHIKO_FACILITIES = {
+  "益子町保健センター": "芳賀郡益子町大字益子1591-3",
+  "保健センター": "芳賀郡益子町大字益子1591-3",
+};
 const MOTEGI_SOURCE = { key: "motegi", label: "茂木町", baseUrl: "https://www.town.motegi.tochigi.jp", center: { lat: 36.5318, lng: 140.1893 } };
 const ICHIKAI_SOURCE = { key: "ichikai", label: "市貝町", baseUrl: "https://www.town.ichikai.tochigi.jp", center: { lat: 36.5206, lng: 140.0817 } };
 const HAGA_SOURCE = { key: "haga", label: "芳賀町", baseUrl: "https://www.town.tochigi-haga.lg.jp", center: { lat: 36.5481, lng: 139.9781 } };
@@ -3544,6 +3648,11 @@ const MIBU_SOURCE = { key: "mibu", label: "壬生町", baseUrl: "https://www.tow
 const NOGI_SOURCE = { key: "nogi", label: "野木町", baseUrl: "https://www.town.nogi.lg.jp", center: { lat: 36.2326, lng: 139.7373 } };
 const SHIOYA_SOURCE = { key: "shioya", label: "塩谷町", baseUrl: "https://www.town.shioya.tochigi.jp", center: { lat: 36.7899, lng: 139.8513 } };
 const TAKANEZAWA_SOURCE = { key: "takanezawa", label: "高根沢町", baseUrl: "https://www.town.takanezawa.tochigi.jp", center: { lat: 36.6236, lng: 139.9862 } };
+const KNOWN_TAKANEZAWA_FACILITIES = {
+  "子育て支援センターれんげそう": "高根沢町大字太田625-3",
+  "れんげそう": "高根沢町大字太田625-3",
+  "にじいろ保育園": "高根沢町大字太田625-3",
+};
 const NASU_SOURCE = { key: "nasu", label: "那須町", baseUrl: "https://www.town.nasu.lg.jp", center: { lat: 37.0194, lng: 140.1211 } };
 const TOCHIGI_NAKAGAWA_SOURCE = { key: "tochigi_nakagawa", label: "那珂川町", baseUrl: "https://www.town.tochigi-nakagawa.lg.jp", center: { lat: 36.6794, lng: 140.1630 } };
 
@@ -3554,20 +3663,87 @@ const KNOWN_YAITA_FACILITIES = {
   "矢板市文化会館": "栃木県矢板市矢板105-1",
 };
 const KNOWN_NIKKO_FACILITIES = {
-  "日光市役所": "栃木県日光市今市本町1",
+  "日光市役所": "日光市今市本町1",
+  "今市保健福祉センター": "日光市平ケ崎109",
+  "地域子育て支援センターぽかぽか": "日光市今市412番地1",
+  "ぽかぽか": "日光市今市412番地1",
+  "日光親子ふれあいひろば": "日光市花石町1942番地1",
+  "鬼怒川親子ふれあいひろば": "日光市藤原29番地1",
 };
 const KNOWN_NASUSHIOBARA_FACILITIES = {
-  "那須塩原市保健センター": "栃木県那須塩原市黒磯幸町8-10",
-  "西那須野保健センター": "栃木県那須塩原市あたご町2-3",
-  "なかよしひろば": "栃木県那須塩原市本町1-1",
-  "つどいの広場ほっぺ": "栃木県那須塩原市西三島7-235-2",
-  "つどいの広場ま～る": "栃木県那須塩原市黒磯幸町3-18",
+  "那須塩原市保健センター": "那須塩原市黒磯幸町8-10",
+  "西那須野保健センター": "那須塩原市あたご町2-3",
+  "なかよしひろば": "那須塩原市本町1-1",
+  "つどいの広場ほっぺ": "那須塩原市方京3-15-9",
+  "つどいの広場ま～る": "那須塩原市南郷屋2-145-10",
+  "子育てサポートステーション": "那須塩原市桜町1-5",
+  "いきいきふれあいセンター": "那須塩原市桜町1-5",
+  "稲村公民館": "那須塩原市稲村3-24",
+  "東那須野公民館": "那須塩原市東小屋382-1",
+  "厚崎公民館": "那須塩原市厚崎748",
+  "狩野公民館": "那須塩原市二区町352-7",
+  "大山公民館": "那須塩原市大山114-3",
+  "南公民館": "那須塩原市二区町401",
+  "西三島公民館": "那須塩原市西三島6-143-11",
 };
 const KNOWN_UTSUNOMIYA_FACILITIES = {
-  "宇都宮市保健センター": "栃木県宇都宮市竹林町972",
-  "まちかど広場": "栃木県宇都宮市江野町8-3",
-  "子育てサロン中央": "栃木県宇都宮市馬場通り4-1-1",
-  "とちぎ福祉プラザ": "栃木県宇都宮市若草1-10-6",
+  "宇都宮市保健センター": "宇都宮市竹林町972",
+  "保健センター": "宇都宮市竹林町972",
+  "まちかど広場": "宇都宮市江野町8-3",
+  "子育てサロン中央": "宇都宮市馬場通り4-1-1",
+  "とちぎ福祉プラザ": "宇都宮市若草1-10-6",
+  "東市民活動センター": "宇都宮市中今泉3-5-1",
+  "平石地区市民センター": "宇都宮市下平出町158-5",
+  "横川地区市民センター": "宇都宮市屋板町576-1",
+  "城山地区市民センター": "宇都宮市大谷町1059-4",
+  "姿川地区市民センター": "宇都宮市西川田町805-1",
+  "雀宮地区市民センター": "宇都宮市新富町9-4",
+  "河内地区市民センター": "宇都宮市中岡本町3160",
+  "豊郷地区市民センター": "宇都宮市岩曽町825-1",
+  "清原地区市民センター": "宇都宮市清原工業団地14-3",
+  "瑞穂野地区市民センター": "宇都宮市下桑島町1086-1",
+  "富屋地区市民センター": "宇都宮市徳次郎町80-2",
+  "国本地区市民センター": "宇都宮市宝木本町1868-17",
+};
+const KNOWN_KANUMA_FACILITIES = {
+  "鹿沼市役所": "鹿沼市今宮町1688-1",
+  "子育て支援課": "鹿沼市今宮町1688-1",
+  "市民情報センター": "鹿沼市文化橋町1982-18",
+  "鹿沼市立図書館": "鹿沼市文化橋町1982-18",
+  "菊沢コミュニティセンター": "鹿沼市仁神堂町37-9",
+  "南押原コミュニティセンター": "鹿沼市磯町117-1",
+  "粟野コミュニティセンター": "鹿沼市口粟野1742",
+  "鹿沼市民文化センター": "鹿沼市坂田山2-170",
+};
+const KNOWN_SANO_FACILITIES = {
+  "佐野市保健センター": "佐野市大橋町2042",
+  "佐野休日・夜間緊急診療所": "佐野市植上町1696-1",
+  "佐野市役所": "佐野市高砂町1",
+};
+const KNOWN_MOKA_FACILITIES = {
+  "真岡市総合福祉保健センター": "真岡市荒町110-1",
+  "総合福祉保健センター": "真岡市荒町110-1",
+  "科学教育センター": "真岡市田町1349-1",
+  "真岡市役所": "真岡市荒町5191",
+};
+const KNOWN_NASU_FACILITIES = {
+  "ゆめプラザ・那須": "那須郡那須町大字寺子乙2566-1",
+  "那須町保健センター": "那須郡那須町大字寺子乙2566-1",
+  "那須町子育て支援センター": "那須郡那須町大字寺子乙2566-1",
+};
+const KNOWN_TOCHIGI_CITY_FACILITIES = {
+  "栃木保健福祉センター": "栃木市今泉町2-1-40",
+  "栃木市役所": "栃木市万町9-25",
+  "大平健康福祉センター": "栃木市大平町西野田666-1",
+  "ゆうゆうプラザ": "栃木市大平町西野田666-1",
+  "藤岡保健福祉センター": "栃木市藤岡町藤岡1770-1",
+  "岩舟健康福祉センター": "栃木市岩舟町静5133-1",
+  "都賀総合支所複合施設": "栃木市都賀町家中5765-1",
+  "都賀公民館": "栃木市都賀町家中5765-1",
+  "北部健康福祉センター": "栃木市西方町金崎301-1",
+  "ゆったりーな": "栃木市西方町金崎301-1",
+  "子育て支援センターエンジェル": "栃木市大平町蔵井2006-2",
+  "きららの杜蔵の街楽習館": "栃木市倭町12-22",
 };
 
 module.exports = {
@@ -3828,6 +4004,7 @@ module.exports = {
   SHIRAOKA_SOURCE,
   SATTE_SOURCE,
   YORII_SOURCE,
+  KNOWN_YORII_FACILITIES,
   SUGITO_SOURCE,
   SOKA_SOURCE, KNOWN_SOKA_FACILITIES,
   TSURUGASHIMA_SOURCE, KNOWN_TSURUGASHIMA_FACILITIES,
@@ -3869,25 +4046,32 @@ module.exports = {
   NIKKO_SOURCE,
   OYAMA_SOURCE,
   MOKA_SOURCE,
-  OHTAWARA_SOURCE,
+  OHTAWARA_SOURCE, KNOWN_OHTAWARA_FACILITIES,
   YAITA_SOURCE, KNOWN_YAITA_FACILITIES,
   NASUSHIOBARA_SOURCE, KNOWN_NASUSHIOBARA_FACILITIES,
-  TOCHIGI_SAKURA_SOURCE,
-  NASUKARASUYAMA_SOURCE,
-  SHIMOTSUKE_SOURCE,
+  TOCHIGI_SAKURA_SOURCE, KNOWN_TOCHIGI_SAKURA_FACILITIES,
+  NASUKARASUYAMA_SOURCE, KNOWN_NASUKARASUYAMA_FACILITIES,
+  SHIMOTSUKE_SOURCE, KNOWN_SHIMOTSUKE_FACILITIES,
   KAMINOKAWA_SOURCE,
-  MASHIKO_SOURCE,
+  MASHIKO_SOURCE, KNOWN_MASHIKO_FACILITIES,
   MOTEGI_SOURCE,
   ICHIKAI_SOURCE,
   HAGA_SOURCE,
   MIBU_SOURCE,
   NOGI_SOURCE,
   SHIOYA_SOURCE,
-  TAKANEZAWA_SOURCE,
+  TAKANEZAWA_SOURCE, KNOWN_TAKANEZAWA_FACILITIES,
   NASU_SOURCE,
   TOCHIGI_NAKAGAWA_SOURCE,
   KNOWN_NIKKO_FACILITIES,
   KNOWN_UTSUNOMIYA_FACILITIES,
+  KNOWN_KANUMA_FACILITIES,
+  KNOWN_SANO_FACILITIES,
+  KNOWN_MOKA_FACILITIES,
+  KNOWN_TOCHIGI_CITY_FACILITIES,
+  KNOWN_ASHIKAGA_FACILITIES,
+  KNOWN_OYAMA_FACILITIES,
+  KNOWN_NASU_FACILITIES,
   // Gunma prefecture (群馬県)
   // Cities
   MAEBASHI_SOURCE, KNOWN_MAEBASHI_FACILITIES,

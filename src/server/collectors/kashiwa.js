@@ -18,21 +18,37 @@ const DETAIL_BATCH_SIZE = 6;
  */
 function parseListPage(html, baseUrl) {
   const events = [];
+
+  // ページヘッダーから年月を取得
+  const ymMatch = html.match(/<span\s+class="year">(\d{4})年<\/span>\s*<span\s+class="month">(\d{1,2})月?<\/span>/);
+  if (!ymMatch) {
+    // フォールバック: ページ内の YYYY年M月 パターン
+    const ymFallback = html.match(/(\d{4})年\s*(\d{1,2})月/);
+    if (!ymFallback) return events;
+    var pageYear = Number(ymFallback[1]);
+    var pageMonth = Number(ymFallback[2]);
+  } else {
+    var pageYear = Number(ymMatch[1]);
+    var pageMonth = Number(ymMatch[2]);
+  }
+
   const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
   let rm;
   while ((rm = rowRe.exec(html)) !== null) {
     const row = rm[1];
-    const dateMatch = row.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-    if (!dateMatch) continue;
-    const y = Number(dateMatch[1]);
-    const mo = Number(dateMatch[2]);
-    const d = Number(dateMatch[3]);
+    // 日付: cal_day_N クラスまたは <p class="day"><span>N</span>日</p>
+    const dayMatch = row.match(/cal_day_(\d+)/) || row.match(/<span>(\d{1,2})<\/span>日/);
+    if (!dayMatch) continue;
+    const d = Number(dayMatch[1]);
+    const y = pageYear;
+    const mo = pageMonth;
+
     const liRe = /<li>([\s\S]*?)<\/li>/gi;
     let lim;
     while ((lim = liRe.exec(row)) !== null) {
       const li = lim[1];
-      // カテゴリ判定: <span class="event_categoryN">子ども向け</span>
-      const catMatch = li.match(/<span\s+class="event_category\d+">([\s\S]*?)<\/span>/);
+      // カテゴリ判定: <span class="event_cate_N">Category</span> or <span class="event_categoryN">
+      const catMatch = li.match(/<span\s+class="event_cate[_gory]*\d+">([\s\S]*?)<\/span>/);
       const hasChildCategory = catMatch && catMatch[1].trim() === CHILD_CATEGORY;
       // リンク抽出
       const linkMatch = li.match(/<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
@@ -63,7 +79,7 @@ function createCollectKashiwaEvents(deps) {
     // 一覧ページ取得
     const rawEvents = [];
     for (const ym of months) {
-      const url = `${source.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`;
+      const url = `${source.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&event_target=1&year=${ym.year}&month=${ym.month}`;
       try {
         const html = await fetchText(url);
         rawEvents.push(...parseListPage(html, source.baseUrl));

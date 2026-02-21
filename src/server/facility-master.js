@@ -38,7 +38,7 @@ function createFacilityMaster(deps) {
       .replace(roomSuffixRe, "")
       .replace(/\d+階.*$/, "")
       .replace(/地下?\d*階.*$/, "")
-      .replace(/[ぁ-んァ-ヶー]{2,6}のへや$/, "")  // "ぞうのへや", "ぱんだのへや" etc.
+      .replace(/[ぁ-ん]{2,6}のへや$/, "")  // "ぞうのへや", "ぱんだのへや" etc.
       .replace(/内$/, "")  // "○○センター内" → "○○センター"
       .replace(/[・]$/, "");  // trailing nakaguro
     for (const [mk, addr] of facilityAddressMaster.entries()) {
@@ -75,7 +75,7 @@ function createFacilityMaster(deps) {
       .replace(roomSuffixRe2, "")
       .replace(/\d+階.*$/, "")
       .replace(/地下?\d*階.*$/, "")
-      .replace(/[ぁ-んァ-ヶー]{2,6}のへや$/, "")
+      .replace(/[ぁ-ん]{2,6}のへや$/, "")
       .replace(/内$/, "")
       .replace(/[・]$/, "");
     for (const [mk, pt] of facilityPointMaster.entries()) {

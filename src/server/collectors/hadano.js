@@ -22,13 +22,13 @@ const DETAIL_BATCH_SIZE = 6;
  */
 function parseCalendarPage(html, baseUrl) {
   const events = [];
-  const linkRe = /<a\s+href="(\/event-calendar\/[^"]+\.html)"[^>]*>([\s\S]*?)<\/a>/gi;
+  const linkRe = /<a\s+href="((?:https?:\/\/[^"]*)?\/event-calendar\/[^"]+\.html)"[^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = linkRe.exec(html)) !== null) {
     const href = m[1].trim();
     const title = stripTags(m[2]).trim();
     if (!href || !title) continue;
-    const absUrl = `${baseUrl}${href}`;
+    const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
     events.push({ title, url: absUrl, href });
   }
   return events;

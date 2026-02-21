@@ -91,17 +91,30 @@ function createCollectMatsudoEvents(deps) {
     const label = MATSUDO_SOURCE.label;
     const months = getMonthsForRange(maxDays);
 
-    // 子ども・子育てカテゴリの月別リストカレンダー取得
+    // 子ども・子育てカテゴリのリストカレンダー取得
     const rawEvents = [];
+
+    // 月別 URL を試し、404 なら接尾辞なし URL にフォールバック
+    const triedBase = new Set();
     for (const ym of months) {
       const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-      const url = `${MATSUDO_SOURCE.baseUrl}/event/kodomo/calendar/list_calendar${ymParam}.html`;
+      const monthUrl = `${MATSUDO_SOURCE.baseUrl}/event/kodomo/calendar/list_calendar${ymParam}.html`;
       try {
-        const html = await fetchText(url);
+        const html = await fetchText(monthUrl);
         const pageEvents = parseListCalendarPage(html, MATSUDO_SOURCE.baseUrl, ym.year, ym.month);
         rawEvents.push(...pageEvents);
       } catch (e) {
-        console.warn(`[${label}] month ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+        // 接尾辞なし URL でフォールバック (1回だけ)
+        const baseUrlKey = "kodomo";
+        if (!triedBase.has(baseUrlKey)) {
+          triedBase.add(baseUrlKey);
+          try {
+            const baseUrl = `${MATSUDO_SOURCE.baseUrl}/event/kodomo/calendar/list_calendar.html`;
+            const html = await fetchText(baseUrl);
+            const pageEvents = parseListCalendarPage(html, MATSUDO_SOURCE.baseUrl, ym.year, ym.month);
+            rawEvents.push(...pageEvents);
+          } catch {}
+        }
       }
     }
 
@@ -109,13 +122,23 @@ function createCollectMatsudoEvents(deps) {
     if (rawEvents.length === 0) {
       for (const ym of months) {
         const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-        const url = `${MATSUDO_SOURCE.baseUrl}/event/calendar/list_calendar${ymParam}.html`;
+        const monthUrl = `${MATSUDO_SOURCE.baseUrl}/event/calendar/list_calendar${ymParam}.html`;
         try {
-          const html = await fetchText(url);
+          const html = await fetchText(monthUrl);
           const pageEvents = parseListCalendarPage(html, MATSUDO_SOURCE.baseUrl, ym.year, ym.month);
           rawEvents.push(...pageEvents);
-        } catch (e) {
-          console.warn(`[${label}] month ${ym.year}/${ym.month} fallback fetch failed:`, e.message || e);
+        } catch {
+          // 接尾辞なし URL でフォールバック
+          const baseUrlKey = "general";
+          if (!triedBase.has(baseUrlKey)) {
+            triedBase.add(baseUrlKey);
+            try {
+              const baseUrl = `${MATSUDO_SOURCE.baseUrl}/event/calendar/list_calendar.html`;
+              const html = await fetchText(baseUrl);
+              const pageEvents = parseListCalendarPage(html, MATSUDO_SOURCE.baseUrl, ym.year, ym.month);
+              rawEvents.push(...pageEvents);
+            } catch {}
+          }
         }
       }
     }
