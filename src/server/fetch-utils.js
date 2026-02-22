@@ -22,7 +22,8 @@ function releaseSlot() {
   if (queue.length > 0) queue.shift()();
 }
 
-async function fetchText(url) {
+async function fetchText(url, opts) {
+  const timeoutMs = (opts && opts.timeout) || 20000;
   let domain = "";
   try { domain = new URL(url).hostname; } catch { domain = "unknown"; }
   await acquireSlot(domain);
@@ -32,7 +33,7 @@ async function fetchText(url) {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
       },
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
 

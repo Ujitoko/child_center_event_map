@@ -49,7 +49,7 @@ const { createCollectHinoharaEvents } = require("./src/server/collectors/hinohar
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createCollectFunabashiEvents } = require("./src/server/collectors/funabashi");
 const { createCollectNaritaEvents } = require("./src/server/collectors/narita");
-const { createCollectChibaEvents } = require("./src/server/collectors/chiba");
+const { createCollectChibaEvents, createCollectChibaCityWardEvents } = require("./src/server/collectors/chiba");
 const { createCollectKashiwaEvents } = require("./src/server/collectors/kashiwa");
 const { createCollectIchikawaEvents } = require("./src/server/collectors/ichikawa");
 const { createCollectYotsukaidoEvents } = require("./src/server/collectors/yotsukaido");
@@ -66,11 +66,21 @@ const {
   createCollectTakoEvents, createCollectShibayamaEvents,
   createCollectMutsuzawaEvents, createCollectChoseiEvents,
   createCollectNagaraEvents, createCollectOnjukuEvents,
-  createCollectChonanEvents,
+  createCollectChonanEvents, createCollectKimitsuKosodateEvents,
+  createCollectMatsudoKosodateEvents, createCollectIchiharaKodomomiraiEvents,
+  createCollectMatsudoLibraryEvents,
+  createCollectIchiharaSalonEvents,
+  createCollectNaritaKosodateEvents,
+  createCollectAbikoKosodateEvents,
+  createCollectKamagayaKosodateEvents,
+  createCollectSakuraLibraryEvents,
+  createCollectInzaiLibraryEvents,
 } = require("./src/server/collectors/chiba-remaining");
 const { createCollectHakoneEvents } = require("./src/server/collectors/hakone");
 const { createEvent2CalendarCollector } = require("./src/server/collectors/event2-calendar-collector");
 const { createCollectSaitamaEvents } = require("./src/server/collectors/saitama");
+const { createCollectSaitamaJidoukanEvents } = require("./src/server/collectors/saitama-jidoukan");
+const { createCollectSaitamaHokenEvents } = require("./src/server/collectors/saitama-hoken");
 const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshigaya");
 const { createCollectSokaEvents } = require("./src/server/collectors/soka");
 const { createCollectTsurugashimaEvents } = require("./src/server/collectors/tsurugashima");
@@ -127,6 +137,9 @@ const {
   createCollectShibukawaPdfScheduleEvents,
   createCollectTomiokaPdfScheduleEvents,
   createCollectAnnakaPdfScheduleEvents,
+  createCollectMinakamiPdfScheduleEvents,
+  createCollectMeiwaPdfScheduleEvents,
+  createCollectShintoPdfScheduleEvents,
 } = require("./src/server/collectors/tochigi-remaining");
 const {
   createCollectKiryuEvents, createCollectNumataEvents,
@@ -150,6 +163,23 @@ const {
   createCollectIsesakiScheduleEvents,
   createCollectKiryuScheduleEvents,
   createCollectTatebayashiScheduleEvents,
+  createCollectNumataScheduleEvents,
+  createCollectKawabaScheduleEvents,
+  createCollectShimonitaScheduleEvents,
+  createCollectChiyodaGunmaScheduleEvents,
+  createCollectFujiokaGunmaScheduleEvents,
+  createCollectTamamuraScheduleEvents,
+  createCollectKanraScheduleEvents,
+  createCollectAnnakaScheduleEvents,
+  createCollectHigashiagatsumaScheduleEvents,
+  createCollectItakuraCalendarEvents,
+  createCollectMidoriScheduleEvents,
+  createCollectOizumiScheduleEvents,
+  createCollectOtaKodomokanEvents,
+  createCollectKiryuShienCenterEvents,
+  createCollectNakanojoRecurringEvents,
+  createCollectShimonitaCrossRowEvents,
+  createCollectTakasakiNandemoEvents,
 } = require("./src/server/collectors/gunma-remaining");
 const { createGetEvents } = require("./src/server/events-service");
 const {
@@ -221,14 +251,14 @@ const {
   ASAHI_SOURCE, KNOWN_ASAHI_FACILITIES,
   KAMOGAWA_SOURCE, KNOWN_KAMOGAWA_FACILITIES,
   YOKOSHIBAHIKARI_SOURCE, ICHIKAWA_SOURCE, KNOWN_ICHIKAWA_FACILITIES,
-  KATSUURA_SOURCE, KIMITSU_SOURCE, KYONAN_SOURCE, KNOWN_KYONAN_FACILITIES,
-  YOTSUKAIDO_SOURCE, MATSUDO_SOURCE,
-  ABIKO_SOURCE, KNOWN_ABIKO_FACILITIES, KAMAGAYA_SOURCE,
+  KATSUURA_SOURCE, KIMITSU_SOURCE, KNOWN_KIMITSU_FACILITIES, KYONAN_SOURCE, KNOWN_KYONAN_FACILITIES,
+  YOTSUKAIDO_SOURCE, MATSUDO_SOURCE, KNOWN_MATSUDO_FACILITIES,
+  ABIKO_SOURCE, KNOWN_ABIKO_FACILITIES, KAMAGAYA_SOURCE, KNOWN_KAMAGAYA_FACILITIES,
   TOMISATO_SOURCE, SHIRAKO_SOURCE, KUJUKURI_SOURCE,
   YACHIMATA_SOURCE, SODEGAURA_SOURCE,
   ICHINOMIYA_SOURCE, CHOSHI_SOURCE,
-  SAKURA_SOURCE, FUTTSU_SOURCE, INZAI_SOURCE,
-  KATORI_SOURCE, TOGANE_SOURCE, ICHIHARA_SOURCE,
+  SAKURA_SOURCE, KNOWN_SAKURA_FACILITIES, FUTTSU_SOURCE, INZAI_SOURCE, KNOWN_INZAI_FACILITIES,
+  KATORI_SOURCE, TOGANE_SOURCE, ICHIHARA_SOURCE, KNOWN_ICHIHARA_FACILITIES,
   SOSA_SOURCE, SAMMU_SOURCE, SAKAE_CHIBA_SOURCE,
   MOBARA_SOURCE, TATEYAMA_SOURCE, MINAMIBOSO_SOURCE,
   OAMISHIRASATO_SOURCE, SHISUI_SOURCE, KOZAKI_SOURCE,
@@ -616,6 +646,24 @@ for (const [name, address] of Object.entries(KNOWN_YACHIYO_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_KYONAN_FACILITIES)) {
   setFacilityAddressToMaster("kyonan", name, address);
 }
+for (const [name, address] of Object.entries(KNOWN_KIMITSU_FACILITIES)) {
+  setFacilityAddressToMaster("kimitsu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_MATSUDO_FACILITIES)) {
+  setFacilityAddressToMaster("matsudo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_ICHIHARA_FACILITIES)) {
+  setFacilityAddressToMaster("ichihara", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KAMAGAYA_FACILITIES)) {
+  setFacilityAddressToMaster("kamagaya", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_SAKURA_FACILITIES)) {
+  setFacilityAddressToMaster("sakura", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_INZAI_FACILITIES)) {
+  setFacilityAddressToMaster("inzai", name, address);
+}
 for (const [name, address] of Object.entries(KNOWN_KAWAGOE_FACILITIES)) {
   setFacilityAddressToMaster("kawagoe", name, address);
 }
@@ -751,6 +799,9 @@ for (const [name, address] of Object.entries(KNOWN_NAKANOJO_FACILITIES)) {
 }
 for (const [name, address] of Object.entries(KNOWN_KUSATSU_FACILITIES)) {
   setFacilityAddressToMaster("kusatsu", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KAWABA_FACILITIES)) {
+  setFacilityAddressToMaster("kawaba", name, address);
 }
 for (const [name, address] of Object.entries(KNOWN_HIGASHIAGATSUMA_FACILITIES)) {
   setFacilityAddressToMaster("higashiagatsuma", name, address);
@@ -974,6 +1025,7 @@ const collectOtakiEvents = createCalendarJsonCollector({ source: OTAKI_SOURCE },
 const collectFunabashiEvents = createCollectFunabashiEvents(geoFmDeps);
 const collectNaritaEvents = createCollectNaritaEvents(geoFmDeps);
 const collectChibaCityEvents = createCollectChibaEvents(geoFmDeps);
+const collectChibaCityWardEvents = createCollectChibaCityWardEvents(geoFmDeps);
 const collectKashiwaEvents = createCollectKashiwaEvents(geoFmDeps);
 // --- 千葉県 municipal-calendar-collector ---
 const collectYachiyoEvents = createMunicipalCalendarCollector({ source: YACHIYO_SOURCE, childCategoryIndex: null }, geoFmDeps);
@@ -988,7 +1040,7 @@ const collectYotsukaidoEvents = createCollectYotsukaidoEvents(geoFmDeps);
 const collectMatsudoEvents = createCollectMatsudoEvents(geoFmDeps);
 // --- 千葉県 list-calendar-collector ---
 const collectAbikoEvents = createListCalendarCollector({ source: ABIKO_SOURCE, calendarPath: "/event/event/calendar/" }, geoFmDeps);
-const collectKamagayaEvents = createListCalendarCollector({ source: KAMAGAYA_SOURCE, calendarPath: "/event/kodomo_kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
+const collectKamagayaEvents = createListCalendarCollector({ source: KAMAGAYA_SOURCE, calendarPath: "/event/calendar/", fallbackPath: "/event/kodomo/calendar/" }, geoFmDeps);
 // --- 千葉県 table-calendar-collector ---
 const collectTomisatoEvents = createTableCalendarCollector({ source: TOMISATO_SOURCE }, geoFmDeps);
 const collectShirakoEvents = createTableCalendarCollector({ source: SHIRAKO_SOURCE }, geoFmDeps);
@@ -1023,9 +1075,19 @@ const collectChoseiEvents = createCollectChoseiEvents(geoFmDeps);
 const collectNagaraEvents = createCollectNagaraEvents(geoFmDeps);
 const collectOnjukuEvents = createCollectOnjukuEvents(geoFmDeps);
 const collectChonanEvents = createCollectChonanEvents(geoFmDeps);
+const collectKimitsuKosodateEvents = createCollectKimitsuKosodateEvents(geoFmDeps);
+const collectMatsudoKosodateEvents = createCollectMatsudoKosodateEvents(geoFmDeps);
+const collectMatsudoLibraryEvents = createCollectMatsudoLibraryEvents(geoFmDeps);
+const collectIchiharaKodomomiraiEvents = createCollectIchiharaKodomomiraiEvents(geoFmDeps);
+const collectIchiharaSalonEvents = createCollectIchiharaSalonEvents(geoFmDeps);
+const collectNaritaKosodateEvents = createCollectNaritaKosodateEvents(geoFmDeps);
+const collectAbikoKosodateEvents = createCollectAbikoKosodateEvents(geoFmDeps);
+const collectKamagayaKosodateEvents = createCollectKamagayaKosodateEvents(geoFmDeps);
+const collectSakuraLibraryEvents = createCollectSakuraLibraryEvents(geoFmDeps);
+const collectInzaiLibraryEvents = createCollectInzaiLibraryEvents(geoFmDeps);
 // --- 埼玉県 calendar-json-collector ---
-const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE }, geoFmDeps);
-const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE }, geoFmDeps);
+const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE, childKeywords: ["おもちゃ", "工作", "映画会", "図書館", "広場"] }, geoFmDeps);
+const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE, childKeywords: ["健診", "相談", "教室", "広場", "サロン", "映画会", "工作", "イチゴ", "図書館"] }, geoFmDeps);
 const collectFujiminoEvents = createCalendarJsonCollector({ source: FUJIMINO_SOURCE }, geoFmDeps);
 const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE }, geoFmDeps);
 // --- 埼玉県 event-js-collector ---
@@ -1052,8 +1114,8 @@ const collectFujimiEvents = createListCalendarCollector({ source: FUJIMI_SOURCE,
 const collectSayamaEvents = createListCalendarCollector({ source: SAYAMA_SOURCE, calendarPath: "/kankou/event/kyoiku/calendar/", fallbackPath: "/kankou/event/calendar/", useQueryParam: true }, geoFmDeps);
 const collectYashioEvents = createListCalendarCollector({ source: YASHIO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/", useQueryParam: true }, geoFmDeps);
 // --- 埼玉県 list-calendar-collector (追加) ---
-const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/kodomo/calendar/", fallbackPath: "/iitokoro/event/main/calendar/" }, geoFmDeps);
-const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/" }, geoFmDeps);
+const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/kodomo/calendar/", fallbackPath: "/iitokoro/event/main/calendar/", useQueryParam: true }, geoFmDeps);
+const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/", useQueryParam: true }, geoFmDeps);
 // --- 埼玉県 event-js-collector (追加) ---
 const collectKukiEvents = createEventJsCollector({
   source: KUKI_SOURCE, jsFile: "event.js",
@@ -1067,7 +1129,7 @@ const collectHigashimatsuyamaEvents = createMunicipalCalendarCollector({ source:
 const collectHannoEvents = createCalendarJsonCollector({ source: HANNO_SOURCE }, geoFmDeps);
 const collectGyodaEvents = createCalendarJsonCollector({ source: GYODA_SOURCE }, geoFmDeps);
 const collectHonjoEvents = createCalendarJsonCollector({ source: HONJO_SOURCE }, geoFmDeps);
-const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE }, geoFmDeps);
+const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE, childKeywords: ["広場", "教室", "おもちゃ", "サロン", "映画会"] }, geoFmDeps);
 const collectShiraokaEvents = createCalendarJsonCollector({ source: SHIRAOKA_SOURCE }, geoFmDeps);
 const collectSatteEvents = createCalendarJsonCollector({ source: SATTE_SOURCE }, geoFmDeps);
 // --- 埼玉県 municipal-calendar-collector (町村) ---
@@ -1075,13 +1137,15 @@ const collectYoriiEvents = createMunicipalCalendarCollector({ source: YORII_SOUR
 const collectSugitoEvents = createMunicipalCalendarCollector({ source: SUGITO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 // --- 埼玉県 custom ---
 const collectSaitamaEvents = createCollectSaitamaEvents(geoFmDeps);
+const collectSaitamaJidoukanEvents = createCollectSaitamaJidoukanEvents(geoFmDeps);
+const collectSaitamaHokenEvents = createCollectSaitamaHokenEvents(geoFmDeps);
 const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
 const collectSokaEvents = createCollectSokaEvents({ ...geoFmDeps, source: SOKA_SOURCE });
 const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps, source: TSURUGASHIMA_SOURCE });
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
-const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php" }, geoFmDeps);
-const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE }, geoFmDeps);
-const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json" }, geoFmDeps);
+const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php", childEventTypeNo: 1 }, geoFmDeps);
+const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE, childKeywords: ["児童館", "健診", "相談", "教室", "広場", "サロン", "おもちゃ", "無料開放"] }, geoFmDeps);
+const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json", childKeywords: ["健診", "相談", "教室", "広場", "サロン"] }, geoFmDeps);
 const collectOkegawaEvents = createCalendarJsonCollector({ source: OKEGAWA_SOURCE }, geoFmDeps);
 const collectOgoseEvents = createCalendarJsonCollector({ source: OGOSE_SOURCE }, geoFmDeps);
 const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE }, geoFmDeps);
@@ -1195,11 +1259,31 @@ const collectOtaGunmaPdfScheduleEvents = createCollectOtaGunmaPdfScheduleEvents(
 const collectShibukawaPdfScheduleEvents = createCollectShibukawaPdfScheduleEvents(geoFmDeps);
 const collectTomiokaPdfScheduleEvents = createCollectTomiokaPdfScheduleEvents(geoFmDeps);
 const collectAnnakaPdfScheduleEvents = createCollectAnnakaPdfScheduleEvents(geoFmDeps);
+const collectMinakamiPdfScheduleEvents = createCollectMinakamiPdfScheduleEvents(geoFmDeps);
+const collectMeiwaPdfScheduleEvents = createCollectMeiwaPdfScheduleEvents(geoFmDeps);
+const collectShintoPdfScheduleEvents = createCollectShintoPdfScheduleEvents(geoFmDeps);
 // --- 群馬県 schedule table collectors (supplement) ---
 const collectMaebashiScheduleEvents = createCollectMaebashiScheduleEvents(geoFmDeps);
 const collectIsesakiScheduleEvents = createCollectIsesakiScheduleEvents(geoFmDeps);
 const collectKiryuScheduleEvents = createCollectKiryuScheduleEvents(geoFmDeps);
 const collectTatebayashiScheduleEvents = createCollectTatebayashiScheduleEvents(geoFmDeps);
+const collectNumataScheduleEvents = createCollectNumataScheduleEvents(geoFmDeps);
+const collectKawabaScheduleEvents = createCollectKawabaScheduleEvents(geoFmDeps);
+const collectShimonitaScheduleEvents = createCollectShimonitaScheduleEvents(geoFmDeps);
+const collectChiyodaGunmaScheduleEvents = createCollectChiyodaGunmaScheduleEvents(geoFmDeps);
+const collectFujiokaGunmaScheduleEvents = createCollectFujiokaGunmaScheduleEvents(geoFmDeps);
+const collectTamamuraScheduleEvents = createCollectTamamuraScheduleEvents(geoFmDeps);
+const collectKanraScheduleEvents = createCollectKanraScheduleEvents(geoFmDeps);
+const collectAnnakaScheduleEvents = createCollectAnnakaScheduleEvents(geoFmDeps);
+const collectHigashiagatsumaScheduleEvents = createCollectHigashiagatsumaScheduleEvents(geoFmDeps);
+const collectItakuraCalendarEvents = createCollectItakuraCalendarEvents(geoFmDeps);
+const collectMidoriScheduleEvents = createCollectMidoriScheduleEvents(geoFmDeps);
+const collectOizumiScheduleEvents = createCollectOizumiScheduleEvents(geoFmDeps);
+const collectOtaKodomokanEvents = createCollectOtaKodomokanEvents(geoFmDeps);
+const collectKiryuShienCenterEvents = createCollectKiryuShienCenterEvents(geoFmDeps);
+const collectNakanojoRecurringEvents = createCollectNakanojoRecurringEvents(geoFmDeps);
+const collectShimonitaCrossRowEvents = createCollectShimonitaCrossRowEvents(geoFmDeps);
+const collectTakasakiNandemoEvents = createCollectTakasakiNandemoEvents(geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -1287,6 +1371,7 @@ const getEvents = createGetEvents({
   collectFunabashiEvents,
   collectNaritaEvents,
   collectChibaCityEvents,
+  collectChibaCityWardEvents,
   collectKashiwaEvents,
   collectYachiyoEvents,
   collectAsahiEvents,
@@ -1329,6 +1414,16 @@ const getEvents = createGetEvents({
   collectNagaraEvents,
   collectOnjukuEvents,
   collectChonanEvents,
+  collectKimitsuKosodateEvents,
+  collectMatsudoKosodateEvents,
+  collectMatsudoLibraryEvents,
+  collectIchiharaKodomomiraiEvents,
+  collectIchiharaSalonEvents,
+  collectNaritaKosodateEvents,
+  collectAbikoKosodateEvents,
+  collectKamagayaKosodateEvents,
+  collectSakuraLibraryEvents,
+  collectInzaiLibraryEvents,
   collectKawaguchiEvents,
   collectKasukabeEvents,
   collectFujiminoEvents,
@@ -1472,11 +1567,31 @@ const getEvents = createGetEvents({
   collectShibukawaPdfScheduleEvents,
   collectTomiokaPdfScheduleEvents,
   collectAnnakaPdfScheduleEvents,
+  collectMinakamiPdfScheduleEvents,
+  collectMeiwaPdfScheduleEvents,
+  collectShintoPdfScheduleEvents,
   // Gunma schedule supplements
   collectMaebashiScheduleEvents,
   collectIsesakiScheduleEvents,
   collectKiryuScheduleEvents,
   collectTatebayashiScheduleEvents,
+  collectNumataScheduleEvents,
+  collectKawabaScheduleEvents,
+  collectShimonitaScheduleEvents,
+  collectChiyodaGunmaScheduleEvents,
+  collectFujiokaGunmaScheduleEvents,
+  collectTamamuraScheduleEvents,
+  collectKanraScheduleEvents,
+  collectAnnakaScheduleEvents,
+  collectHigashiagatsumaScheduleEvents,
+  collectItakuraCalendarEvents,
+  collectMidoriScheduleEvents,
+  collectOizumiScheduleEvents,
+  collectOtaKodomokanEvents,
+  collectKiryuShienCenterEvents,
+  collectNakanojoRecurringEvents,
+  collectShimonitaCrossRowEvents,
+  collectTakasakiNandemoEvents,
 });
 
 // --- HTTP server ---

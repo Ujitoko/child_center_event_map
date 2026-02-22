@@ -26,8 +26,8 @@ function parseEventListHtml(html) {
   while ((lim = liRe.exec(html)) !== null) {
     const liContent = lim[1];
 
-    // URL
-    const urlMatch = liContent.match(/<a\s+href="(\/kosodate\/eventdetail\/\d+)"/);
+    // URL (absolute URL or relative path)
+    const urlMatch = liContent.match(/<a\s+href="(?:https?:\/\/[^"]*?)?(\/kosodate\/eventdetail\/\d+)"/);
     if (!urlMatch) continue;
     const detailPath = urlMatch[1];
 
@@ -51,19 +51,19 @@ function parseEventListHtml(html) {
     let y = now.getFullYear();
     if (mo < now.getMonth() + 1 - 2) y++; // 2ヶ月以上前の月なら来年
 
-    // 時刻
+    // 時刻 (HH時MM分～HH時MM分, HH時～HH時MM分, HH時～HH時 等)
     let timeRange = null;
-    const timeMatch = dateText.match(/(\d{1,2})時(\d{2})分\s*[～〜~-]\s*(\d{1,2})時(\d{2})分/);
+    const timeMatch = dateText.match(/(\d{1,2})時(?:(\d{2})分)?\s*[～〜~-]\s*(\d{1,2})時(?:(\d{2})分)?/);
     if (timeMatch) {
       timeRange = {
-        startHour: Number(timeMatch[1]), startMin: Number(timeMatch[2]),
-        endHour: Number(timeMatch[3]), endMin: Number(timeMatch[4]),
+        startHour: Number(timeMatch[1]), startMin: timeMatch[2] ? Number(timeMatch[2]) : 0,
+        endHour: Number(timeMatch[3]), endMin: timeMatch[4] ? Number(timeMatch[4]) : 0,
       };
     } else {
-      const startOnly = dateText.match(/(\d{1,2})時(\d{2})分/);
+      const startOnly = dateText.match(/(\d{1,2})時(?:(\d{2})分)?/);
       if (startOnly) {
         timeRange = {
-          startHour: Number(startOnly[1]), startMin: Number(startOnly[2]),
+          startHour: Number(startOnly[1]), startMin: startOnly[2] ? Number(startOnly[2]) : 0,
           endHour: null, endMin: null,
         };
       }

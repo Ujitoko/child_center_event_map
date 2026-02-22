@@ -182,13 +182,15 @@ function createCollectKitamotoEvents(deps) {
       return [];
     }
 
-    // PDFリンク抽出
-    const pdfRe = /<a\s+href="([^"]*material\/files\/group\/41\/\d+\.pdf)"[^>]*>/gi;
+    // PDFリンク抽出 (protocol-relative URL対応: //www.city.kitamoto.lg.jp/material/...)
+    const pdfRe = /<a\s+[^>]*?href="([^"]*\/material\/files\/group\/41\/\d+\.pdf)"[^>]*>/gi;
     const pdfUrls = [];
     let pm;
     while ((pm = pdfRe.exec(html)) !== null) {
       const href = pm[1];
-      const absUrl = href.startsWith("http") ? href : `${baseUrl}${href.startsWith("/") ? "" : "/"}${href}`;
+      const absUrl = href.startsWith("http") ? href
+        : href.startsWith("//") ? `https:${href}`
+        : `${baseUrl}${href.startsWith("/") ? "" : "/"}${href}`;
       if (!pdfUrls.includes(absUrl)) pdfUrls.push(absUrl);
     }
 

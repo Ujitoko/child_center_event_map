@@ -327,6 +327,8 @@ function isJunkVenueName(venueName) {
   if (/^(?:キラキラ|お湯につけると|抽せん結果)/.test(v)) return true;
   // Floor + room without facility name
   if (/^\d+階\s*[^\s]+$/.test(v) && !/センター|館|プラザ|ホール/.test(v)) return true;
+  // Notification/administrative text extracted as venue (e.g. "送付される個人通知の...")
+  if (/送付される|個人通知|ご確認ください|についてはこちら|をご覧ください/.test(v)) return true;
   return false;
 }
 

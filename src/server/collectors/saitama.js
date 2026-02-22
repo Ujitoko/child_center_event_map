@@ -55,6 +55,9 @@ function parseEventListPage(html, baseUrl) {
 
     let y = null, mo = null, d = null;
 
+    // 日付範囲かどうか判定 (M月D日～M月D日)
+    const isDateRange = /\d{1,2}月\s*\d{1,2}日.*[～〜\-－].*\d{1,2}月\s*\d{1,2}日/.test(dateText);
+
     // M月D日 パターン (開始日を使用)
     const mdMatch = dateText.match(/(\d{1,2})月\s*(\d{1,2})日/);
     if (mdMatch) {
@@ -62,7 +65,13 @@ function parseEventListPage(html, baseUrl) {
       d = Number(mdMatch[2]);
       // 年の推定: 日付テキストにYYYY年があればそれを使用
       const yearMatch = dateText.match(/(\d{4})年/);
-      y = yearMatch ? Number(yearMatch[1]) : jstYear;
+      if (yearMatch) {
+        y = Number(yearMatch[1]);
+      } else {
+        // 年がない場合: 月が現在月より6ヶ月以上先なら前年と推定
+        const jstMonth = new Date(now.getTime() + 9 * 3600000).getMonth() + 1;
+        y = (mo - jstMonth > 6) ? jstYear - 1 : jstYear;
+      }
     }
 
     // 令和N年M月D日 パターン
@@ -76,13 +85,14 @@ function parseEventListPage(html, baseUrl) {
     }
 
     // 日付が取れなくても詳細ページで補完するため追加
+    // 日付範囲の場合も詳細ページで個別日程を取得
     const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
-    events.push({ title, url: absUrl, y: y || 0, mo: mo || 0, d: d || 0, needDates: !d });
+    events.push({ title, url: absUrl, y: y || 0, mo: mo || 0, d: d || 0, needDates: !d || isDateRange });
   }
 
   // フォールバック: in_column_box が見つからない場合、従来のリンクパターンも試す
   if (events.length === 0) {
-    const linkRe = /<a\s+[^>]*href="(\/(?:004|003|001|006|chuo|urawa)\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+    const linkRe = /<a\s+[^>]*href="(\/(?:004|003|001|006|chuo|urawa|nishi|kita|oomiya|minuma|sakura|minami|midori|iwaki)\/[^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
     while ((m = linkRe.exec(html)) !== null) {
       const href = m[1].replace(/&amp;/g, "&").trim();
       const rawTitle = stripTags(m[2]).trim();
@@ -139,11 +149,12 @@ function createCollectSaitamaEvents(deps) {
 
     // 月別ページURL生成
     const months = getMonthsForRange(maxDays);
-    const urls = months.map(({ year, month }) => {
+    const urls = [];
+    // 全市イベントカレンダー
+    for (const { year, month } of months) {
       const mm = String(month).padStart(2, "0");
-      return `${baseUrl}/004/001/002/005/event${year}${mm}.html`;
-    });
-    // 現在のイベントページも追加
+      urls.push(`${baseUrl}/004/001/002/005/event${year}${mm}.html`);
+    }
     urls.push(`${baseUrl}/004/001/002/005/event.html`);
 
     // 一覧ページ取得・解析

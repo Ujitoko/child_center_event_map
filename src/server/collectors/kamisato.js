@@ -32,8 +32,8 @@ const CHILD_RE =
  * EventCal_Standard ページから年月とイベントを抽出
  */
 function parseEventCalPage(html, baseUrl) {
-  // 年月抽出: <h2>2026年2月</h2>
-  const ymMatch = html.match(/(\d{4})年\s*(\d{1,2})月/);
+  // 年月抽出: <h2>2026年2月</h2> (ニュース日付ではなくカレンダー見出しを狙う)
+  const ymMatch = html.match(/<h2>\s*(\d{4})年\s*(\d{1,2})月/);
   if (!ymMatch) return { events: [], nextUrl: null, y: 0, mo: 0 };
   const y = Number(ymMatch[1]);
   const mo = Number(ymMatch[2]);

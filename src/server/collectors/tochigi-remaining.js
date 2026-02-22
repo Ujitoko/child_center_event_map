@@ -268,16 +268,17 @@ async function fetchDetailInfo(url) {
 }
 
 /** 会場テキストから括弧内の住所を抽出 */
-function extractEmbeddedAddressFromVenue(venue, cityName) {
+function extractEmbeddedAddressFromVenue(venue, cityName, prefecture) {
   if (!venue) return [];
+  const pref = prefecture || "栃木県";
   const results = [];
   const parenMatches = venue.match(/[（(]([^）)]{3,60})[）)]/g) || [];
   for (const m of parenMatches) {
     const inner = m.slice(1, -1);
     if (/[0-9０-９]+[-ー－][0-9０-９]+|[0-9０-９]+番地|[0-9０-９]+丁目/.test(inner) || (inner.includes(cityName) && /[0-9０-９]/.test(inner))) {
-      let addr = /栃木県/.test(inner) ? inner
-        : inner.includes(cityName) ? `栃木県${inner}`
-        : `栃木県${cityName}${inner}`;
+      let addr = /[都道府県]/.test(inner) ? inner
+        : inner.includes(cityName) ? `${pref}${inner}`
+        : `${pref}${cityName}${inner}`;
       results.push(addr);
     }
   }
@@ -285,17 +286,18 @@ function extractEmbeddedAddressFromVenue(venue, cityName) {
 }
 
 /** ジオコーディング候補を生成 */
-function buildGeoCandidatesForCity(cityName, venue, address, prefixLabel) {
+function buildGeoCandidatesForCity(cityName, venue, address, prefixLabel, prefecture) {
+  const pref = prefecture || "栃木県";
   const candidates = [];
   // 会場テキスト内の括弧住所を抽出（最優先）
-  const embeddedAddrs = extractEmbeddedAddressFromVenue(venue, cityName);
+  const embeddedAddrs = extractEmbeddedAddressFromVenue(venue, cityName, pref);
   for (const ea of embeddedAddrs) candidates.push(ea);
   if (address) {
     const full = address.includes(cityName) ? address : `${cityName}${address}`;
-    candidates.push(/栃木県/.test(full) ? full : `栃木県${full}`);
+    candidates.push(/[都道府県]/.test(full) ? full : `${pref}${full}`);
   }
   if (venue) {
-    candidates.push(`栃木県${prefixLabel || cityName} ${venue}`);
+    candidates.push(`${pref}${prefixLabel || cityName} ${venue}`);
   }
   return [...new Set(candidates)];
 }
@@ -303,8 +305,10 @@ function buildGeoCandidatesForCity(cityName, venue, address, prefixLabel) {
 /** イベントレコードを生成して byId Map に追加 */
 function addEventRecord(byId, {
   sourceObj, eventDate, title, url, venue, rawAddress, timeRange, cityName, prefixLabel,
+  prefecture,
   geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
 }) {
+  const pref = prefecture || "栃木県";
   const source = `ward_${sourceObj.key}`;
   const label = sourceObj.label;
   const dateKey = `${eventDate.y}${String(eventDate.mo).padStart(2, "0")}${String(eventDate.d).padStart(2, "0")}`;
@@ -312,11 +316,11 @@ function addEventRecord(byId, {
   if (byId.has(id)) return;
 
   return (async () => {
-    let geoCandidates = buildGeoCandidatesForCity(cityName, venue, rawAddress, prefixLabel);
+    let geoCandidates = buildGeoCandidatesForCity(cityName, venue, rawAddress, prefixLabel, pref);
     if (getFacilityAddressFromMaster && venue) {
       const fmAddr = getFacilityAddressFromMaster(sourceObj.key, venue);
       if (fmAddr) {
-        const full = /栃木県/.test(fmAddr) ? fmAddr : `栃木県${fmAddr}`;
+        const full = /[都道府県]/.test(fmAddr) ? fmAddr : `${pref}${fmAddr}`;
         geoCandidates.unshift(full);
       }
     }
@@ -1475,7 +1479,7 @@ function createScheduleTableCollector(sourceObj, config, deps) {
         // 住所抽出
         let rawAddress = "";
         if (venue) {
-          const embedded = extractEmbeddedAddressFromVenue(venue, cityName);
+          const embedded = extractEmbeddedAddressFromVenue(venue, cityName, prefecture);
           if (embedded.length > 0) rawAddress = embedded[0];
         }
 
@@ -1486,7 +1490,7 @@ function createScheduleTableCollector(sourceObj, config, deps) {
             sourceObj, eventDate, title, url: page.url,
             venue: sanitizeVenueText(venue), rawAddress,
             timeRange,
-            cityName, prefixLabel,
+            cityName, prefixLabel, prefecture,
             geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
           }));
         }
@@ -1864,6 +1868,17 @@ function createPdfScheduleCollector(sourceObj, config, deps) {
         if (!dup) dates.push({ y, mo, d });
       }
     }
+    // RN年M月D日(曜) 形式 (明和町など: R7年 4月24日(木))
+    const rYearRe = /R(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
+    while ((m = rYearRe.exec(nText)) !== null) {
+      const y = 2018 + Number(m[1]);
+      const mo = Number(m[2]);
+      const d = Number(m[3]);
+      if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
+        const dup = dates.some(dd => dd.y === y && dd.mo === mo && dd.d === d);
+        if (!dup) dates.push({ y, mo, d });
+      }
+    }
     // M D 曜日 形式 (テーブル由来: "4 24 木", "10 23 木")
     // 同一行に複数列がある場合（"4 24 木 ...  9 水 ...  11 金 ..."）、
     // 行頭の月を全列に適用
@@ -1962,6 +1977,9 @@ function createPdfScheduleCollector(sourceObj, config, deps) {
     const nt = text.normalize("NFKC");
     const reiwaFy = nt.match(/令和\s*(\d{1,2})\s*年度/);
     if (reiwaFy) return 2018 + Number(reiwaFy[1]);
+    // RN年度 形式 (みなかみ町など: R7年度)
+    const rShortFy = nt.match(/R(\d{1,2})年度/);
+    if (rShortFy) return 2018 + Number(rShortFy[1]);
     const westernFy = nt.match(/(\d{4})\s*年度/);
     if (westernFy) return Number(westernFy[1]);
     // 年度がない場合は最大の令和N年を使う（対象者の生年月日を除外するため）
@@ -2030,6 +2048,46 @@ function createCollectAnnakaPdfScheduleEvents(deps) {
       { url: "https://www.city.annaka.lg.jp/uploaded/attachment/15739.pdf", title: "2歳児歯科健康診査", defaultVenue: "安中市保健センター" },
       { url: "https://www.city.annaka.lg.jp/uploaded/attachment/15740.pdf", title: "2歳6か月児歯科健康診査", defaultVenue: "安中市保健センター" },
       { url: "https://www.city.annaka.lg.jp/uploaded/attachment/15741.pdf", title: "3歳児健康診査", defaultVenue: "安中市保健センター" },
+    ],
+  }, deps);
+}
+
+
+// ---- みなかみ町 PDF スケジュールコレクター ----
+
+function createCollectMinakamiPdfScheduleEvents(deps) {
+  const { MINAKAMI_SOURCE } = require("../../config/wards");
+  return createPdfScheduleCollector(MINAKAMI_SOURCE, {
+    cityName: "みなかみ町", prefixLabel: "利根郡みなかみ町", prefecture: "群馬県",
+    pages: [
+      { url: "https://www.town.minakami.gunma.jp/life/07kenkou/files/R7kenkoukodomo10-3.pdf", title: "こどもの保健（後期）", defaultVenue: "みなかみ町保健福祉センター" },
+    ],
+  }, deps);
+}
+
+
+// ---- 明和町 PDF スケジュールコレクター ----
+
+function createCollectMeiwaPdfScheduleEvents(deps) {
+  const { MEIWA_SOURCE } = require("../../config/wards");
+  return createPdfScheduleCollector(MEIWA_SOURCE, {
+    cityName: "明和町", prefixLabel: "邑楽郡明和町", prefecture: "群馬県",
+    pages: [
+      { url: "https://www.town.meiwa.gunma.jp/material/files/group/6/R7nyuuyoujikennshinnnittei.pdf", title: "乳幼児健診", defaultVenue: "明和町保健センター" },
+      { url: "https://www.town.meiwa.gunma.jp/material/files/group/6/R7kosodatekyoushituannnai.pdf", title: "子育て教室", defaultVenue: "明和町保健センター" },
+    ],
+  }, deps);
+}
+
+
+// ---- 榛東村 PDF スケジュールコレクター ----
+
+function createCollectShintoPdfScheduleEvents(deps) {
+  const { SHINTO_SOURCE } = require("../../config/wards");
+  return createPdfScheduleCollector(SHINTO_SOURCE, {
+    cityName: "榛東村", prefixLabel: "北群馬郡榛東村", prefecture: "群馬県",
+    pages: [
+      { url: "https://www.vill.shinto.gunma.jp/manage/contents/upload/%E4%BB%A4%E5%92%8C7%E5%B9%B4%E5%BA%A6%E6%A6%9B%E6%9D%B1%E6%9D%91%E5%81%A5%E5%BA%B7%E3%82%AB%E3%83%AC%E3%83%B3%E3%83%80%E3%83%BC.pdf", title: "健康カレンダー", defaultVenue: "榛東村保健相談センター" },
     ],
   }, deps);
 }
@@ -2672,6 +2730,9 @@ module.exports = {
   createCollectShibukawaPdfScheduleEvents,
   createCollectTomiokaPdfScheduleEvents,
   createCollectAnnakaPdfScheduleEvents,
+  createCollectMinakamiPdfScheduleEvents,
+  createCollectMeiwaPdfScheduleEvents,
+  createCollectShintoPdfScheduleEvents,
   // SOURCE定義のエクスポート（他モジュールから参照用）
   UTSUNOMIYA_SOURCE,
   ASHIKAGA_SOURCE,
