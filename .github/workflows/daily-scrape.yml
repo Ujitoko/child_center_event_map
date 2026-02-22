@@ -29,7 +29,7 @@ jobs:
           BASE_URL="${BASE_URL%/}"
           echo "Requesting refresh..."
           set +e
-          HTTP_CODE=$(curl -s --retry 3 --retry-delay 30 --retry-all-errors --max-time 300 \
+          HTTP_CODE=$(curl -s --retry 3 --retry-delay 30 --retry-all-errors --max-time 600 \
             "${BASE_URL}/api/events?refresh=1" \
             -o data/events_snapshot.json -w "%{http_code}")
           CURL_EXIT=$?
