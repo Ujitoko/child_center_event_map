@@ -321,7 +321,7 @@ const { parseDetailMeta } = require("../html-utils");
 const KOSODATE_NET_BASE = "https://www.city.koshigaya.saitama.jp/kosodate-net";
 const KOSODATE_NET_PAGES = [
   "/genres/oshirase/index.html",
-  "/genres/asobu/index.html",
+  "/recent/index.html",
 ];
 
 const KNOWN_KOSHIGAYA_VENUES = {
