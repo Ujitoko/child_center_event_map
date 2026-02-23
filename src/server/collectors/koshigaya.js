@@ -315,13 +315,93 @@ function createCollectKoshigayaEvents(deps) {
  * https://www.city.koshigaya.saitama.jp/kosodate-net/genres/oshirase/index.html
  * カレンダーが空のため、こそだてネットのお知らせ一覧から子育てイベントを収集
  */
-const { parseDatesFromHtml } = require("../date-utils");
-const { parseDetailMeta } = require("../html-utils");
+
+/** 越谷市こそだて詳細ページ用の日付抽出 (令和/M月D日 対応) */
+function parseKosodateDates(html) {
+  const text = stripTags(html);
+  const out = [];
+  const seen = new Set();
+  const push = (y, mo, d) => {
+    if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(d)) return;
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return;
+    const key = `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ y, mo, d });
+  };
+
+  let m;
+  // 1) YYYY年M月D日
+  const jpRe = /(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
+  while ((m = jpRe.exec(text)) !== null) push(Number(m[1]), Number(m[2]), Number(m[3]));
+
+  // 2) 令和N年M月D日
+  const reRe = /令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
+  while ((m = reRe.exec(text)) !== null) push(2018 + Number(m[1]), Number(m[2]), Number(m[3]));
+
+  // 3) ■日時 M月D日 (年なし) → 現在年から推定
+  if (out.length === 0) {
+    const now = new Date();
+    const jstYear = new Date(now.getTime() + 9 * 3600000).getFullYear();
+    const jstMonth = new Date(now.getTime() + 9 * 3600000).getMonth() + 1;
+    const mdRe = /(\d{1,2})月\s*(\d{1,2})日/g;
+    while ((m = mdRe.exec(text)) !== null) {
+      const mo = Number(m[1]);
+      const d = Number(m[2]);
+      const y = (mo - jstMonth > 6) ? jstYear - 1 : jstYear;
+      push(y, mo, d);
+    }
+  }
+
+  return out;
+}
+
+/** ■会場 / ■場所 セクションからの施設名・住所抽出 */
+function parseKosodateVenueAddress(html) {
+  const text = stripTags(html);
+  let venue = "";
+  let address = "";
+
+  // ■会場 / ■場所 パターン
+  const venueMatch = text.match(/■(?:会場|場所)[：:\s]*([^\n■]{2,60})/);
+  if (venueMatch) {
+    venue = venueMatch[1].replace(/[（(].+$/, "").trim();
+    // 括弧内に住所がある場合
+    const parenMatch = venueMatch[1].match(/[（(]([^）)]*越谷市[^）)]*)[）)]/);
+    if (parenMatch) address = parenMatch[1].trim();
+  }
+
+  // dt/dd, th/td パターン (フォールバック)
+  if (!venue) {
+    const metaRe = /<(?:dt|th)[^>]*>([\s\S]*?)<\/(?:dt|th)>\s*<(?:dd|td)[^>]*>([\s\S]*?)<\/(?:dd|td)>/gi;
+    let mm;
+    while ((mm = metaRe.exec(html)) !== null) {
+      const k = stripTags(mm[1]);
+      const v = stripTags(mm[2]);
+      if (!k || !v) continue;
+      if (!venue && /(会場|開催場所|実施場所|場所|ところ)/.test(k)) venue = v.trim();
+      if (!address && /(住所|所在地)/.test(k)) address = v.trim();
+    }
+  }
+
+  // テキスト内住所: 越谷市... or 住所:越谷市...
+  if (!address) {
+    const addrMatch = text.match(/住所[：:]\s*(越谷市[^\s\n]{2,30})/);
+    if (addrMatch) address = addrMatch[1];
+  }
+  if (!address) {
+    const addrMatch = text.match(/越谷市[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FFa-zA-Z0-9\-\d]+/);
+    if (addrMatch) address = addrMatch[0];
+  }
+
+  return { venue: venue.substring(0, 60), address };
+}
 
 const KOSODATE_NET_BASE = "https://www.city.koshigaya.saitama.jp/kosodate-net";
 const KOSODATE_NET_PAGES = [
   "/genres/oshirase/index.html",
   "/recent/index.html",
+  "/calendar/index.html",
 ];
 
 const KNOWN_KOSHIGAYA_VENUES = {
@@ -334,6 +414,15 @@ const KNOWN_KOSHIGAYA_VENUES = {
   "越谷市立図書館": "越谷市東越谷4-9-1",
   "児童館コスモス": "越谷市千間台東1-2-1",
   "児童館ヒマワリ": "越谷市船渡2-4",
+  "あおいとり": "越谷市川柳町1-582-1",
+  "にこにこ": "越谷市新方地区センター",
+  "新方保育所": "越谷市大字弥十郎167-1",
+  "緑の森公園保育所": "越谷市増林3-1-1",
+  "蒲生第三保育所": "越谷市蒲生3-1-60",
+  "七左保育所": "越谷市蒲生旭町7-20",
+  "大相模保育所": "越谷市大成町7-289-1",
+  "登戸保育所": "越谷市登戸町33-21",
+  "ヴァリエ": "越谷市レイクタウン3-1-1",
 };
 
 function createCollectKoshigayaKosodateEvents(deps) {
@@ -377,7 +466,7 @@ function createCollectKoshigayaKosodateEvents(deps) {
     }
 
     // 重複除去
-    const uniqueLinks = [...new Map(allLinks.map(l => [l.url, l])).values()].slice(0, 40);
+    const uniqueLinks = [...new Map(allLinks.map(l => [l.url, l])).values()].slice(0, 80);
 
     // 詳細ページをバッチ取得
     for (let i = 0; i < uniqueLinks.length; i += DETAIL_BATCH_SIZE) {
@@ -385,10 +474,10 @@ function createCollectKoshigayaKosodateEvents(deps) {
       const results = await Promise.allSettled(
         batch.map(async (link) => {
           const html = await fetchText(link.url);
-          const dates = parseDatesFromHtml(html);
-          const meta = parseDetailMeta(html);
+          const dates = parseKosodateDates(html);
+          const va = parseKosodateVenueAddress(html);
           const timeRange = parseTimeRangeFromText(stripTags(html));
-          return { ...link, dates, meta, timeRange };
+          return { ...link, dates, venue: va.venue, address: va.address, timeRange };
         })
       );
       for (const r of results) {
@@ -397,8 +486,8 @@ function createCollectKoshigayaKosodateEvents(deps) {
         if (!detail.dates || detail.dates.length === 0) continue;
 
         const title = detail.title;
-        const venue = sanitizeVenueText((detail.meta && detail.meta.venue) || "");
-        const rawAddress = sanitizeAddressText((detail.meta && detail.meta.address) || "");
+        const venue = sanitizeVenueText(detail.venue || "");
+        const rawAddress = sanitizeAddressText(detail.address || "");
 
         // 既知施設マッチ
         let knownAddr = "";

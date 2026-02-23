@@ -965,18 +965,22 @@ const collectKiyoseEvents = createEventJsCollector({
 const collectTamaEvents = createEventJsCollector({
   source: TAMA_SOURCE, jsFile: "event.js",
   childCategoryIds: ["70"], knownFacilities: KNOWN_TAMA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectInagiEvents = createEventJsCollector({
   source: INAGI_SOURCE, jsFile: "event.js",
   childCategoryIds: ["40"], knownFacilities: KNOWN_INAGI_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectHinoEvents = createEventJsCollector({
   source: HINO_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["1"], knownFacilities: KNOWN_HINO_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectKokubunjiEvents = createEventJsCollector({
   source: KOKUBUNJI_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["6"], knownFacilities: KNOWN_KOKUBUNJI_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectHigashikurumeEvents = createEventJsCollector({
   source: HIGASHIKURUME_SOURCE, jsFile: "event_d.js",
@@ -1005,19 +1009,23 @@ const collectChigasakiEvents = createEventJsCollector({
 const collectZamaEvents = createEventJsCollector({
   source: ZAMA_SOURCE, jsFile: "event.js",
   childCategoryIds: ["60"], knownFacilities: KNOWN_ZAMA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectZushiEvents = createEventJsCollector({
   source: ZUSHI_SOURCE, jsFile: "event.js",
   childCategoryIds: ["20"], knownFacilities: KNOWN_ZUSHI_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 // --- 千葉県 event-js-collector ---
 const collectNagareyamaEvents = createEventJsCollector({
   source: NAGAREYAMA_SOURCE, jsFile: "event_d.js",
   childCategoryIds: ["6"], knownFacilities: KNOWN_NAGAREYAMA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectUrayasuEvents = createEventJsCollector({
   source: URAYASU_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["6"], knownFacilities: KNOWN_URAYASU_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectNodaEvents = createEventJsCollector({
   source: NODA_SOURCE, jsFile: "event_data.js",
@@ -1106,14 +1114,17 @@ const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE,
 const collectKawagoeEvents = createEventJsCollector({
   source: KAWAGOE_SOURCE, jsFile: "event.js",
   childCategoryIds: ["20", "30"], knownFacilities: KNOWN_KAWAGOE_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectWakoEvents = createEventJsCollector({
   source: WAKO_SOURCE, jsFile: "event.js",
   childCategoryIds: ["60"], knownFacilities: KNOWN_WAKO_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectWarabiEvents = createEventJsCollector({
   source: WARABI_SOURCE, jsFile: "event.js",
   childCategoryIds: ["30"], knownFacilities: KNOWN_WARABI_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 // --- 埼玉県 municipal-calendar-collector ---
 const collectAgeoEvents = createMunicipalCalendarCollector({ source: AGEO_SOURCE, childCategoryIndex: null }, geoFmDeps);
