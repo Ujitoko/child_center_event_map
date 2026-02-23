@@ -15,6 +15,7 @@ const { createCollectChuoAkachanTengokuEvents } = require("./src/server/collecto
 const { createCollectKitaJidokanEvents } = require("./src/server/collectors/kita");
 const { createCollectWardGenericEvents } = require("./src/server/collectors/ward-generic");
 const { createCollectAdditionalWardsEvents } = require("./src/server/collectors/additional-wards");
+const { createCollectKatsushikaScheduleEvents } = require("./src/server/collectors/katsushika-schedule");
 const { createCollectHachiojiEvents } = require("./src/server/collectors/hachioji");
 const { createCollectMusashinoEvents } = require("./src/server/collectors/musashino");
 const { createCollectTachikawaEvents } = require("./src/server/collectors/tachikawa");
@@ -1316,6 +1317,8 @@ const collectKiryuShienCenterEvents = createCollectKiryuShienCenterEvents(geoFmD
 const collectNakanojoRecurringEvents = createCollectNakanojoRecurringEvents(geoFmDeps);
 const collectShimonitaCrossRowEvents = createCollectShimonitaCrossRowEvents(geoFmDeps);
 const collectTakasakiNandemoEvents = createCollectTakasakiNandemoEvents(geoFmDeps);
+// --- 葛飾区 schedule collector ---
+const collectKatsushikaScheduleEvents = createCollectKatsushikaScheduleEvents(geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -1632,6 +1635,8 @@ const getEvents = createGetEvents({
   collectNakanojoRecurringEvents,
   collectShimonitaCrossRowEvents,
   collectTakasakiNandemoEvents,
+  // Katsushika schedule supplement
+  collectKatsushikaScheduleEvents,
 });
 
 // --- HTTP server ---

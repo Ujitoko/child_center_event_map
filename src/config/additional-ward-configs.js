@@ -412,7 +412,7 @@ function buildAdditionalWardConfigs(deps) {
     katsushika: {
       source: KATSUSHIKA_SOURCE,
       listUrls: (m) => [
-        `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=21`,
+        // cate=21 (児童館) は katsushika-schedule.js が担当
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=20`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=22`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=25`,
@@ -422,15 +422,11 @@ function buildAdditionalWardConfigs(deps) {
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u89aa\u5b50")}`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u80b2\u3066")}`,
       ],
-      oneTimeListUrls: () => Promise.resolve([
-        `${KATSUSHIKA_SOURCE.baseUrl}/event/1000114/index.html`,
-        `${KATSUSHIKA_SOURCE.baseUrl}/event/1022292/index.html`,
-        `${KATSUSHIKA_SOURCE.baseUrl}/event/1000115/index.html`,
-      ]),
+      // oneTimeListUrls removed: katsushika-schedule.js handles facility index pages
       parseOpts: {
         blockRe: /<ul class="listlink">([\s\S]*?)<\/ul>/i,
         urlAllow: /city\.katsushika\.lg\.jp\/(?:event|kosodate|shisetsu)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap)\.html$|\/event\/(?:1000114|1022292|1000115)\/index\.html$/i,
+        urlDeny: /\/(?:index|sitemap)\.html$|\/event\/(?:1000114|1022292|1000115)\//i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },

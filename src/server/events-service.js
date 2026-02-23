@@ -347,6 +347,8 @@ function createGetEvents(deps) {
     collectNakanojoRecurringEvents,
     collectShimonitaCrossRowEvents,
     collectTakasakiNandemoEvents,
+    // Katsushika schedule supplement
+    collectKatsushikaScheduleEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -693,6 +695,8 @@ function createGetEvents(deps) {
     () => collectNakanojoRecurringEvents(days),
     () => collectShimonitaCrossRowEvents(days),
     () => collectTakasakiNandemoEvents(days),
+    // Katsushika schedule supplement
+    () => collectKatsushikaScheduleEvents(days),
   ], 5);
   // Flatten all collector results into a single array.
   // Most collectors return an array; additional-wards returns an object of arrays.
