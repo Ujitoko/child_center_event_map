@@ -52,7 +52,7 @@ const { createCollectFunabashiEvents } = require("./src/server/collectors/funaba
 const { createCollectNaritaEvents } = require("./src/server/collectors/narita");
 const { createCollectChibaEvents, createCollectChibaCityWardEvents } = require("./src/server/collectors/chiba");
 const { createCollectKashiwaEvents } = require("./src/server/collectors/kashiwa");
-const { createCollectIchikawaEvents } = require("./src/server/collectors/ichikawa");
+const { createCollectIchikawaEvents, createCollectIchikawaIkujiEvents } = require("./src/server/collectors/ichikawa");
 const { createCollectYotsukaidoEvents } = require("./src/server/collectors/yotsukaido");
 const { createCollectMatsudoEvents } = require("./src/server/collectors/matsudo");
 const { createListCalendarCollector } = require("./src/server/collectors/list-calendar-collector");
@@ -927,24 +927,26 @@ const collectAtsugiKosodateEvents = createCollectAtsugiKosodateEvents(geoFmDeps)
 const collectIseharaEvents = createCollectIseharaEvents(geoFmDeps);
 const collectMinamiashigaraEvents = createCollectMinamiashigaraEvents(geoFmDeps);
 const collectFujisawaEvents = createCollectFujisawaEvents(geoFmDeps);
-const collectSamukawaEvents = createCalendarJsonCollector({ source: SAMUKAWA_SOURCE }, geoFmDeps);
-const collectAikawaEvents = createCalendarJsonCollector({ source: AIKAWA_SOURCE }, geoFmDeps);
-const collectMiuraEvents = createCalendarJsonCollector({ source: MIURA_SOURCE }, geoFmDeps);
-const collectOisoEvents = createCalendarJsonCollector({ source: OISO_SOURCE }, geoFmDeps);
-const collectHayamaEvents = createCalendarJsonCollector({ source: HAYAMA_SOURCE }, geoFmDeps);
-const collectNakaiEvents = createCalendarJsonCollector({ source: NAKAI_SOURCE }, geoFmDeps);
-const collectKiyokawaEvents = createCalendarJsonCollector({ source: KIYOKAWA_SOURCE }, geoFmDeps);
+const KANAGAWA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectSamukawaEvents = createCalendarJsonCollector({ source: SAMUKAWA_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectAikawaEvents = createCalendarJsonCollector({ source: AIKAWA_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectMiuraEvents = createCalendarJsonCollector({ source: MIURA_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectOisoEvents = createCalendarJsonCollector({ source: OISO_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectHayamaEvents = createCalendarJsonCollector({ source: HAYAMA_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectNakaiEvents = createCalendarJsonCollector({ source: NAKAI_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
+const collectKiyokawaEvents = createCalendarJsonCollector({ source: KIYOKAWA_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
 const collectNinomiyaEvents = createCollectNinomiyaEvents(geoFmDeps);
 const collectOiEvents = createMunicipalCalendarCollector({ source: OI_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectYugawaraEvents = createMunicipalCalendarCollector({ source: YUGAWARA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectMatsudaEvents = createCollectMatsudaEvents(geoFmDeps);
-const collectManazuruEvents = createCalendarJsonCollector({ source: MANAZURU_SOURCE }, geoFmDeps);
+const collectManazuruEvents = createCalendarJsonCollector({ source: MANAZURU_SOURCE, childKeywords: KANAGAWA_CHILD_KW }, geoFmDeps);
 const collectHakoneEvents = createCollectHakoneEvents(geoFmDeps);
 const collectKaiseiEvents = createCollectKaiseiEvents(geoFmDeps);
 const collectYamakitaEvents = createCollectYamakitaEvents(geoFmDeps);
 const collectMachidaKosodateEvents = createCollectMachidaKosodateEvents(geoFmDeps);
 const collectMizuhoEvents = createCollectMizuhoEvents(geoFmDeps);
-const collectOkutamaEvents = createCalendarJsonCollector({ source: OKUTAMA_SOURCE }, geoFmDeps);
+const TOKYO_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectOkutamaEvents = createCalendarJsonCollector({ source: OKUTAMA_SOURCE, childKeywords: TOKYO_CHILD_KW }, geoFmDeps);
 const collectHinodeEvents = createCollectHinodeEvents(geoFmDeps);
 const collectHinoharaEvents = createCollectHinoharaEvents(geoFmDeps);
 const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
@@ -1021,12 +1023,13 @@ const collectNodaEvents = createEventJsCollector({
   knownFacilities: KNOWN_NODA_FACILITIES,
 }, eventJsDeps);
 // --- 千葉県 calendar-json-collector ---
-const collectNarashinoEvents = createCalendarJsonCollector({ source: NARASHINO_SOURCE }, geoFmDeps);
-const collectShiroiEvents = createCalendarJsonCollector({ source: SHIROI_SOURCE }, geoFmDeps);
-const collectKisarazuEvents = createCalendarJsonCollector({ source: KISARAZU_SOURCE }, geoFmDeps);
-const collectIsumiEvents = createCalendarJsonCollector({ source: ISUMI_SOURCE }, geoFmDeps);
-const collectTohnoshoEvents = createCalendarJsonCollector({ source: TOHNOSHO_SOURCE }, geoFmDeps);
-const collectOtakiEvents = createCalendarJsonCollector({ source: OTAKI_SOURCE }, geoFmDeps);
+const CHIBA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectNarashinoEvents = createCalendarJsonCollector({ source: NARASHINO_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectShiroiEvents = createCalendarJsonCollector({ source: SHIROI_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectKisarazuEvents = createCalendarJsonCollector({ source: KISARAZU_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectIsumiEvents = createCalendarJsonCollector({ source: ISUMI_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectTohnoshoEvents = createCalendarJsonCollector({ source: TOHNOSHO_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectOtakiEvents = createCalendarJsonCollector({ source: OTAKI_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
 // --- 千葉県 custom collectors ---
 const collectFunabashiEvents = createCollectFunabashiEvents(geoFmDeps);
 const collectNaritaEvents = createCollectNaritaEvents(geoFmDeps);
@@ -1039,6 +1042,7 @@ const collectAsahiEvents = createMunicipalCalendarCollector({ source: ASAHI_SOUR
 const collectKamogawaEvents = createMunicipalCalendarCollector({ source: KAMOGAWA_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectYokoshibahikariEvents = createMunicipalCalendarCollector({ source: YOKOSHIBAHIKARI_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectIchikawaEvents = createCollectIchikawaEvents(geoFmDeps);
+const collectIchikawaIkujiEvents = createCollectIchikawaIkujiEvents(geoFmDeps);
 const collectKatsuuraEvents = createMunicipalCalendarCollector({ source: KATSUURA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectKimitsuEvents = createMunicipalCalendarCollector({ source: KIMITSU_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectKyonanEvents = createMunicipalCalendarCollector({ source: KYONAN_SOURCE, childCategoryIndex: null }, geoFmDeps);
@@ -1058,15 +1062,15 @@ const collectSodegauraEvents = createRdfEventCollector({ source: SODEGAURA_SOURC
 const collectIchinomiyaEvents = createCollectIchinomiyaEvents(geoFmDeps);
 const collectChoshiEvents = createCollectChoshiEvents(geoFmDeps);
 // --- 千葉県追加 ---
-const collectSakuraEvents = createCalendarJsonCollector({ source: SAKURA_SOURCE }, geoFmDeps);
+const collectSakuraEvents = createCalendarJsonCollector({ source: SAKURA_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
 const collectFuttsuEvents = createEvent2CalendarCollector({ source: FUTTSU_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
 const collectInzaiEvents = createEvent2CalendarCollector({ source: INZAI_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
 const collectKatoriEvents = createListCalendarCollector({ source: KATORI_SOURCE, calendarPath: "/yotei/kosodate/calendar/", fallbackPath: "/yotei/calendar/" }, geoFmDeps);
-const collectToganeEvents = createEvent2CalendarCollector({ source: TOGANE_SOURCE, childIconAlts: [] }, geoFmDeps);
-const collectIchiharaEvents = createCalendarJsonCollector({ source: ICHIHARA_SOURCE }, geoFmDeps);
-const collectSosaEvents = createCalendarJsonCollector({ source: SOSA_SOURCE }, geoFmDeps);
-const collectSammuEvents = createCalendarJsonCollector({ source: SAMMU_SOURCE }, geoFmDeps);
-const collectSakaeChibaEvents = createCalendarJsonCollector({ source: SAKAE_CHIBA_SOURCE }, geoFmDeps);
+const collectToganeEvents = createEvent2CalendarCollector({ source: TOGANE_SOURCE, childIconAlts: ["子育て", "子ども"] }, geoFmDeps);
+const collectIchiharaEvents = createCalendarJsonCollector({ source: ICHIHARA_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectSosaEvents = createCalendarJsonCollector({ source: SOSA_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectSammuEvents = createCalendarJsonCollector({ source: SAMMU_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
+const collectSakaeChibaEvents = createCalendarJsonCollector({ source: SAKAE_CHIBA_SOURCE, childKeywords: CHIBA_CHILD_KW }, geoFmDeps);
 // --- 千葉県 残り13自治体 custom ---
 const collectMobaraEvents = createCollectMobaraEvents(geoFmDeps);
 const collectTateyamaEvents = createCollectTateyamaEvents(geoFmDeps);
@@ -1092,10 +1096,10 @@ const collectKamagayaKosodateEvents = createCollectKamagayaKosodateEvents(geoFmD
 const collectSakuraLibraryEvents = createCollectSakuraLibraryEvents(geoFmDeps);
 const collectInzaiLibraryEvents = createCollectInzaiLibraryEvents(geoFmDeps);
 // --- 埼玉県 calendar-json-collector ---
-const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE, childKeywords: ["おもちゃ", "工作", "映画会", "図書館", "広場"] }, geoFmDeps);
-const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE, childKeywords: ["健診", "相談", "教室", "広場", "サロン", "映画会", "工作", "イチゴ", "図書館"] }, geoFmDeps);
-const collectFujiminoEvents = createCalendarJsonCollector({ source: FUJIMINO_SOURCE }, geoFmDeps);
-const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE }, geoFmDeps);
+const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE, childKeywords: ["おもちゃ", "工作", "映画会", "図書館", "広場", "子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童館", "赤ちゃん"] }, geoFmDeps);
+const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE, childKeywords: ["健診", "相談", "教室", "広場", "サロン", "映画会", "工作", "イチゴ", "図書館", "子育て", "親子", "幼児", "乳幼児", "キッズ", "児童", "赤ちゃん", "おはなし"] }, geoFmDeps);
+const collectFujiminoEvents = createCalendarJsonCollector({ source: FUJIMINO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん"] }, geoFmDeps);
+const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "おはなし会", "読み聞かせ", "教室", "相談", "健診", "キッズ", "児童", "サロン", "ひろば", "赤ちゃん"] }, geoFmDeps);
 // --- 埼玉県 event-js-collector ---
 const collectKawagoeEvents = createEventJsCollector({
   source: KAWAGOE_SOURCE, jsFile: "event.js",
@@ -1132,12 +1136,13 @@ const collectKounosuEvents = createMunicipalCalendarCollector({ source: KOUNOSU_
 const collectSakadoEvents = createMunicipalCalendarCollector({ source: SAKADO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectHigashimatsuyamaEvents = createMunicipalCalendarCollector({ source: HIGASHIMATSUYAMA_SOURCE, childCategoryIndex: null }, geoFmDeps);
 // --- 埼玉県 calendar-json-collector (追加) ---
-const collectHannoEvents = createCalendarJsonCollector({ source: HANNO_SOURCE }, geoFmDeps);
-const collectGyodaEvents = createCalendarJsonCollector({ source: GYODA_SOURCE }, geoFmDeps);
-const collectHonjoEvents = createCalendarJsonCollector({ source: HONJO_SOURCE }, geoFmDeps);
-const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE, childKeywords: ["広場", "教室", "おもちゃ", "サロン", "映画会"] }, geoFmDeps);
-const collectShiraokaEvents = createCalendarJsonCollector({ source: SHIRAOKA_SOURCE }, geoFmDeps);
-const collectSatteEvents = createCalendarJsonCollector({ source: SATTE_SOURCE }, geoFmDeps);
+const SAITAMA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会"];
+const collectHannoEvents = createCalendarJsonCollector({ source: HANNO_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectGyodaEvents = createCalendarJsonCollector({ source: GYODA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectHonjoEvents = createCalendarJsonCollector({ source: HONJO_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectHidakaEvents = createCalendarJsonCollector({ source: HIDAKA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectShiraokaEvents = createCalendarJsonCollector({ source: SHIRAOKA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectSatteEvents = createCalendarJsonCollector({ source: SATTE_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
 // --- 埼玉県 municipal-calendar-collector (町村) ---
 const collectYoriiEvents = createMunicipalCalendarCollector({ source: YORII_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectSugitoEvents = createMunicipalCalendarCollector({ source: SUGITO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
@@ -1152,12 +1157,12 @@ const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
 const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php", childEventTypeNo: 1 }, geoFmDeps);
 const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE, childKeywords: ["児童館", "健診", "相談", "教室", "広場", "サロン", "おもちゃ", "無料開放"] }, geoFmDeps);
-const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json", childKeywords: ["健診", "相談", "教室", "広場", "サロン"] }, geoFmDeps);
-const collectOkegawaEvents = createCalendarJsonCollector({ source: OKEGAWA_SOURCE }, geoFmDeps);
-const collectOgoseEvents = createCalendarJsonCollector({ source: OGOSE_SOURCE }, geoFmDeps);
-const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE }, geoFmDeps);
-const collectYoshimiEvents = createCalendarJsonCollector({ source: YOSHIMI_SOURCE }, geoFmDeps);
-const collectKamikawaEvents = createCalendarJsonCollector({ source: KAMIKAWA_SOURCE }, geoFmDeps);
+const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json", childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectOkegawaEvents = createCalendarJsonCollector({ source: OKEGAWA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectOgoseEvents = createCalendarJsonCollector({ source: OGOSE_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectOgawaEvents = createCalendarJsonCollector({ source: OGAWA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectYoshimiEvents = createCalendarJsonCollector({ source: YOSHIMI_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
+const collectKamikawaEvents = createCalendarJsonCollector({ source: KAMIKAWA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
 const collectKamisatoEvents = createCollectKamisatoEvents({ ...geoFmDeps, source: KAMISATO_SOURCE });
 const collectYoshikawaEvents = createCollectYoshikawaEvents({ ...geoFmDeps, source: YOSHIKAWA_SOURCE });
 const collectOganoEvents = createCollectOganoEvents({ ...geoFmDeps, source: OGANO_SOURCE });
@@ -1180,9 +1185,10 @@ const collectHanyuEvents = createCollectHanyuEvents({ ...geoFmDeps, source: HANY
 const collectMisatoSaitamaEvents = createCollectMisatoSaitamaEvents({ ...geoFmDeps, source: MISATO_SAITAMA_SOURCE });
 // --- 栃木県 calendar-json-collector ---
 const collectSanoEvents = createCollectSanoScheduleEvents(geoFmDeps); // スケジュール表コレクター
-const collectNikkoEvents = createCalendarJsonCollector({ source: NIKKO_SOURCE }, geoFmDeps);
+const TOCHIGI_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectNikkoEvents = createCalendarJsonCollector({ source: NIKKO_SOURCE, childKeywords: TOCHIGI_CHILD_KW }, geoFmDeps);
 const collectMokaEvents = createCollectMokaScheduleEvents(geoFmDeps); // スケジュール表コレクター
-const collectNasushiobaraEvents = createCalendarJsonCollector({ source: NASUSHIOBARA_SOURCE }, geoFmDeps);
+const collectNasushiobaraEvents = createCalendarJsonCollector({ source: NASUSHIOBARA_SOURCE, childKeywords: TOCHIGI_CHILD_KW }, geoFmDeps);
 // --- 栃木県 municipal-calendar-collector ---
 const collectTochigiCityEvents = createCollectTochigiCityScheduleEvents(geoFmDeps); // スケジュール表コレクター
 const collectYaitaEvents = createMunicipalCalendarCollector({ source: YAITA_SOURCE, childCategoryIndex: null }, geoFmDeps);
@@ -1208,7 +1214,8 @@ const collectNasuEvents = createCollectNasuEvents(geoFmDeps);
 const collectTochigiNakagawaEvents = createCollectTochigiNakagawaEvents(geoFmDeps);
 // --- 群馬県 calendar-json-collector ---
 const collectMaebashiEvents = createCalendarJsonCollector({ source: MAEBASHI_SOURCE, childEventTypeNo: 1 }, geoFmDeps);
-const collectIsesakiEvents = createCalendarJsonCollector({ source: ISESAKI_SOURCE }, geoFmDeps);
+const GUNMA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectIsesakiEvents = createCalendarJsonCollector({ source: ISESAKI_SOURCE, childKeywords: GUNMA_CHILD_KW }, geoFmDeps);
 const collectFujiokaGunmaEvents = createCollectFujiokaGunmaKosodateEvents(geoFmDeps); // calendar.jsonに子育てイベントなし→kosodate
 // --- 群馬県 municipal-calendar-collector ---
 const collectTakasakiEvents = createMunicipalCalendarCollector({ source: TAKASAKI_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
@@ -1389,6 +1396,7 @@ const getEvents = createGetEvents({
   collectKamogawaEvents,
   collectYokoshibahikariEvents,
   collectIchikawaEvents,
+  collectIchikawaIkujiEvents,
   collectKatsuuraEvents,
   collectKimitsuEvents,
   collectKyonanEvents,

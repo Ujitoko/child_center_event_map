@@ -64,8 +64,14 @@ function parseDatesFromDetail(html) {
     push(Number(m[1]), Number(m[2]), Number(m[3]));
   }
 
-  // 完全形が見つかった場合はそれを使う
-  if (dates.length > 0) return dates;
+  // 完全形の日付がすべて過去すぎる場合（対象年齢の生年月日等）、
+  // M月D日パターンに fallback する
+  const now = new Date();
+  const jstYear = new Date(now.getTime() + 9 * 3600000).getUTCFullYear();
+  const hasRecentFullDate = dates.some(
+    dd => dd.y >= jstYear - 1
+  );
+  if (dates.length > 0 && hasRecentFullDate) return dates;
 
   // 年度推定: 「令和N年度」から
   let fiscalYear = null;
@@ -80,21 +86,29 @@ function parseDatesFromDetail(html) {
   }
 
   // テーブル内の M月D日 パターン
+  const mdDates = [];
+  const mdSeen = new Set();
   const mdRe = /(\d{1,2})月\s*(\d{1,2})日/g;
   while ((m = mdRe.exec(text)) !== null) {
     const mo = Number(m[1]);
     const d = Number(m[2]);
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+    let y;
     if (fiscalYear) {
       // 年度判定: 4月以降は年度年、1-3月は年度年+1
-      const y = mo >= 4 ? fiscalYear : fiscalYear + 1;
-      push(y, mo, d);
+      y = mo >= 4 ? fiscalYear : fiscalYear + 1;
     } else {
-      // フォールバック: 現在のJST年
-      const now = new Date();
-      const jstYear = new Date(now.getTime() + 9 * 3600000).getUTCFullYear();
-      push(jstYear, mo, d);
+      y = jstYear;
+    }
+    const key = `${y}-${mo}-${d}`;
+    if (!mdSeen.has(key)) {
+      mdSeen.add(key);
+      mdDates.push({ y, mo, d });
     }
   }
+
+  // M月D日 dates が見つかった場合はそちらを優先（スケジュール表から）
+  if (mdDates.length > 0) return mdDates;
 
   return dates;
 }

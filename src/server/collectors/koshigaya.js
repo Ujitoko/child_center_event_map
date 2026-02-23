@@ -352,7 +352,7 @@ function createCollectKoshigayaKosodateEvents(deps) {
     // お知らせ/遊ぶページからリンク一覧を取得
     const allLinks = [];
     for (const pagePath of KOSODATE_NET_PAGES) {
-      const url = `${KOSHIGAYA_SOURCE.baseUrl}${pagePath}`;
+      const url = `${KOSODATE_NET_BASE}${pagePath}`;
       let html;
       try {
         html = await fetchText(url);
@@ -385,7 +385,7 @@ function createCollectKoshigayaKosodateEvents(deps) {
       const results = await Promise.allSettled(
         batch.map(async (link) => {
           const html = await fetchText(link.url);
-          const { dates } = parseDatesFromHtml(html);
+          const dates = parseDatesFromHtml(html);
           const meta = parseDetailMeta(html);
           const timeRange = parseTimeRangeFromText(stripTags(html));
           return { ...link, dates, meta, timeRange };

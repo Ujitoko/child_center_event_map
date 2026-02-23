@@ -183,4 +183,166 @@ function createCollectIchikawaEvents(deps) {
   };
 }
 
-module.exports = { createCollectIchikawaEvents };
+/**
+ * 市川市 ikuji365.net 子育てイベントコレクター
+ * https://ichikawa.ikuji365.net/event/
+ * 全イベントが子育て関連のためキーワードフィルタ不要
+ */
+const IKUJI365_BASE = "https://ichikawa.ikuji365.net";
+const IKUJI365_LIMIT = 20;
+const IKUJI365_MAX_PAGES = 3; // 最大60件（最新のみ）
+
+function parseIkujiListPage(html) {
+  const items = [];
+  // リスト内の各イベントリンクを抽出
+  // <a class="p-notice__listLink" href="https://ichikawa.ikuji365.net/G0000121/system/event/10804.html">
+  //   <div class="p-notice__listHeading">Title</div>
+  //   <p class="p-notice__listSummary">開催日：2026年03月07日（土）...</p>
+  // </a>
+  const linkRe = /<a\s+[^>]*href="(https?:\/\/ichikawa\.ikuji365\.net\/[^"]+\/system\/event\/\d+\.html)"[^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = linkRe.exec(html)) !== null) {
+    const href = m[1];
+    const inner = m[2];
+    // タイトル: p-notice__listHeading div or h3
+    const headingMatch = inner.match(/<div\s+class="p-notice__listHeading">([\s\S]*?)<\/div>/) ||
+                         inner.match(/<h3>([\s\S]*?)<\/h3>/);
+    const title = headingMatch ? stripTags(headingMatch[1]).trim() : "";
+    if (!title) continue;
+    // 開催日 (リスト上の日付)
+    const dateMatch = inner.match(/開催日[：:]\s*(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    if (!dateMatch) continue;
+    items.push({
+      url: href,
+      title,
+      y: Number(dateMatch[1]),
+      mo: Number(dateMatch[2]),
+      d: Number(dateMatch[3]),
+    });
+  }
+  return items;
+}
+
+function parseIkujiDetailPage(html) {
+  const text = stripTags(html);
+  const result = { venue: "", address: "", timeRange: null };
+  // 開催場所
+  const venueMatch = text.match(/開催場所\s*[:：]?\s*(.+?)(?:\n|開催時間|郵便番号|住所|対象)/);
+  if (venueMatch) result.venue = venueMatch[1].trim();
+  // 住所
+  const addrMatch = text.match(/住所\s*[:：]?\s*(.+?)(?:\n|対象|費用|問い合わせ|授乳)/);
+  if (addrMatch) result.address = addrMatch[1].trim();
+  // 開催時間
+  const timeMatch = text.match(/開催時間\s*[:：]?\s*(\d{1,2}:\d{2})\s*[～~ー\-]\s*(\d{1,2}:\d{2})/);
+  if (timeMatch) {
+    result.timeRange = {
+      startH: Number(timeMatch[1].split(":")[0]),
+      startM: Number(timeMatch[1].split(":")[1]),
+      endH: Number(timeMatch[2].split(":")[0]),
+      endM: Number(timeMatch[2].split(":")[1]),
+    };
+  }
+  return result;
+}
+
+function createCollectIchikawaIkujiEvents(deps) {
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
+  const source = ICHIKAWA_SOURCE;
+  const srcKey = `ward_${source.key}`;
+  const label = `${source.label}ikuji365`;
+
+  return async function collectIchikawaIkujiEvents(maxDays) {
+    // ページネーションでリスト取得
+    const allItems = [];
+    for (let page = 0; page < IKUJI365_MAX_PAGES; page++) {
+      const offset = page * IKUJI365_LIMIT;
+      const url = `${IKUJI365_BASE}/event/?offset=${offset}&limit=${IKUJI365_LIMIT}&_filter=event`;
+      try {
+        const html = await fetchText(url);
+        const items = parseIkujiListPage(html);
+        if (items.length === 0) break;
+        allItems.push(...items);
+      } catch (e) {
+        console.warn(`[${label}] page ${page} fetch failed:`, e.message || e);
+        break;
+      }
+    }
+
+    // 重複除去 & 日付フィルタ
+    const uniqueMap = new Map();
+    for (const item of allItems) {
+      if (!inRangeJst(item.y, item.mo, item.d, maxDays)) continue;
+      const key = `${item.url}:${item.y}-${item.mo}-${item.d}`;
+      if (!uniqueMap.has(key)) uniqueMap.set(key, item);
+    }
+    const filtered = Array.from(uniqueMap.values());
+
+    // 詳細ページをバッチ取得 (会場・住所・時間)
+    const BATCH = 6;
+    const byId = new Map();
+    for (let i = 0; i < filtered.length; i += BATCH) {
+      const batch = filtered.slice(i, i + BATCH);
+      const results = await Promise.allSettled(
+        batch.map(async (item) => {
+          let detail = { venue: "", address: "", timeRange: null };
+          try {
+            const html = await fetchText(item.url);
+            detail = parseIkujiDetailPage(html);
+          } catch (_e) { /* use fallback */ }
+          return { ...item, ...detail };
+        })
+      );
+      for (const r of results) {
+        if (r.status !== "fulfilled") continue;
+        const ev = r.value;
+        const venue = sanitizeVenueText(ev.venue || "");
+        const rawAddress = ev.address || "";
+
+        // ジオコーディング
+        const candidates = [];
+        if (getFacilityAddressFromMaster && venue) {
+          const fmAddr = getFacilityAddressFromMaster(source.key, venue);
+          if (fmAddr) {
+            candidates.push(/千葉県/.test(fmAddr) ? fmAddr : `千葉県${fmAddr}`);
+          }
+        }
+        if (rawAddress && rawAddress.includes("市川市")) {
+          candidates.push(/千葉県/.test(rawAddress) ? rawAddress : `千葉県${rawAddress}`);
+        }
+        if (venue) {
+          candidates.push(`千葉県市川市 ${venue}`);
+        }
+        let point = await geocodeForWard(candidates.slice(0, 5), source);
+        point = resolveEventPoint(source, venue, point, rawAddress || `市川市 ${venue}`);
+        const address = resolveEventAddress(source, venue, rawAddress || `市川市 ${venue}`, point);
+
+        const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
+        const { startsAt, endsAt } = buildStartsEndsForDate(
+          { y: ev.y, mo: ev.mo, d: ev.d },
+          ev.timeRange
+        );
+        const id = `${srcKey}:ikuji:${ev.url}:${dateKey}`;
+        if (byId.has(id)) continue;
+        byId.set(id, {
+          id,
+          source: srcKey,
+          source_label: source.label,
+          title: ev.title,
+          starts_at: startsAt,
+          ends_at: endsAt,
+          venue_name: venue,
+          address: address || "",
+          url: ev.url,
+          lat: point ? point.lat : source.center.lat,
+          lng: point ? point.lng : source.center.lng,
+        });
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectIchikawaEvents, createCollectIchikawaIkujiEvents };
