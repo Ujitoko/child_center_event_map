@@ -1609,6 +1609,9 @@ function createCollectOhtawaraScheduleEvents(deps) {
     const pages = [
       { url: "https://www.city.ohtawara.tochigi.jp/docs/2025041100029/", title: "乳幼児健康相談", defaultVenue: "大田原市福祉センター" },
       { url: "https://www.city.ohtawara.tochigi.jp/docs/2016042600069/", title: "教育支援相談会", defaultVenue: "大田原市役所" },
+      { url: "https://www.city.ohtawara.tochigi.jp/docs/2021111100029/", title: "保護者の会（教育支援センター）", defaultVenue: "大志館すばる" },
+      { url: "https://www.city.ohtawara.tochigi.jp/docs/2013082771599/", title: "ファミサポ出張登録会", defaultVenue: "つどいの広場トコトコ" },
+      { url: "https://www.city.ohtawara.tochigi.jp/docs/2021070900043/", title: "就学時健康診断", defaultVenue: "大田原市役所" },
     ];
 
     const now = new Date(Date.now() + 9 * 3600000);
@@ -2003,6 +2006,22 @@ function createCollectOtaGunmaPdfScheduleEvents(deps) {
       { url: "https://www.city.ota.gunma.jp/uploaded/attachment/30267.pdf", title: "マタニティセミナー", defaultVenue: "太田市保健センター" },
       { url: "https://www.city.ota.gunma.jp/uploaded/attachment/30205.pdf", title: "歯ぴもぐ教室", defaultVenue: "太田市保健センター" },
       { url: "https://www.city.ota.gunma.jp/uploaded/attachment/36246.pdf", title: "子育て相談", defaultVenue: "太田市保健センター" },
+      // 児童館・こども館だより（月刊ニュースレター）
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37484.pdf", title: "児童センターだより", defaultVenue: "児童センター" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37485.pdf", title: "九合児童館だより", defaultVenue: "九合児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37486.pdf", title: "沢野児童館だより", defaultVenue: "沢野児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37487.pdf", title: "韮川児童館だより", defaultVenue: "韮川児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37488.pdf", title: "強戸児童館だより", defaultVenue: "強戸児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37489.pdf", title: "休泊児童館だより", defaultVenue: "休泊児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37490.pdf", title: "宝泉児童館だより", defaultVenue: "宝泉児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37491.pdf", title: "毛里田児童館だより", defaultVenue: "毛里田児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37492.pdf", title: "尾島児童館だより", defaultVenue: "尾島児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37493.pdf", title: "世良田児童館だより", defaultVenue: "世良田児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37494.pdf", title: "生品児童館だより", defaultVenue: "生品児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37496.pdf", title: "綿打児童館だより", defaultVenue: "綿打児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37497.pdf", title: "木崎児童館だより", defaultVenue: "木崎児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37498.pdf", title: "藪塚本町児童館だより", defaultVenue: "藪塚本町児童館" },
+      { url: "https://www.city.ota.gunma.jp/uploaded/attachment/37499.pdf", title: "こども館だより", defaultVenue: "太田市こども館" },
     ],
   }, deps);
 }

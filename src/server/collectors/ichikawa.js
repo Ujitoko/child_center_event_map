@@ -190,7 +190,7 @@ function createCollectIchikawaEvents(deps) {
  */
 const IKUJI365_BASE = "https://ichikawa.ikuji365.net";
 const IKUJI365_LIMIT = 20;
-const IKUJI365_MAX_PAGES = 3; // 最大60件（最新のみ）
+const IKUJI365_MAX_PAGES = 8; // 最大160件
 
 function parseIkujiListPage(html) {
   const items = [];

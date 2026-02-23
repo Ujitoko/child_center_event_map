@@ -339,6 +339,11 @@ function buildAdditionalWardConfigs(deps) {
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/oizumi.html`,
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/jidokan/nikoniko/hikarigaoka.html`,
         `${NERIMA_SOURCE.baseUrl}/shisetsu/hokenfuku/fukushi/koseibunka/jido/club_gyouji.html`,
+        `${NERIMA_SOURCE.baseUrl}/kankomoyoshi/event/kodomo/index.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/kodomo_cafe.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/terrace.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/ohipiyo.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/sotoasobi.html`,
       ],
       oneTimeListUrls: () => {
         const facilities = [
@@ -351,14 +356,14 @@ function buildAdditionalWardConfigs(deps) {
       },
       parseOpts: {
         urlAllow:
-          /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+          /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/(?:jidokan|asobi)|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido|kankomoyoshi\/event\/kodomo)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
         urlDeny:
           /\/(?:sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
       rowUrlAllowRe:
-        /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/jidokan|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+        /city\.nerima\.tokyo\.jp\/(?:kosodatekyoiku\/kodomo\/(?:jidokan|asobi)|shisetsu\/hokenfuku\/fukushi\/koseibunka\/jido|kankomoyoshi\/event\/kodomo)\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
       rowUrlDenyRe:
         /\/(?:sitemap)\.html$|\/photo\.html$|\/riyou-annai\.html$|\/(?:riyoannai|nyuyoji_hogosha|tyuukousei2017|hogosyanominasama|minnkanngakudou|hoikunorekishi|kosooutokyopassport|birthdaysupport|nerijiten)\.html$/i,
       requirePreHint: false,
@@ -402,6 +407,8 @@ function buildAdditionalWardConfigs(deps) {
       listUrls: (m) => [
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=21`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=20`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=22`,
+        `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&cate=25`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
         `${KATSUSHIKA_SOURCE.baseUrl}/cgi-bins/event/event.cgi?year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
@@ -519,21 +526,25 @@ function buildAdditionalWardConfigs(deps) {
     },
     koganei: {
       source: KOGANEI_SOURCE,
-      listUrls: (m, now) => [
-        buildListCalendarUrl(`${KOGANEI_SOURCE.baseUrl}/event/kosodatekyoiku/calendar`, m, now),
+      listUrls: () => [
+        `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/jidokan/jidoukan2/HP.html`,
+        `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/hoikuen/minnadeasobo.html`,
+        `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/kodomokateisiensenta/kodomosien.html`,
+        `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/jidokan/jidoukan2/index.html`,
       ],
       parseOpts: {
-        urlAllow: /city\.koganei\.lg\.jp\/.+\.html?(?:\?|$)/i,
-        urlDeny: /\/(?:index|sitemap|404)\.html$/i,
+        urlAllow: /city\.koganei\.lg\.jp\/kosodatekyoiku\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
+        urlDeny: /\/(?:index|sitemap|404)\.html$|hoshanosokuteikekka/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
-      relaxChildFilter: true,
+      relaxChildFilter: false,
       requirePreHint: false,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
+      allowPdfDetail: true,
       maxRows: 500,
-      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信)/i,
+      titleDenyRe: /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|放射線測定|リンク集|法人番号|休日診療|ホームページについて|市役所へのマップ|安全・安心メール|防災情報|新着情報一覧)/i,
     },
     nishitokyo: {
       source: NISHITOKYO_SOURCE,

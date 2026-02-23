@@ -22,7 +22,7 @@ function isChildRelated(entry) {
     if (fields.some(f => /子育て|子ども|こども/.test(f))) return true;
   }
   if (CHILD_TITLE_RE.test(entry.page_name || "")) return true;
-  if (entry.url && /\/kodomo\//.test(entry.url)) return true;
+  if (entry.url && /\/(kodomo|kosodate|kenkozukurika)\//.test(entry.url)) return true;
   return false;
 }
 

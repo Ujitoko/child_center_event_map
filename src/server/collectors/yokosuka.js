@@ -34,7 +34,12 @@ function parseListPage(html, baseUrl) {
       const li = lim[1];
       // カテゴリ判定: <span class="event_categoryN">子育て・教育</span>
       const catMatch = li.match(/<span\s+class="event_category\d+">([\s\S]*?)<\/span>/);
-      if (!catMatch || catMatch[1].trim() !== CHILD_CATEGORY) continue;
+      const cat = catMatch ? catMatch[1].trim() : "";
+      if (cat !== CHILD_CATEGORY) {
+        // 他カテゴリでもタイトルに子育てキーワードがあれば取得
+        const titleText = stripTags(li);
+        if (!/乳児|赤ちゃん|親子|子ども|こども|子育て|ベビー|キッズ|幼児|読み聞かせ|離乳食|おはなし/.test(titleText)) continue;
+      }
       // リンク抽出
       const linkMatch = li.match(/<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
       if (!linkMatch) continue;

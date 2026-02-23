@@ -5,6 +5,7 @@ const {
   parseTimeRangeFromText,
   buildStartsEndsForDate,
   getMonthsForRange,
+  parseYmdFromJst,
 } = require("../date-utils");
 const {
   sanitizeVenueText,
@@ -106,12 +107,29 @@ function createListCalendarCollector(config, deps) {
       return `${source.baseUrl}${basePath}list_calendar${ymParam}.html`;
     }
 
+    // 当月判定: list_calendarYYYYMM.html が存在しない場合に list_calendar.html (bare) をフォールバック
+    const now = parseYmdFromJst(new Date());
+    const currentYm = `${now.y}${String(now.m).padStart(2, "0")}`;
+
+    async function fetchCalPage(basePath, ym) {
+      const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
+      const url = buildCalUrl(basePath, ymParam);
+      try {
+        return await fetchText(url);
+      } catch (e) {
+        // 当月の場合 bare URL にフォールバック (CMSによってはYYYYMM付きが当月は404になる)
+        if (!useQueryParam && ymParam === currentYm) {
+          const bareUrl = `${source.baseUrl}${basePath}list_calendar.html`;
+          return await fetchText(bareUrl);
+        }
+        throw e;
+      }
+    }
+
     const rawEvents = [];
     for (const ym of months) {
-      const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-      const url = buildCalUrl(calendarPath, ymParam);
       try {
-        const html = await fetchText(url);
+        const html = await fetchCalPage(calendarPath, ym);
         const pageEvents = parseListCalendarPage(html, source.baseUrl, ym.year, ym.month);
         rawEvents.push(...pageEvents);
       } catch (e) {
@@ -122,10 +140,8 @@ function createListCalendarCollector(config, deps) {
     // フォールバック: 全カテゴリカレンダー
     if (rawEvents.length === 0 && fallbackPath) {
       for (const ym of months) {
-        const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-        const url = buildCalUrl(fallbackPath, ymParam);
         try {
-          const html = await fetchText(url);
+          const html = await fetchCalPage(fallbackPath, ym);
           const pageEvents = parseListCalendarPage(html, source.baseUrl, ym.year, ym.month);
           rawEvents.push(...pageEvents);
         } catch (e) {

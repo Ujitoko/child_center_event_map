@@ -119,7 +119,12 @@ function createCollectMitakaEvents(deps) {
         console.warn(`[${label}] detail page failed: ${url}`, e.message || e);
       }
 
-      if (!venue) continue;
+      // venue空でもタイトルから施設名をfallback推定
+      if (!venue) {
+        const titleVenue = ev.title.match(/(?:すくすくひろば|東多世代交流センター|西多世代交流センター|元気創造プラザ|総合保健センター|むらさき子どもひろば|三鷹市公会堂|三鷹市市民協働センター)/);
+        if (titleVenue) venue = titleVenue[0];
+      }
+      if (!venue) venue = "";
 
       // Geocode
       let point = null;

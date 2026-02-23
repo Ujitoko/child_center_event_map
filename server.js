@@ -990,6 +990,7 @@ const collectSagamiharaEvents = createEventJsCollector({
 const collectEbinaEvents = createEventJsCollector({
   source: EBINA_SOURCE, jsFile: "event_data.js",
   childCategoryIds: ["6", "7"], knownFacilities: KNOWN_EBINA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectChigasakiEvents = createEventJsCollector({
   source: CHIGASAKI_SOURCE, jsFile: "event_d.js",
@@ -1120,12 +1121,12 @@ const collectAsakaEvents = createMunicipalCalendarCollector({ source: ASAKA_SOUR
 const collectTodaEvents = createMunicipalCalendarCollector({ source: TODA_SOURCE, childCategoryIndex: 8 }, geoFmDeps);
 const collectShikiEvents = createMunicipalCalendarCollector({ source: SHIKI_SOURCE, childCategoryIndex: null }, geoFmDeps);
 // --- 埼玉県 list-calendar-collector ---
-const collectFujimiEvents = createListCalendarCollector({ source: FUJIMI_SOURCE, calendarPath: "/event/naiyo/kodomo_kosodate/calendar/", fallbackPath: "/event/naiyo/calendar/", useQueryParam: true }, geoFmDeps);
-const collectSayamaEvents = createListCalendarCollector({ source: SAYAMA_SOURCE, calendarPath: "/kankou/event/kyoiku/calendar/", fallbackPath: "/kankou/event/calendar/", useQueryParam: true }, geoFmDeps);
-const collectYashioEvents = createListCalendarCollector({ source: YASHIO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/", useQueryParam: true }, geoFmDeps);
+const collectFujimiEvents = createListCalendarCollector({ source: FUJIMI_SOURCE, calendarPath: "/event/naiyo/kodomo_kosodate/calendar/", fallbackPath: "/event/naiyo/calendar/" }, geoFmDeps);
+const collectSayamaEvents = createListCalendarCollector({ source: SAYAMA_SOURCE, calendarPath: "/kankou/event/calendar/", fallbackPath: "/kankou/event/kyoiku/calendar/" }, geoFmDeps);
+const collectYashioEvents = createListCalendarCollector({ source: YASHIO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
 // --- 埼玉県 list-calendar-collector (追加) ---
-const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/kodomo/calendar/", fallbackPath: "/iitokoro/event/main/calendar/", useQueryParam: true }, geoFmDeps);
-const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/", useQueryParam: true }, geoFmDeps);
+const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/kodomo/calendar/", fallbackPath: "/iitokoro/event/main/calendar/" }, geoFmDeps);
+const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/" }, geoFmDeps);
 // --- 埼玉県 event-js-collector (追加) ---
 const collectKukiEvents = createEventJsCollector({
   source: KUKI_SOURCE, jsFile: "event.js",
@@ -1213,8 +1214,8 @@ const collectTakanezawaEvents = createCollectTakanezawaEvents(geoFmDeps);
 const collectNasuEvents = createCollectNasuEvents(geoFmDeps);
 const collectTochigiNakagawaEvents = createCollectTochigiNakagawaEvents(geoFmDeps);
 // --- 群馬県 calendar-json-collector ---
-const collectMaebashiEvents = createCalendarJsonCollector({ source: MAEBASHI_SOURCE, childEventTypeNo: 1 }, geoFmDeps);
 const GUNMA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "工作", "映画会", "読み聞かせ"];
+const collectMaebashiEvents = createCalendarJsonCollector({ source: MAEBASHI_SOURCE, childEventTypeNo: 1, childKeywords: GUNMA_CHILD_KW }, geoFmDeps);
 const collectIsesakiEvents = createCalendarJsonCollector({ source: ISESAKI_SOURCE, childKeywords: GUNMA_CHILD_KW }, geoFmDeps);
 const collectFujiokaGunmaEvents = createCollectFujiokaGunmaKosodateEvents(geoFmDeps); // calendar.jsonに子育てイベントなし→kosodate
 // --- 群馬県 municipal-calendar-collector ---

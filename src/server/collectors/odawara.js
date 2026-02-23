@@ -101,7 +101,7 @@ function createCollectOdawaraEvents(deps) {
         `${ODAWARA_SOURCE.baseUrl}/event/index.php` +
         `?start_y=${startY}&start_m=${startM}&start_d=${startD}` +
         `&end_y=${endY}&end_m=${endM}&end_d=${endD}` +
-        `&evt_genre_chk%5B4%5D=1&pager_num=${page}`;
+        `&evt_genre_chk%5B1%5D=1&evt_genre_chk%5B4%5D=1&pager_num=${page}`;
       try {
         const html = await fetchText(url);
         const pageEvents = parseListPage(html, ODAWARA_SOURCE.baseUrl);
