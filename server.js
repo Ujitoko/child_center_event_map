@@ -957,6 +957,7 @@ const collectAkishimaEvents = createEventJsCollector({
 const collectHigashiyamatoEvents = createEventJsCollector({
   source: HIGASHIYAMATO_SOURCE, jsFile: "event.js",
   childCategoryIds: ["20"], knownFacilities: KNOWN_HIGASHIYAMATO_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectKiyoseEvents = createEventJsCollector({
   source: KIYOSE_SOURCE, jsFile: "event.js",
@@ -1169,7 +1170,7 @@ const collectKoshigayaKosodateEvents = createCollectKoshigayaKosodateEvents(geoF
 const collectSokaEvents = createCollectSokaEvents({ ...geoFmDeps, source: SOKA_SOURCE });
 const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps, source: TSURUGASHIMA_SOURCE });
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
-const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php", childEventTypeNo: 1 }, geoFmDeps);
+const collectIrumaEvents = createCalendarJsonCollector({ source: IRUMA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php", childEventTypeNo: 1, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
 const collectKazoEvents = createCalendarJsonCollector({ source: KAZO_SOURCE, childKeywords: ["児童館", "健診", "相談", "教室", "広場", "サロン", "おもちゃ", "無料開放"] }, geoFmDeps);
 const collectFukayaEvents = createCalendarJsonCollector({ source: FUKAYA_SOURCE, jsonPath: "/event/calendar.json", childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
 const collectOkegawaEvents = createCalendarJsonCollector({ source: OKEGAWA_SOURCE, childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
@@ -1190,7 +1191,7 @@ const collectMiyoshiEvents = createCollectMiyoshiEvents({ ...geoFmDeps, source: 
 const collectHatoyamaEvents = createCollectHatoyamaEvents({ ...geoFmDeps, source: HATOYAMA_SOURCE });
 const collectMiyashiroEvents = createCollectMiyashiroEvents({ ...geoFmDeps, source: MIYASHIRO_SOURCE });
 const collectChichibuEvents = createCollectChichibuEvents({ ...geoFmDeps, source: CHICHIBU_SOURCE });
-const collectNamegawaEvents = createCalendarJsonCollector({ source: NAMEGAWA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php" }, geoFmDeps);
+const collectNamegawaEvents = createCalendarJsonCollector({ source: NAMEGAWA_SOURCE, jsonPath: "/cgi-bin/get_event_calendar.php", childKeywords: SAITAMA_CHILD_KW }, geoFmDeps);
 const collectRanzanEvents = createCollectRanzanEvents({ ...geoFmDeps, source: RANZAN_SOURCE });
 const collectMatsubushiEvents = createCollectMatsubushiEvents({ ...geoFmDeps, source: MATSUBUSHI_SOURCE });
 const collectMinanoEvents = createCollectMinanoEvents({ ...geoFmDeps, source: MINANO_SOURCE });

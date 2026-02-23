@@ -344,6 +344,11 @@ function buildAdditionalWardConfigs(deps) {
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/terrace.html`,
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/ohipiyo.html`,
         `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/sotoasobi.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/akachan.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/hiroba.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/kaiho.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/nobinobihiroba.html`,
+        `${NERIMA_SOURCE.baseUrl}/kosodatekyoiku/kodomo/asobi/ouchicafe.html`,
       ],
       oneTimeListUrls: () => {
         const facilities = [
