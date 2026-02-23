@@ -14,7 +14,7 @@ const {
 const { extractVenueFromTitle, hasJidokanHint } = require("../venue-utils");
 const { isLikelyWardOfficeAddress } = require("../address-utils");
 const { collectDetailMetaMap } = require("../ward-parsing");
-const { SETAGAYA_SOURCE, SETAGAYA_JIDOKAN_URL_RE } = require("../../config/wards");
+const { SETAGAYA_SOURCE, SETAGAYA_JIDOKAN_URL_RE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 
 function parseSetagayaMonth(html) {
   const out = [];
@@ -27,7 +27,7 @@ function parseSetagayaMonth(html) {
     const dateText = normalizeText(String(m[3] || "").replace(/<[^>]+>/g, ""));
     if (!hrefRaw || !title) continue;
     const absUrl = hrefRaw.startsWith("http") ? hrefRaw : `${SETAGAYA_SOURCE.baseUrl}${hrefRaw}`;
-    if (!hasJidokanHint(title) && !SETAGAYA_JIDOKAN_URL_RE.test(absUrl)) continue;
+    if (!hasJidokanHint(title) && !SETAGAYA_JIDOKAN_URL_RE.test(absUrl) && !WARD_CHILD_HINT_RE.test(title)) continue;
     out.push({ title, url: absUrl, dateText });
   }
   return out;

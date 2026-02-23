@@ -78,7 +78,7 @@ function createCollectChibaEvents(deps) {
     const uniqueEvents = Array.from(uniqueMap.values());
 
     // 詳細ページをバッチ取得
-    const detailUrls = [...new Set(uniqueEvents.map(e => e.url))].slice(0, 120);
+    const detailUrls = [...new Set(uniqueEvents.map(e => e.url))].slice(0, 200);
     const detailMap = new Map();
     for (let i = 0; i < detailUrls.length; i += DETAIL_BATCH_SIZE) {
       const batch = detailUrls.slice(i, i + DETAIL_BATCH_SIZE);

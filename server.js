@@ -986,6 +986,7 @@ const collectHigashikurumeEvents = createEventJsCollector({
 const collectSagamiharaEvents = createEventJsCollector({
   source: SAGAMIHARA_SOURCE, jsFile: "event_j.js",
   childCategoryIds: ["5", "6", "13"], knownFacilities: KNOWN_SAGAMIHARA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectEbinaEvents = createEventJsCollector({
   source: EBINA_SOURCE, jsFile: "event_data.js",
@@ -1131,6 +1132,7 @@ const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOU
 const collectKukiEvents = createEventJsCollector({
   source: KUKI_SOURCE, jsFile: "event.js",
   childCategoryIds: ["50"], knownFacilities: KNOWN_KUKI_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 // --- 埼玉県 municipal-calendar-collector (追加) ---
 const collectKounosuEvents = createMunicipalCalendarCollector({ source: KOUNOSU_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
