@@ -11,7 +11,7 @@ const {
 const { KAMAKURA_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
-const CHILD_URL_PATHS = /\/(sei-fukushi|kodomo|kosodate|kyouiku)\//;
+const CHILD_URL_PATHS = /\/(sei-fukushi|kodomo|kodomokyoku|kosodate|kyouiku)\//;
 const DETAIL_BATCH_SIZE = 6;
 
 function parseListPage(html, baseUrl) {
@@ -43,6 +43,8 @@ function parseListPage(html, baseUrl) {
 }
 
 function isChildRelated(ev) {
+  // ひきこもり支援は子育てイベントではない
+  if (/ひきこもり/.test(ev.title)) return false;
   if (CHILD_URL_PATHS.test(ev.url)) return true;
   if (WARD_CHILD_HINT_RE.test(ev.title)) return true;
   return false;

@@ -1440,6 +1440,8 @@ const getEvents = createGetEvents({
   collectSayamaEvents,
   collectYashioEvents,
   collectSaitamaEvents,
+  collectSaitamaJidoukanEvents,
+  collectSaitamaHokenEvents,
   collectKoshigayaEvents,
   collectTokorozawaEvents,
   collectKukiEvents,

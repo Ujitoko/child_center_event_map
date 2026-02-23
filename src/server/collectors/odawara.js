@@ -26,12 +26,30 @@ function parseListPage(html, baseUrl) {
   while ((m = blockRe.exec(html)) !== null) {
     const dateText = stripTags(m[1]);
     const h5Html = m[2];
-    // 日付抽出: 開催日：YYYY年MM月DD日
+    // 日付抽出: 開催日：YYYY年MM月DD日 ～ YYYY年MM月DD日
     const dateMatch = dateText.match(/(\d{4})年(\d{2})月(\d{2})日/);
     if (!dateMatch) continue;
-    const y = Number(dateMatch[1]);
-    const mo = Number(dateMatch[2]);
-    const d = Number(dateMatch[3]);
+    let y = Number(dateMatch[1]);
+    let mo = Number(dateMatch[2]);
+    let d = Number(dateMatch[3]);
+    // 期間イベント: 終了日があり、開始日が過去なら今日の日付を使用
+    const rangeMatch = dateText.match(/(\d{4})年(\d{2})月(\d{2})日\s*～\s*(\d{4})年(\d{2})月(\d{2})日/);
+    if (rangeMatch) {
+      const endY = Number(rangeMatch[4]);
+      const endMo = Number(rangeMatch[5]);
+      const endD = Number(rangeMatch[6]);
+      const now = new Date();
+      const jstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+      const todayY = jstNow.getUTCFullYear();
+      const todayMo = jstNow.getUTCMonth() + 1;
+      const todayD = jstNow.getUTCDate();
+      const startVal = y * 10000 + mo * 100 + d;
+      const endVal = endY * 10000 + endMo * 100 + endD;
+      const todayVal = todayY * 10000 + todayMo * 100 + todayD;
+      if (startVal < todayVal && endVal >= todayVal) {
+        y = todayY; mo = todayMo; d = todayD;
+      }
+    }
     // リンク抽出
     const linkMatch = h5Html.match(/<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
     if (!linkMatch) continue;

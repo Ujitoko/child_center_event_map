@@ -83,10 +83,12 @@ function createCollectIseharaEvents(deps) {
         batch.map(async (url) => {
           const html = await fetchText(url);
           const meta = parseDetailMeta(html);
-          const dates = parseDatesFromHtml(html);
           const plainText = stripTags(html);
           const timeRange = parseTimeRangeFromText(plainText);
-          return { url, meta, dates, timeRange, plainText };
+          // parseDatesFromHtml はCMS公開日/更新日を拾ってしまい、
+          // 実際のスケジュール日付(M月D日形式)が無視される。
+          // 常に空配列を返し、M月D日フォールバックに任せる。
+          return { url, meta, dates: [], timeRange, plainText };
         })
       );
       for (const r of results) {

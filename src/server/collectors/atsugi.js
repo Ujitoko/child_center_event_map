@@ -12,7 +12,7 @@ const { ATSUGI_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
 const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const CHILD_TITLE_RE =
-  /(子ども|こども|子育て|親子|育児|乳幼児|幼児|児童|キッズ|ベビー|赤ちゃん|読み聞かせ|絵本|離乳食|妊娠|出産|おはなし|ブックスタート)/;
+  /(子ども|こども|子育て|親子|育児|乳幼児|幼児|児童|キッズ|ベビー|赤ちゃん|読み聞かせ|絵本|離乳食|妊娠|出産|おはなし|ブックスタート|0歳|1歳|2歳|3歳)/;
 const DETAIL_BATCH_SIZE = 6;
 
 function isChildRelated(entry) {

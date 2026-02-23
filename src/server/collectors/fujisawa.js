@@ -158,6 +158,82 @@ function extractLinkedEvents(html, baseUrl, centerName, defaultYear, currentMont
   return events;
 }
 
+// f-mirai.jp (藤沢市みらい創造財団) の施設住所
+const FMIRAI_FACILITIES = {
+  "辻堂青少年会館": "藤沢市辻堂東海岸1-1-25",
+  "藤沢青少年会館": "藤沢市朝日町10-8",
+  "少年の森": "藤沢市打戻2345",
+  "大鋸児童館": "藤沢市大鋸976",
+  "辻堂児童館": "藤沢市辻堂東海岸2-6-18",
+  "鵠洋児童館": "藤沢市鵠沼桜が岡3-16-9",
+  "辻堂砂山児童館": "藤沢市辻堂西海岸2-1-14",
+  "石川児童館": "藤沢市石川1-1-21",
+};
+
+const FMIRAI_CHILD_RE =
+  /親子|子育て|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|おはなし|リトミック|ママ|パパ|ぴーか・ぶー|ちびっこ|0歳|1歳|2歳|3歳|未就学|未就園/;
+
+/**
+ * f-mirai.jp WordPress REST API からイベント記事を取得
+ */
+async function fetchFmiraiEvents(maxDays) {
+  const events = [];
+  try {
+    const apiUrl = "https://f-mirai.jp/wp-json/wp/v2/posts?categories=34&per_page=50&_fields=id,title,content,link,date";
+    const text = await fetchText(apiUrl);
+    const posts = JSON.parse(text);
+    if (!Array.isArray(posts)) return events;
+
+    for (const post of posts) {
+      const title = stripTags((post.title && post.title.rendered) || "").trim();
+      const content = stripTags((post.content && post.content.rendered) || "");
+      const postUrl = post.link || "";
+      if (!title || !FMIRAI_CHILD_RE.test(title + content)) continue;
+
+      // コンテンツからM月D日(曜日)を抽出
+      const dateRe = /(\d{1,2})月(\d{1,2})日\s*[(（][^)）]*[)）]/g;
+      let dm;
+      const now = parseYmdFromJst(new Date());
+      while ((dm = dateRe.exec(content)) !== null) {
+        const mo = Number(dm[1]);
+        const d = Number(dm[2]);
+        let y = now.y;
+        if (mo < now.m - 2) y = now.y + 1;
+        events.push({ y, mo, d, title, url: postUrl, content });
+      }
+
+      // YYYY年M月D日 or YYYY/M/D パターンもチェック
+      const fullRe = /(\d{4})[年/](\d{1,2})[月/](\d{1,2})日?/g;
+      let fm;
+      while ((fm = fullRe.exec(content)) !== null) {
+        const y = Number(fm[1]);
+        const mo = Number(fm[2]);
+        const d = Number(fm[3]);
+        // 重複チェック
+        if (!events.find(e => e.y === y && e.mo === mo && e.d === d && e.title === title)) {
+          events.push({ y, mo, d, title, url: postUrl, content });
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("[藤沢市] f-mirai.jp API failed:", e.message || e);
+  }
+  return events;
+}
+
+/**
+ * コンテンツから施設名を推定
+ */
+function inferFmiraiFacility(content, title) {
+  for (const name of Object.keys(FMIRAI_FACILITIES)) {
+    if (content.includes(name) || title.includes(name)) return name;
+  }
+  // 部分マッチ: 青少年会館
+  if (/辻堂.*青少年会館|辻堂青少年/.test(content + title)) return "辻堂青少年会館";
+  if (/藤沢.*青少年会館|藤沢青少年/.test(content + title)) return "藤沢青少年会館";
+  return "";
+}
+
 function createCollectFujisawaEvents(deps) {
   const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
 
@@ -165,7 +241,9 @@ function createCollectFujisawaEvents(deps) {
     const srcKey = "ward_fujisawa";
     const label = "藤沢市";
     const baseUrl = "https://www.city.fujisawa.kanagawa.jp";
+    const sourceObj = { key: "fujisawa", label, baseUrl, center: { lat: 35.3388, lng: 139.4900 } };
 
+    // ソース1: 公民館ページ
     const allEvents = [];
     for (const center of CENTERS) {
       const url = `${baseUrl}${center.path}`;
@@ -182,42 +260,54 @@ function createCollectFujisawaEvents(deps) {
       }
     }
 
-    // 子育て関連フィルタ (extractLinkedEvents は既にフィルタ済みだが、他パターンは未フィルタ)
     const childEvents = allEvents.filter(
       (ev) => CHILD_RE.test(ev.title) || WARD_CHILD_HINT_RE.test(ev.title)
     );
 
-    // 重複除去 + 範囲フィルタ
     const byId = new Map();
     for (const ev of childEvents) {
       if (!inRangeJst(ev.y, ev.mo, ev.d, maxDays)) continue;
       const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
-
-      // ジオコーディング (公民館住所を使用)
       const geoCandidates = [`神奈川県${ev.centerAddress}`, `神奈川県藤沢市 ${ev.center}`];
-      const source = { key: "fujisawa", label, baseUrl, center: { lat: 35.3388, lng: 139.4900 } };
-      let point = await geocodeForWard(geoCandidates.slice(0, 7), source);
-      point = resolveEventPoint(source, ev.center, point, `神奈川県${ev.centerAddress}`);
-      const address = resolveEventAddress(source, ev.center, `神奈川県${ev.centerAddress}`, point);
-
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), sourceObj);
+      point = resolveEventPoint(sourceObj, ev.center, point, `神奈川県${ev.centerAddress}`);
+      const address = resolveEventAddress(sourceObj, ev.center, `神奈川県${ev.centerAddress}`, point);
       const { startsAt, endsAt } = buildStartsEndsForDate(
-        { y: ev.y, mo: ev.mo, d: ev.d },
-        ev.timeRange
+        { y: ev.y, mo: ev.mo, d: ev.d }, ev.timeRange
       );
       const id = `${srcKey}:${ev.url}:${ev.title}:${dateKey}`;
       if (byId.has(id)) continue;
       byId.set(id, {
-        id,
-        source: srcKey,
-        source_label: label,
-        title: ev.title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        venue_name: ev.center,
-        address: address || `神奈川県${ev.centerAddress}`,
-        url: ev.url,
-        lat: point ? point.lat : null,
-        lng: point ? point.lng : null,
+        id, source: srcKey, source_label: label, title: ev.title,
+        starts_at: startsAt, ends_at: endsAt, venue_name: ev.center,
+        address: address || `神奈川県${ev.centerAddress}`, url: ev.url,
+        lat: point ? point.lat : null, lng: point ? point.lng : null,
+      });
+    }
+
+    // ソース2: f-mirai.jp WordPress API (児童館・青少年会館)
+    const fmiraiEvents = await fetchFmiraiEvents(maxDays);
+    for (const ev of fmiraiEvents) {
+      if (!inRangeJst(ev.y, ev.mo, ev.d, maxDays)) continue;
+      const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
+      const facility = inferFmiraiFacility(ev.content || "", ev.title);
+      const facilityAddr = FMIRAI_FACILITIES[facility] || "";
+      const geoCandidates = facilityAddr
+        ? [`神奈川県${facilityAddr}`, `神奈川県藤沢市 ${facility}`]
+        : [`神奈川県藤沢市 ${facility || ev.title}`];
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), sourceObj);
+      point = resolveEventPoint(sourceObj, facility, point, facilityAddr ? `神奈川県${facilityAddr}` : `${label}`);
+      const address = resolveEventAddress(sourceObj, facility, facilityAddr ? `神奈川県${facilityAddr}` : `${label}`, point);
+      const { startsAt, endsAt } = buildStartsEndsForDate(
+        { y: ev.y, mo: ev.mo, d: ev.d }, null
+      );
+      const id = `${srcKey}:${ev.url}:${ev.title}:${dateKey}`;
+      if (byId.has(id)) continue;
+      byId.set(id, {
+        id, source: srcKey, source_label: label, title: ev.title,
+        starts_at: startsAt, ends_at: endsAt, venue_name: facility || label,
+        address: address || (facilityAddr ? `神奈川県${facilityAddr}` : ""), url: ev.url,
+        lat: point ? point.lat : null, lng: point ? point.lng : null,
       });
     }
 

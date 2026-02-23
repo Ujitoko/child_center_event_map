@@ -2,7 +2,7 @@ const { HIRATSUKA_SOURCE } = require("../../config/wards");
 const { parseYmdFromJst, getMonthsForRange } = require("../date-utils");
 const { stripTags } = require("../html-utils");
 
-const CHILD_RE = /(子ども|こども|子育て|親子|育児|乳幼児|幼児|児童|キッズ|ベビー|赤ちゃん|読み聞かせ|絵本|離乳食|妊娠|出産)/;
+const CHILD_RE = /(子ども|こども|子育て|親子|育児|乳幼児|幼児|児童|キッズ|ベビー|赤ちゃん|読み聞かせ|絵本|離乳食|妊娠|出産|おはなし|ブックスタート|0歳|1歳|2歳|3歳)/;
 
 function buildGeoCandidates(venue, address) {
   const candidates = [];
