@@ -138,8 +138,8 @@ function createCollectYamakitaEvents(deps) {
       return [];
     }
 
-    // タイトルフィルタ
-    const filteredItems = rawItems.filter((item) => WARD_CHILD_HINT_RE.test(item.title));
+    // カテゴリページ自体が子育てカテゴリ(1-6-2)なので全件対象
+    const filteredItems = rawItems;
 
     // 重複除去 (URL)
     const uniqueItems = [...new Map(filteredItems.map((i) => [i.url, i])).values()];

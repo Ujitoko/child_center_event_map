@@ -310,4 +310,145 @@ function createCollectKoshigayaEvents(deps) {
   };
 }
 
-module.exports = { createCollectKoshigayaEvents };
+/**
+ * 越谷市こそだてネット お知らせページコレクター
+ * https://www.city.koshigaya.saitama.jp/kosodate-net/genres/oshirase/index.html
+ * カレンダーが空のため、こそだてネットのお知らせ一覧から子育てイベントを収集
+ */
+const { parseDatesFromHtml } = require("../date-utils");
+const { parseDetailMeta } = require("../html-utils");
+
+const KOSODATE_NET_BASE = "https://www.city.koshigaya.saitama.jp/kosodate-net";
+const KOSODATE_NET_PAGES = [
+  "/genres/oshirase/index.html",
+  "/genres/asobu/index.html",
+];
+
+const KNOWN_KOSHIGAYA_VENUES = {
+  "子育てサロン": "越谷市越ヶ谷4-1-1",
+  "中央市民会館": "越谷市越ヶ谷4-1-1",
+  "越谷市保健センター": "越谷市東越谷10-31",
+  "保健センター": "越谷市東越谷10-31",
+  "子育て世代包括支援センター": "越谷市越ヶ谷4-2-1",
+  "サンシティ": "越谷市南越谷1-2876-1",
+  "越谷市立図書館": "越谷市東越谷4-9-1",
+  "児童館コスモス": "越谷市千間台東1-2-1",
+  "児童館ヒマワリ": "越谷市船渡2-4",
+};
+
+function createCollectKoshigayaKosodateEvents(deps) {
+  const {
+    geocodeForWard,
+    resolveEventPoint,
+    resolveEventAddress,
+    getFacilityAddressFromMaster,
+  } = deps;
+
+  return async function collectKoshigayaKosodateEvents(maxDays) {
+    const source = `ward_${KOSHIGAYA_SOURCE.key}`;
+    const label = `${KOSHIGAYA_SOURCE.label}子育てネット`;
+    const byId = new Map();
+
+    // お知らせ/遊ぶページからリンク一覧を取得
+    const allLinks = [];
+    for (const pagePath of KOSODATE_NET_PAGES) {
+      const url = `${KOSHIGAYA_SOURCE.baseUrl}${pagePath}`;
+      let html;
+      try {
+        html = await fetchText(url);
+      } catch (e) {
+        console.warn(`[${label}] ${pagePath} fetch failed:`, e.message || e);
+        continue;
+      }
+
+      const linkRe = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
+      let lm;
+      while ((lm = linkRe.exec(html)) !== null) {
+        const href = lm[1].replace(/&amp;/g, "&").trim();
+        const text = stripTags(lm[2]).trim();
+        if (!text || text.length < 3) continue;
+        // kosodate-net 配下のリンクのみ
+        if (!href.includes("kosodate-net") && !href.includes("kosodate")) continue;
+        // 索引ページや画像リンクはスキップ
+        if (/index\.html$|\.jpg$|\.png$|\.pdf$/i.test(href)) continue;
+        const absUrl = href.startsWith("http") ? href : `${KOSHIGAYA_SOURCE.baseUrl}${href}`;
+        allLinks.push({ url: absUrl, title: text });
+      }
+    }
+
+    // 重複除去
+    const uniqueLinks = [...new Map(allLinks.map(l => [l.url, l])).values()].slice(0, 40);
+
+    // 詳細ページをバッチ取得
+    for (let i = 0; i < uniqueLinks.length; i += DETAIL_BATCH_SIZE) {
+      const batch = uniqueLinks.slice(i, i + DETAIL_BATCH_SIZE);
+      const results = await Promise.allSettled(
+        batch.map(async (link) => {
+          const html = await fetchText(link.url);
+          const { dates } = parseDatesFromHtml(html);
+          const meta = parseDetailMeta(html);
+          const timeRange = parseTimeRangeFromText(stripTags(html));
+          return { ...link, dates, meta, timeRange };
+        })
+      );
+      for (const r of results) {
+        if (r.status !== "fulfilled") continue;
+        const detail = r.value;
+        if (!detail.dates || detail.dates.length === 0) continue;
+
+        const title = detail.title;
+        const venue = sanitizeVenueText((detail.meta && detail.meta.venue) || "");
+        const rawAddress = sanitizeAddressText((detail.meta && detail.meta.address) || "");
+
+        // 既知施設マッチ
+        let knownAddr = "";
+        for (const [name, addr] of Object.entries(KNOWN_KOSHIGAYA_VENUES)) {
+          if (venue.includes(name) || title.includes(name)) {
+            knownAddr = addr;
+            break;
+          }
+        }
+
+        // ジオコーディング (ページ単位)
+        let geoCandidates = buildGeoCandidates(venue, rawAddress || knownAddr);
+        if (getFacilityAddressFromMaster && venue) {
+          const fmAddr = getFacilityAddressFromMaster(KOSHIGAYA_SOURCE.key, venue);
+          if (fmAddr) {
+            const full = /埼玉県/.test(fmAddr) ? fmAddr : `埼玉県${fmAddr}`;
+            geoCandidates.unshift(full);
+          }
+        }
+        let point = await geocodeForWard(geoCandidates.slice(0, 7), KOSHIGAYA_SOURCE);
+        point = resolveEventPoint(KOSHIGAYA_SOURCE, venue, point, `${label} ${venue}`);
+        const address = resolveEventAddress(KOSHIGAYA_SOURCE, venue, `${label} ${venue}`, point);
+
+        for (const dd of detail.dates) {
+          if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
+          const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
+          const { startsAt, endsAt } = buildStartsEndsForDate(dd, detail.timeRange);
+          const id = `${source}:${detail.url}:${title}:${dateKey}`;
+          if (byId.has(id)) continue;
+          byId.set(id, {
+            id,
+            source,
+            source_label: KOSHIGAYA_SOURCE.label,
+            title,
+            starts_at: startsAt,
+            ends_at: endsAt,
+            venue_name: venue,
+            address: address || "",
+            url: detail.url,
+            lat: point ? point.lat : KOSHIGAYA_SOURCE.center.lat,
+            lng: point ? point.lng : KOSHIGAYA_SOURCE.center.lng,
+          });
+        }
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectKoshigayaEvents, createCollectKoshigayaKosodateEvents };

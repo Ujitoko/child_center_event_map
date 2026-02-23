@@ -133,15 +133,26 @@ function parseCalendarPage(html, baseUrl, pageYear, pageMonth, childCategoryInde
  * @returns {Object|null}
  */
 function parseEventBox(eventBox, baseUrl, childCategoryIndex) {
-  // タイトルとURLを抽出
-  const titleMatch = eventBox.match(
+  // タイトルとURLを抽出 (リンクあり or リンクなし)
+  let href = "";
+  let title = "";
+  const titleWithLink = eventBox.match(
     /<(?:span|div)\s+class="article_title">\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/(?:span|div)>/
   );
-  if (!titleMatch) return null;
-  const href = titleMatch[1].replace(/&amp;/g, "&").trim();
-  const title = stripTags(titleMatch[2]).trim();
-  if (!href || !title) return null;
-  const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
+  if (titleWithLink) {
+    href = titleWithLink[1].replace(/&amp;/g, "&").trim();
+    title = stripTags(titleWithLink[2]).trim();
+  } else {
+    // リンクなしのarticle_title (大井町等)
+    const titleNoLink = eventBox.match(
+      /<(?:span|div)\s+class="article_title">([\s\S]*?)<\/(?:span|div)>/
+    );
+    if (titleNoLink) {
+      title = stripTags(titleNoLink[1]).trim();
+    }
+  }
+  if (!title) return null;
+  const absUrl = href ? (href.startsWith("http") ? href : `${baseUrl}${href}`) : baseUrl;
 
   // カテゴリアイコンを抽出
   const categories = [];

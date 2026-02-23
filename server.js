@@ -43,6 +43,7 @@ const { createMunicipalCalendarCollector } = require("./src/server/collectors/mu
 const { createCollectMatsudaEvents } = require("./src/server/collectors/matsuda");
 const { createCollectKaiseiEvents } = require("./src/server/collectors/kaisei");
 const { createCollectYamakitaEvents } = require("./src/server/collectors/yamakita");
+const { createCollectMachidaKosodateEvents } = require("./src/server/collectors/machida");
 const { createCollectMizuhoEvents } = require("./src/server/collectors/mizuho");
 const { createCollectHinodeEvents } = require("./src/server/collectors/hinode");
 const { createCollectHinoharaEvents } = require("./src/server/collectors/hinohara");
@@ -81,7 +82,7 @@ const { createEvent2CalendarCollector } = require("./src/server/collectors/event
 const { createCollectSaitamaEvents } = require("./src/server/collectors/saitama");
 const { createCollectSaitamaJidoukanEvents } = require("./src/server/collectors/saitama-jidoukan");
 const { createCollectSaitamaHokenEvents } = require("./src/server/collectors/saitama-hoken");
-const { createCollectKoshigayaEvents } = require("./src/server/collectors/koshigaya");
+const { createCollectKoshigayaEvents, createCollectKoshigayaKosodateEvents } = require("./src/server/collectors/koshigaya");
 const { createCollectSokaEvents } = require("./src/server/collectors/soka");
 const { createCollectTsurugashimaEvents } = require("./src/server/collectors/tsurugashima");
 const { createCollectHasudaEvents } = require("./src/server/collectors/hasuda");
@@ -941,6 +942,7 @@ const collectManazuruEvents = createCalendarJsonCollector({ source: MANAZURU_SOU
 const collectHakoneEvents = createCollectHakoneEvents(geoFmDeps);
 const collectKaiseiEvents = createCollectKaiseiEvents(geoFmDeps);
 const collectYamakitaEvents = createCollectYamakitaEvents(geoFmDeps);
+const collectMachidaKosodateEvents = createCollectMachidaKosodateEvents(geoFmDeps);
 const collectMizuhoEvents = createCollectMizuhoEvents(geoFmDeps);
 const collectOkutamaEvents = createCalendarJsonCollector({ source: OKUTAMA_SOURCE }, geoFmDeps);
 const collectHinodeEvents = createCollectHinodeEvents(geoFmDeps);
@@ -977,6 +979,7 @@ const collectKokubunjiEvents = createEventJsCollector({
 const collectHigashikurumeEvents = createEventJsCollector({
   source: HIGASHIKURUME_SOURCE, jsFile: "event_d.js",
   childCategoryIds: ["6", "7"], knownFacilities: KNOWN_HIGASHIKURUME_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectSagamiharaEvents = createEventJsCollector({
   source: SAGAMIHARA_SOURCE, jsFile: "event_j.js",
@@ -1143,6 +1146,7 @@ const collectSaitamaEvents = createCollectSaitamaEvents(geoFmDeps);
 const collectSaitamaJidoukanEvents = createCollectSaitamaJidoukanEvents(geoFmDeps);
 const collectSaitamaHokenEvents = createCollectSaitamaHokenEvents(geoFmDeps);
 const collectKoshigayaEvents = createCollectKoshigayaEvents(geoFmDeps);
+const collectKoshigayaKosodateEvents = createCollectKoshigayaKosodateEvents(geoFmDeps);
 const collectSokaEvents = createCollectSokaEvents({ ...geoFmDeps, source: SOKA_SOURCE });
 const collectTsurugashimaEvents = createCollectTsurugashimaEvents({ ...geoFmDeps, source: TSURUGASHIMA_SOURCE });
 const collectHasudaEvents = createCollectHasudaEvents({ ...geoFmDeps, source: HASUDA_SOURCE });
@@ -1361,6 +1365,7 @@ const getEvents = createGetEvents({
   collectHakoneEvents,
   collectKaiseiEvents,
   collectYamakitaEvents,
+  collectMachidaKosodateEvents,
   collectMizuhoEvents,
   collectOkutamaEvents,
   collectHinodeEvents,
@@ -1449,6 +1454,7 @@ const getEvents = createGetEvents({
   collectSaitamaJidoukanEvents,
   collectSaitamaHokenEvents,
   collectKoshigayaEvents,
+  collectKoshigayaKosodateEvents,
   collectTokorozawaEvents,
   collectKukiEvents,
   collectKumagayaEvents,
