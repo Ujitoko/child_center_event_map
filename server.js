@@ -953,6 +953,7 @@ const eventJsDeps = { ...geoDeps, getFacilityAddressFromMaster };
 const collectAkishimaEvents = createEventJsCollector({
   source: AKISHIMA_SOURCE, jsFile: "event.js",
   childCategoryIds: ["10"], knownFacilities: KNOWN_AKISHIMA_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectHigashiyamatoEvents = createEventJsCollector({
   source: HIGASHIYAMATO_SOURCE, jsFile: "event.js",
@@ -962,6 +963,7 @@ const collectHigashiyamatoEvents = createEventJsCollector({
 const collectKiyoseEvents = createEventJsCollector({
   source: KIYOSE_SOURCE, jsFile: "event.js",
   childCategoryIds: ["60"], knownFacilities: KNOWN_KIYOSE_FACILITIES,
+  useKeywordFilter: true,
 }, eventJsDeps);
 const collectTamaEvents = createEventJsCollector({
   source: TAMA_SOURCE, jsFile: "event.js",
@@ -1001,6 +1003,7 @@ const collectEbinaEvents = createEventJsCollector({
 const collectChigasakiEvents = createEventJsCollector({
   source: CHIGASAKI_SOURCE, jsFile: "event_d.js",
   childCategoryIds: [], childCategory2Ids: ["1"], knownFacilities: KNOWN_CHIGASAKI_FACILITIES,
+  useKeywordFilter: true,
   placeIdMap: {
     "1": "小和田公民館", "2": "鶴嶺公民館", "3": "松林公民館",
     "5": "香川公民館", "7": "茅ヶ崎公園体験学習センター",

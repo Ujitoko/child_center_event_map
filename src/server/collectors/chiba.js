@@ -59,7 +59,7 @@ function createCollectChibaEvents(deps) {
     // 一覧ページ取得
     const rawEvents = [];
     for (const ym of months) {
-      const url = `${source.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&mon=${ym.month}`;
+      const url = `${source.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`;
       try {
         const html = await fetchText(url);
         rawEvents.push(...parseListPage(html, source.baseUrl));
