@@ -202,4 +202,178 @@ function createCollectAtsugiEvents(deps) {
   };
 }
 
-module.exports = { createCollectAtsugiEvents };
+/**
+ * 厚木市子育てポータル固定ページコレクター
+ * /kosodate/asobu_manabu/ 配下の子育て講座ページから
+ * 令和N年M月D日形式のスケジュールを抽出
+ */
+const ATSUGI_KOSODATE_PAGES = [
+  "/kosodate/asobu_manabu/oyako_event/47279.html",  // 子育てリフレッシュ講座
+  "/kosodate/asobu_manabu/oyako_event/47280.html",  // ベビーマッサージ
+  "/kosodate/asobu_manabu/oyako_event/47281.html",  // 親子ふれあい遊び(7か月~)
+  "/kosodate/asobu_manabu/oyako_event/47282.html",  // 親子ふれあい遊び(1歳児)
+  "/kosodate/asobu_manabu/oyako_event/47283.html",  // 親子ふれあい遊び(2歳児)
+  "/kosodate/asobu_manabu/oyako_event/47289.html",  // (乳幼児向け)プラネタリウム
+  "/kosodate/asobu_manabu/kyoushitsu_kouza/20548.html",  // すこやかマタニティクラス
+  "/kosodate/asobu_manabu/kyoushitsu_kouza/20549.html",  // スマイルチェリー
+  "/kosodate/asobu_manabu/kyoushitsu_kouza/20550.html",  // パンダクラブ
+  "/kosodate/asobu_manabu/kyoushitsu_kouza/42085.html",  // こどもの食事
+  "/kosodate/asobu_manabu/kyoushitsu_kouza/20547.html",  // ブックスタート
+];
+
+const ATSUGI_VENUE_MAP = {
+  "あつぎ市民交流プラザ": "厚木市中町2-12-15",
+  "アミューあつぎ": "厚木市中町2-12-15",
+  "厚木市保健福祉センター": "厚木市中町1-4-1",
+  "保健福祉センター": "厚木市中町1-4-1",
+  "子ども科学館": "厚木市中町1-1-3",
+  "厚木市子ども科学館": "厚木市中町1-1-3",
+  "中央図書館": "厚木市中町1-1-3",
+};
+
+/** 令和N年M月D日 → { y, mo, d } */
+function parseReiwaDate(text) {
+  const m = text.match(/令和(\d{1,2})年(\d{1,2})月(\d{1,2})日/);
+  if (!m) return null;
+  const reiwa = Number(m[1]);
+  return { y: 2018 + reiwa, mo: Number(m[2]), d: Number(m[3]) };
+}
+
+/** 詳細ページから会場名を抽出 */
+function extractAtsugiVenue(plainText) {
+  // <h2>会場</h2> or <h3>会場</h3> の後のテキスト
+  const m = plainText.match(/(?:会場|場所)[：:\s]*\n?\s*([^\n]{2,60})/);
+  if (m) {
+    let v = m[1].trim();
+    // 階数・部屋名を除去
+    v = v.replace(/[\s　]*\d*階.*$/, "").replace(/[\s　]*[（(][^）)]*[）)]$/, "").trim();
+    if (v.length >= 2) return v;
+  }
+  return "";
+}
+
+function createCollectAtsugiKosodateEvents(deps) {
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
+
+  return async function collectAtsugiKosodateEvents(maxDays) {
+    const source = `ward_${ATSUGI_SOURCE.key}`;
+    const label = `${ATSUGI_SOURCE.label}子育て`;
+    const byId = new Map();
+
+    for (const pagePath of ATSUGI_KOSODATE_PAGES) {
+      const url = `${ATSUGI_SOURCE.baseUrl}${pagePath}`;
+      let html;
+      try {
+        html = await fetchText(url);
+      } catch (e) {
+        console.warn(`[${label}] ${pagePath} fetch failed:`, e.message || e);
+        continue;
+      }
+
+      const plainText = stripTags(html).normalize("NFKC");
+      // タイトル抽出
+      const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+      let pageTitle = titleMatch ? stripTags(titleMatch[1]).trim() : "";
+      // "厚木市..." プレフィックスを除去
+      pageTitle = pageTitle.replace(/^厚木市[のｰ\s]*/, "").replace(/\|.*$/, "").trim();
+      if (!pageTitle) continue;
+
+      // 会場抽出
+      let venue = extractAtsugiVenue(plainText);
+      // 会場名からKNOWN施設アドレスを探す
+      let venueAddress = "";
+      for (const [name, addr] of Object.entries(ATSUGI_VENUE_MAP)) {
+        if (venue.includes(name) || plainText.includes(name)) {
+          venue = venue || name;
+          venueAddress = addr;
+          break;
+        }
+      }
+
+      // 令和N年M月D日 パターンで日付抽出
+      const reiwaRe = /令和(\d{1,2})年(\d{1,2})月(\d{1,2})日/g;
+      let rm;
+      const dates = [];
+      const seen = new Set();
+      while ((rm = reiwaRe.exec(plainText)) !== null) {
+        const reiwa = Number(rm[1]);
+        const y = 2018 + reiwa;
+        const mo = Number(rm[2]);
+        const d = Number(rm[3]);
+        const key = `${y}-${mo}-${d}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          dates.push({ y, mo, d });
+        }
+      }
+
+      // M月D日 パターンもフォールバック (年は令和日付から推定)
+      if (dates.length === 0) {
+        const mdRe = /(\d{1,2})月(\d{1,2})日/g;
+        let mdm;
+        const now = new Date(Date.now() + 9 * 3600 * 1000);
+        const thisY = now.getUTCFullYear();
+        while ((mdm = mdRe.exec(plainText)) !== null) {
+          const mo = Number(mdm[1]);
+          const d = Number(mdm[2]);
+          if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+          const y = mo >= now.getUTCMonth() - 1 ? thisY : thisY + 1;
+          const key = `${y}-${mo}-${d}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            dates.push({ y, mo, d });
+          }
+        }
+      }
+
+      if (dates.length === 0) continue;
+
+      // ジオコーディング (ページ単位で1回)
+      let geoCandidates = [];
+      if (venueAddress) {
+        geoCandidates.push(`神奈川県${venueAddress}`);
+      }
+      if (getFacilityAddressFromMaster && venue) {
+        const fmAddr = getFacilityAddressFromMaster(ATSUGI_SOURCE.key, venue);
+        if (fmAddr) {
+          const full = /神奈川県/.test(fmAddr) ? fmAddr : `神奈川県${fmAddr}`;
+          geoCandidates.unshift(full);
+        }
+      }
+      if (venue) geoCandidates.push(`神奈川県厚木市 ${venue}`);
+      let point = await geocodeForWard(geoCandidates.slice(0, 7), ATSUGI_SOURCE);
+      point = resolveEventPoint(ATSUGI_SOURCE, venue, point, venueAddress ? `神奈川県${venueAddress}` : `厚木市 ${venue}`);
+      const address = resolveEventAddress(ATSUGI_SOURCE, venue, venueAddress ? `神奈川県${venueAddress}` : `厚木市 ${venue}`, point);
+
+      // 時間抽出
+      const timeRange = parseTimeRangeFromText(plainText);
+
+      for (const dd of dates) {
+        if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
+        const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
+        const { startsAt, endsAt } = buildStartsEndsForDate(dd, timeRange);
+        const id = `${source}:${url}:${pageTitle}:${dateKey}`;
+        if (byId.has(id)) continue;
+        byId.set(id, {
+          id,
+          source,
+          source_label: ATSUGI_SOURCE.label,
+          title: pageTitle,
+          starts_at: startsAt,
+          ends_at: endsAt,
+          venue_name: venue,
+          address: address || "",
+          url,
+          lat: point ? point.lat : null,
+          lng: point ? point.lng : null,
+        });
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectAtsugiEvents, createCollectAtsugiKosodateEvents };

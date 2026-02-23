@@ -1,6 +1,7 @@
 const { HIRATSUKA_SOURCE } = require("../../config/wards");
-const { parseYmdFromJst, getMonthsForRange } = require("../date-utils");
+const { parseYmdFromJst, getMonthsForRange, inRangeJst, buildStartsEndsForDate } = require("../date-utils");
 const { stripTags } = require("../html-utils");
+const { fetchText } = require("../fetch-utils");
 
 const CHILD_RE = /(子ども|こども|子育て|親子|育児|乳幼児|幼児|児童|キッズ|ベビー|赤ちゃん|読み聞かせ|絵本|離乳食|妊娠|出産|おはなし|ブックスタート|0歳|1歳|2歳|3歳)/;
 
@@ -183,4 +184,125 @@ function createCollectHiratsukaEvents(deps) {
   };
 }
 
-module.exports = { createCollectHiratsukaEvents };
+/**
+ * 平塚市図書館カレンダーコレクター
+ * https://www.lib.city.hiratsuka.kanagawa.jp/viewer/calendar-monthly.html
+ * リスト表示から子育て関連イベント(おはなし会, ブックスタート等)を収集
+ */
+const LIB_BASE = "https://www.lib.city.hiratsuka.kanagawa.jp";
+
+const LIB_CHILD_RE = /(おはなし|おはなし会|ブックスタート|読み聞かせ|こども|子ども|映画会|人形劇|赤ちゃん|乳幼児|幼児|絵本|キッズ)/;
+
+const LIB_BRANCHES = {
+  "中央図書館": "平塚市浅間町12-41",
+  "北図書館": "平塚市田村3-12-5",
+  "西図書館": "平塚市山下3-29-1",
+  "南図書館": "平塚市袖ヶ浜20-1",
+};
+
+function createCollectHiratsukaLibraryEvents(deps) {
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
+
+  return async function collectHiratsukaLibraryEvents(maxDays) {
+    const source = `ward_${HIRATSUKA_SOURCE.key}`;
+    const label = `${HIRATSUKA_SOURCE.label}図書館`;
+    const months = getMonthsForRange(maxDays);
+    const byId = new Map();
+
+    // 月ごとにカレンダーリスト表示を取得
+    for (const ym of months) {
+      const url = `${LIB_BASE}/viewer/calendar-monthly.html?date=${ym.year}/${ym.month}/1&T_Display_Type=display_type_list`;
+      let html;
+      try {
+        html = await fetchText(url);
+      } catch (e) {
+        console.warn(`[${label}] ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+        continue;
+      }
+
+      const plainText = stripTags(html);
+
+      // リスト表示のイベント行をパース
+      // パターン: M月D日 ... <a href="../viewer/info.html?id=NNN">Title</a>
+      // テーブル行から日付とリンクを抽出
+      const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+      let rm;
+      let currentDate = null;
+      while ((rm = rowRe.exec(html)) !== null) {
+        const row = rm[1];
+        // 日付セル: M月D日
+        const dateMatch = row.match(/(\d{1,2})月(\d{1,2})日/);
+        if (dateMatch) {
+          currentDate = { y: ym.year, mo: Number(dateMatch[1]), d: Number(dateMatch[2]) };
+        }
+        if (!currentDate) continue;
+
+        // イベントリンク: info.html?id=NNN
+        const linkRe = /<a\s+[^>]*href="([^"]*info\.html\?id=\d+)"[^>]*>([\s\S]*?)<\/a>/gi;
+        let lm;
+        while ((lm = linkRe.exec(row)) !== null) {
+          const href = lm[1].replace(/&amp;/g, "&").trim();
+          const title = stripTags(lm[2]).trim();
+          if (!title) continue;
+          if (!LIB_CHILD_RE.test(title)) continue;
+
+          const absUrl = href.startsWith("http") ? href : `${LIB_BASE}/viewer/${href.replace(/^\.\.\/viewer\//, "")}`;
+
+          if (!inRangeJst(currentDate.y, currentDate.mo, currentDate.d, maxDays)) continue;
+
+          // 図書館ブランチ推定
+          let branch = "";
+          let branchAddr = "";
+          for (const [name, addr] of Object.entries(LIB_BRANCHES)) {
+            if (title.includes(name)) {
+              branch = `平塚市${name}`;
+              branchAddr = addr;
+              break;
+            }
+          }
+
+          // ジオコーディング
+          let geoCandidates = [];
+          if (branchAddr) {
+            geoCandidates.push(`神奈川県${branchAddr}`);
+          }
+          if (getFacilityAddressFromMaster && branch) {
+            const fmAddr = getFacilityAddressFromMaster(HIRATSUKA_SOURCE.key, branch);
+            if (fmAddr) {
+              const full = /神奈川県/.test(fmAddr) ? fmAddr : `神奈川県${fmAddr}`;
+              geoCandidates.unshift(full);
+            }
+          }
+          if (branch) geoCandidates.push(`神奈川県平塚市 ${branch}`);
+          let point = await geocodeForWard(geoCandidates.slice(0, 7), HIRATSUKA_SOURCE);
+          point = resolveEventPoint(HIRATSUKA_SOURCE, branch, point, branchAddr ? `神奈川県${branchAddr}` : `平塚市 ${branch}`);
+          const address = resolveEventAddress(HIRATSUKA_SOURCE, branch, branchAddr ? `神奈川県${branchAddr}` : `平塚市 ${branch}`, point);
+
+          const dateKey = `${currentDate.y}${String(currentDate.mo).padStart(2, "0")}${String(currentDate.d).padStart(2, "0")}`;
+          const { startsAt, endsAt } = buildStartsEndsForDate(currentDate, null);
+          const id = `${source}:${absUrl}:${title}:${dateKey}`;
+          if (byId.has(id)) continue;
+          byId.set(id, {
+            id,
+            source,
+            source_label: HIRATSUKA_SOURCE.label,
+            title,
+            starts_at: startsAt,
+            ends_at: endsAt,
+            venue_name: branch || "平塚市図書館",
+            address: address || "",
+            url: absUrl,
+            lat: point ? point.lat : null,
+            lng: point ? point.lng : null,
+          });
+        }
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectHiratsukaEvents, createCollectHiratsukaLibraryEvents };

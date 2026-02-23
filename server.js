@@ -26,14 +26,14 @@ const { createCollectOmeEvents } = require("./src/server/collectors/ome");
 const { createCollectHamuraEvents } = require("./src/server/collectors/hamura");
 const { createCollectKawasakiEvents } = require("./src/server/collectors/kawasaki");
 const { createCollectYokohamaEvents } = require("./src/server/collectors/yokohama");
-const { createCollectKamakuraEvents } = require("./src/server/collectors/kamakura");
+const { createCollectKamakuraEvents, createCollectKamakuraKmspotEvents } = require("./src/server/collectors/kamakura");
 const { createCollectYokosukaEvents } = require("./src/server/collectors/yokosuka");
 const { createCollectYamatoEvents } = require("./src/server/collectors/yamato");
-const { createCollectHiratsukaEvents } = require("./src/server/collectors/hiratsuka");
+const { createCollectHiratsukaEvents, createCollectHiratsukaLibraryEvents } = require("./src/server/collectors/hiratsuka");
 const { createCollectOdawaraEvents } = require("./src/server/collectors/odawara");
 const { createCollectHadanoEvents } = require("./src/server/collectors/hadano");
 const { createCollectAyaseEvents } = require("./src/server/collectors/ayase");
-const { createCollectAtsugiEvents } = require("./src/server/collectors/atsugi");
+const { createCollectAtsugiEvents, createCollectAtsugiKosodateEvents } = require("./src/server/collectors/atsugi");
 const { createCollectIseharaEvents } = require("./src/server/collectors/isehara");
 const { createCollectMinamiashigaraEvents } = require("./src/server/collectors/minamiashigara");
 const { createCalendarJsonCollector } = require("./src/server/collectors/calendar-json-collector");
@@ -913,13 +913,16 @@ const collectHamuraEvents = createCollectHamuraEvents(geoFmDeps);
 const collectKawasakiEvents = createCollectKawasakiEvents();
 const collectYokohamaEvents = createCollectYokohamaEvents();
 const collectKamakuraEvents = createCollectKamakuraEvents(geoFmDeps);
+const collectKamakuraKmspotEvents = createCollectKamakuraKmspotEvents(geoFmDeps);
 const collectYokosukaEvents = createCollectYokosukaEvents(geoFmDeps);
 const collectYamatoEvents = createCollectYamatoEvents(geoFmDeps);
 const collectHiratsukaEvents = createCollectHiratsukaEvents(geoFmDeps);
+const collectHiratsukaLibraryEvents = createCollectHiratsukaLibraryEvents(geoFmDeps);
 const collectOdawaraEvents = createCollectOdawaraEvents(geoFmDeps);
 const collectHadanoEvents = createCollectHadanoEvents(geoFmDeps);
 const collectAyaseEvents = createCollectAyaseEvents(geoFmDeps);
 const collectAtsugiEvents = createCollectAtsugiEvents(geoFmDeps);
+const collectAtsugiKosodateEvents = createCollectAtsugiKosodateEvents(geoFmDeps);
 const collectIseharaEvents = createCollectIseharaEvents(geoFmDeps);
 const collectMinamiashigaraEvents = createCollectMinamiashigaraEvents(geoFmDeps);
 const collectFujisawaEvents = createCollectFujisawaEvents(geoFmDeps);
@@ -1327,16 +1330,19 @@ const getEvents = createGetEvents({
   collectSagamiharaEvents,
   collectEbinaEvents,
   collectKamakuraEvents,
+  collectKamakuraKmspotEvents,
   collectYokosukaEvents,
   collectChigasakiEvents,
   collectZamaEvents,
   collectZushiEvents,
   collectYamatoEvents,
   collectHiratsukaEvents,
+  collectHiratsukaLibraryEvents,
   collectOdawaraEvents,
   collectHadanoEvents,
   collectAyaseEvents,
   collectAtsugiEvents,
+  collectAtsugiKosodateEvents,
   collectIseharaEvents,
   collectMinamiashigaraEvents,
   collectFujisawaEvents,
