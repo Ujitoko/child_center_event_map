@@ -216,6 +216,8 @@ function detectPrefecture(source) {
   if (/yachiyo|asahi|kamogawa|katsuura|kimitsu|kyonan|yokoshibahikari/.test(source.key || "")) return "千葉県";
   if (/takasaki|ota_gunma|annaka|nakanojo/.test(source.key || "")) return "群馬県";
   if (/tochigi_city|yaita/.test(source.key || "")) return "栃木県";
+  if (/ibaraki\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "茨城県";
+  if (/^ibaraki_/.test(source.key || "")) return "茨城県";
   return "神奈川県";
 }
 

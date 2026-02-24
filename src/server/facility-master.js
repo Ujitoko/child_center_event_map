@@ -117,7 +117,7 @@ function createFacilityMaster(deps) {
     const label = sourceOrCenter?.label || WARD_LABEL_BY_KEY[sourceKey] || "";
     const addr = sanitizeAddressText(point?.address || "");
     if (!addr) return "";
-    if (!/^(?:東京都|神奈川県|埼玉県|千葉県|群馬県|栃木県)/.test(addr)) return "";
+    if (!/^(?:東京都|神奈川県|埼玉県|千葉県|群馬県|栃木県|茨城県)/.test(addr)) return "";
     if (label && !addr.includes(label)) return "";
     return addr;
   }

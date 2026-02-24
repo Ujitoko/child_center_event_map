@@ -1200,6 +1200,49 @@ const WARD_LABEL_BY_KEY = {
   takanezawa: "高根沢町",
   nasu: "那須町",
   tochigi_nakagawa: "那珂川町",
+  // Ibaraki prefecture (茨城県)
+  ibaraki_mito: "水戸市",
+  ibaraki_hitachi: "日立市",
+  ibaraki_hitachinaka: "ひたちなか市",
+  ibaraki_tsukuba: "つくば市",
+  ibaraki_koga: "古河市",
+  ibaraki_moriya: "守谷市",
+  ibaraki_kamisu: "神栖市",
+  ibaraki_tokai: "東海村",
+  ibaraki_toride: "取手市",
+  ibaraki_ryugasaki: "龍ケ崎市",
+  ibaraki_chikusei: "筑西市",
+  ibaraki_tsuchiura: "土浦市",
+  ibaraki_ishioka: "石岡市",
+  ibaraki_joso: "常総市",
+  ibaraki_naka: "那珂市",
+  ibaraki_bando: "坂東市",
+  ibaraki_hitachiota: "常陸太田市",
+  ibaraki_yuki: "結城市",
+  ibaraki_tsukubamirai: "つくばみらい市",
+  ibaraki_inashiki: "稲敷市",
+  ibaraki_sakuragawa: "桜川市",
+  ibaraki_hitachiomiya: "常陸大宮市",
+  ibaraki_shimotsuma: "下妻市",
+  ibaraki_hokota: "鉾田市",
+  ibaraki_namegata: "行方市",
+  ibaraki_itako: "潮来市",
+  ibaraki_kasumigaura: "かすみがうら市",
+  ibaraki_takahagi: "高萩市",
+  ibaraki_kashima: "鹿嶋市",
+  ibaraki_kasama: "笠間市",
+  ibaraki_shiro: "城里町",
+  ibaraki_sakai: "境町",
+  ibaraki_daigo: "大子町",
+  ibaraki_yachiyo: "八千代町",
+  ibaraki_goka: "五霞町",
+  ibaraki_oarai: "大洗町",
+  ibaraki_kawachi: "河内町",
+  ibaraki_ibarakimachi: "茨城町",
+  ibaraki_kitaibaraki: "北茨城市",
+  ibaraki_ushiku: "牛久市",
+  ibaraki_ami: "阿見町",
+  ibaraki_tone: "利根町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -3928,6 +3971,130 @@ const KNOWN_TOCHIGI_CITY_FACILITIES = {
   "きららの杜蔵の街楽習館": "栃木市倭町12-22",
 };
 
+// Ibaraki prefecture (茨城県)
+const MITO_SOURCE = { key: "ibaraki_mito", label: "水戸市", baseUrl: "https://www.city.mito.lg.jp", center: { lat: 36.3416, lng: 140.4467 } };
+const HITACHI_IB_SOURCE = { key: "ibaraki_hitachi", label: "日立市", baseUrl: "https://www.city.hitachi.lg.jp", center: { lat: 36.5991, lng: 140.6514 } };
+const HITACHINAKA_SOURCE = { key: "ibaraki_hitachinaka", label: "ひたちなか市", baseUrl: "https://www.city.hitachinaka.lg.jp", center: { lat: 36.3966, lng: 140.5347 } };
+const TSUKUBA_SOURCE = { key: "ibaraki_tsukuba", label: "つくば市", baseUrl: "https://www.city.tsukuba.lg.jp", center: { lat: 36.0835, lng: 140.0764 } };
+const KOGA_IB_SOURCE = { key: "ibaraki_koga", label: "古河市", baseUrl: "https://www.city.ibaraki-koga.lg.jp", center: { lat: 36.1953, lng: 139.7553 } };
+const MORIYA_SOURCE = { key: "ibaraki_moriya", label: "守谷市", baseUrl: "https://www.city.moriya.ibaraki.jp", center: { lat: 35.9513, lng: 139.9747 } };
+const KAMISU_SOURCE = { key: "ibaraki_kamisu", label: "神栖市", baseUrl: "https://www.city.kamisu.ibaraki.jp", center: { lat: 35.89, lng: 140.66 } };
+const TOKAI_IB_SOURCE = { key: "ibaraki_tokai", label: "東海村", baseUrl: "https://www.vill.tokai.ibaraki.jp", center: { lat: 36.4734, lng: 140.5647 } };
+const TORIDE_SOURCE = { key: "ibaraki_toride", label: "取手市", baseUrl: "https://www.city.toride.ibaraki.jp", center: { lat: 35.9117, lng: 140.0502 } };
+const RYUGASAKI_SOURCE = { key: "ibaraki_ryugasaki", label: "龍ケ崎市", baseUrl: "https://www.city.ryugasaki.ibaraki.jp", center: { lat: 35.9117, lng: 140.1830 } };
+const CHIKUSEI_SOURCE = { key: "ibaraki_chikusei", label: "筑西市", baseUrl: "https://www.city.chikusei.lg.jp", center: { lat: 36.3071, lng: 139.9847 } };
+const TSUCHIURA_SOURCE = { key: "ibaraki_tsuchiura", label: "土浦市", baseUrl: "https://www.city.tsuchiura.lg.jp", center: { lat: 36.0719, lng: 140.2056 } };
+const ISHIOKA_SOURCE = { key: "ibaraki_ishioka", label: "石岡市", baseUrl: "https://www.city.ishioka.lg.jp", center: { lat: 36.1899, lng: 140.2863 } };
+const JOSO_SOURCE = { key: "ibaraki_joso", label: "常総市", baseUrl: "https://www.city.joso.lg.jp", center: { lat: 36.0236, lng: 139.9936 } };
+const NAKA_IB_SOURCE = { key: "ibaraki_naka", label: "那珂市", baseUrl: "https://www.city.naka.lg.jp", center: { lat: 36.4575, lng: 140.4855 } };
+const BANDO_SOURCE = { key: "ibaraki_bando", label: "坂東市", baseUrl: "https://www.city.bando.lg.jp", center: { lat: 36.0479, lng: 139.8894 } };
+const HITACHIOTA_SOURCE = { key: "ibaraki_hitachiota", label: "常陸太田市", baseUrl: "https://www.city.hitachiota.ibaraki.jp", center: { lat: 36.5392, lng: 140.5276 } };
+const YUKI_SOURCE = { key: "ibaraki_yuki", label: "結城市", baseUrl: "https://www.city.yuki.lg.jp", center: { lat: 36.3056, lng: 139.8736 } };
+const TSUKUBAMIRAI_SOURCE = { key: "ibaraki_tsukubamirai", label: "つくばみらい市", baseUrl: "https://www.city.tsukubamirai.lg.jp", center: { lat: 35.9608, lng: 140.0345 } };
+const INASHIKI_SOURCE = { key: "ibaraki_inashiki", label: "稲敷市", baseUrl: "https://www.city.inashiki.lg.jp", center: { lat: 35.9558, lng: 140.3217 } };
+const SAKURAGAWA_SOURCE = { key: "ibaraki_sakuragawa", label: "桜川市", baseUrl: "https://www.city.sakuragawa.lg.jp", center: { lat: 36.3722, lng: 140.0861 } };
+const HITACHIOMIYA_SOURCE = { key: "ibaraki_hitachiomiya", label: "常陸大宮市", baseUrl: "https://www.city.hitachiomiya.lg.jp", center: { lat: 36.5429, lng: 140.4109 } };
+const SHIMOTSUMA_SOURCE = { key: "ibaraki_shimotsuma", label: "下妻市", baseUrl: "https://www.city.shimotsuma.lg.jp", center: { lat: 36.1840, lng: 139.9680 } };
+const HOKOTA_SOURCE = { key: "ibaraki_hokota", label: "鉾田市", baseUrl: "https://www.city.hokota.lg.jp", center: { lat: 36.1569, lng: 140.5159 } };
+const NAMEGATA_SOURCE = { key: "ibaraki_namegata", label: "行方市", baseUrl: "https://www.city.namegata.ibaraki.jp", center: { lat: 36.1142, lng: 140.4826 } };
+const ITAKO_SOURCE = { key: "ibaraki_itako", label: "潮来市", baseUrl: "https://www.city.itako.lg.jp", center: { lat: 35.9470, lng: 140.5544 } };
+const KASUMIGAURA_SOURCE = { key: "ibaraki_kasumigaura", label: "かすみがうら市", baseUrl: "https://www.city.kasumigaura.lg.jp", center: { lat: 36.1505, lng: 140.2375 } };
+const TAKAHAGI_SOURCE = { key: "ibaraki_takahagi", label: "高萩市", baseUrl: "https://www.city.takahagi.ibaraki.jp", center: { lat: 36.7165, lng: 140.7147 } };
+const KASHIMA_IB_SOURCE = { key: "ibaraki_kashima", label: "鹿嶋市", baseUrl: "https://www.city.kashima.ibaraki.jp", center: { lat: 35.9650, lng: 140.6444 } };
+const KASAMA_SOURCE = { key: "ibaraki_kasama", label: "笠間市", baseUrl: "https://www.city.kasama.lg.jp", center: { lat: 36.3458, lng: 140.3053 } };
+const SHIRO_IB_SOURCE = { key: "ibaraki_shiro", label: "城里町", baseUrl: "https://www.town.shirosato.lg.jp", center: { lat: 36.4400, lng: 140.3600 } };
+const SAKAI_IB_SOURCE = { key: "ibaraki_sakai", label: "境町", baseUrl: "https://www.town.sakai.ibaraki.jp", center: { lat: 36.1082, lng: 139.7891 } };
+const DAIGO_SOURCE = { key: "ibaraki_daigo", label: "大子町", baseUrl: "https://www.town.daigo.ibaraki.jp", center: { lat: 36.7700, lng: 140.3500 } };
+const YACHIYO_IB_SOURCE = { key: "ibaraki_yachiyo", label: "八千代町", baseUrl: "https://www.town.ibaraki-yachiyo.lg.jp", center: { lat: 36.1740, lng: 139.8817 } };
+const GOKA_SOURCE = { key: "ibaraki_goka", label: "五霞町", baseUrl: "https://www.town.goka.lg.jp", center: { lat: 36.0949, lng: 139.7453 } };
+const OARAI_SOURCE = { key: "ibaraki_oarai", label: "大洗町", baseUrl: "https://www.town.oarai.lg.jp", center: { lat: 36.3143, lng: 140.5665 } };
+const KAWACHI_IB_SOURCE = { key: "ibaraki_kawachi", label: "河内町", baseUrl: "https://www.town.ibaraki-kawachi.lg.jp", center: { lat: 35.9295, lng: 140.3043 } };
+const IBARAKIMACHI_SOURCE = { key: "ibaraki_ibarakimachi", label: "茨城町", baseUrl: "https://www.town.ibaraki.lg.jp", center: { lat: 36.2870, lng: 140.4138 } };
+const KITAIBARAKI_SOURCE = { key: "ibaraki_kitaibaraki", label: "北茨城市", baseUrl: "http://isohara-hoikuen.com", center: { lat: 36.8022, lng: 140.7513 } };
+const USHIKU_SOURCE = { key: "ibaraki_ushiku", label: "牛久市", baseUrl: "https://www.city.ushiku.lg.jp", center: { lat: 35.9774, lng: 140.1490 } };
+const AMI_SOURCE = { key: "ibaraki_ami", label: "阿見町", baseUrl: "https://www.town.ami.lg.jp", center: { lat: 36.0300, lng: 140.2130 } };
+const TONE_IB_SOURCE = { key: "ibaraki_tone", label: "利根町", baseUrl: "https://www.town.tone.ibaraki.jp", center: { lat: 35.8603, lng: 140.1464 } };
+
+// Ibaraki KNOWN_FACILITIES
+const KNOWN_MITO_FACILITIES = {
+  "水戸市総合教育研究所": "水戸市笠原町978-5",
+  "みと文化交流プラザ": "水戸市五軒町1-2-12",
+  "赤塚出張所": "水戸市赤塚1-1",
+  "常澄出張所": "水戸市大串町2134",
+  "内原出張所": "水戸市内原町1395-4",
+};
+const KNOWN_HITACHI_IB_FACILITIES = {
+  "日立シビックセンター": "日立市幸町1-21-1",
+  "萬葉の里シンフォニーホール": "日立市鳩が丘町1-1-1",
+  "日立市立中央図書館": "日立市幸町1-21-1",
+  "日立市役所": "日立市助川町1-1-1",
+};
+const KNOWN_HITACHINAKA_FACILITIES = {
+  "ひたちなか市役所": "ひたちなか市東石川2-10-1",
+  "ふぁみりこらぼ": "ひたちなか市石川町11-1",
+  "子育て支援センターふぁみりこらぼ": "ひたちなか市石川町11-1",
+  "那珂湊コミュニティセンター": "ひたちなか市和田町3-1-5",
+};
+const KNOWN_TSUKUBA_FACILITIES = {
+  "つくば市役所": "つくば市研究学園1-1-1",
+  "つくばカピオ": "つくば市竹園1-10-1",
+  "つくば市中央図書館": "つくば市吾妻2-8",
+  "子育て総合支援センター": "つくば市流星台61-1",
+};
+const KNOWN_TORIDE_FACILITIES = {
+  "取手市役所": "取手市寺田5139",
+  "取手ウェルネスプラザ": "取手市新町2-5-25",
+  "福祉会館": "取手市寺田5144-1",
+};
+const KNOWN_YACHIYO_IB_FACILITIES = {
+  "八千代町保健センター": "八千代町菅谷898-1",
+  "子育て交流サロン": "八千代町菅谷1017",
+  "八千代町役場": "八千代町菅谷1170",
+};
+const KNOWN_GOKA_FACILITIES = {
+  "五霞町児童館": "五霞町小福田1162-1",
+  "五霞町役場": "五霞町小福田1162-1",
+  "五霞幼稚園": "五霞町川妻893",
+};
+const KNOWN_OARAI_FACILITIES = {
+  "大洗町子育て支援センター": "大洗町磯浜町6881-275",
+  "大洗町役場": "大洗町磯浜町6881-275",
+  "大洗文化センター": "大洗町磯浜町6881-88",
+};
+const KNOWN_KAWACHI_IB_FACILITIES = {
+  "河内町役場": "河内町源清田1183",
+  "かわち学園": "河内町源清田1183",
+  "河内町中央公民館": "河内町源清田1183",
+};
+const KNOWN_IBARAKIMACHI_FACILITIES = {
+  "茨城町保健センター": "茨城町小堤1037-1",
+  "茨城町役場": "茨城町小堤1080",
+  "ゆうゆう館": "茨城町小堤1037-1",
+};
+const KNOWN_KITAIBARAKI_FACILITIES = {
+  "磯原保育園": "北茨城市磯原町磯原2-155",
+  "北茨城市役所": "北茨城市磯原町磯原1630",
+  "子育て支援センター": "北茨城市磯原町磯原2-155",
+};
+const KNOWN_USHIKU_FACILITIES = {
+  "牛久市保健センター": "牛久市中央3-15-1",
+  "牛久市役所": "牛久市中央3-15-1",
+  "エスカード牛久": "牛久市牛久町280",
+  "牛久市中央図書館": "牛久市柏田町1606-1",
+  "市民活動センター": "牛久市柏田町1606-1",
+};
+const KNOWN_AMI_FACILITIES = {
+  "阿見町保健センター": "阿見町中央1-1-1",
+  "阿見町役場": "阿見町中央1-1-1",
+  "本郷ふれあいセンター": "阿見町本郷3-1-1",
+  "阿見町立図書館": "阿見町若栗1936-6",
+};
+const KNOWN_TONE_IB_FACILITIES = {
+  "利根町役場": "利根町布川841-1",
+  "利根町保健福祉センター": "利根町下曽根221-1",
+  "利根町図書館": "利根町中田切418-1",
+};
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -4292,4 +4459,47 @@ module.exports = {
   CHIYODA_GUNMA_SOURCE, KNOWN_CHIYODA_GUNMA_FACILITIES,
   OIZUMI_SOURCE, KNOWN_OIZUMI_FACILITIES,
   ORA_SOURCE, KNOWN_ORA_FACILITIES,
+  // Ibaraki prefecture (茨城県)
+  MITO_SOURCE, KNOWN_MITO_FACILITIES,
+  HITACHI_IB_SOURCE, KNOWN_HITACHI_IB_FACILITIES,
+  HITACHINAKA_SOURCE, KNOWN_HITACHINAKA_FACILITIES,
+  TSUKUBA_SOURCE, KNOWN_TSUKUBA_FACILITIES,
+  KOGA_IB_SOURCE,
+  MORIYA_SOURCE,
+  KAMISU_SOURCE,
+  TOKAI_IB_SOURCE,
+  TORIDE_SOURCE, KNOWN_TORIDE_FACILITIES,
+  RYUGASAKI_SOURCE,
+  CHIKUSEI_SOURCE,
+  TSUCHIURA_SOURCE,
+  ISHIOKA_SOURCE,
+  JOSO_SOURCE,
+  NAKA_IB_SOURCE,
+  BANDO_SOURCE,
+  HITACHIOTA_SOURCE,
+  YUKI_SOURCE,
+  TSUKUBAMIRAI_SOURCE,
+  INASHIKI_SOURCE,
+  SAKURAGAWA_SOURCE,
+  HITACHIOMIYA_SOURCE,
+  SHIMOTSUMA_SOURCE,
+  HOKOTA_SOURCE,
+  NAMEGATA_SOURCE,
+  ITAKO_SOURCE,
+  KASUMIGAURA_SOURCE,
+  TAKAHAGI_SOURCE,
+  KASHIMA_IB_SOURCE,
+  KASAMA_SOURCE,
+  SHIRO_IB_SOURCE,
+  SAKAI_IB_SOURCE,
+  DAIGO_SOURCE,
+  YACHIYO_IB_SOURCE, KNOWN_YACHIYO_IB_FACILITIES,
+  GOKA_SOURCE, KNOWN_GOKA_FACILITIES,
+  OARAI_SOURCE, KNOWN_OARAI_FACILITIES,
+  KAWACHI_IB_SOURCE, KNOWN_KAWACHI_IB_FACILITIES,
+  IBARAKIMACHI_SOURCE, KNOWN_IBARAKIMACHI_FACILITIES,
+  KITAIBARAKI_SOURCE, KNOWN_KITAIBARAKI_FACILITIES,
+  USHIKU_SOURCE, KNOWN_USHIKU_FACILITIES,
+  AMI_SOURCE, KNOWN_AMI_FACILITIES,
+  TONE_IB_SOURCE, KNOWN_TONE_IB_FACILITIES,
 };

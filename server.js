@@ -183,6 +183,13 @@ const {
   createCollectShimonitaCrossRowEvents,
   createCollectTakasakiNandemoEvents,
 } = require("./src/server/collectors/gunma-remaining");
+const { createCalPhpCollector } = require("./src/server/collectors/cal-php-collector");
+const { createCollectMitoEvents, createCollectKashimaIbEvents } = require("./src/server/collectors/ibaraki-remaining");
+const {
+  createCollectYachiyoIbEvents, createCollectGokaEvents, createCollectOaraiEvents,
+  createCollectKawachiIbEvents, createCollectIbarakimachiEvents, createCollectKitaibarakiEvents,
+  createCollectUshikuEvents, createCollectAmiEvents, createCollectToneIbEvents,
+} = require("./src/server/collectors/ibaraki-extra");
 const { createGetEvents } = require("./src/server/events-service");
 const {
   CACHE_TTL_MS,
@@ -360,6 +367,49 @@ const {
   CHIYODA_GUNMA_SOURCE, KNOWN_CHIYODA_GUNMA_FACILITIES,
   OIZUMI_SOURCE, KNOWN_OIZUMI_FACILITIES,
   ORA_SOURCE, KNOWN_ORA_FACILITIES,
+  // Ibaraki
+  MITO_SOURCE, KNOWN_MITO_FACILITIES,
+  HITACHI_IB_SOURCE, KNOWN_HITACHI_IB_FACILITIES,
+  HITACHINAKA_SOURCE, KNOWN_HITACHINAKA_FACILITIES,
+  TSUKUBA_SOURCE, KNOWN_TSUKUBA_FACILITIES,
+  KOGA_IB_SOURCE,
+  MORIYA_SOURCE,
+  KAMISU_SOURCE,
+  TOKAI_IB_SOURCE,
+  TORIDE_SOURCE, KNOWN_TORIDE_FACILITIES,
+  RYUGASAKI_SOURCE,
+  CHIKUSEI_SOURCE,
+  TSUCHIURA_SOURCE,
+  ISHIOKA_SOURCE,
+  JOSO_SOURCE,
+  NAKA_IB_SOURCE,
+  BANDO_SOURCE,
+  HITACHIOTA_SOURCE,
+  YUKI_SOURCE,
+  TSUKUBAMIRAI_SOURCE,
+  INASHIKI_SOURCE,
+  SAKURAGAWA_SOURCE,
+  HITACHIOMIYA_SOURCE,
+  SHIMOTSUMA_SOURCE,
+  HOKOTA_SOURCE,
+  NAMEGATA_SOURCE,
+  ITAKO_SOURCE,
+  KASUMIGAURA_SOURCE,
+  TAKAHAGI_SOURCE,
+  KASHIMA_IB_SOURCE,
+  KASAMA_SOURCE,
+  SHIRO_IB_SOURCE,
+  SAKAI_IB_SOURCE,
+  DAIGO_SOURCE,
+  YACHIYO_IB_SOURCE, KNOWN_YACHIYO_IB_FACILITIES,
+  GOKA_SOURCE, KNOWN_GOKA_FACILITIES,
+  OARAI_SOURCE, KNOWN_OARAI_FACILITIES,
+  KAWACHI_IB_SOURCE, KNOWN_KAWACHI_IB_FACILITIES,
+  IBARAKIMACHI_SOURCE, KNOWN_IBARAKIMACHI_FACILITIES,
+  KITAIBARAKI_SOURCE, KNOWN_KITAIBARAKI_FACILITIES,
+  USHIKU_SOURCE, KNOWN_USHIKU_FACILITIES,
+  AMI_SOURCE, KNOWN_AMI_FACILITIES,
+  TONE_IB_SOURCE, KNOWN_TONE_IB_FACILITIES,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -881,6 +931,49 @@ for (const [name, address] of Object.entries(KNOWN_TOCHIGI_SAKURA_FACILITIES)) {
 for (const [name, address] of Object.entries(KNOWN_NASUKARASUYAMA_FACILITIES)) {
   setFacilityAddressToMaster("nasukarasuyama", name, address);
 }
+// Ibaraki
+for (const [name, address] of Object.entries(KNOWN_MITO_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_mito", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HITACHI_IB_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_hitachi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_HITACHINAKA_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_hitachinaka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TSUKUBA_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_tsukuba", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TORIDE_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_toride", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_YACHIYO_IB_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_yachiyo", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_GOKA_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_goka", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_OARAI_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_oarai", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KAWACHI_IB_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_kawachi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_IBARAKIMACHI_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_ibarakimachi", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_KITAIBARAKI_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_kitaibaraki", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_USHIKU_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_ushiku", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_AMI_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_ami", name, address);
+}
+for (const [name, address] of Object.entries(KNOWN_TONE_IB_FACILITIES)) {
+  setFacilityAddressToMaster("ibaraki_tone", name, address);
+}
 
 // --- Shared deps for collectors ---
 const geoDeps = { geocodeForWard, resolveEventPoint, resolveEventAddress };
@@ -1319,6 +1412,65 @@ const collectShimonitaCrossRowEvents = createCollectShimonitaCrossRowEvents(geoF
 const collectTakasakiNandemoEvents = createCollectTakasakiNandemoEvents(geoFmDeps);
 // --- 葛飾区 schedule collector ---
 const collectKatsushikaScheduleEvents = createCollectKatsushikaScheduleEvents(geoFmDeps);
+// --- 茨城県 ---
+const IBARAKI_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+// Tier1: event.js (4市)
+const collectHitachiIbEvents = createEventJsCollector({
+  source: HITACHI_IB_SOURCE, jsFile: "event.js", childCategoryIds: ["20","70"], useKeywordFilter: true, knownFacilities: KNOWN_HITACHI_IB_FACILITIES,
+}, eventJsDeps);
+const collectHitachinakaEvents = createEventJsCollector({
+  source: HITACHINAKA_SOURCE, jsFile: "event.js", childCategoryIds: ["20","30"], useKeywordFilter: true, knownFacilities: KNOWN_HITACHINAKA_FACILITIES,
+}, eventJsDeps);
+const collectMoriyaEvents = createEventJsCollector({
+  source: MORIYA_SOURCE, jsFile: "event.js", childCategoryIds: ["20"], useKeywordFilter: true,
+}, eventJsDeps);
+const collectKamisuEvents = createEventJsCollector({
+  source: KAMISU_SOURCE, jsFile: "event_data.js", childCategoryIds: ["20"], useKeywordFilter: true,
+}, eventJsDeps);
+// Tier1: calendar.json (3市村)
+const collectTokaiIbEvents = createCalendarJsonCollector({ source: TOKAI_IB_SOURCE, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectKogaIbEvents = createCalendarJsonCollector({ source: KOGA_IB_SOURCE, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectTsukubaEvents = createCalendarJsonCollector({ source: TSUKUBA_SOURCE, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+// Tier1: list_calendar (龍ケ崎市)
+const collectRyugasakiEvents = createListCalendarCollector({ source: RYUGASAKI_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
+// Tier2: cal.php コレクター (21自治体)
+const collectChikuseiEvents = createCalPhpCollector({ source: CHIKUSEI_SOURCE, category: 6, childCategoryLabels: ["子育て", "教育"] }, geoFmDeps);
+const collectTsuchiuraEvents = createCalPhpCollector({ source: TSUCHIURA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectIshiokaEvents = createCalPhpCollector({ source: ISHIOKA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectJosoEvents = createCalPhpCollector({ source: JOSO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectNakaIbEvents = createCalPhpCollector({ source: NAKA_IB_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectBandoEvents = createCalPhpCollector({ source: BANDO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectHitachiotaEvents = createCalPhpCollector({ source: HITACHIOTA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectYukiEvents = createCalPhpCollector({ source: YUKI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectTsukubamiraiEvents = createCalPhpCollector({ source: TSUKUBAMIRAI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectInashikiEvents = createCalPhpCollector({ source: INASHIKI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectSakuragawaEvents = createCalPhpCollector({ source: SAKURAGAWA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectHitachiomiyaEvents = createCalPhpCollector({ source: HITACHIOMIYA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectShimotsumaEvents = createCalPhpCollector({ source: SHIMOTSUMA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectHokotaEvents = createCalPhpCollector({ source: HOKOTA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectNamegataEvents = createCalPhpCollector({ source: NAMEGATA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectItakoEvents = createCalPhpCollector({ source: ITAKO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectKasumigauraEvents = createCalPhpCollector({ source: KASUMIGAURA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectTakahagiEvents = createCalPhpCollector({ source: TAKAHAGI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectShiroIbEvents = createCalPhpCollector({ source: SHIRO_IB_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectSakaiIbEvents = createCalPhpCollector({ source: SAKAI_IB_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+const collectDaigoEvents = createCalPhpCollector({ source: DAIGO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+// Tier1: CGI calendar (取手市) - ward-generic経由
+const collectTorideEvents = createCalendarJsonCollector({ source: TORIDE_SOURCE, childKeywords: IBARAKI_CHILD_KW }, geoFmDeps);
+// Tier2: 水戸市 + 鹿嶋市 (カスタムPHP) + 笠間市 (cal.php)
+const collectMitoEvents = createCollectMitoEvents({ ...geoFmDeps, source: MITO_SOURCE });
+const collectKashimaIbEvents = createCollectKashimaIbEvents({ ...geoFmDeps, source: KASHIMA_IB_SOURCE });
+const collectKasamaEvents = createCalPhpCollector({ source: KASAMA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: IBARAKI_CHILD_KW, calPath: "/cal.php" }, geoFmDeps);
+// --- 茨城県 追加9自治体 ---
+const collectYachiyoIbEvents = createCollectYachiyoIbEvents(geoFmDeps);
+const collectGokaEvents = createCollectGokaEvents(geoFmDeps);
+const collectOaraiEvents = createCollectOaraiEvents(geoFmDeps);
+const collectKawachiIbEvents = createCollectKawachiIbEvents(geoFmDeps);
+const collectIbarakimachiEvents = createCollectIbarakimachiEvents(geoFmDeps);
+const collectKitaibarakiEvents = createCollectKitaibarakiEvents(geoFmDeps);
+const collectUshikuEvents = createCollectUshikuEvents(geoFmDeps);
+const collectAmiEvents = createCollectAmiEvents(geoFmDeps);
+const collectToneIbEvents = createCollectToneIbEvents(geoFmDeps);
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -1637,6 +1789,49 @@ const getEvents = createGetEvents({
   collectTakasakiNandemoEvents,
   // Katsushika schedule supplement
   collectKatsushikaScheduleEvents,
+  // Ibaraki
+  collectHitachiIbEvents,
+  collectHitachinakaEvents,
+  collectMoriyaEvents,
+  collectKamisuEvents,
+  collectTokaiIbEvents,
+  collectKogaIbEvents,
+  collectTsukubaEvents,
+  collectRyugasakiEvents,
+  collectTorideEvents,
+  collectMitoEvents,
+  collectKashimaIbEvents,
+  collectKasamaEvents,
+  collectChikuseiEvents,
+  collectTsuchiuraEvents,
+  collectIshiokaEvents,
+  collectJosoEvents,
+  collectNakaIbEvents,
+  collectBandoEvents,
+  collectHitachiotaEvents,
+  collectYukiEvents,
+  collectTsukubamiraiEvents,
+  collectInashikiEvents,
+  collectSakuragawaEvents,
+  collectHitachiomiyaEvents,
+  collectShimotsumaEvents,
+  collectHokotaEvents,
+  collectNamegataEvents,
+  collectItakoEvents,
+  collectKasumigauraEvents,
+  collectTakahagiEvents,
+  collectShiroIbEvents,
+  collectSakaiIbEvents,
+  collectDaigoEvents,
+  collectYachiyoIbEvents,
+  collectGokaEvents,
+  collectOaraiEvents,
+  collectKawachiIbEvents,
+  collectIbarakimachiEvents,
+  collectKitaibarakiEvents,
+  collectUshikuEvents,
+  collectAmiEvents,
+  collectToneIbEvents,
 });
 
 // --- HTTP server ---

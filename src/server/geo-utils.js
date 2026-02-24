@@ -61,8 +61,8 @@ function createGeoHelpers(deps) {
 
   function isLikelyLocalPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    // 東京都 + 神奈川県 + 千葉県 + 埼玉県 + 群馬県 + 栃木県全域をカバー
-    // (南: 湯河原町 35.14, 北: 那須町 37.12, 西: 嬬恋村 138.48, 東: 銚子市 140.87)
+    // 東京都 + 神奈川県 + 千葉県 + 埼玉県 + 群馬県 + 栃木県 + 茨城県全域をカバー
+    // (南: 湯河原町 35.14, 北: 北茨城市 36.87/那須町 37.12, 西: 嬬恋村 138.48, 東: 神栖市 140.87)
     return point.lat >= 34.9 && point.lat <= 37.2 && point.lng >= 138.4 && point.lng <= 140.9;
   }
 
@@ -224,6 +224,49 @@ function createGeoHelpers(deps) {
       annaka: 15,
       tomioka: 12,
       midori: 20,
+      // 茨城県
+      ibaraki_mito: 15,
+      ibaraki_hitachi: 20,
+      ibaraki_hitachinaka: 12,
+      ibaraki_tsukuba: 20,
+      ibaraki_koga: 15,
+      ibaraki_moriya: 10,
+      ibaraki_kamisu: 15,
+      ibaraki_tokai: 10,
+      ibaraki_toride: 12,
+      ibaraki_ryugasaki: 12,
+      ibaraki_chikusei: 15,
+      ibaraki_tsuchiura: 12,
+      ibaraki_ishioka: 15,
+      ibaraki_joso: 15,
+      ibaraki_naka: 12,
+      ibaraki_bando: 12,
+      ibaraki_hitachiota: 25,
+      ibaraki_yuki: 10,
+      ibaraki_tsukubamirai: 12,
+      ibaraki_inashiki: 15,
+      ibaraki_sakuragawa: 20,
+      ibaraki_hitachiomiya: 25,
+      ibaraki_shimotsuma: 12,
+      ibaraki_hokota: 15,
+      ibaraki_namegata: 15,
+      ibaraki_itako: 12,
+      ibaraki_kasumigaura: 15,
+      ibaraki_takahagi: 15,
+      ibaraki_kashima: 15,
+      ibaraki_kasama: 15,
+      ibaraki_shiro: 10,
+      ibaraki_sakai: 8,
+      ibaraki_daigo: 25,
+      ibaraki_yachiyo: 8,
+      ibaraki_goka: 6,
+      ibaraki_oarai: 8,
+      ibaraki_kawachi: 8,
+      ibaraki_ibarakimachi: 10,
+      ibaraki_kitaibaraki: 15,
+      ibaraki_ushiku: 10,
+      ibaraki_ami: 10,
+      ibaraki_tone: 8,
     };
     return overrides[key] || 10;
   }
@@ -255,6 +298,7 @@ function createGeoHelpers(deps) {
     if (/^千葉県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     if (/^群馬県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     if (/^栃木県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^茨城県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     return false;
   }
 
