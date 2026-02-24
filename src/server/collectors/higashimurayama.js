@@ -2,7 +2,8 @@ const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText } = require("../date-utils");
 const { normalizeText } = require("../text-utils");
 const { stripTags } = require("../html-utils");
-const { HIGASHIMURAYAMA_SOURCE, KNOWN_HIGASHIMURAYAMA_FACILITIES } = require("../../config/wards");
+const { HIGASHIMURAYAMA_SOURCE } = require("../../config/wards");
+const KNOWN_HIGASHIMURAYAMA_FACILITIES = require("../../config/known-facilities").higashimurayama;
 
 function buildGeoCandidates(venue, address, knownFacilities) {
   const label = HIGASHIMURAYAMA_SOURCE.label;

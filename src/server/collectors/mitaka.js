@@ -2,7 +2,8 @@ const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText, parseDateSpans, explodeSpanToDates, inRangeJst } = require("../date-utils");
 const { normalizeText } = require("../text-utils");
 const { stripTags } = require("../html-utils");
-const { MITAKA_SOURCE, KNOWN_MITAKA_FACILITIES } = require("../../config/wards");
+const { MITAKA_SOURCE } = require("../../config/wards");
+const KNOWN_MITAKA_FACILITIES = require("../../config/known-facilities").mitaka;
 
 function buildGeoCandidates(venue, address, knownFacilities) {
   const label = MITAKA_SOURCE.label;

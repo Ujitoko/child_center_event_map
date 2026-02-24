@@ -9,7 +9,8 @@ const {
   sanitizeVenueText,
   sanitizeAddressText,
 } = require("../text-utils");
-const { YAMAKITA_SOURCE, KNOWN_YAMAKITA_FACILITIES, WARD_CHILD_HINT_RE } = require("../../config/wards");
+const { YAMAKITA_SOURCE, WARD_CHILD_HINT_RE } = require("../../config/wards");
+const KNOWN_YAMAKITA_FACILITIES = require("../../config/known-facilities").yamakita;
 
 const DETAIL_BATCH_SIZE = 6;
 

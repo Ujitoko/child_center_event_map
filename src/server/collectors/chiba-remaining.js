@@ -1516,7 +1516,8 @@ function createCollectIchiharaSalonEvents(deps) {
  * ICSフィードから全イベントURL取得 → 詳細ページで日時・会場・座標を抽出
  */
 function createCollectNaritaKosodateEvents(deps) {
-  const { NARITA_SOURCE, KNOWN_NARITA_FACILITIES } = require("../../config/wards");
+  const { NARITA_SOURCE } = require("../../config/wards");
+  const KNOWN_NARITA_FACILITIES = require("../../config/known-facilities").narita;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;
@@ -1695,7 +1696,8 @@ function createCollectNaritaKosodateEvents(deps) {
  * カレンダーページから日付→イベントリンクを取得 → 詳細ページで会場・時間を抽出
  */
 function createCollectAbikoKosodateEvents(deps) {
-  const { ABIKO_SOURCE, KNOWN_ABIKO_FACILITIES } = require("../../config/wards");
+  const { ABIKO_SOURCE } = require("../../config/wards");
+  const KNOWN_ABIKO_FACILITIES = require("../../config/known-facilities").abiko;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;
@@ -2201,7 +2203,8 @@ function createCollectSakuraLibraryEvents(deps) {
  * library.city.inzai.lg.jp のイベント一覧 + 月次おはなし会ページ
  */
 function createCollectInzaiLibraryEvents(deps) {
-  const { INZAI_SOURCE, KNOWN_INZAI_FACILITIES } = require("../../config/wards");
+  const { INZAI_SOURCE } = require("../../config/wards");
+  const KNOWN_INZAI_FACILITIES = require("../../config/known-facilities").inzai;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;

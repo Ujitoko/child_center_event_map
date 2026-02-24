@@ -1,6 +1,7 @@
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst } = require("../date-utils");
-const { KODAIRA_SOURCE, KNOWN_KODAIRA_FACILITIES } = require("../../config/wards");
+const { KODAIRA_SOURCE } = require("../../config/wards");
+const KNOWN_KODAIRA_FACILITIES = require("../../config/known-facilities").kodaira;
 
 // 施設ID → 施設名マッピング (data.csv の通しNOに対応)
 const FACILITY_ID_NAME = {

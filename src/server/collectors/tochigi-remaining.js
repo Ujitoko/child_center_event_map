@@ -2116,7 +2116,8 @@ function createCollectShintoPdfScheduleEvents(deps) {
 // 日光市の健診ページは <table> ではなく <ul><li> に日付リストがある
 
 function createCollectNikkoScheduleEvents(deps) {
-  const { NIKKO_SOURCE, KNOWN_NIKKO_FACILITIES } = require("../../config/wards");
+  const { NIKKO_SOURCE } = require("../../config/wards");
+  const KNOWN_NIKKO_FACILITIES = require("../../config/known-facilities").nikko;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;
@@ -2497,7 +2498,8 @@ function createCollectNasukarasuyamaPdfScheduleEvents(deps) {
 // ---- 益子町カレンダーコレクター ----
 // cal.php のリスト表示をパースし、詳細ページから会場・時間を取得
 function createCollectMashikoCalendarEvents(deps) {
-  const { MASHIKO_SOURCE, KNOWN_MASHIKO_FACILITIES } = require("../../config/wards");
+  const { MASHIKO_SOURCE } = require("../../config/wards");
+  const KNOWN_MASHIKO_FACILITIES = require("../../config/known-facilities").mashiko;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;
@@ -2595,7 +2597,8 @@ function createCollectMashikoCalendarEvents(deps) {
 // ---- 日光市子育て支援センターイベントコレクター ----
 // 9525.html: 3施設のイベント表（イベント名 | 日時 | 内容）
 function createCollectNikkoSupportCenterEvents(deps) {
-  const { NIKKO_SOURCE, KNOWN_NIKKO_FACILITIES } = require("../../config/wards");
+  const { NIKKO_SOURCE } = require("../../config/wards");
+  const KNOWN_NIKKO_FACILITIES = require("../../config/known-facilities").nikko;
   const {
     geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
   } = deps;

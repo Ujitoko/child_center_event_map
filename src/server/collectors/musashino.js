@@ -2,7 +2,8 @@ const vm = require("vm");
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst } = require("../date-utils");
 const { parseTimeRangeFromText } = require("../date-utils");
-const { MUSASHINO_SOURCE, KNOWN_MUSASHINO_FACILITIES } = require("../../config/wards");
+const { MUSASHINO_SOURCE } = require("../../config/wards");
+const KNOWN_MUSASHINO_FACILITIES = require("../../config/known-facilities").musashino;
 
 /** place2 をパース: 施設名と住所候補を抽出 */
 function parsePlace2(raw) {

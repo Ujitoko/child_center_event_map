@@ -1,7 +1,8 @@
 const vm = require("vm");
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst, parseTimeRangeFromText } = require("../date-utils");
-const { TACHIKAWA_SOURCE, KNOWN_TACHIKAWA_FACILITIES } = require("../../config/wards");
+const { TACHIKAWA_SOURCE } = require("../../config/wards");
+const KNOWN_TACHIKAWA_FACILITIES = require("../../config/known-facilities").tachikawa;
 
 /** place2 をパース: 施設名と住所候補を抽出 */
 function parsePlace2(raw) {

@@ -1,7 +1,8 @@
 const { fetchText } = require("../fetch-utils");
 const { parseYmdFromJst } = require("../date-utils");
 const { stripTags } = require("../html-utils");
-const { HAMURA_SOURCE, KNOWN_HAMURA_FACILITIES } = require("../../config/wards");
+const { HAMURA_SOURCE } = require("../../config/wards");
+const KNOWN_HAMURA_FACILITIES = require("../../config/known-facilities").hamura;
 
 function reiwaToWestern(reiwaYear) {
   return reiwaYear + 2018;
