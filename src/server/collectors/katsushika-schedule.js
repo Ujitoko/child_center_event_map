@@ -33,31 +33,26 @@ const INDEX_PAGES = [
 /** スケジュールページ判定: /event/1000114/ or /event/1022292/ or /event/1000115/ */
 const SCHEDULE_PATH_RE = /\/event\/(?:1000114|1022292|1000115)\/(?!index\.html$)/;
 
-/** テーブルの実施日セルから日リストを抽出 */
+/** テーブルの実施日セルから日リストを抽出
+ *  「2月2日・3日・4日」→ [2/2, 2/3, 2/4] のように月コンテキストを追跡
+ */
 function parseDateCells(text, pageMonth, pageYear) {
   const dates = [];
   const nText = text.normalize("NFKC");
 
-  // M月D日 パターン
-  const mdRe = /(\d{1,2})月(\d{1,2})日/g;
+  // 単一パスで「M月D日」と「D日」の両方を検出し、月コンテキストを追跡
+  const re = /(?:(\d{1,2})月)?(\d{1,2})日/g;
+  let currentMonth = pageMonth;
+  const seen = new Set();
   let m;
-  while ((m = mdRe.exec(nText)) !== null) {
-    const mo = Number(m[1]);
+  while ((m = re.exec(nText)) !== null) {
+    if (m[1]) currentMonth = Number(m[1]);
     const d = Number(m[2]);
-    if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) {
-      dates.push({ y: resolveYear(mo, pageYear), mo, d });
-    }
-  }
-
-  // 「D日（曜日）」パターン（月が前提、pageMonthから補完）
-  if (dates.length === 0 && pageMonth) {
-    // 「13日（金曜日）」「13日、20日」
-    const dayRe = /(\d{1,2})日/g;
-    let dm;
-    while ((dm = dayRe.exec(nText)) !== null) {
-      const d = Number(dm[1]);
-      if (d >= 1 && d <= 31) {
-        dates.push({ y: resolveYear(pageMonth, pageYear), mo: pageMonth, d });
+    if (currentMonth && currentMonth >= 1 && currentMonth <= 12 && d >= 1 && d <= 31) {
+      const key = `${currentMonth}-${d}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        dates.push({ y: resolveYear(currentMonth, pageYear), mo: currentMonth, d });
       }
     }
   }
@@ -75,13 +70,11 @@ function resolveYear(month, baseYear) {
   return baseYear;
 }
 
-/** 現在の年度を返す (4月始まり) */
-function currentFiscalYear() {
+/** 現在の暦年を返す（スケジュールページは常に当月or翌月なので暦年が正しい） */
+function currentCalendarYear() {
   const now = new Date();
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const y = jst.getUTCFullYear();
-  const m = jst.getUTCMonth() + 1;
-  return m >= 4 ? y : y - 1;
+  return jst.getUTCFullYear();
 }
 
 /** テキストから年度/年を推定 */
@@ -230,8 +223,12 @@ function parseHeadingsFromHtml(html, pageMonth, pageYear) {
     }
   }
 
+  // ボイラープレート見出しを除外
+  const SKIP_HEADINGS = /^(?:関連リンク|このページに関する|お問い合わせ|葛飾区役所|コールセンター|イベント情報|イベントカレンダー|イベント一覧|よくある質問|.*の利用について$|.*の皆さんの利用について$)/;
+
   for (let i = 0; i < headings.length; i++) {
     const h = headings[i];
+    if (SKIP_HEADINGS.test(h.title)) continue;
     // 次の見出しまで or 次のテーブル or ページ末尾の間のテキスト
     const nextBoundary = headings[i + 1] ? headings[i + 1].endIndex - 100 : nHtml.length;
     const section = nHtml.slice(h.endIndex, Math.min(nextBoundary, h.endIndex + 2000));
@@ -322,10 +319,9 @@ function createCollectKatsushikaScheduleEvents(deps) {
           const h1Text = h1Match ? stripTags(h1Match[1]).trim() : "";
           const facilityName = h1Text ? extractFacilityName(h1Text) : "";
 
-          // 年と月を推定
-          const fullText = stripTags(nHtml);
-          const pageYear = inferYear(fullText) || inferYearFromUrl(pageUrl) || currentFiscalYear();
-          const pageMonth = extractMonthFromTitle(h1Text || fullText) || extractMonthFromUrl(pageUrl);
+          // 年と月を推定（H1タイトルを優先、本文の"令和N年度生まれ"等は誤マッチするため使わない）
+          const pageYear = inferYear(h1Text) || inferYearFromUrl(pageUrl) || currentCalendarYear();
+          const pageMonth = extractMonthFromTitle(h1Text) || extractMonthFromUrl(pageUrl);
 
           // パース
           const events = parseKatsushikaSchedulePage(nHtml, pageMonth, pageYear);

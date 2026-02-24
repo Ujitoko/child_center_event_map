@@ -268,17 +268,18 @@ function buildGeoCandidates(venue, address, source) {
 
 /**
  * 汎用 municipal CMS カレンダーコレクターファクトリー
- * 対応自治体: 大井町, 湯河原町 (同一CMSを使用)
  * @param {Object} config
  * @param {Object} config.source - { key, label, baseUrl, center }
  * @param {number} config.childCategoryIndex - 子育てカテゴリのインデックス (例: 2)
+ * @param {string} [config.calendarPath] - カレンダーパス接頭辞 (例: "/event/") デフォルト: "/"
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createMunicipalCalendarCollector(config, deps) {
-  const { source, childCategoryIndex } = config;
+  const { source, childCategoryIndex, calendarPath } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
+  const calBase = `${source.baseUrl}${calendarPath || "/"}calendar/`;
 
   return async function collectMunicipalCalendarEvents(maxDays) {
     const months = getMonthsForRange(maxDays);
@@ -289,7 +290,7 @@ function createMunicipalCalendarCollector(config, deps) {
       // ?ym=YYYYMM で月を指定
       const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
       // カテゴリフィルタ付きURL
-      const url = `${source.baseUrl}/calendar/?ym=${ymParam}&s_d1%5B%5D=${childCategoryIndex}`;
+      const url = `${calBase}?ym=${ymParam}&s_d1%5B%5D=${childCategoryIndex}`;
       try {
         const html = await fetchText(url);
         const pageCtx = parsePageYearMonth(html);
@@ -304,7 +305,7 @@ function createMunicipalCalendarCollector(config, deps) {
     if (rawEvents.length === 0) {
       for (const ym of months) {
         const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-        const url = `${source.baseUrl}/calendar/?ym=${ymParam}`;
+        const url = `${calBase}?ym=${ymParam}`;
         try {
           const html = await fetchText(url);
           const pageCtx = parsePageYearMonth(html);
