@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const zlib = require("zlib");
+const crypto = require("crypto");
 
 const COMPRESSIBLE = new Set([
   ".html", ".css", ".js", ".json", ".svg",
@@ -38,6 +39,10 @@ function sendJson(res, statusCode, payload, req) {
   }, body, req);
 }
 
+function computeETag(data) {
+  return '"' + crypto.createHash("md5").update(data).digest("hex").slice(0, 16) + '"';
+}
+
 function sendFile(res, filePath, req) {
   fs.readFile(filePath, (err, data) => {
     if (err) {
@@ -56,9 +61,17 @@ function sendFile(res, filePath, req) {
       ".jpeg": "image/jpeg",
       ".svg": "image/svg+xml",
     };
+    const etag = computeETag(data);
+    const ifNoneMatch = req && req.headers && req.headers["if-none-match"];
+    if (ifNoneMatch === etag) {
+      res.writeHead(304);
+      res.end();
+      return;
+    }
     const headers = {
       "Content-Type": typeMap[ext] || "application/octet-stream",
-      "Cache-Control": "public, max-age=3600",
+      "Cache-Control": "public, max-age=0, must-revalidate",
+      "ETag": etag,
     };
     if (COMPRESSIBLE.has(ext)) {
       sendGzip(res, 200, headers, data, req);

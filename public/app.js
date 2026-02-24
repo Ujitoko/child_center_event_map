@@ -1,4 +1,4 @@
-const map = L.map("map").setView([35.681236, 139.767125], 11);
+const map = L.map("map").setView([36.5, 138.0], 6);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors",
@@ -23,247 +23,13 @@ const MAX_LIST_RENDER = 250;
 let lastFetchedItems = [];
 let lastDateText = "";
 let lastWarningText = "";
-const SOURCE_WARD_MAP = {
-  chiyoda: "千代田区",
-  chuo: "中央区",
-  minato: "港区",
-  shinjuku: "新宿区",
-  bunkyo: "文京区",
-  taito: "台東区",
-  sumida: "墨田区",
-  koto: "江東区",
-  shinagawa: "品川区",
-  meguro: "目黒区",
-  ota: "大田区",
-  setagaya: "世田谷区",
-  shibuya: "渋谷区",
-  nakano: "中野区",
-  suginami: "杉並区",
-  toshima: "豊島区",
-  kita: "北区",
-  arakawa: "荒川区",
-  itabashi: "板橋区",
-  nerima: "練馬区",
-  adachi: "足立区",
-  adachi_odekake: "足立区",
-  katsushika: "葛飾区",
-  edogawa: "江戸川区",
-  hachioji: "八王子市",
-  chofu: "調布市",
-  musashino: "武蔵野市",
-  tachikawa: "立川市",
-  akishima: "昭島市",
-  higashiyamato: "東大和市",
-  kiyose: "清瀬市",
-  tama: "多摩市",
-  inagi: "稲城市",
-  hino: "日野市",
-  kokubunji: "国分寺市",
-  higashikurume: "東久留米市",
-  fuchu: "府中市",
-  koganei: "小金井市",
-  nishitokyo: "西東京市",
-  machida: "町田市",
-  fussa: "福生市",
-  musashimurayama: "武蔵村山市",
-  akiruno: "あきる野市",
-  komae: "狛江市",
-  mitaka: "三鷹市",
-  kodaira: "小平市",
-  higashimurayama: "東村山市",
-  kunitachi: "国立市",
-  ome: "青梅市",
-  hamura: "羽村市",
-  kawasaki: "川崎市",
-  yokohama: "横浜市",
-  sagamihara: "相模原市",
-  ebina: "海老名市",
-  kamakura: "鎌倉市",
-  yokosuka: "横須賀市",
-  chigasaki: "茅ヶ崎市",
-  zama: "座間市",
-  zushi: "逗子市",
-  yamato: "大和市",
-  hiratsuka: "平塚市",
-  odawara: "小田原市",
-  hadano: "秦野市",
-  ayase: "綾瀬市",
-  atsugi: "厚木市",
-  isehara: "伊勢原市",
-  minamiashigara: "南足柄市",
-  fujisawa: "藤沢市",
-  samukawa: "寒川町",
-  aikawa: "愛川町",
-  miura: "三浦市",
-  oiso: "大磯町",
-  hayama: "葉山町",
-  nakai: "中井町",
-  kiyokawa: "清川村",
-  ninomiya: "二宮町",
-  oi: "大井町",
-  yugawara: "湯河原町",
-  matsuda: "松田町",
-  manazuru: "真鶴町",
-  hakone: "箱根町",
-  kaisei: "開成町",
-  yamakita: "山北町",
-  mizuho: "瑞穂町",
-  okutama: "奥多摩町",
-  hinode: "日の出町",
-  hinohara: "檜原村",
-  chiba: "千葉市",
-  funabashi: "船橋市",
-  kashiwa: "柏市",
-  nagareyama: "流山市",
-  urayasu: "浦安市",
-  noda: "野田市",
-  narashino: "習志野市",
-  shiroi: "白井市",
-  narita: "成田市",
-  kisarazu: "木更津市",
-  isumi: "いすみ市",
-  tohnosho: "東庄町",
-  otaki: "大多喜町",
-  yachiyo: "八千代市",
-  asahi: "旭市",
-  kamogawa: "鴨川市",
-  yokoshibahikari: "横芝光町",
-  ichikawa: "市川市",
-  katsuura: "勝浦市",
-  kimitsu: "君津市",
-  kyonan: "鋸南町",
-  yotsukaido: "四街道市",
-  matsudo: "松戸市",
-  abiko: "我孫子市",
-  kamagaya: "鎌ケ谷市",
-  tomisato: "富里市",
-  shirako: "白子町",
-  kujukuri: "九十九里町",
-  yachimata: "八街市",
-  sodegaura: "袖ケ浦市",
-  ichinomiya: "一宮町",
-  choshi: "銚子市",
-  sakura: "佐倉市",
-  futtsu: "富津市",
-  inzai: "印西市",
-  katori: "香取市",
-  togane: "東金市",
-  ichihara: "市原市",
-  sosa: "匝瑳市",
-  sammu: "山武市",
-  sakae_chiba: "栄町",
-  mobara: "茂原市",
-  tateyama: "館山市",
-  minamiboso: "南房総市",
-  oamishirasato: "大網白里市",
-  shisui: "酒々井町",
-  kozaki: "神崎町",
-  tako: "多古町",
-  shibayama: "芝山町",
-  mutsuzawa: "睦沢町",
-  chosei: "長生村",
-  nagara: "長柄町",
-  onjuku: "御宿町",
-  chonan: "長南町",
-  saitamashi: "さいたま市",
-  kawaguchi: "川口市",
-  kasukabe: "春日部市",
-  fujimino: "ふじみ野市",
-  misato: "三郷市",
-  kawagoe: "川越市",
-  wako: "和光市",
-  warabi: "蕨市",
-  ageo: "上尾市",
-  niiza: "新座市",
-  asaka: "朝霞市",
-  toda: "戸田市",
-  shiki: "志木市",
-  fujimi: "富士見市",
-  sayama: "狭山市",
-  yashio: "八潮市",
-  koshigaya: "越谷市",
-  tokorozawa: "所沢市",
-  kuki: "久喜市",
-  kumagaya: "熊谷市",
-  kounosu: "鴻巣市",
-  sakado: "坂戸市",
-  hanno: "飯能市",
-  higashimatsuyama: "東松山市",
-  gyoda: "行田市",
-  honjo: "本庄市",
-  hidaka: "日高市",
-  shiraoka: "白岡市",
-  satte: "幸手市",
-  yorii: "寄居町",
-  sugito: "杉戸町",
-  soka: "草加市",
-  tsurugashima: "鶴ヶ島市",
-  hasuda: "蓮田市",
-  iruma: "入間市",
-  kazo: "加須市",
-  // 群馬県
-  maebashi: "前橋市",
-  takasaki: "高崎市",
-  kiryu: "桐生市",
-  isesaki: "伊勢崎市",
-  ota_gunma: "太田市",
-  numata: "沼田市",
-  tatebayashi: "館林市",
-  shibukawa: "渋川市",
-  fujioka_gunma: "藤岡市",
-  tomioka: "富岡市",
-  annaka: "安中市",
-  midori: "みどり市",
-  shinto: "榛東村",
-  yoshioka: "吉岡町",
-  ueno_gunma: "上野村",
-  kanna: "神流町",
-  shimonita: "下仁田町",
-  nanmoku: "南牧村",
-  kanra: "甘楽町",
-  nakanojo: "中之条町",
-  naganohara: "長野原町",
-  tsumagoi: "嬬恋村",
-  kusatsu: "草津町",
-  takayama_gunma: "高山村",
-  higashiagatsuma: "東吾妻町",
-  katashina: "片品村",
-  kawaba: "川場村",
-  showa_gunma: "昭和村",
-  minakami: "みなかみ町",
-  tamamura: "玉村町",
-  itakura: "板倉町",
-  meiwa: "明和町",
-  chiyoda_gunma: "千代田町",
-  oizumi: "大泉町",
-  ora: "邑楽町",
-  // 栃木県
-  utsunomiya: "宇都宮市",
-  ashikaga: "足利市",
-  tochigi_city: "栃木市",
-  sano: "佐野市",
-  kanuma: "鹿沼市",
-  nikko: "日光市",
-  oyama: "小山市",
-  moka: "真岡市",
-  ohtawara: "大田原市",
-  yaita: "矢板市",
-  nasushiobara: "那須塩原市",
-  tochigi_sakura: "さくら市",
-  nasukarasuyama: "那須烏山市",
-  shimotsuke: "下野市",
-  kaminokawa: "上三川町",
-  mashiko: "益子町",
-  motegi: "茂木町",
-  ichikai: "市貝町",
-  haga: "芳賀町",
-  mibu: "壬生町",
-  nogi: "野木町",
-  shioya: "塩谷町",
-  takanezawa: "高根沢町",
-  nasu: "那須町",
-  tochigi_nakagawa: "那珂川町",
-};
+
+// Metadata from /api/metadata (loaded dynamically)
+let REGION_GROUPS = [];
+let PREF_CENTERS = {};
+let SOURCE_TO_PREF = {};
+let VALID_PREFS = new Set();
+
 const selectedPrefs = new Set();
 let searchQuery = "";
 let searchDebounceTimer = null;
@@ -274,9 +40,9 @@ let sortByDistance = false;
 const statusEl = document.getElementById("status");
 const listEl = document.getElementById("list");
 const dateEl = document.getElementById("dateText");
-const wardFiltersEl = document.getElementById("wardFilters");
-const selectAllWardsBtnEl = document.getElementById("selectAllWardsBtn");
-const clearAllWardsBtnEl = document.getElementById("clearAllWardsBtn");
+const regionFiltersEl = document.getElementById("regionFilters");
+const selectAllBtnEl = document.getElementById("selectAllBtn");
+const clearAllBtnEl = document.getElementById("clearAllBtn");
 
 function setStatus(text) {
   statusEl.textContent = text;
@@ -363,114 +129,176 @@ function distanceLabel(km) {
   return `${km.toFixed(1)}km`;
 }
 
-function getWardLabel(item) {
+function getPrefForEvent(item) {
   const source = String(item.source || "");
-  if (source.startsWith("ward_")) {
-    const key = source.slice(5);
-    if (SOURCE_WARD_MAP[key]) return SOURCE_WARD_MAP[key];
-  }
+  // Try ward_ prefix first, then bare source key
+  const key = source.startsWith("ward_") ? source.slice(5) : source;
+  if (SOURCE_TO_PREF[key]) return SOURCE_TO_PREF[key];
+  // Fallback: try source_label
   const sourceLabel = String(item.source_label || "");
-  const fromLabel = sourceLabel.match(/([^\s　]+[区市町村])/u);
-  if (fromLabel) return fromLabel[1];
+  for (const region of REGION_GROUPS) {
+    for (const pref of region.prefs) {
+      if (sourceLabel.includes(pref.replace(/[県府都道]$/, ""))) return pref;
+    }
+  }
+  // Fallback: try address
   const address = String(item.address || "");
-  const fromAddress = address.match(/([^\s　]+[区市町村])/u);
-  if (fromAddress) return fromAddress[1];
+  for (const region of REGION_GROUPS) {
+    for (const pref of region.prefs) {
+      if (address.startsWith(pref)) return pref;
+    }
+  }
   return "";
 }
 
-function countByWard(items) {
+function countByPref(items) {
   const counts = new Map();
   for (const item of items) {
-    const ward = getWardLabel(item);
-    if (!ward) continue;
-    counts.set(ward, (counts.get(ward) || 0) + 1);
+    const pref = getPrefForEvent(item);
+    if (!pref) continue;
+    counts.set(pref, (counts.get(pref) || 0) + 1);
   }
   return counts;
 }
 
-const WARD_GROUPS = [
-  {
-    label: "東京都",
-    wards: [
-      "千代田区", "中央区", "港区", "新宿区", "文京区", "台東区", "墨田区", "江東区",
-      "品川区", "目黒区", "大田区", "世田谷区", "渋谷区", "中野区", "杉並区", "豊島区",
-      "北区", "荒川区", "板橋区", "練馬区", "足立区", "葛飾区", "江戸川区",
-      "八王子市", "調布市", "武蔵野市", "立川市", "昭島市", "東大和市", "清瀬市",
-      "多摩市", "稲城市", "日野市", "国分寺市", "東久留米市", "府中市", "小金井市",
-      "西東京市", "町田市", "福生市", "武蔵村山市", "あきる野市", "狛江市", "三鷹市",
-      "小平市", "東村山市", "国立市", "青梅市", "羽村市", "瑞穂町",
-      "奥多摩町", "日の出町", "檜原村",
-    ],
-  },
-  {
-    label: "神奈川県",
-    wards: ["川崎市", "横浜市", "相模原市", "海老名市", "鎌倉市", "横須賀市", "茅ヶ崎市", "座間市", "逗子市", "大和市", "平塚市", "小田原市", "秦野市", "綾瀬市", "厚木市", "伊勢原市", "南足柄市", "藤沢市", "寒川町", "愛川町", "三浦市", "大磯町", "葉山町", "中井町", "清川村", "二宮町", "大井町", "湯河原町", "松田町", "真鶴町", "箱根町", "開成町", "山北町"],
-  },
-  {
-    label: "千葉県",
-    wards: ["千葉市", "船橋市", "市川市", "松戸市", "柏市", "八千代市", "流山市", "浦安市", "野田市", "習志野市", "白井市", "成田市", "木更津市", "旭市", "鴨川市", "いすみ市", "東庄町", "大多喜町", "横芝光町", "勝浦市", "君津市", "鋸南町", "四街道市", "我孫子市", "鎌ケ谷市", "富里市", "白子町", "九十九里町", "八街市", "袖ケ浦市", "一宮町", "銚子市", "佐倉市", "富津市", "印西市", "香取市", "東金市", "市原市", "匝瑳市", "山武市", "栄町", "茂原市", "館山市", "南房総市", "大網白里市", "酒々井町", "神崎町", "多古町", "芝山町", "睦沢町", "長生村", "長柄町", "御宿町", "長南町"],
-  },
-  {
-    label: "埼玉県",
-    wards: ["さいたま市", "川口市", "川越市", "越谷市", "所沢市", "草加市", "春日部市", "熊谷市", "久喜市", "入間市", "加須市", "深谷市", "桶川市", "吉川市", "上尾市", "鴻巣市", "坂戸市", "飯能市", "東松山市", "行田市", "本庄市", "日高市", "白岡市", "幸手市", "鶴ヶ島市", "蓮田市", "秩父市", "寄居町", "杉戸町", "越生町", "小川町", "吉見町", "滑川町", "嵐山町", "神川町", "上里町", "美里町", "小鹿野町", "東秩父村", "川島町", "北本市", "伊奈町", "横瀬町", "皆野町", "長瀞町", "毛呂山町", "三芳町", "鳩山町", "宮代町", "松伏町", "新座市", "朝霞市", "戸田市", "和光市", "志木市", "富士見市", "ふじみ野市", "三郷市", "八潮市", "蕨市", "狭山市", "羽生市"],
-  },
-  {
-    label: "群馬県",
-    wards: ["前橋市", "高崎市", "桐生市", "伊勢崎市", "太田市", "沼田市", "館林市", "渋川市", "藤岡市", "富岡市", "安中市", "みどり市", "榛東村", "吉岡町", "上野村", "神流町", "下仁田町", "南牧村", "甘楽町", "中之条町", "長野原町", "嬬恋村", "草津町", "高山村", "東吾妻町", "片品村", "川場村", "昭和村", "みなかみ町", "玉村町", "板倉町", "明和町", "千代田町", "大泉町", "邑楽町"],
-  },
-  {
-    label: "栃木県",
-    wards: ["宇都宮市", "足利市", "栃木市", "佐野市", "鹿沼市", "日光市", "小山市", "真岡市", "大田原市", "矢板市", "那須塩原市", "さくら市", "那須烏山市", "下野市", "上三川町", "益子町", "茂木町", "市貝町", "芳賀町", "壬生町", "野木町", "塩谷町", "高根沢町", "那須町", "那珂川町"],
-  },
-];
+// Region/prefecture checkbox state
+const regionGroupCheckboxes = new Map(); // regionId → checkbox
+const regionGroupCountSpans = new Map(); // regionId → span
+const prefCheckboxes = new Map(); // prefName → checkbox
+const prefCountSpans = new Map(); // prefName → span
 
-const WARD_TO_PREF = new Map();
-for (const group of WARD_GROUPS) {
-  for (const w of group.wards) WARD_TO_PREF.set(w, group.label);
-}
+function initRegionFilters() {
+  regionFiltersEl.innerHTML = "";
+  for (const region of REGION_GROUPS) {
+    const details = document.createElement("details");
+    details.className = "region-group";
+    // Default open for regions with selected prefs
+    const hasSelected = region.prefs.some((p) => selectedPrefs.has(p));
+    if (hasSelected) details.open = true;
 
-const wardGroupCheckboxes = new Map();
-const wardGroupCountSpans = new Map();
+    const summary = document.createElement("summary");
+    summary.className = "region-header";
 
-function initWardFilters() {
-  wardFiltersEl.innerHTML = "";
-  for (const group of WARD_GROUPS) {
-    const row = document.createElement("label");
-    row.className = "ward-option";
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.checked = selectedPrefs.has(group.label);
-    cb.addEventListener("change", () => {
-      if (cb.checked) {
-        selectedPrefs.add(group.label);
-      } else {
-        selectedPrefs.delete(group.label);
+    const regionCb = document.createElement("input");
+    regionCb.type = "checkbox";
+    regionCb.addEventListener("click", (ev) => ev.stopPropagation());
+    regionCb.addEventListener("change", () => {
+      for (const pref of region.prefs) {
+        if (regionCb.checked) {
+          selectedPrefs.add(pref);
+        } else {
+          selectedPrefs.delete(pref);
+        }
+        const pcb = prefCheckboxes.get(pref);
+        if (pcb) pcb.checked = regionCb.checked;
       }
       applyFiltersAndRender({ autoFit: false });
     });
-    const text = document.createElement("span");
-    text.textContent = `${group.label} (0)`;
-    row.appendChild(cb);
-    row.appendChild(text);
-    wardFiltersEl.appendChild(row);
-    wardGroupCheckboxes.set(group.label, cb);
-    wardGroupCountSpans.set(group.label, text);
+
+    const labelSpan = document.createElement("span");
+    labelSpan.textContent = region.label;
+
+    const countSpan = document.createElement("span");
+    countSpan.className = "region-count";
+    countSpan.textContent = "(0)";
+
+    summary.appendChild(regionCb);
+    summary.appendChild(labelSpan);
+    summary.appendChild(countSpan);
+    details.appendChild(summary);
+
+    regionGroupCheckboxes.set(region.id, regionCb);
+    regionGroupCountSpans.set(region.id, countSpan);
+
+    const prefList = document.createElement("div");
+    prefList.className = "pref-list";
+
+    for (const pref of region.prefs) {
+      const row = document.createElement("label");
+      row.className = "pref-option";
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = selectedPrefs.has(pref);
+      cb.addEventListener("change", () => {
+        if (cb.checked) {
+          selectedPrefs.add(pref);
+        } else {
+          selectedPrefs.delete(pref);
+        }
+        syncRegionCheckbox(region);
+        applyFiltersAndRender({ autoFit: false });
+      });
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = pref;
+
+      const cntSpan = document.createElement("span");
+      cntSpan.className = "pref-count";
+      cntSpan.textContent = "0";
+
+      row.appendChild(cb);
+      row.appendChild(nameSpan);
+      row.appendChild(cntSpan);
+      prefList.appendChild(row);
+
+      prefCheckboxes.set(pref, cb);
+      prefCountSpans.set(pref, cntSpan);
+    }
+
+    details.appendChild(prefList);
+    regionFiltersEl.appendChild(details);
   }
 }
 
-function updateWardCounts(wardCounts) {
-  for (const group of WARD_GROUPS) {
-    let prefTotal = 0;
-    for (const ward of group.wards) {
-      prefTotal += wardCounts.get(ward) || 0;
+function syncRegionCheckbox(region) {
+  const allChecked = region.prefs.every((p) => selectedPrefs.has(p));
+  const someChecked = region.prefs.some((p) => selectedPrefs.has(p));
+  const rcb = regionGroupCheckboxes.get(region.id);
+  if (rcb) {
+    rcb.checked = allChecked;
+    rcb.indeterminate = !allChecked && someChecked;
+  }
+}
+
+function updatePrefCounts(prefCounts) {
+  for (const region of REGION_GROUPS) {
+    let regionTotal = 0;
+    for (const pref of region.prefs) {
+      const cnt = prefCounts.get(pref) || 0;
+      regionTotal += cnt;
+      const span = prefCountSpans.get(pref);
+      if (span) span.textContent = String(cnt);
+      const cb = prefCheckboxes.get(pref);
+      if (cb) cb.checked = selectedPrefs.has(pref);
     }
-    const span = wardGroupCountSpans.get(group.label);
-    if (span) span.textContent = `${group.label} (${prefTotal})`;
-    const cb = wardGroupCheckboxes.get(group.label);
-    if (cb) {
-      cb.checked = selectedPrefs.has(group.label);
+    const rSpan = regionGroupCountSpans.get(region.id);
+    if (rSpan) rSpan.textContent = `(${regionTotal})`;
+    syncRegionCheckbox(region);
+  }
+}
+
+function fitMapToSelection() {
+  if (selectedPrefs.size === 0) return;
+  // If exactly one pref selected, zoom to that pref
+  if (selectedPrefs.size === 1) {
+    const pref = [...selectedPrefs][0];
+    const center = PREF_CENTERS[pref];
+    if (center) {
+      map.setView([center.lat, center.lng], center.zoom || 10);
+      return;
     }
   }
+  // If all prefs in one region, zoom to region
+  for (const region of REGION_GROUPS) {
+    const selectedInRegion = region.prefs.filter((p) => selectedPrefs.has(p));
+    if (selectedInRegion.length === selectedPrefs.size && selectedInRegion.length > 0) {
+      map.setView([region.center.lat, region.center.lng], region.zoom || 8);
+      return;
+    }
+  }
+  // Multiple regions: fit to nationwide
+  map.setView([36.5, 138.0], 6);
 }
 
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
@@ -704,7 +532,7 @@ function parseDateValue(val) {
   return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
 }
 
-function saveWardsToStorage() {
+function savePrefsToStorage() {
   try {
     if (selectedPrefs.size > 0) {
       localStorage.setItem("selectedPrefs", JSON.stringify([...selectedPrefs]));
@@ -715,24 +543,12 @@ function saveWardsToStorage() {
   } catch (_) {}
 }
 
-const VALID_PREFS = new Set(WARD_GROUPS.map(g => g.label));
-
-function restoreWardsFromStorage() {
+function restorePrefsFromStorage() {
   try {
     const saved = localStorage.getItem("selectedPrefs");
     if (saved) {
       for (const p of JSON.parse(saved)) {
         if (VALID_PREFS.has(p)) selectedPrefs.add(p);
-      }
-    } else {
-      // 旧形式からのマイグレーション
-      const oldSaved = localStorage.getItem("selectedWards");
-      if (oldSaved) {
-        for (const w of JSON.parse(oldSaved)) {
-          const pref = WARD_TO_PREF.get(w);
-          if (pref) selectedPrefs.add(pref);
-        }
-        localStorage.removeItem("selectedWards");
       }
     }
   } catch (_) {}
@@ -762,13 +578,6 @@ function restoreFromUrl() {
     selectedPrefs.clear();
     for (const p of params.get("prefs").split(",")) {
       if (VALID_PREFS.has(p)) selectedPrefs.add(p);
-    }
-  } else if (params.has("wards")) {
-    // 旧形式URLからのマイグレーション
-    selectedPrefs.clear();
-    for (const w of params.get("wards").split(",")) {
-      const pref = WARD_TO_PREF.get(w);
-      if (pref) selectedPrefs.add(pref);
     }
   }
   if (params.has("q")) {
@@ -807,15 +616,13 @@ function applyFiltersAndRender(options = {}) {
   });
   const totalInRange = items.length;
 
-  // 区カウントは日数フィルタ済みデータで計算
-  updateWardCounts(countByWard(items));
+  // 都道府県カウントは日数フィルタ済みデータで計算
+  updatePrefCounts(countByPref(items));
 
   // 都道府県フィルタ
   if (selectedPrefs.size > 0) {
     items = items.filter((e) => {
-      const ward = getWardLabel(e);
-      if (!ward) return true;
-      const pref = WARD_TO_PREF.get(ward);
+      const pref = getPrefForEvent(e);
       return pref ? selectedPrefs.has(pref) : true;
     });
   }
@@ -849,7 +656,23 @@ function applyFiltersAndRender(options = {}) {
   updateTabBadge(items.length);
   render(items, { autoFit, distCache });
   syncUrlParams();
-  saveWardsToStorage();
+  savePrefsToStorage();
+}
+
+async function loadMetadata() {
+  try {
+    const res = await fetch("/api/metadata");
+    const data = await res.json();
+    REGION_GROUPS = data.regions || [];
+    PREF_CENTERS = data.pref_centers || {};
+    SOURCE_TO_PREF = data.source_to_pref || {};
+    VALID_PREFS = new Set();
+    for (const region of REGION_GROUPS) {
+      for (const pref of region.prefs) VALID_PREFS.add(pref);
+    }
+  } catch (err) {
+    console.error("Failed to load metadata:", err);
+  }
 }
 
 async function loadEvents() {
@@ -864,7 +687,7 @@ async function loadEvents() {
     lastFetchedItems = data.items.slice().sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     lastDateText = data.date_jst;
     lastWarningText = data.warning || "";
-    applyFiltersAndRender({ autoFit: true });
+    applyFiltersAndRender({ autoFit: selectedPrefs.size === 0 });
   } catch (err) {
     setStatus(`取得失敗: ${err.message}`);
     render([], { autoFit: false });
@@ -880,12 +703,13 @@ searchInputEl.addEventListener("input", () => {
   }, 250);
 });
 
-initWardFilters();
-selectAllWardsBtnEl.addEventListener("click", () => {
-  for (const group of WARD_GROUPS) selectedPrefs.add(group.label);
+selectAllBtnEl.addEventListener("click", () => {
+  for (const region of REGION_GROUPS) {
+    for (const pref of region.prefs) selectedPrefs.add(pref);
+  }
   applyFiltersAndRender({ autoFit: false });
 });
-clearAllWardsBtnEl.addEventListener("click", () => {
+clearAllBtnEl.addEventListener("click", () => {
   selectedPrefs.clear();
   applyFiltersAndRender({ autoFit: false });
 });
@@ -1074,11 +898,20 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   }
   initDateRange();
   updatePresetHighlight();
-  applyFiltersAndRender({ autoFit: true });
+  map.setView([36.5, 138.0], 6);
+  applyFiltersAndRender({ autoFit: false });
 });
 
-initDateRange();
-restoreWardsFromStorage();
-restoreFromUrl();
-updatePresetHighlight();
-loadEvents();
+// --- Initialization ---
+async function init() {
+  initDateRange();
+  await loadMetadata();
+  restorePrefsFromStorage();
+  restoreFromUrl();
+  initRegionFilters();
+  updatePresetHighlight();
+  if (selectedPrefs.size > 0) fitMapToSelection();
+  loadEvents();
+}
+
+init();

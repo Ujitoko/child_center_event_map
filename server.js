@@ -427,7 +427,9 @@ const {
   TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, YAMAGUCHI_HIKARI_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, KOCHI_MUROTO_SOURCE,
   // 九州・沖縄
   FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE,
+  REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 } = require("./src/config/wards");
+const _wardsExports = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -436,6 +438,7 @@ const GEO_CACHE_PATH = path.join(__dirname, "data", "geo_cache.json");
 
 // --- Mutable state ---
 const cache = { key: "", data: null, savedAt: 0 };
+let metadataCache = null;
 
 // --- Pre-load snapshot on startup ---
 try {
@@ -2174,6 +2177,18 @@ const server = http.createServer(async (req, res) => {
       cache_age_s: cache.savedAt ? Math.floor((Date.now() - cache.savedAt) / 1000) : null,
       cached_items: cache.data?.items?.length ?? 0,
     }, req);
+    return;
+  }
+
+  if (url.pathname === "/api/metadata") {
+    if (!metadataCache) {
+      metadataCache = {
+        regions: REGION_GROUPS,
+        pref_centers: PREF_CENTERS,
+        source_to_pref: buildSourceToPrefMap(_wardsExports),
+      };
+    }
+    sendJson(res, 200, metadataCache, req);
     return;
   }
 

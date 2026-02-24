@@ -1,19 +1,19 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#005d73" />
-    <meta name="description" content="東京23区の児童向けイベント（児童館等）をマップ上に表示。日付・区・現在地で絞り込み。" />
-    <meta property="og:title" content="東京児童イベントマップ" />
-    <meta property="og:description" content="東京23区の児童向けイベントをマップで探せる。今週末どこ行く？" />
+    <meta name="description" content="全国の児童向けイベント（児童館・子育て支援等）をマップ上に表示。日付・地域・現在地で絞り込み。" />
+    <meta property="og:title" content="こどもイベントマップ" />
+    <meta property="og:description" content="全国の児童向けイベントをマップで探せる。今週末どこ行く？" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/icon-512.svg" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="東京児童イベントマップ" />
-    <meta name="twitter:description" content="東京23区の児童向けイベントをマップで探せる。今週末どこ行く？" />
+    <meta name="twitter:title" content="こどもイベントマップ" />
+    <meta name="twitter:description" content="全国の児童向けイベントをマップで探せる。今週末どこ行く？" />
     <meta name="twitter:image" content="/icon-512.svg" />
-    <title>東京児童イベントマップ</title>
+    <title>こどもイベントマップ</title>
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="/icon-192.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,9 +29,9 @@
   </head>
   <body>
     <header>
-      <h1>東京児童イベントマップ</h1>
+      <h1>こどもイベントマップ</h1>
       <p class="description">
-        東京23区の児童向けイベント（主に児童館でのイベント）をマップ上に表示するページです。プロトタイプ版。
+        全国の児童向けイベント（児童館・子育て支援等）をマップ上に表示するページです。
       </p>
       <div class="sub" id="dateText">読み込み中...</div>
     </header>
@@ -66,13 +66,13 @@
 
             <input type="text" id="searchInput" placeholder="イベント名・会場で検索…" />
 
-            <details class="ward-section">
-              <summary class="ward-filter-title">表示する自治体</summary>
-              <div class="ward-bulk">
-                <button id="selectAllWardsBtn" type="button">全選択</button>
-                <button id="clearAllWardsBtn" type="button">全解除</button>
+            <details class="region-section" open>
+              <summary class="region-filter-title">表示する地域</summary>
+              <div class="region-bulk">
+                <button id="selectAllBtn" type="button">全選択</button>
+                <button id="clearAllBtn" type="button">全解除</button>
               </div>
-              <div id="wardFilters" class="ward-filters"></div>
+              <div id="regionFilters"></div>
             </details>
 
             <button type="button" id="nearbyBtn">現在地から近い順</button>

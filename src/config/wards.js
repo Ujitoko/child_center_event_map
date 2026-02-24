@@ -4622,6 +4622,162 @@ const KNOWN_TONE_IB_FACILITIES = {
   "利根町図書館": "利根町中田切418-1",
 };
 
+// --- Metadata for frontend (nationwide) ---
+
+const PREF_PREFIX_MAP = {
+  hokkaido: "北海道", tokyo: "東京都",
+  aomori: "青森県", iwate: "岩手県", miyagi: "宮城県", akita: "秋田県", yamagata: "山形県", fukushima: "福島県",
+  ibaraki: "茨城県", tochigi: "栃木県", gunma: "群馬県", saitama: "埼玉県", chiba: "千葉県", kanagawa: "神奈川県",
+  niigata: "新潟県", toyama: "富山県", ishikawa: "石川県", fukui: "福井県", yamanashi: "山梨県", nagano: "長野県", gifu: "岐阜県", shizuoka: "静岡県", aichi: "愛知県",
+  mie: "三重県", shiga: "滋賀県", kyoto: "京都府", osaka: "大阪府", hyogo: "兵庫県", nara: "奈良県", wakayama: "和歌山県",
+  tottori: "鳥取県", shimane: "島根県", okayama: "岡山県", hiroshima: "広島県", yamaguchi: "山口県",
+  tokushima: "徳島県", kagawa: "香川県", ehime: "愛媛県", kochi: "高知県",
+  fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県",
+};
+
+// Legacy keys (no pref prefix) → prefecture
+const LEGACY_KEY_PREF = {
+  // 東京23区
+  setagaya: "東京都", ota: "東京都", shinagawa: "東京都", shibuya: "東京都", minato: "東京都",
+  chiyoda: "東京都", chuo: "東京都", bunkyo: "東京都", taito: "東京都", sumida: "東京都",
+  koto: "東京都", nakano: "東京都", suginami: "東京都", toshima: "東京都", kita: "東京都",
+  arakawa: "東京都", itabashi: "東京都", nerima: "東京都", adachi: "東京都", adachi_odekake: "東京都",
+  katsushika: "東京都", edogawa: "東京都", shinjuku: "東京都", meguro: "東京都",
+  // 東京市部
+  hachioji: "東京都", chofu: "東京都", musashino: "東京都", tachikawa: "東京都", akishima: "東京都",
+  higashiyamato: "東京都", kiyose: "東京都", tama: "東京都", inagi: "東京都", hino: "東京都",
+  kokubunji: "東京都", higashikurume: "東京都", fuchu: "東京都", koganei: "東京都",
+  nishitokyo: "東京都", machida: "東京都", fussa: "東京都", musashimurayama: "東京都",
+  akiruno: "東京都", komae: "東京都", mitaka: "東京都", kodaira: "東京都", higashimurayama: "東京都",
+  kunitachi: "東京都", ome: "東京都", hamura: "東京都", mizuho: "東京都", okutama: "東京都",
+  hinode: "東京都", hinohara: "東京都",
+  // 神奈川県
+  kawasaki: "神奈川県", yokohama: "神奈川県", sagamihara: "神奈川県", ebina: "神奈川県",
+  kamakura: "神奈川県", yokosuka: "神奈川県", chigasaki: "神奈川県", zama: "神奈川県",
+  zushi: "神奈川県", yamato: "神奈川県", hiratsuka: "神奈川県", odawara: "神奈川県",
+  hadano: "神奈川県", ayase: "神奈川県", atsugi: "神奈川県", isehara: "神奈川県",
+  minamiashigara: "神奈川県", fujisawa: "神奈川県", samukawa: "神奈川県", aikawa: "神奈川県",
+  miura: "神奈川県", oiso: "神奈川県", hayama: "神奈川県", nakai: "神奈川県", kiyokawa: "神奈川県",
+  ninomiya: "神奈川県", oi: "神奈川県", yugawara: "神奈川県", matsuda: "神奈川県",
+  manazuru: "神奈川県", hakone: "神奈川県", kaisei: "神奈川県", yamakita: "神奈川県",
+  // 千葉県
+  chiba: "千葉県", funabashi: "千葉県", kashiwa: "千葉県", nagareyama: "千葉県",
+  urayasu: "千葉県", noda: "千葉県", narashino: "千葉県", shiroi: "千葉県",
+  narita: "千葉県", kisarazu: "千葉県", isumi: "千葉県", tohnosho: "千葉県", otaki: "千葉県",
+  yachiyo: "千葉県", asahi: "千葉県", kamogawa: "千葉県", yokoshibahikari: "千葉県",
+  ichikawa: "千葉県", katsuura: "千葉県", kimitsu: "千葉県", kyonan: "千葉県",
+  yotsukaido: "千葉県", matsudo: "千葉県", abiko: "千葉県", kamagaya: "千葉県",
+  tomisato: "千葉県", shirako: "千葉県", kujukuri: "千葉県", yachimata: "千葉県",
+  sodegaura: "千葉県", ichinomiya: "千葉県", choshi: "千葉県", sakura: "千葉県",
+  futtsu: "千葉県", inzai: "千葉県", katori: "千葉県", togane: "千葉県",
+  ichihara: "千葉県", sosa: "千葉県", sammu: "千葉県", sakae_chiba: "千葉県",
+  mobara: "千葉県", tateyama: "千葉県", minamiboso: "千葉県", oamishirasato: "千葉県",
+  shisui: "千葉県", kozaki: "千葉県", tako: "千葉県", shibayama: "千葉県",
+  mutsuzawa: "千葉県", chosei: "千葉県", nagara: "千葉県", onjuku: "千葉県", chonan: "千葉県",
+  // 埼玉県
+  saitamashi: "埼玉県", kawaguchi: "埼玉県", kasukabe: "埼玉県", fujimino: "埼玉県",
+  misato: "埼玉県", kawagoe: "埼玉県", wako: "埼玉県", warabi: "埼玉県", ageo: "埼玉県",
+  niiza: "埼玉県", asaka: "埼玉県", toda: "埼玉県", shiki: "埼玉県", fujimi: "埼玉県",
+  sayama: "埼玉県", yashio: "埼玉県", koshigaya: "埼玉県", tokorozawa: "埼玉県",
+  kuki: "埼玉県", kumagaya: "埼玉県", kounosu: "埼玉県", sakado: "埼玉県", hanno: "埼玉県",
+  higashimatsuyama: "埼玉県", gyoda: "埼玉県", honjo: "埼玉県", hidaka: "埼玉県",
+  shiraoka: "埼玉県", satte: "埼玉県", yorii: "埼玉県", sugito: "埼玉県",
+  soka: "埼玉県", tsurugashima: "埼玉県", hasuda: "埼玉県", iruma: "埼玉県", kazo: "埼玉県",
+  fukaya: "埼玉県", okegawa: "埼玉県", ogose: "埼玉県", ogawa: "埼玉県", yoshimi: "埼玉県",
+  kamikawa: "埼玉県", kamisato: "埼玉県", yoshikawa: "埼玉県", ogano: "埼玉県",
+  higashichichibu: "埼玉県", kawajima: "埼玉県", kitamoto: "埼玉県", ina_saitama: "埼玉県",
+  yokoze: "埼玉県", nagatoro: "埼玉県", miyoshi_saitama: "埼玉県", hatoyama: "埼玉県",
+  miyashiro: "埼玉県", chichibu: "埼玉県", namegawa: "埼玉県", ranzan: "埼玉県",
+  matsubushi: "埼玉県", minano: "埼玉県", moroyama: "埼玉県", hanyu: "埼玉県",
+  misato_saitama: "埼玉県",
+  // 群馬県
+  maebashi: "群馬県", takasaki: "群馬県", kiryu: "群馬県", isesaki: "群馬県",
+  ota_gunma: "群馬県", numata: "群馬県", tatebayashi: "群馬県", shibukawa: "群馬県",
+  fujioka_gunma: "群馬県", tomioka: "群馬県", annaka: "群馬県", midori: "群馬県",
+  shinto: "群馬県", yoshioka: "群馬県", ueno_gunma: "群馬県", kanna: "群馬県",
+  shimonita: "群馬県", nanmoku: "群馬県", kanra: "群馬県", nakanojo: "群馬県",
+  naganohara: "群馬県", tsumagoi: "群馬県", kusatsu: "群馬県", takayama_gunma: "群馬県",
+  higashiagatsuma: "群馬県", katashina: "群馬県", kawaba: "群馬県", showa_gunma: "群馬県",
+  minakami: "群馬県", tamamura: "群馬県", itakura: "群馬県", meiwa: "群馬県",
+  chiyoda_gunma: "群馬県", oizumi: "群馬県", ora: "群馬県",
+  // 栃木県
+  utsunomiya: "栃木県", ashikaga: "栃木県", tochigi_city: "栃木県", sano: "栃木県",
+  kanuma: "栃木県", nikko: "栃木県", oyama: "栃木県", moka: "栃木県", ohtawara: "栃木県",
+  yaita: "栃木県", nasushiobara: "栃木県", tochigi_sakura: "栃木県", nasukarasuyama: "栃木県",
+  shimotsuke: "栃木県", kaminokawa: "栃木県", mashiko: "栃木県", motegi: "栃木県",
+  ichikai: "栃木県", haga: "栃木県", mibu: "栃木県", nogi: "栃木県", shioya: "栃木県",
+  takanezawa: "栃木県", nasu: "栃木県", tochigi_nakagawa: "栃木県",
+};
+
+const REGION_GROUPS = [
+  { id: "hokkaido", label: "北海道", prefs: ["北海道"], center: { lat: 43.06, lng: 141.35 }, zoom: 7 },
+  { id: "tohoku", label: "東北", prefs: ["青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"], center: { lat: 39.7, lng: 140.1 }, zoom: 7 },
+  { id: "kanto", label: "関東", prefs: ["東京都", "神奈川県", "千葉県", "埼玉県", "群馬県", "栃木県", "茨城県"], center: { lat: 35.9, lng: 139.7 }, zoom: 8 },
+  { id: "chubu", label: "中部", prefs: ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県"], center: { lat: 36.2, lng: 137.7 }, zoom: 7 },
+  { id: "kinki", label: "近畿", prefs: ["三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"], center: { lat: 34.7, lng: 135.5 }, zoom: 8 },
+  { id: "chugoku_shikoku", label: "中国・四国", prefs: ["鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県"], center: { lat: 34.0, lng: 133.5 }, zoom: 7 },
+  { id: "kyushu_okinawa", label: "九州・沖縄", prefs: ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"], center: { lat: 32.5, lng: 131.0 }, zoom: 7 },
+];
+
+const PREF_CENTERS = {
+  "北海道": { lat: 43.06, lng: 141.35, zoom: 7 },
+  "青森県": { lat: 40.82, lng: 140.74, zoom: 9 }, "岩手県": { lat: 39.70, lng: 141.15, zoom: 8 },
+  "宮城県": { lat: 38.27, lng: 140.87, zoom: 9 }, "秋田県": { lat: 39.72, lng: 140.10, zoom: 8 },
+  "山形県": { lat: 38.24, lng: 140.34, zoom: 9 }, "福島県": { lat: 37.75, lng: 140.47, zoom: 8 },
+  "茨城県": { lat: 36.34, lng: 140.45, zoom: 9 }, "栃木県": { lat: 36.57, lng: 139.88, zoom: 9 },
+  "群馬県": { lat: 36.39, lng: 139.06, zoom: 9 }, "埼玉県": { lat: 35.86, lng: 139.65, zoom: 10 },
+  "千葉県": { lat: 35.60, lng: 140.12, zoom: 9 }, "東京都": { lat: 35.68, lng: 139.77, zoom: 11 },
+  "神奈川県": { lat: 35.45, lng: 139.64, zoom: 10 },
+  "新潟県": { lat: 37.90, lng: 139.02, zoom: 8 }, "富山県": { lat: 36.70, lng: 137.21, zoom: 9 },
+  "石川県": { lat: 36.59, lng: 136.63, zoom: 9 }, "福井県": { lat: 36.07, lng: 136.22, zoom: 9 },
+  "山梨県": { lat: 35.66, lng: 138.57, zoom: 9 }, "長野県": { lat: 36.23, lng: 138.18, zoom: 8 },
+  "岐阜県": { lat: 35.39, lng: 136.72, zoom: 9 }, "静岡県": { lat: 34.98, lng: 138.38, zoom: 9 },
+  "愛知県": { lat: 35.18, lng: 136.91, zoom: 9 },
+  "三重県": { lat: 34.73, lng: 136.51, zoom: 9 }, "滋賀県": { lat: 35.00, lng: 135.87, zoom: 10 },
+  "京都府": { lat: 35.02, lng: 135.76, zoom: 9 }, "大阪府": { lat: 34.69, lng: 135.52, zoom: 10 },
+  "兵庫県": { lat: 34.69, lng: 135.18, zoom: 9 }, "奈良県": { lat: 34.69, lng: 135.83, zoom: 10 },
+  "和歌山県": { lat: 34.23, lng: 135.17, zoom: 9 },
+  "鳥取県": { lat: 35.50, lng: 134.24, zoom: 9 }, "島根県": { lat: 35.47, lng: 133.05, zoom: 8 },
+  "岡山県": { lat: 34.66, lng: 133.93, zoom: 9 }, "広島県": { lat: 34.40, lng: 132.46, zoom: 9 },
+  "山口県": { lat: 34.19, lng: 131.47, zoom: 9 },
+  "徳島県": { lat: 34.07, lng: 134.56, zoom: 9 }, "香川県": { lat: 34.34, lng: 134.04, zoom: 10 },
+  "愛媛県": { lat: 33.84, lng: 132.77, zoom: 9 }, "高知県": { lat: 33.56, lng: 133.53, zoom: 9 },
+  "福岡県": { lat: 33.61, lng: 130.42, zoom: 9 }, "佐賀県": { lat: 33.25, lng: 130.30, zoom: 10 },
+  "長崎県": { lat: 32.74, lng: 129.87, zoom: 9 }, "熊本県": { lat: 32.79, lng: 130.74, zoom: 9 },
+  "大分県": { lat: 33.24, lng: 131.61, zoom: 9 }, "宮崎県": { lat: 31.91, lng: 131.42, zoom: 9 },
+  "鹿児島県": { lat: 31.56, lng: 130.56, zoom: 9 }, "沖縄県": { lat: 26.34, lng: 127.80, zoom: 9 },
+};
+
+const PREF_PREFIX_RE = new RegExp("^(" + Object.keys(PREF_PREFIX_MAP).join("|") + ")_");
+
+function getPrefectureForSourceKey(key) {
+  // Check legacy keys first (exact match)
+  if (LEGACY_KEY_PREF[key]) return LEGACY_KEY_PREF[key];
+  // Check prefix-based keys (e.g., ibaraki_mito → 茨城県)
+  const m = key.match(PREF_PREFIX_RE);
+  if (m) return PREF_PREFIX_MAP[m[1]];
+  return null;
+}
+
+function buildSourceToPrefMap(exportsObj) {
+  const result = {};
+  // Scan all *_SOURCE exports for their .key field
+  for (const [name, val] of Object.entries(exportsObj)) {
+    if (name.endsWith("_SOURCE") && val && typeof val.key === "string") {
+      const pref = getPrefectureForSourceKey(val.key);
+      if (pref) result[val.key] = pref;
+    }
+  }
+  // Also include WARD_LABEL_BY_KEY for any non-SOURCE keys (e.g. adachi_odekake)
+  for (const key of Object.keys(WARD_LABEL_BY_KEY)) {
+    if (!result[key]) {
+      const pref = getPrefectureForSourceKey(key);
+      if (pref) result[key] = pref;
+    }
+  }
+  return result;
+}
+
 module.exports = {
   ADACHI_SOURCE,
   KAWASAKI_SOURCE,
@@ -5046,4 +5202,8 @@ module.exports = {
   TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, YAMAGUCHI_HIKARI_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, KOCHI_MUROTO_SOURCE,
   // 九州・沖縄
   FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE,
+  // Metadata for frontend
+  REGION_GROUPS,
+  PREF_CENTERS,
+  buildSourceToPrefMap,
 };
