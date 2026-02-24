@@ -1286,6 +1286,204 @@ const WARD_LABEL_BY_KEY = {
   fukushima_shimogo: "下郷町",
   fukushima_aizumisato: "会津美里町",
   fukushima_furudono: "古殿町",
+  // 北海道
+  hokkaido_iwamizawa: "岩見沢市",
+  hokkaido_shibetsu: "士別市",
+  hokkaido_chitose: "千歳市",
+  hokkaido_mori: "森町",
+  hokkaido_ozora: "大空町",
+  hokkaido_tsubetsu: "津別町",
+  hokkaido_taiki: "大樹町",
+  hokkaido_niseko: "ニセコ町",
+  hokkaido_shiraoi: "白老町",
+  hokkaido_higashikagura: "東神楽町",
+  hokkaido_otoineppu: "音威子府村",
+  hokkaido_yubetsu: "湧別町",
+  hokkaido_nakasatsunai: "中札内村",
+  hokkaido_sarabetsu: "更別村",
+  hokkaido_honbetsu: "本別町",
+  hokkaido_hiroo: "広尾町",
+  hokkaido_shikaoi: "鹿追町",
+  hokkaido_akkeshi: "厚岸町",
+  hokkaido_betsukai: "別海町",
+  hokkaido_nakashibetsu: "中標津町",
+  hokkaido_shibetsu_cho: "標津町",
+  hokkaido_shintoku: "新得町",
+  hokkaido_kutchan: "倶知安町",
+  hokkaido_haboro: "羽幌町",
+  // 中部
+  niigata_sanjo: "三条市",
+  niigata_kashiwazaki: "柏崎市",
+  niigata_tsubame: "燕市",
+  niigata_agano: "阿賀野市",
+  niigata_seiro: "聖籠町",
+  niigata_yuzawa: "湯沢町",
+  niigata_kamo: "加茂市",
+  niigata_minamiuonuma: "南魚沼市",
+  niigata_tagami: "田上町",
+  toyama_himi: "氷見市",
+  toyama_namerikawa: "滑川市",
+  toyama_kurobe: "黒部市",
+  toyama_nyuzen: "入善町",
+  toyama_asahi_ty: "朝日町",
+  ishikawa_kanazawa: "金沢市",
+  ishikawa_komatsu: "小松市",
+  ishikawa_kaga: "加賀市",
+  ishikawa_nakanoto: "中能登町",
+  fukui_sabae: "鯖江市",
+  yamanashi_chuo: "中央市",
+  yamanashi_minamialps: "南アルプス市",
+  yamanashi_hokuto: "北杜市",
+  nagano_suzaka: "須坂市",
+  nagano_komagane: "駒ヶ根市",
+  nagano_chikuma: "千曲市",
+  nagano_iijimacho: "飯島町",
+  nagano_matsukawa: "松川町",
+  nagano_ikeda: "池田町",
+  gifu_ogaki: "大垣市",
+  gifu_seki: "関市",
+  gifu_ena: "恵那市",
+  gifu_motosu: "本巣市",
+  gifu_kaizu: "海津市",
+  gifu_anpachi: "安八町",
+  gifu_ibigawa: "揖斐川町",
+  gifu_ono_gf: "大野町",
+  shizuoka_fujieda: "藤枝市",
+  shizuoka_susono: "裾野市",
+  shizuoka_kosai: "湖西市",
+  shizuoka_izu: "伊豆市",
+  shizuoka_omaezaki: "御前崎市",
+  shizuoka_nagaizumi: "長泉町",
+  shizuoka_kannami: "函南町",
+  aichi_toyokawa: "豊川市",
+  aichi_hekinan: "碧南市",
+  aichi_shinshiro: "新城市",
+  aichi_chiryu: "知立市",
+  aichi_inazawa: "稲沢市",
+  aichi_iwakura: "岩倉市",
+  aichi_nisshin: "日進市",
+  aichi_aisai: "愛西市",
+  aichi_miyoshi: "みよし市",
+  aichi_nagakute: "長久手市",
+  aichi_togo: "東郷町",
+  aichi_agui: "阿久比町",
+  aichi_higashiura: "東浦町",
+  // 近畿
+  mie_toba: "鳥羽市",
+  mie_owase: "尾鷲市",
+  mie_iga: "伊賀市",
+  mie_kisosaki: "木曽岬町",
+  mie_taki: "多気町",
+  mie_meiwa: "明和町",
+  shiga_hikone: "彦根市",
+  shiga_nagahama: "長浜市",
+  shiga_omihachiman: "近江八幡市",
+  shiga_koka: "甲賀市",
+  shiga_maibara: "米原市",
+  shiga_aisho: "愛荘町",
+  shiga_hino: "日野町",
+  shiga_toyosato: "豊郷町",
+  kyoto_maizuru: "舞鶴市",
+  kyoto_ayabe: "綾部市",
+  kyoto_joyo: "城陽市",
+  kyoto_nagaokakyo: "長岡京市",
+  kyoto_yawata: "八幡市",
+  kyoto_seika: "精華町",
+  kyoto_kumiyama: "久御山町",
+  kyoto_minamiyamashiro: "南山城村",
+  osaka_ikeda: "池田市",
+  osaka_izumiotsu: "泉大津市",
+  osaka_kaizuka: "貝塚市",
+  osaka_moriguchi: "守口市",
+  osaka_ibaraki: "茨木市",
+  osaka_hirakata: "枚方市",
+  osaka_neyagawa: "寝屋川市",
+  osaka_izumi: "和泉市",
+  osaka_habikino: "羽曳野市",
+  osaka_fujiidera: "藤井寺市",
+  osaka_higashiosaka: "東大阪市",
+  osaka_sennan: "泉南市",
+  osaka_hannan: "阪南市",
+  osaka_kumatori: "熊取町",
+  osaka_tadaoka: "忠岡町",
+  osaka_taishi: "太子町",
+  hyogo_himeji: "姫路市",
+  hyogo_itami: "伊丹市",
+  hyogo_kakogawa: "加古川市",
+  hyogo_tatsuno: "たつの市",
+  hyogo_ono: "小野市",
+  hyogo_shiso: "宍粟市",
+  hyogo_kato: "加東市",
+  hyogo_inagawa: "猪名川町",
+  hyogo_inami: "稲美町",
+  hyogo_fukusaki: "福崎町",
+  hyogo_kamikawa: "神河町",
+  nara_tenri: "天理市",
+  nara_kashihara: "橿原市",
+  nara_gojo: "五條市",
+  nara_gose: "御所市",
+  nara_ikoma: "生駒市",
+  nara_ikaruga: "斑鳩町",
+  nara_ando: "安堵町",
+  nara_kawanishi_nr: "河合町",
+  nara_tawaramoto: "田原本町",
+  nara_oji: "王寺町",
+  nara_koryo: "広陵町",
+  nara_asuka: "明日香村",
+  nara_totsukawa: "十津川村",
+  nara_shimoichi: "下市町",
+  wakayama_hashimoto: "橋本市",
+  wakayama_inami_wk: "印南町",
+  // 中国・四国
+  tottori_nichinan: "日南町",
+  tottori_sakaiminato: "境港市",
+  shimane_masuda: "益田市",
+  shimane_ama: "海士町",
+  okayama_okayama: "岡山市",
+  okayama_akaiwa: "赤磐市",
+  okayama_mimasaka: "美作市",
+  okayama_hayashima: "早島町",
+  hiroshima_fuchu: "府中市",
+  hiroshima_otake: "大竹市",
+  hiroshima_higashihiroshima: "東広島市",
+  yamaguchi_hikari: "光市",
+  tokushima_tokushima: "徳島市",
+  tokushima_naka: "那賀町",
+  tokushima_higashimiyoshi: "東みよし町",
+  kagawa_takamatsu: "高松市",
+  kagawa_sanuki: "さぬき市",
+  kagawa_mitoyo: "三豊市",
+  kagawa_tonosho: "土庄町",
+  ehime_seiyo: "西予市",
+  ehime_tobe: "砥部町",
+  kochi_muroto: "室戸市",
+  // 九州・沖縄
+  fukuoka_fukutsu: "福津市",
+  fukuoka_shingu_fk: "新宮町",
+  fukuoka_hirokawa: "広川町",
+  fukuoka_kawara: "川崎町",
+  nagasaki_tsushima: "対馬市",
+  nagasaki_iki: "壱岐市",
+  nagasaki_saikai: "西海市",
+  nagasaki_togitsu: "時津町",
+  nagasaki_higashisonogi: "東彼杵町",
+  kumamoto_takamori: "高森町",
+  oita_hita: "日田市",
+  oita_taketa: "竹田市",
+  oita_kitsuki: "杵築市",
+  oita_kusu: "玖珠町",
+  miyazaki_miyazaki: "宮崎市",
+  miyazaki_nichinan: "日南市",
+  miyazaki_kijo: "木城町",
+  miyazaki_kadogawa: "門川町",
+  miyazaki_miyakojima: "都城市",
+  kagoshima_satsumasendai: "薩摩川内市",
+  kagoshima_minamikyushu: "南九州市",
+  kagoshima_satsuma: "さつま町",
+  kagoshima_kimotsuki: "肝付町",
+  okinawa_yomitan: "読谷村",
+  okinawa_kitanakagusuku: "北中城村",
+  okinawa_ie: "伊江村",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -4108,6 +4306,242 @@ const SHIMOGO_SOURCE = { key: "fukushima_shimogo", label: "下郷町", baseUrl: 
 const AIZUMISATO_SOURCE = { key: "fukushima_aizumisato", label: "会津美里町", baseUrl: "https://www.town.aizumisato.fukushima.jp", center: { lat: 37.4590, lng: 139.8422 } };
 const FURUDONO_SOURCE = { key: "fukushima_furudono", label: "古殿町", baseUrl: "https://www.town.furudono.fukushima.jp", center: { lat: 37.0934, lng: 140.5600 } };
 
+// ========== 北海道 ==========
+// 北海道
+const HOKKAIDO_IWAMIZAWA_SOURCE = { key: "hokkaido_iwamizawa", label: "岩見沢市", baseUrl: "https://www.city.iwamizawa.hokkaido.jp", center: { lat: 43.1965, lng: 141.7764 } };
+const HOKKAIDO_SHIBETSU_SOURCE = { key: "hokkaido_shibetsu", label: "士別市", baseUrl: "https://www.city.shibetsu.lg.jp", center: { lat: 44.1765, lng: 142.3987 } };
+const HOKKAIDO_CHITOSE_SOURCE = { key: "hokkaido_chitose", label: "千歳市", baseUrl: "https://www.city.chitose.lg.jp", center: { lat: 42.8195, lng: 141.6516 } };
+const HOKKAIDO_MORI_SOURCE = { key: "hokkaido_mori", label: "森町", baseUrl: "https://www.town.hokkaido-mori.lg.jp", center: { lat: 42.1033, lng: 140.5742 } };
+const HOKKAIDO_OZORA_SOURCE = { key: "hokkaido_ozora", label: "大空町", baseUrl: "https://www.town.ozora.hokkaido.jp", center: { lat: 43.6167, lng: 144.1833 } };
+const HOKKAIDO_TSUBETSU_SOURCE = { key: "hokkaido_tsubetsu", label: "津別町", baseUrl: "https://www.town.tsubetsu.lg.jp", center: { lat: 43.7212, lng: 144.028 } };
+const HOKKAIDO_TAIKI_SOURCE = { key: "hokkaido_taiki", label: "大樹町", baseUrl: "https://www.town.taiki.hokkaido.jp", center: { lat: 42.493, lng: 143.2845 } };
+const HOKKAIDO_NISEKO_SOURCE = { key: "hokkaido_niseko", label: "ニセコ町", baseUrl: "https://www.town.niseko.lg.jp", center: { lat: 42.871, lng: 140.6877 } };
+const HOKKAIDO_SHIRAOI_SOURCE = { key: "hokkaido_shiraoi", label: "白老町", baseUrl: "https://www.town.shiraoi.hokkaido.jp", center: { lat: 42.55, lng: 141.3553 } };
+const HOKKAIDO_HIGASHIKAGURA_SOURCE = { key: "hokkaido_higashikagura", label: "東神楽町", baseUrl: "https://www.town.higashikagura.lg.jp", center: { lat: 43.6932, lng: 142.45 } };
+const HOKKAIDO_OTOINEPPU_SOURCE = { key: "hokkaido_otoineppu", label: "音威子府村", baseUrl: "https://www.vill.otoineppu.hokkaido.jp", center: { lat: 44.7247, lng: 142.2575 } };
+const HOKKAIDO_YUBETSU_SOURCE = { key: "hokkaido_yubetsu", label: "湧別町", baseUrl: "https://www.town.yubetsu.lg.jp", center: { lat: 44.1682, lng: 143.5845 } };
+const HOKKAIDO_NAKASATSUNAI_SOURCE = { key: "hokkaido_nakasatsunai", label: "中札内村", baseUrl: "https://www.vill.nakasatsunai.hokkaido.jp", center: { lat: 42.6695, lng: 143.1295 } };
+const HOKKAIDO_SARABETSU_SOURCE = { key: "hokkaido_sarabetsu", label: "更別村", baseUrl: "https://www.sarabetsu.jp", center: { lat: 42.56, lng: 143.23 } };
+const HOKKAIDO_HONBETSU_SOURCE = { key: "hokkaido_honbetsu", label: "本別町", baseUrl: "https://www.town.honbetsu.hokkaido.jp", center: { lat: 43.1184, lng: 143.5483 } };
+const HOKKAIDO_HIROO_SOURCE = { key: "hokkaido_hiroo", label: "広尾町", baseUrl: "https://www.town.hiroo.lg.jp", center: { lat: 42.2845, lng: 143.3148 } };
+const HOKKAIDO_SHIKAOI_SOURCE = { key: "hokkaido_shikaoi", label: "鹿追町", baseUrl: "https://www.town.shikaoi.lg.jp", center: { lat: 43.0917, lng: 143.1003 } };
+const HOKKAIDO_AKKESHI_SOURCE = { key: "hokkaido_akkeshi", label: "厚岸町", baseUrl: "https://www.akkeshi-town.jp", center: { lat: 43.0488, lng: 144.8439 } };
+const HOKKAIDO_BETSUKAI_SOURCE = { key: "hokkaido_betsukai", label: "別海町", baseUrl: "https://betsukai.jp", center: { lat: 43.3905, lng: 145.1178 } };
+const HOKKAIDO_NAKASHIBETSU_SOURCE = { key: "hokkaido_nakashibetsu", label: "中標津町", baseUrl: "https://www.nakashibetsu.jp", center: { lat: 43.5493, lng: 144.9695 } };
+const HOKKAIDO_SHIBETSU_CHO_SOURCE = { key: "hokkaido_shibetsu_cho", label: "標津町", baseUrl: "https://www.shibetsutown.jp", center: { lat: 43.6619, lng: 145.1257 } };
+const HOKKAIDO_SHINTOKU_SOURCE = { key: "hokkaido_shintoku", label: "新得町", baseUrl: "https://www.shintoku-town.jp", center: { lat: 43.0735, lng: 142.8475 } };
+const HOKKAIDO_KUTCHAN_SOURCE = { key: "hokkaido_kutchan", label: "倶知安町", baseUrl: "https://www.town.kutchan.hokkaido.jp", center: { lat: 42.9018, lng: 140.757 } };
+const HOKKAIDO_HABORO_SOURCE = { key: "hokkaido_haboro", label: "羽幌町", baseUrl: "https://www.town.haboro.lg.jp", center: { lat: 44.3597, lng: 141.7013 } };
+
+// ========== 中部 ==========
+// 新潟県
+const NIIGATA_SANJO_SOURCE = { key: "niigata_sanjo", label: "三条市", baseUrl: "https://www.city.sanjo.niigata.jp", center: { lat: 37.6297, lng: 138.9624 } };
+const NIIGATA_KASHIWAZAKI_SOURCE = { key: "niigata_kashiwazaki", label: "柏崎市", baseUrl: "https://www.city.kashiwazaki.lg.jp", center: { lat: 37.3724, lng: 138.5592 } };
+const NIIGATA_TSUBAME_SOURCE = { key: "niigata_tsubame", label: "燕市", baseUrl: "https://www.city.tsubame.niigata.jp", center: { lat: 37.6719, lng: 138.8805 } };
+const NIIGATA_AGANO_SOURCE = { key: "niigata_agano", label: "阿賀野市", baseUrl: "https://www.city.agano.niigata.jp", center: { lat: 37.8307, lng: 139.2297 } };
+const NIIGATA_SEIRO_SOURCE = { key: "niigata_seiro", label: "聖籠町", baseUrl: "https://www.town.seiro.niigata.jp", center: { lat: 37.9625, lng: 139.2792 } };
+const NIIGATA_YUZAWA_SOURCE = { key: "niigata_yuzawa", label: "湯沢町", baseUrl: "https://www.town.yuzawa.lg.jp", center: { lat: 36.9329, lng: 138.8131 } };
+const NIIGATA_KAMO_SOURCE = { key: "niigata_kamo", label: "加茂市", baseUrl: "https://www.city.kamo.niigata.jp", center: { lat: 37.6621, lng: 139.0406 } };
+const NIIGATA_MINAMIUONUMA_SOURCE = { key: "niigata_minamiuonuma", label: "南魚沼市", baseUrl: "https://www.city.minamiuonuma.niigata.jp", center: { lat: 37.0665, lng: 138.8815 } };
+const NIIGATA_TAGAMI_SOURCE = { key: "niigata_tagami", label: "田上町", baseUrl: "https://www.town.tagami.niigata.jp", center: { lat: 37.6937, lng: 139.0646 } };
+// 富山県
+const TOYAMA_HIMI_SOURCE = { key: "toyama_himi", label: "氷見市", baseUrl: "https://www.city.himi.toyama.jp", center: { lat: 36.8563, lng: 136.9832 } };
+const TOYAMA_NAMERIKAWA_SOURCE = { key: "toyama_namerikawa", label: "滑川市", baseUrl: "https://www.city.namerikawa.toyama.jp", center: { lat: 36.7643, lng: 137.3398 } };
+const TOYAMA_KUROBE_SOURCE = { key: "toyama_kurobe", label: "黒部市", baseUrl: "https://www.city.kurobe.toyama.jp", center: { lat: 36.8709, lng: 137.435 } };
+const TOYAMA_NYUZEN_SOURCE = { key: "toyama_nyuzen", label: "入善町", baseUrl: "https://www.town.nyuzen.toyama.jp", center: { lat: 36.9317, lng: 137.5011 } };
+const TOYAMA_ASAHI_TY_SOURCE = { key: "toyama_asahi_ty", label: "朝日町", baseUrl: "https://www.town.asahi.toyama.jp", center: { lat: 36.9464, lng: 137.5611 } };
+// 石川県
+const ISHIKAWA_KANAZAWA_SOURCE = { key: "ishikawa_kanazawa", label: "金沢市", baseUrl: "https://www4.city.kanazawa.lg.jp", center: { lat: 36.5613, lng: 136.6562 } };
+const ISHIKAWA_KOMATSU_SOURCE = { key: "ishikawa_komatsu", label: "小松市", baseUrl: "https://www.city.komatsu.lg.jp", center: { lat: 36.4022, lng: 136.4451 } };
+const ISHIKAWA_KAGA_SOURCE = { key: "ishikawa_kaga", label: "加賀市", baseUrl: "https://www.city.kaga.ishikawa.jp", center: { lat: 36.3028, lng: 136.3147 } };
+const ISHIKAWA_NAKANOTO_SOURCE = { key: "ishikawa_nakanoto", label: "中能登町", baseUrl: "https://www.town.nakanoto.ishikawa.jp", center: { lat: 36.8902, lng: 136.872 } };
+// 福井県
+const FUKUI_SABAE_SOURCE = { key: "fukui_sabae", label: "鯖江市", baseUrl: "https://www.city.sabae.fukui.jp", center: { lat: 35.9563, lng: 136.1842 } };
+// 山梨県
+const YAMANASHI_CHUO_SOURCE = { key: "yamanashi_chuo", label: "中央市", baseUrl: "https://www.city.chuo.yamanashi.jp", center: { lat: 35.6087, lng: 138.5224 } };
+const YAMANASHI_MINAMIALPS_SOURCE = { key: "yamanashi_minamialps", label: "南アルプス市", baseUrl: "https://www.city.minami-alps.yamanashi.jp", center: { lat: 35.6085, lng: 138.4655 } };
+const YAMANASHI_HOKUTO_SOURCE = { key: "yamanashi_hokuto", label: "北杜市", baseUrl: "https://www.city.hokuto.yamanashi.jp", center: { lat: 35.7811, lng: 138.381 } };
+// 長野県
+const NAGANO_SUZAKA_SOURCE = { key: "nagano_suzaka", label: "須坂市", baseUrl: "https://www.city.suzaka.nagano.jp", center: { lat: 36.6511, lng: 138.3071 } };
+const NAGANO_KOMAGANE_SOURCE = { key: "nagano_komagane", label: "駒ヶ根市", baseUrl: "https://www.city.komagane.nagano.jp", center: { lat: 35.7273, lng: 137.9933 } };
+const NAGANO_CHIKUMA_SOURCE = { key: "nagano_chikuma", label: "千曲市", baseUrl: "https://www.city.chikuma.lg.jp", center: { lat: 36.5309, lng: 138.1182 } };
+const NAGANO_IIJIMACHO_SOURCE = { key: "nagano_iijimacho", label: "飯島町", baseUrl: "https://www.town.iijima.lg.jp", center: { lat: 35.6654, lng: 137.9159 } };
+const NAGANO_MATSUKAWA_SOURCE = { key: "nagano_matsukawa", label: "松川町", baseUrl: "https://www.town.matsukawa.nagano.jp", center: { lat: 35.5843, lng: 137.9175 } };
+const NAGANO_IKEDA_SOURCE = { key: "nagano_ikeda", label: "池田町", baseUrl: "https://www.ikedamachi.net", center: { lat: 36.4217, lng: 137.8775 } };
+// 岐阜県
+const GIFU_OGAKI_SOURCE = { key: "gifu_ogaki", label: "大垣市", baseUrl: "https://www.city.ogaki.lg.jp", center: { lat: 35.3598, lng: 136.6129 } };
+const GIFU_SEKI_SOURCE = { key: "gifu_seki", label: "関市", baseUrl: "https://www.city.seki.lg.jp", center: { lat: 35.4955, lng: 136.9175 } };
+const GIFU_ENA_SOURCE = { key: "gifu_ena", label: "恵那市", baseUrl: "https://www.city.ena.lg.jp", center: { lat: 35.4498, lng: 137.4127 } };
+const GIFU_MOTOSU_SOURCE = { key: "gifu_motosu", label: "本巣市", baseUrl: "https://www.city.motosu.lg.jp", center: { lat: 35.4833, lng: 136.6862 } };
+const GIFU_KAIZU_SOURCE = { key: "gifu_kaizu", label: "海津市", baseUrl: "https://www.city.kaizu.lg.jp", center: { lat: 35.2241, lng: 136.6337 } };
+const GIFU_ANPACHI_SOURCE = { key: "gifu_anpachi", label: "安八町", baseUrl: "https://www.town.anpachi.gifu.jp", center: { lat: 35.3427, lng: 136.6389 } };
+const GIFU_IBIGAWA_SOURCE = { key: "gifu_ibigawa", label: "揖斐川町", baseUrl: "https://www.town.ibigawa.lg.jp", center: { lat: 35.4787, lng: 136.5717 } };
+const GIFU_ONO_GF_SOURCE = { key: "gifu_ono_gf", label: "大野町", baseUrl: "https://www.town-ono.jp", center: { lat: 35.468, lng: 136.6343 } };
+// 静岡県
+const SHIZUOKA_FUJIEDA_SOURCE = { key: "shizuoka_fujieda", label: "藤枝市", baseUrl: "https://www.city.fujieda.shizuoka.jp", center: { lat: 34.8679, lng: 138.2529 } };
+const SHIZUOKA_SUSONO_SOURCE = { key: "shizuoka_susono", label: "裾野市", baseUrl: "https://www.city.susono.shizuoka.jp", center: { lat: 35.1744, lng: 138.9056 } };
+const SHIZUOKA_KOSAI_SOURCE = { key: "shizuoka_kosai", label: "湖西市", baseUrl: "https://www.city.kosai.shizuoka.jp", center: { lat: 34.7189, lng: 137.5266 } };
+const SHIZUOKA_IZU_SOURCE = { key: "shizuoka_izu", label: "伊豆市", baseUrl: "https://www.city.izu.shizuoka.jp", center: { lat: 34.9744, lng: 138.9456 } };
+const SHIZUOKA_OMAEZAKI_SOURCE = { key: "shizuoka_omaezaki", label: "御前崎市", baseUrl: "https://www.city.omaezaki.shizuoka.jp", center: { lat: 34.6381, lng: 138.127 } };
+const SHIZUOKA_NAGAIZUMI_SOURCE = { key: "shizuoka_nagaizumi", label: "長泉町", baseUrl: "https://www.town.nagaizumi.lg.jp", center: { lat: 35.144, lng: 138.8948 } };
+const SHIZUOKA_KANNAMI_SOURCE = { key: "shizuoka_kannami", label: "函南町", baseUrl: "https://www.town.kannami.shizuoka.jp", center: { lat: 35.0726, lng: 138.9456 } };
+// 愛知県
+const AICHI_TOYOKAWA_SOURCE = { key: "aichi_toyokawa", label: "豊川市", baseUrl: "https://www.city.toyokawa.lg.jp", center: { lat: 34.8275, lng: 137.3755 } };
+const AICHI_HEKINAN_SOURCE = { key: "aichi_hekinan", label: "碧南市", baseUrl: "https://www.city.hekinan.lg.jp", center: { lat: 34.8815, lng: 136.9935 } };
+const AICHI_SHINSHIRO_SOURCE = { key: "aichi_shinshiro", label: "新城市", baseUrl: "https://www.city.shinshiro.lg.jp", center: { lat: 34.8993, lng: 137.4979 } };
+const AICHI_CHIRYU_SOURCE = { key: "aichi_chiryu", label: "知立市", baseUrl: "https://www.city.chiryu.aichi.jp", center: { lat: 34.9928, lng: 137.051 } };
+const AICHI_INAZAWA_SOURCE = { key: "aichi_inazawa", label: "稲沢市", baseUrl: "https://www.city.inazawa.aichi.jp", center: { lat: 35.2476, lng: 136.7858 } };
+const AICHI_IWAKURA_SOURCE = { key: "aichi_iwakura", label: "岩倉市", baseUrl: "https://www.city.iwakura.aichi.jp", center: { lat: 35.2797, lng: 136.8704 } };
+const AICHI_NISSHIN_SOURCE = { key: "aichi_nisshin", label: "日進市", baseUrl: "https://www.city.nisshin.lg.jp", center: { lat: 35.1316, lng: 137.0397 } };
+const AICHI_AISAI_SOURCE = { key: "aichi_aisai", label: "愛西市", baseUrl: "https://www.city.aisai.lg.jp", center: { lat: 35.1586, lng: 136.7256 } };
+const AICHI_MIYOSHI_SOURCE = { key: "aichi_miyoshi", label: "みよし市", baseUrl: "https://www.city.aichi-miyoshi.lg.jp", center: { lat: 35.086, lng: 137.0704 } };
+const AICHI_NAGAKUTE_SOURCE = { key: "aichi_nagakute", label: "長久手市", baseUrl: "https://www.city.nagakute.lg.jp", center: { lat: 35.183, lng: 137.0481 } };
+const AICHI_TOGO_SOURCE = { key: "aichi_togo", label: "東郷町", baseUrl: "https://www.town.aichi-togo.lg.jp", center: { lat: 35.0917, lng: 137.0556 } };
+const AICHI_AGUI_SOURCE = { key: "aichi_agui", label: "阿久比町", baseUrl: "https://www.town.agui.lg.jp", center: { lat: 34.9336, lng: 136.9192 } };
+const AICHI_HIGASHIURA_SOURCE = { key: "aichi_higashiura", label: "東浦町", baseUrl: "https://www.town.aichi-higashiura.lg.jp", center: { lat: 34.974, lng: 136.9641 } };
+
+// ========== 近畿 ==========
+// 三重県
+const MIE_TOBA_SOURCE = { key: "mie_toba", label: "鳥羽市", baseUrl: "https://www.city.toba.mie.jp", center: { lat: 34.4802, lng: 136.8427 } };
+const MIE_OWASE_SOURCE = { key: "mie_owase", label: "尾鷲市", baseUrl: "https://www.city.owase.lg.jp", center: { lat: 34.0706, lng: 136.1909 } };
+const MIE_IGA_SOURCE = { key: "mie_iga", label: "伊賀市", baseUrl: "https://www.city.iga.lg.jp", center: { lat: 34.7663, lng: 136.1295 } };
+const MIE_KISOSAKI_SOURCE = { key: "mie_kisosaki", label: "木曽岬町", baseUrl: "https://www.town.kisosaki.lg.jp", center: { lat: 35.0887, lng: 136.7726 } };
+const MIE_TAKI_SOURCE = { key: "mie_taki", label: "多気町", baseUrl: "https://www.town.taki.mie.jp", center: { lat: 34.4811, lng: 136.5496 } };
+const MIE_MEIWA_SOURCE = { key: "mie_meiwa", label: "明和町", baseUrl: "https://www.town.meiwa.mie.jp", center: { lat: 34.5426, lng: 136.6187 } };
+// 滋賀県
+const SHIGA_HIKONE_SOURCE = { key: "shiga_hikone", label: "彦根市", baseUrl: "https://www.city.hikone.lg.jp", center: { lat: 35.276, lng: 136.2515 } };
+const SHIGA_NAGAHAMA_SOURCE = { key: "shiga_nagahama", label: "長浜市", baseUrl: "https://www.city.nagahama.lg.jp", center: { lat: 35.3813, lng: 136.2699 } };
+const SHIGA_OMIHACHIMAN_SOURCE = { key: "shiga_omihachiman", label: "近江八幡市", baseUrl: "https://www.city.omihachiman.shiga.jp", center: { lat: 35.1278, lng: 136.0977 } };
+const SHIGA_KOKA_SOURCE = { key: "shiga_koka", label: "甲賀市", baseUrl: "https://www.city.koka.lg.jp", center: { lat: 34.9659, lng: 136.1651 } };
+const SHIGA_MAIBARA_SOURCE = { key: "shiga_maibara", label: "米原市", baseUrl: "https://www.city.maibara.lg.jp", center: { lat: 35.3153, lng: 136.2886 } };
+const SHIGA_AISHO_SOURCE = { key: "shiga_aisho", label: "愛荘町", baseUrl: "https://www.town.aisho.shiga.jp", center: { lat: 35.1467, lng: 136.2233 } };
+const SHIGA_HINO_SOURCE = { key: "shiga_hino", label: "日野町", baseUrl: "https://www.town.shiga-hino.lg.jp", center: { lat: 35.0178, lng: 136.2494 } };
+const SHIGA_TOYOSATO_SOURCE = { key: "shiga_toyosato", label: "豊郷町", baseUrl: "https://www.town.toyosato.shiga.jp", center: { lat: 35.2053, lng: 136.2556 } };
+// 京都府
+const KYOTO_MAIZURU_SOURCE = { key: "kyoto_maizuru", label: "舞鶴市", baseUrl: "https://www.city.maizuru.kyoto.jp", center: { lat: 35.4544, lng: 135.3842 } };
+const KYOTO_AYABE_SOURCE = { key: "kyoto_ayabe", label: "綾部市", baseUrl: "https://www.city.ayabe.lg.jp", center: { lat: 35.2912, lng: 135.2533 } };
+const KYOTO_JOYO_SOURCE = { key: "kyoto_joyo", label: "城陽市", baseUrl: "https://www.city.joyo.kyoto.jp", center: { lat: 34.8522, lng: 135.7808 } };
+const KYOTO_NAGAOKAKYO_SOURCE = { key: "kyoto_nagaokakyo", label: "長岡京市", baseUrl: "https://www.city.nagaokakyo.lg.jp", center: { lat: 34.9264, lng: 135.6952 } };
+const KYOTO_YAWATA_SOURCE = { key: "kyoto_yawata", label: "八幡市", baseUrl: "https://www.city.yawata.kyoto.jp", center: { lat: 34.8763, lng: 135.7081 } };
+const KYOTO_SEIKA_SOURCE = { key: "kyoto_seika", label: "精華町", baseUrl: "https://www.town.seika.kyoto.jp", center: { lat: 34.7584, lng: 135.7828 } };
+const KYOTO_KUMIYAMA_SOURCE = { key: "kyoto_kumiyama", label: "久御山町", baseUrl: "https://www.town.kumiyama.lg.jp", center: { lat: 34.883, lng: 135.7245 } };
+const KYOTO_MINAMIYAMASHIRO_SOURCE = { key: "kyoto_minamiyamashiro", label: "南山城村", baseUrl: "https://www.vill.minamiyamashiro.lg.jp", center: { lat: 34.7552, lng: 135.9756 } };
+// 大阪府
+const OSAKA_IKEDA_SOURCE = { key: "osaka_ikeda", label: "池田市", baseUrl: "https://www.city.ikeda.osaka.jp", center: { lat: 34.8215, lng: 135.4268 } };
+const OSAKA_IZUMIOTSU_SOURCE = { key: "osaka_izumiotsu", label: "泉大津市", baseUrl: "https://www.city.izumiotsu.lg.jp", center: { lat: 34.5053, lng: 135.4057 } };
+const OSAKA_KAIZUKA_SOURCE = { key: "osaka_kaizuka", label: "貝塚市", baseUrl: "https://www.city.kaizuka.lg.jp", center: { lat: 34.4426, lng: 135.3598 } };
+const OSAKA_MORIGUCHI_SOURCE = { key: "osaka_moriguchi", label: "守口市", baseUrl: "https://www.city.moriguchi.osaka.jp", center: { lat: 34.7359, lng: 135.5639 } };
+const OSAKA_IBARAKI_SOURCE = { key: "osaka_ibaraki", label: "茨木市", baseUrl: "https://www.city.ibaraki.osaka.jp", center: { lat: 34.8156, lng: 135.5685 } };
+const OSAKA_HIRAKATA_SOURCE = { key: "osaka_hirakata", label: "枚方市", baseUrl: "https://www.city.hirakata.osaka.jp", center: { lat: 34.8144, lng: 135.6519 } };
+const OSAKA_NEYAGAWA_SOURCE = { key: "osaka_neyagawa", label: "寝屋川市", baseUrl: "https://www.city.neyagawa.osaka.jp", center: { lat: 34.7662, lng: 135.6278 } };
+const OSAKA_IZUMI_SOURCE = { key: "osaka_izumi", label: "和泉市", baseUrl: "https://www.city.osaka-izumi.lg.jp", center: { lat: 34.4837, lng: 135.4226 } };
+const OSAKA_HABIKINO_SOURCE = { key: "osaka_habikino", label: "羽曳野市", baseUrl: "https://www.city.habikino.lg.jp", center: { lat: 34.5577, lng: 135.6063 } };
+const OSAKA_FUJIIDERA_SOURCE = { key: "osaka_fujiidera", label: "藤井寺市", baseUrl: "https://www.city.fujiidera.lg.jp", center: { lat: 34.5737, lng: 135.5968 } };
+const OSAKA_HIGASHIOSAKA_SOURCE = { key: "osaka_higashiosaka", label: "東大阪市", baseUrl: "https://www.city.higashiosaka.lg.jp", center: { lat: 34.6796, lng: 135.6005 } };
+const OSAKA_SENNAN_SOURCE = { key: "osaka_sennan", label: "泉南市", baseUrl: "https://www.city.sennan.lg.jp", center: { lat: 34.3628, lng: 135.2725 } };
+const OSAKA_HANNAN_SOURCE = { key: "osaka_hannan", label: "阪南市", baseUrl: "https://www.city.hannan.lg.jp", center: { lat: 34.3561, lng: 135.2444 } };
+const OSAKA_KUMATORI_SOURCE = { key: "osaka_kumatori", label: "熊取町", baseUrl: "https://www.town.kumatori.lg.jp", center: { lat: 34.3989, lng: 135.3489 } };
+const OSAKA_TADAOKA_SOURCE = { key: "osaka_tadaoka", label: "忠岡町", baseUrl: "https://www.town.tadaoka.osaka.jp", center: { lat: 34.4883, lng: 135.4008 } };
+const OSAKA_TAISHI_SOURCE = { key: "osaka_taishi", label: "太子町", baseUrl: "https://www.town.taishi.osaka.jp", center: { lat: 34.5183, lng: 135.6479 } };
+// 兵庫県
+const HYOGO_HIMEJI_SOURCE = { key: "hyogo_himeji", label: "姫路市", baseUrl: "https://www.city.himeji.lg.jp", center: { lat: 34.8159, lng: 134.6853 } };
+const HYOGO_ITAMI_SOURCE = { key: "hyogo_itami", label: "伊丹市", baseUrl: "https://www.city.itami.lg.jp", center: { lat: 34.7847, lng: 135.3985 } };
+const HYOGO_KAKOGAWA_SOURCE = { key: "hyogo_kakogawa", label: "加古川市", baseUrl: "https://www.city.kakogawa.lg.jp", center: { lat: 34.7568, lng: 134.8413 } };
+const HYOGO_TATSUNO_SOURCE = { key: "hyogo_tatsuno", label: "たつの市", baseUrl: "https://www.city.tatsuno.lg.jp", center: { lat: 34.8588, lng: 134.5446 } };
+const HYOGO_ONO_SOURCE = { key: "hyogo_ono", label: "小野市", baseUrl: "https://www.city.ono.hyogo.jp", center: { lat: 34.853, lng: 134.931 } };
+const HYOGO_SHISO_SOURCE = { key: "hyogo_shiso", label: "宍粟市", baseUrl: "https://www.city.shiso.lg.jp", center: { lat: 35.0006, lng: 134.5367 } };
+const HYOGO_KATO_SOURCE = { key: "hyogo_kato", label: "加東市", baseUrl: "https://www.city.kato.lg.jp", center: { lat: 34.9176, lng: 134.9642 } };
+const HYOGO_INAGAWA_SOURCE = { key: "hyogo_inagawa", label: "猪名川町", baseUrl: "https://www.town.inagawa.lg.jp", center: { lat: 34.8954, lng: 135.3758 } };
+const HYOGO_INAMI_SOURCE = { key: "hyogo_inami", label: "稲美町", baseUrl: "https://www.town.hyogo-inami.lg.jp", center: { lat: 34.7445, lng: 134.894 } };
+const HYOGO_FUKUSAKI_SOURCE = { key: "hyogo_fukusaki", label: "福崎町", baseUrl: "https://www.town.fukusaki.hyogo.jp", center: { lat: 34.9475, lng: 134.7564 } };
+const HYOGO_KAMIKAWA_SOURCE = { key: "hyogo_kamikawa", label: "神河町", baseUrl: "https://www.town.kamikawa.hyogo.jp", center: { lat: 35.0556, lng: 134.7394 } };
+// 奈良県
+const NARA_TENRI_SOURCE = { key: "nara_tenri", label: "天理市", baseUrl: "https://www.city.tenri.nara.jp", center: { lat: 34.5963, lng: 135.8371 } };
+const NARA_KASHIHARA_SOURCE = { key: "nara_kashihara", label: "橿原市", baseUrl: "https://www.city.kashihara.nara.jp", center: { lat: 34.5092, lng: 135.7929 } };
+const NARA_GOJO_SOURCE = { key: "nara_gojo", label: "五條市", baseUrl: "https://www.city.gojo.lg.jp", center: { lat: 34.3511, lng: 135.6938 } };
+const NARA_GOSE_SOURCE = { key: "nara_gose", label: "御所市", baseUrl: "https://www.city.gose.nara.jp", center: { lat: 34.4567, lng: 135.7388 } };
+const NARA_IKOMA_SOURCE = { key: "nara_ikoma", label: "生駒市", baseUrl: "https://www.city.ikoma.lg.jp", center: { lat: 34.6923, lng: 135.6995 } };
+const NARA_IKARUGA_SOURCE = { key: "nara_ikaruga", label: "斑鳩町", baseUrl: "https://www.town.ikaruga.nara.jp", center: { lat: 34.6142, lng: 135.728 } };
+const NARA_ANDO_SOURCE = { key: "nara_ando", label: "安堵町", baseUrl: "https://www.town.ando.nara.jp", center: { lat: 34.5975, lng: 135.7268 } };
+const NARA_KAWANISHI_NR_SOURCE = { key: "nara_kawanishi_nr", label: "河合町", baseUrl: "https://www.town.kawai.nara.jp", center: { lat: 34.586, lng: 135.7604 } };
+const NARA_TAWARAMOTO_SOURCE = { key: "nara_tawaramoto", label: "田原本町", baseUrl: "https://www.town.tawaramoto.nara.jp", center: { lat: 34.5564, lng: 135.7923 } };
+const NARA_OJI_SOURCE = { key: "nara_oji", label: "王寺町", baseUrl: "https://www.town.oji.nara.jp", center: { lat: 34.5933, lng: 135.7064 } };
+const NARA_KORYO_SOURCE = { key: "nara_koryo", label: "広陵町", baseUrl: "https://www.town.koryo.nara.jp", center: { lat: 34.5563, lng: 135.75 } };
+const NARA_ASUKA_SOURCE = { key: "nara_asuka", label: "明日香村", baseUrl: "https://www.asukamura.jp", center: { lat: 34.4754, lng: 135.8175 } };
+const NARA_TOTSUKAWA_SOURCE = { key: "nara_totsukawa", label: "十津川村", baseUrl: "https://www.vill.totsukawa.lg.jp", center: { lat: 34.1064, lng: 135.696 } };
+const NARA_SHIMOICHI_SOURCE = { key: "nara_shimoichi", label: "下市町", baseUrl: "https://www.town.shimoichi.lg.jp", center: { lat: 34.3708, lng: 135.7648 } };
+// 和歌山県
+const WAKAYAMA_HASHIMOTO_SOURCE = { key: "wakayama_hashimoto", label: "橋本市", baseUrl: "https://www.city.hashimoto.lg.jp", center: { lat: 34.3146, lng: 135.6051 } };
+const WAKAYAMA_INAMI_WK_SOURCE = { key: "wakayama_inami_wk", label: "印南町", baseUrl: "https://www.town.wakayama-inami.lg.jp", center: { lat: 33.8042, lng: 135.2292 } };
+
+// ========== 中国・四国 ==========
+// 鳥取県
+const TOTTORI_NICHINAN_SOURCE = { key: "tottori_nichinan", label: "日南町", baseUrl: "https://www.town.nichinan.lg.jp", center: { lat: 35.1545, lng: 133.3184 } };
+const TOTTORI_SAKAIMINATO_SOURCE = { key: "tottori_sakaiminato", label: "境港市", baseUrl: "https://www.city.sakaiminato.lg.jp", center: { lat: 35.54, lng: 133.2309 } };
+// 島根県
+const SHIMANE_MASUDA_SOURCE = { key: "shimane_masuda", label: "益田市", baseUrl: "https://www.city.masuda.lg.jp", center: { lat: 34.6791, lng: 131.843 } };
+const SHIMANE_AMA_SOURCE = { key: "shimane_ama", label: "海士町", baseUrl: "https://www.town.ama.shimane.jp", center: { lat: 36.0792, lng: 133.0876 } };
+// 岡山県
+const OKAYAMA_OKAYAMA_SOURCE = { key: "okayama_okayama", label: "岡山市", baseUrl: "https://www.city.okayama.jp", center: { lat: 34.6551, lng: 133.9195 } };
+const OKAYAMA_AKAIWA_SOURCE = { key: "okayama_akaiwa", label: "赤磐市", baseUrl: "https://www.city.akaiwa.lg.jp", center: { lat: 34.7543, lng: 134.0171 } };
+const OKAYAMA_MIMASAKA_SOURCE = { key: "okayama_mimasaka", label: "美作市", baseUrl: "https://www.city.mimasaka.lg.jp", center: { lat: 35.007, lng: 134.1458 } };
+const OKAYAMA_HAYASHIMA_SOURCE = { key: "okayama_hayashima", label: "早島町", baseUrl: "https://www.town.hayashima.lg.jp", center: { lat: 34.5997, lng: 133.8275 } };
+// 広島県
+const HIROSHIMA_FUCHU_SOURCE = { key: "hiroshima_fuchu", label: "府中市", baseUrl: "https://www.city.fuchu.hiroshima.jp", center: { lat: 34.5678, lng: 133.2393 } };
+const HIROSHIMA_OTAKE_SOURCE = { key: "hiroshima_otake", label: "大竹市", baseUrl: "https://www.city.otake.hiroshima.jp", center: { lat: 34.2389, lng: 132.2222 } };
+const HIROSHIMA_HIGASHIHIROSHIMA_SOURCE = { key: "hiroshima_higashihiroshima", label: "東広島市", baseUrl: "https://www.city.higashihiroshima.lg.jp", center: { lat: 34.4275, lng: 132.7432 } };
+// 山口県
+const YAMAGUCHI_HIKARI_SOURCE = { key: "yamaguchi_hikari", label: "光市", baseUrl: "https://www.city.hikari.lg.jp", center: { lat: 33.9619, lng: 131.9422 } };
+// 徳島県
+const TOKUSHIMA_TOKUSHIMA_SOURCE = { key: "tokushima_tokushima", label: "徳島市", baseUrl: "https://www.city.tokushima.tokushima.jp", center: { lat: 34.0658, lng: 134.5593 } };
+const TOKUSHIMA_NAKA_SOURCE = { key: "tokushima_naka", label: "那賀町", baseUrl: "https://www.town.tokushima-naka.lg.jp", center: { lat: 33.9375, lng: 134.5236 } };
+const TOKUSHIMA_HIGASHIMIYOSHI_SOURCE = { key: "tokushima_higashimiyoshi", label: "東みよし町", baseUrl: "https://www.town.higashimiyoshi.lg.jp", center: { lat: 34.0294, lng: 133.9286 } };
+// 香川県
+const KAGAWA_TAKAMATSU_SOURCE = { key: "kagawa_takamatsu", label: "高松市", baseUrl: "https://www.city.takamatsu.kagawa.jp", center: { lat: 34.3401, lng: 134.0434 } };
+const KAGAWA_SANUKI_SOURCE = { key: "kagawa_sanuki", label: "さぬき市", baseUrl: "https://www.city.sanuki.kagawa.jp", center: { lat: 34.3255, lng: 134.1766 } };
+const KAGAWA_MITOYO_SOURCE = { key: "kagawa_mitoyo", label: "三豊市", baseUrl: "https://www.city.mitoyo.lg.jp", center: { lat: 34.1833, lng: 133.7167 } };
+const KAGAWA_TONOSHO_SOURCE = { key: "kagawa_tonosho", label: "土庄町", baseUrl: "https://www.town.tonosho.kagawa.jp", center: { lat: 34.49, lng: 134.1863 } };
+// 愛媛県
+const EHIME_SEIYO_SOURCE = { key: "ehime_seiyo", label: "西予市", baseUrl: "https://www.city.seiyo.ehime.jp", center: { lat: 33.3645, lng: 132.5113 } };
+const EHIME_TOBE_SOURCE = { key: "ehime_tobe", label: "砥部町", baseUrl: "https://www.town.tobe.ehime.jp", center: { lat: 33.748, lng: 132.7906 } };
+// 高知県
+const KOCHI_MUROTO_SOURCE = { key: "kochi_muroto", label: "室戸市", baseUrl: "https://www.city.muroto.kochi.jp", center: { lat: 33.2899, lng: 134.1527 } };
+
+// ========== 九州・沖縄 ==========
+// 福岡県
+const FUKUOKA_FUKUTSU_SOURCE = { key: "fukuoka_fukutsu", label: "福津市", baseUrl: "https://www.city.fukutsu.lg.jp", center: { lat: 33.7699, lng: 130.4882 } };
+const FUKUOKA_SHINGU_FK_SOURCE = { key: "fukuoka_shingu_fk", label: "新宮町", baseUrl: "https://www.town.shingu.fukuoka.jp", center: { lat: 33.7151, lng: 130.4448 } };
+const FUKUOKA_HIROKAWA_SOURCE = { key: "fukuoka_hirokawa", label: "広川町", baseUrl: "https://www.town.hirokawa.fukuoka.jp", center: { lat: 33.2467, lng: 130.5538 } };
+const FUKUOKA_KAWARA_SOURCE = { key: "fukuoka_kawara", label: "川崎町", baseUrl: "https://www.town-kawara.com", center: { lat: 33.5783, lng: 130.8506 } };
+// 長崎県
+const NAGASAKI_TSUSHIMA_SOURCE = { key: "nagasaki_tsushima", label: "対馬市", baseUrl: "https://www.city.tsushima.nagasaki.jp", center: { lat: 34.2044, lng: 129.2888 } };
+const NAGASAKI_IKI_SOURCE = { key: "nagasaki_iki", label: "壱岐市", baseUrl: "https://www.city.iki.nagasaki.jp", center: { lat: 33.749, lng: 129.6915 } };
+const NAGASAKI_SAIKAI_SOURCE = { key: "nagasaki_saikai", label: "西海市", baseUrl: "https://www.city.saikai.nagasaki.jp", center: { lat: 32.9558, lng: 129.6732 } };
+const NAGASAKI_TOGITSU_SOURCE = { key: "nagasaki_togitsu", label: "時津町", baseUrl: "https://www.town.togitsu.nagasaki.jp", center: { lat: 32.8283, lng: 129.8575 } };
+const NAGASAKI_HIGASHISONOGI_SOURCE = { key: "nagasaki_higashisonogi", label: "東彼杵町", baseUrl: "https://www.town.higashisonogi.lg.jp", center: { lat: 33.0767, lng: 129.9633 } };
+// 熊本県
+const KUMAMOTO_TAKAMORI_SOURCE = { key: "kumamoto_takamori", label: "高森町", baseUrl: "https://www.town.takamori.kumamoto.jp", center: { lat: 32.8191, lng: 131.1124 } };
+// 大分県
+const OITA_HITA_SOURCE = { key: "oita_hita", label: "日田市", baseUrl: "https://www.city.hita.oita.jp", center: { lat: 33.3214, lng: 130.9414 } };
+const OITA_TAKETA_SOURCE = { key: "oita_taketa", label: "竹田市", baseUrl: "https://www.city.taketa.oita.jp", center: { lat: 32.9692, lng: 131.3967 } };
+const OITA_KITSUKI_SOURCE = { key: "oita_kitsuki", label: "杵築市", baseUrl: "https://www.city.kitsuki.lg.jp", center: { lat: 33.4153, lng: 131.6171 } };
+const OITA_KUSU_SOURCE = { key: "oita_kusu", label: "玖珠町", baseUrl: "https://www.town.kusu.oita.jp", center: { lat: 33.2817, lng: 131.149 } };
+// 宮崎県
+const MIYAZAKI_MIYAZAKI_SOURCE = { key: "miyazaki_miyazaki", label: "宮崎市", baseUrl: "https://www.city.miyazaki.miyazaki.jp", center: { lat: 31.9111, lng: 131.4239 } };
+const MIYAZAKI_NICHINAN_SOURCE = { key: "miyazaki_nichinan", label: "日南市", baseUrl: "https://www.city.nichinan.lg.jp", center: { lat: 31.6028, lng: 131.3817 } };
+const MIYAZAKI_KIJO_SOURCE = { key: "miyazaki_kijo", label: "木城町", baseUrl: "https://www.town.kijo.lg.jp", center: { lat: 32.1229, lng: 131.4592 } };
+const MIYAZAKI_KADOGAWA_SOURCE = { key: "miyazaki_kadogawa", label: "門川町", baseUrl: "https://www.town.kadogawa.lg.jp", center: { lat: 32.4693, lng: 131.6364 } };
+const MIYAZAKI_MIYAKOJIMA_SOURCE = { key: "miyazaki_miyakojima", label: "都城市", baseUrl: "https://www.city.miyakonojo.miyazaki.jp", center: { lat: 31.7283, lng: 131.0653 } };
+// 鹿児島県
+const KAGOSHIMA_SATSUMASENDAI_SOURCE = { key: "kagoshima_satsumasendai", label: "薩摩川内市", baseUrl: "https://www.city.satsumasendai.lg.jp", center: { lat: 31.8132, lng: 130.3042 } };
+const KAGOSHIMA_MINAMIKYUSHU_SOURCE = { key: "kagoshima_minamikyushu", label: "南九州市", baseUrl: "https://www.city.minamikyushu.lg.jp", center: { lat: 31.3802, lng: 130.4393 } };
+const KAGOSHIMA_SATSUMA_SOURCE = { key: "kagoshima_satsuma", label: "さつま町", baseUrl: "https://www.satsuma-net.jp", center: { lat: 31.8992, lng: 130.4589 } };
+const KAGOSHIMA_KIMOTSUKI_SOURCE = { key: "kagoshima_kimotsuki", label: "肝付町", baseUrl: "https://www.town.kimotsuki.lg.jp", center: { lat: 31.3417, lng: 131.0853 } };
+// 沖縄県
+const OKINAWA_YOMITAN_SOURCE = { key: "okinawa_yomitan", label: "読谷村", baseUrl: "https://www.vill.yomitan.okinawa.jp", center: { lat: 26.395, lng: 127.7442 } };
+const OKINAWA_KITANAKAGUSUKU_SOURCE = { key: "okinawa_kitanakagusuku", label: "北中城村", baseUrl: "https://www.vill.kitanakagusuku.lg.jp", center: { lat: 26.3367, lng: 127.7892 } };
+const OKINAWA_IE_SOURCE = { key: "okinawa_ie", label: "伊江村", baseUrl: "https://www.iejima.org", center: { lat: 26.71, lng: 127.8063 } };
+
 // Ibaraki KNOWN_FACILITIES
 const KNOWN_MITO_FACILITIES = {
   "水戸市総合教育研究所": "水戸市笠原町978-5",
@@ -4602,4 +5036,14 @@ module.exports = {
   YOKOTE_SOURCE, YURIHONJYO_SOURCE, OGA_SOURCE, KOSAKA_SOURCE, HACHIROGATA_SOURCE,
   YONEZAWA_SOURCE, SAKATA_SOURCE, SHINJO_SOURCE, NAGAI_SOURCE, NAKAYAMA_YM_SOURCE, KAHOKU_SOURCE, ASAHI_YM_SOURCE, KANEYAMA_YM_SOURCE, MAMUROGAWA_SOURCE, OKURA_SOURCE, SHIRATAKA_SOURCE,
   FUKUSHIMA_CITY_SOURCE, SOMA_SOURCE, MINAMISOMA_SOURCE, OTAMA_SOURCE, SHIMOGO_SOURCE, AIZUMISATO_SOURCE, FURUDONO_SOURCE,
+  // 北海道
+  HOKKAIDO_IWAMIZAWA_SOURCE, HOKKAIDO_SHIBETSU_SOURCE, HOKKAIDO_CHITOSE_SOURCE, HOKKAIDO_MORI_SOURCE, HOKKAIDO_OZORA_SOURCE, HOKKAIDO_TSUBETSU_SOURCE, HOKKAIDO_TAIKI_SOURCE, HOKKAIDO_NISEKO_SOURCE, HOKKAIDO_SHIRAOI_SOURCE, HOKKAIDO_HIGASHIKAGURA_SOURCE, HOKKAIDO_OTOINEPPU_SOURCE, HOKKAIDO_YUBETSU_SOURCE, HOKKAIDO_NAKASATSUNAI_SOURCE, HOKKAIDO_SARABETSU_SOURCE, HOKKAIDO_HONBETSU_SOURCE, HOKKAIDO_HIROO_SOURCE, HOKKAIDO_SHIKAOI_SOURCE, HOKKAIDO_AKKESHI_SOURCE, HOKKAIDO_BETSUKAI_SOURCE, HOKKAIDO_NAKASHIBETSU_SOURCE, HOKKAIDO_SHIBETSU_CHO_SOURCE, HOKKAIDO_SHINTOKU_SOURCE, HOKKAIDO_KUTCHAN_SOURCE, HOKKAIDO_HABORO_SOURCE,
+  // 中部
+  NIIGATA_SANJO_SOURCE, NIIGATA_KASHIWAZAKI_SOURCE, NIIGATA_TSUBAME_SOURCE, NIIGATA_AGANO_SOURCE, NIIGATA_SEIRO_SOURCE, NIIGATA_YUZAWA_SOURCE, NIIGATA_KAMO_SOURCE, NIIGATA_MINAMIUONUMA_SOURCE, NIIGATA_TAGAMI_SOURCE, TOYAMA_HIMI_SOURCE, TOYAMA_NAMERIKAWA_SOURCE, TOYAMA_KUROBE_SOURCE, TOYAMA_NYUZEN_SOURCE, TOYAMA_ASAHI_TY_SOURCE, ISHIKAWA_KANAZAWA_SOURCE, ISHIKAWA_KOMATSU_SOURCE, ISHIKAWA_KAGA_SOURCE, ISHIKAWA_NAKANOTO_SOURCE, FUKUI_SABAE_SOURCE, YAMANASHI_CHUO_SOURCE, YAMANASHI_MINAMIALPS_SOURCE, YAMANASHI_HOKUTO_SOURCE, NAGANO_SUZAKA_SOURCE, NAGANO_KOMAGANE_SOURCE, NAGANO_CHIKUMA_SOURCE, NAGANO_IIJIMACHO_SOURCE, NAGANO_MATSUKAWA_SOURCE, NAGANO_IKEDA_SOURCE, GIFU_OGAKI_SOURCE, GIFU_SEKI_SOURCE, GIFU_ENA_SOURCE, GIFU_MOTOSU_SOURCE, GIFU_KAIZU_SOURCE, GIFU_ANPACHI_SOURCE, GIFU_IBIGAWA_SOURCE, GIFU_ONO_GF_SOURCE, SHIZUOKA_FUJIEDA_SOURCE, SHIZUOKA_SUSONO_SOURCE, SHIZUOKA_KOSAI_SOURCE, SHIZUOKA_IZU_SOURCE, SHIZUOKA_OMAEZAKI_SOURCE, SHIZUOKA_NAGAIZUMI_SOURCE, SHIZUOKA_KANNAMI_SOURCE, AICHI_TOYOKAWA_SOURCE, AICHI_HEKINAN_SOURCE, AICHI_SHINSHIRO_SOURCE, AICHI_CHIRYU_SOURCE, AICHI_INAZAWA_SOURCE, AICHI_IWAKURA_SOURCE, AICHI_NISSHIN_SOURCE, AICHI_AISAI_SOURCE, AICHI_MIYOSHI_SOURCE, AICHI_NAGAKUTE_SOURCE, AICHI_TOGO_SOURCE, AICHI_AGUI_SOURCE, AICHI_HIGASHIURA_SOURCE,
+  // 近畿
+  MIE_TOBA_SOURCE, MIE_OWASE_SOURCE, MIE_IGA_SOURCE, MIE_KISOSAKI_SOURCE, MIE_TAKI_SOURCE, MIE_MEIWA_SOURCE, SHIGA_HIKONE_SOURCE, SHIGA_NAGAHAMA_SOURCE, SHIGA_OMIHACHIMAN_SOURCE, SHIGA_KOKA_SOURCE, SHIGA_MAIBARA_SOURCE, SHIGA_AISHO_SOURCE, SHIGA_HINO_SOURCE, SHIGA_TOYOSATO_SOURCE, KYOTO_MAIZURU_SOURCE, KYOTO_AYABE_SOURCE, KYOTO_JOYO_SOURCE, KYOTO_NAGAOKAKYO_SOURCE, KYOTO_YAWATA_SOURCE, KYOTO_SEIKA_SOURCE, KYOTO_KUMIYAMA_SOURCE, KYOTO_MINAMIYAMASHIRO_SOURCE, OSAKA_IKEDA_SOURCE, OSAKA_IZUMIOTSU_SOURCE, OSAKA_KAIZUKA_SOURCE, OSAKA_MORIGUCHI_SOURCE, OSAKA_IBARAKI_SOURCE, OSAKA_HIRAKATA_SOURCE, OSAKA_NEYAGAWA_SOURCE, OSAKA_IZUMI_SOURCE, OSAKA_HABIKINO_SOURCE, OSAKA_FUJIIDERA_SOURCE, OSAKA_HIGASHIOSAKA_SOURCE, OSAKA_SENNAN_SOURCE, OSAKA_HANNAN_SOURCE, OSAKA_KUMATORI_SOURCE, OSAKA_TADAOKA_SOURCE, OSAKA_TAISHI_SOURCE, HYOGO_HIMEJI_SOURCE, HYOGO_ITAMI_SOURCE, HYOGO_KAKOGAWA_SOURCE, HYOGO_TATSUNO_SOURCE, HYOGO_ONO_SOURCE, HYOGO_SHISO_SOURCE, HYOGO_KATO_SOURCE, HYOGO_INAGAWA_SOURCE, HYOGO_INAMI_SOURCE, HYOGO_FUKUSAKI_SOURCE, HYOGO_KAMIKAWA_SOURCE, NARA_TENRI_SOURCE, NARA_KASHIHARA_SOURCE, NARA_GOJO_SOURCE, NARA_GOSE_SOURCE, NARA_IKOMA_SOURCE, NARA_IKARUGA_SOURCE, NARA_ANDO_SOURCE, NARA_KAWANISHI_NR_SOURCE, NARA_TAWARAMOTO_SOURCE, NARA_OJI_SOURCE, NARA_KORYO_SOURCE, NARA_ASUKA_SOURCE, NARA_TOTSUKAWA_SOURCE, NARA_SHIMOICHI_SOURCE, WAKAYAMA_HASHIMOTO_SOURCE, WAKAYAMA_INAMI_WK_SOURCE,
+  // 中国・四国
+  TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, YAMAGUCHI_HIKARI_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, KOCHI_MUROTO_SOURCE,
+  // 九州・沖縄
+  FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE,
 };

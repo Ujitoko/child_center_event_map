@@ -1,0 +1,340 @@
+#!/usr/bin/env node
+/**
+ * 九州7県 + 沖縄 全自治体 CMS自動probe
+ */
+
+const KYUSHU = [
+  // ========== 福岡県 (60) ==========
+  { pref: "福岡県", key: "fukuoka_kitakyushu", label: "北九州市", domain: "www.city.kitakyushu.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_fukuoka", label: "福岡市", domain: "www.city.fukuoka.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_omuta", label: "大牟田市", domain: "www.city.omuta.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kurume", label: "久留米市", domain: "www.city.kurume.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_nogata", label: "直方市", domain: "www.city.nogata.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_iizuka", label: "飯塚市", domain: "www.city.iizuka.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_tagawa", label: "田川市", domain: "www.city.tagawa.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_yanagawa", label: "柳川市", domain: "www.city.yanagawa.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_yame", label: "八女市", domain: "www.city.yame.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_chikugo", label: "筑後市", domain: "www.city.chikugo.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_okawa", label: "大川市", domain: "www.city.okawa.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_yukuhashi", label: "行橋市", domain: "www.city.yukuhashi.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_buzen", label: "豊前市", domain: "www.city.buzen.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_nakama", label: "中間市", domain: "www.city.nakama.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_ogori", label: "小郡市", domain: "www.city.ogori.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_chikushino", label: "筑紫野市", domain: "www.city.chikushino.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_kasuga", label: "春日市", domain: "www.city.kasuga.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_onojo", label: "大野城市", domain: "www.city.onojo.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_munakata", label: "宗像市", domain: "www.city.munakata.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_dazaifu", label: "太宰府市", domain: "www.city.dazaifu.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_koga", label: "古賀市", domain: "www.city.koga.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_fukutsu", label: "福津市", domain: "www.city.fukutsu.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_ukiha", label: "うきは市", domain: "www.city.ukiha.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_miyawaka", label: "宮若市", domain: "www.city.miyawaka.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kama", label: "嘉麻市", domain: "www.city.kama.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_asakura", label: "朝倉市", domain: "www.city.asakura.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_miyama", label: "みやま市", domain: "www.city.miyama.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_itoshima", label: "糸島市", domain: "www.city.itoshima.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_nakagawa", label: "那珂川市", domain: "www.city.nakagawa.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_umi", label: "宇美町", domain: "www.town.umi.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_sasaguri", label: "篠栗町", domain: "www.town.sasaguri.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_shime", label: "志免町", domain: "www.town.shime.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_sue", label: "須恵町", domain: "www.town.sue.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_shingu_fk", label: "新宮町", domain: "www.town.shingu.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_hisayama", label: "久山町", domain: "www.town.hisayama.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_kasuya", label: "粕屋町", domain: "www.town.kasuya.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_ashiya_fk", label: "芦屋町", domain: "www.town.ashiya.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_mizumaki", label: "水巻町", domain: "www.town.mizumaki.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_okagaki", label: "岡垣町", domain: "www.town.okagaki.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_onga", label: "遠賀町", domain: "www.town.onga.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kotake", label: "小竹町", domain: "www.town.kotake.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kurate", label: "鞍手町", domain: "www.town.kurate.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_keisen", label: "桂川町", domain: "www.town.keisen.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_chikuzen", label: "筑前町", domain: "www.town.chikuzen.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_toho", label: "東峰村", domain: "www.vill.toho.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_tachiarai", label: "大刀洗町", domain: "www.town.tachiarai.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_oki", label: "大木町", domain: "www.town.oki.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_hirokawa", label: "広川町", domain: "www.town.hirokawa.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_kawara", label: "香春町", domain: "www.town.kawara.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_soeda", label: "添田町", domain: "www.town.soeda.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_itoda", label: "糸田町", domain: "www.town.itoda.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kawasaki_fk", label: "川崎町", domain: "www.town-kawasaki.com" },
+  { pref: "福岡県", key: "fukuoka_oto", label: "大任町", domain: "www.town.oto.fukuoka.jp" },
+  { pref: "福岡県", key: "fukuoka_akamura", label: "赤村", domain: "www.akamura.net" },
+  { pref: "福岡県", key: "fukuoka_miyako", label: "みやこ町", domain: "www.town.miyako.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_yoshitomi", label: "吉富町", domain: "www.town.yoshitomi.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_kanda", label: "苅田町", domain: "www.town.kanda.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_chikusan", label: "築上町", domain: "www.town.chikusan.lg.jp" },
+  { pref: "福岡県", key: "fukuoka_shinyoshitomi", label: "上毛町", domain: "www.town.koge.lg.jp" },
+
+  // ========== 佐賀県 (20) ==========
+  { pref: "佐賀県", key: "saga_saga", label: "佐賀市", domain: "www.city.saga.lg.jp" },
+  { pref: "佐賀県", key: "saga_karatsu", label: "唐津市", domain: "www.city.karatsu.lg.jp" },
+  { pref: "佐賀県", key: "saga_tosu", label: "鳥栖市", domain: "www.city.tosu.lg.jp" },
+  { pref: "佐賀県", key: "saga_taku", label: "多久市", domain: "www.city.taku.lg.jp" },
+  { pref: "佐賀県", key: "saga_imari", label: "伊万里市", domain: "www.city.imari.saga.jp" },
+  { pref: "佐賀県", key: "saga_takeo", label: "武雄市", domain: "www.city.takeo.lg.jp" },
+  { pref: "佐賀県", key: "saga_kashima", label: "鹿島市", domain: "www.city.saga-kashima.lg.jp" },
+  { pref: "佐賀県", key: "saga_ogi", label: "小城市", domain: "www.city.ogi.lg.jp" },
+  { pref: "佐賀県", key: "saga_ureshino", label: "嬉野市", domain: "www.city.ureshino.lg.jp" },
+  { pref: "佐賀県", key: "saga_kanzaki", label: "神埼市", domain: "www.city.kanzaki.saga.jp" },
+  { pref: "佐賀県", key: "saga_yoshinogari", label: "吉野ヶ里町", domain: "www.town.yoshinogari.saga.jp" },
+  { pref: "佐賀県", key: "saga_kiyama", label: "基山町", domain: "www.town.kiyama.lg.jp" },
+  { pref: "佐賀県", key: "saga_kamimine", label: "上峰町", domain: "www.town.kamimine.lg.jp" },
+  { pref: "佐賀県", key: "saga_miyaki", label: "みやき町", domain: "www.town.miyaki.lg.jp" },
+  { pref: "佐賀県", key: "saga_genkai", label: "玄海町", domain: "www.town.genkai.saga.jp" },
+  { pref: "佐賀県", key: "saga_arita", label: "有田町", domain: "www.town.arita.lg.jp" },
+  { pref: "佐賀県", key: "saga_omachi", label: "大町町", domain: "www.town.omachi.lg.jp" },
+  { pref: "佐賀県", key: "saga_kohoku", label: "江北町", domain: "www.town.kohoku.saga.jp" },
+  { pref: "佐賀県", key: "saga_shiroishi", label: "白石町", domain: "www.town.shiroishi.lg.jp" },
+  { pref: "佐賀県", key: "saga_tara", label: "太良町", domain: "www.town.tara.lg.jp" },
+
+  // ========== 長崎県 (21) ==========
+  { pref: "長崎県", key: "nagasaki_nagasaki", label: "長崎市", domain: "www.city.nagasaki.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_sasebo", label: "佐世保市", domain: "www.city.sasebo.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_shimabara", label: "島原市", domain: "www.city.shimabara.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_isahaya", label: "諫早市", domain: "www.city.isahaya.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_omura", label: "大村市", domain: "www.city.omura.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_hirado", label: "平戸市", domain: "www.city.hirado.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_matsuura", label: "松浦市", domain: "www.city.matsuura.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_tsushima", label: "対馬市", domain: "www.city.tsushima.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_iki", label: "壱岐市", domain: "www.city.iki.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_goto", label: "五島市", domain: "www.city.goto.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_saikai", label: "西海市", domain: "www.city.saikai.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_unzen", label: "雲仙市", domain: "www.city.unzen.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_minamishimabara", label: "南島原市", domain: "www.city.minamishimabara.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_nagayo", label: "長与町", domain: "www.town.nagayo.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_togitsu", label: "時津町", domain: "www.town.togitsu.nagasaki.jp" },
+  { pref: "長崎県", key: "nagasaki_higashisonogi", label: "東彼杵町", domain: "www.town.higashisonogi.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_kawatana", label: "川棚町", domain: "www.town.kawatana.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_hasami", label: "波佐見町", domain: "www.town.hasami.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_ojika", label: "小値賀町", domain: "www.town.ojika.lg.jp" },
+  { pref: "長崎県", key: "nagasaki_shinkamigoto", label: "新上五島町", domain: "official.shinkamigoto.net" },
+  { pref: "長崎県", key: "nagasaki_saza", label: "佐々町", domain: "www.town.saza.nagasaki.jp" },
+
+  // ========== 熊本県 (45) ==========
+  { pref: "熊本県", key: "kumamoto_kumamoto", label: "熊本市", domain: "www.city.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_yatsushiro", label: "八代市", domain: "www.city.yatsushiro.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_hitoyoshi", label: "人吉市", domain: "www.city.hitoyoshi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_arao", label: "荒尾市", domain: "www.city.arao.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_tamana", label: "玉名市", domain: "www.city.tamana.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_yamaga", label: "山鹿市", domain: "www.city.yamaga.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_kikuchi", label: "菊池市", domain: "www.city.kikuchi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_uto", label: "宇土市", domain: "www.city.uto.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_uki", label: "宇城市", domain: "www.city.uki.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_aso", label: "阿蘇市", domain: "www.city.aso.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_amakusa", label: "天草市", domain: "www.city.amakusa.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_koshi", label: "合志市", domain: "www.city.koshi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_misato_km", label: "美里町", domain: "www.town.kumamoto-misato.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_tamana_cho", label: "玉東町", domain: "www.town.gyokuto.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_nankan", label: "南関町", domain: "www.town.nankan.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_nagasu", label: "長洲町", domain: "www.town.nagasu.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_nagomi", label: "和水町", domain: "www.town.nagomi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_ozu_km", label: "大津町", domain: "www.town.ozu.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_kikuyo", label: "菊陽町", domain: "www.town.kikuyo.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_minamioguni", label: "南小国町", domain: "www.town.minamioguni.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_oguni", label: "小国町", domain: "www.town.kumamoto-oguni.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_ubuyama", label: "産山村", domain: "www.ubuyama-v.jp" },
+  { pref: "熊本県", key: "kumamoto_takamori", label: "高森町", domain: "www.town.takamori.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_nishihara", label: "西原村", domain: "www.vill.nishihara.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_minamiaso", label: "南阿蘇村", domain: "www.vill.minamiaso.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_mifune", label: "御船町", domain: "www.town.mifune.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_kashima_km", label: "嘉島町", domain: "www.town.kashima.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_mashiki", label: "益城町", domain: "www.town.mashiki.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_kosa", label: "甲佐町", domain: "www.town.kosa.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_yamato", label: "山都町", domain: "www.town.kumamoto-yamato.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_hikawa", label: "氷川町", domain: "www.town.hikawa.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_ashikita", label: "芦北町", domain: "www.town.ashikita.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_tsunagi", label: "津奈木町", domain: "www.town.tsunagi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_nishiki", label: "錦町", domain: "www.town.nishiki.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_taragi", label: "多良木町", domain: "www.town.taragi.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_yunomae", label: "湯前町", domain: "www.town.yunomae.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_mizukami", label: "水上村", domain: "www.vill.mizukami.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_sagara", label: "相良村", domain: "www.vill.sagara.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_itsuki", label: "五木村", domain: "www.vill.itsuki.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_yamae", label: "山江村", domain: "www.vill.yamae.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_asagiri", label: "あさぎり町", domain: "www.asagiri-town.net" },
+  { pref: "熊本県", key: "kumamoto_reihoku", label: "苓北町", domain: "www.town.reihoku.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_kamiamakusa", label: "上天草市", domain: "www.city.kamiamakusa.kumamoto.jp" },
+  { pref: "熊本県", key: "kumamoto_minamata", label: "水俣市", domain: "www.city.minamata.lg.jp" },
+  { pref: "熊本県", key: "kumamoto_kamimashiki", label: "上益城郡", skip: true },
+
+  // ========== 大分県 (18) ==========
+  { pref: "大分県", key: "oita_oita", label: "大分市", domain: "www.city.oita.oita.jp" },
+  { pref: "大分県", key: "oita_beppu", label: "別府市", domain: "www.city.beppu.oita.jp" },
+  { pref: "大分県", key: "oita_nakatsu", label: "中津市", domain: "www.city-nakatsu.jp" },
+  { pref: "大分県", key: "oita_hita", label: "日田市", domain: "www.city.hita.oita.jp" },
+  { pref: "大分県", key: "oita_saiki", label: "佐伯市", domain: "www.city.saiki.oita.jp" },
+  { pref: "大分県", key: "oita_usuki", label: "臼杵市", domain: "www.city.usuki.oita.jp" },
+  { pref: "大分県", key: "oita_tsukumi", label: "津久見市", domain: "www.city.tsukumi.oita.jp" },
+  { pref: "大分県", key: "oita_taketa", label: "竹田市", domain: "www.city.taketa.oita.jp" },
+  { pref: "大分県", key: "oita_bungoono", label: "豊後大野市", domain: "www.bungo-ohno.jp" },
+  { pref: "大分県", key: "oita_yufu", label: "由布市", domain: "www.city.yufu.oita.jp" },
+  { pref: "大分県", key: "oita_kunisaki", label: "国東市", domain: "www.city.kunisaki.oita.jp" },
+  { pref: "大分県", key: "oita_kitsuki", label: "杵築市", domain: "www.city.kitsuki.lg.jp" },
+  { pref: "大分県", key: "oita_usa", label: "宇佐市", domain: "www.city.usa.oita.jp" },
+  { pref: "大分県", key: "oita_bungotakada", label: "豊後高田市", domain: "www.city.bungotakada.oita.jp" },
+  { pref: "大分県", key: "oita_himeshima", label: "姫島村", domain: "www.himeshima.jp" },
+  { pref: "大分県", key: "oita_hiji", label: "日出町", domain: "www.town.hiji.lg.jp" },
+  { pref: "大分県", key: "oita_kokonoe", label: "九重町", domain: "www.town.kokonoe.oita.jp" },
+  { pref: "大分県", key: "oita_kusu", label: "玖珠町", domain: "www.town.kusu.oita.jp" },
+
+  // ========== 宮崎県 (26) ==========
+  { pref: "宮崎県", key: "miyazaki_miyazaki", label: "宮崎市", domain: "www.city.miyazaki.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_miyakonojo", label: "都城市", domain: "www.city.miyakonojo.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_nobeoka", label: "延岡市", domain: "www.city.nobeoka.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_nichinan", label: "日南市", domain: "www.city.nichinan.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_kobayashi", label: "小林市", domain: "www.city.kobayashi.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_hyuga", label: "日向市", domain: "www.city.hyuga.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_kushima", label: "串間市", domain: "www.city.kushima.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_saito", label: "西都市", domain: "www.city.saito.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_ebino", label: "えびの市", domain: "www.city.ebino.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_mimata", label: "三股町", domain: "www.town.mimata.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_takaharu", label: "高原町", domain: "www.town.takaharu.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_kunitomi", label: "国富町", domain: "www.town.kunitomi.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_aya", label: "綾町", domain: "www.town.aya.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_takanabe", label: "高鍋町", domain: "www.town.takanabe.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_shintomi", label: "新富町", domain: "www.town.shintomi.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_nishimera", label: "西米良村", domain: "www.vill.nishimera.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_kijo", label: "木城町", domain: "www.town.kijo.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_kawaminami", label: "川南町", domain: "www.town.kawaminami.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_tsuno", label: "都農町", domain: "www.town.tsuno.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_kadogawa", label: "門川町", domain: "www.town.kadogawa.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_morotsuka", label: "諸塚村", domain: "www.vill.morotsuka.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_shiiba", label: "椎葉村", domain: "www.vill.shiiba.miyazaki.jp" },
+  { pref: "宮崎県", key: "miyazaki_misato_mz", label: "美郷町", domain: "www.town.miyazaki-misato.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_takachiho", label: "高千穂町", domain: "www.town-takachiho.jp" },
+  { pref: "宮崎県", key: "miyazaki_hinokage", label: "日之影町", domain: "www.town.hinokage.lg.jp" },
+  { pref: "宮崎県", key: "miyazaki_gokase", label: "五ヶ瀬町", domain: "www.town.gokase.miyazaki.jp" },
+
+  // ========== 鹿児島県 (43) ==========
+  { pref: "鹿児島県", key: "kagoshima_kagoshima", label: "鹿児島市", domain: "www.city.kagoshima.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_kanoya", label: "鹿屋市", domain: "www.city.kanoya.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_makurazaki", label: "枕崎市", domain: "www.city.makurazaki.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_akune", label: "阿久根市", domain: "www.city.akune.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_izumi", label: "出水市", domain: "www.city.izumi.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_ibusuki", label: "指宿市", domain: "www.city.ibusuki.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_nishinoomote", label: "西之表市", domain: "www.city.nishinoomote.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_tarumizu", label: "垂水市", domain: "www.city.tarumizu.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_satsumasendai", label: "薩摩川内市", domain: "www.city.satsumasendai.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_hioki", label: "日置市", domain: "www.city.hioki.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_soo", label: "曽於市", domain: "www.city.soo.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_kirishima", label: "霧島市", domain: "www.city-kirishima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_ichikikushikino", label: "いちき串木野市", domain: "www.city.ichikikushikino.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_minamisatsuma", label: "南さつま市", domain: "www.city.minamisatsuma.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_shibushi", label: "志布志市", domain: "www.city.shibushi.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_amami", label: "奄美市", domain: "www.city.amami.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_minamikyushu", label: "南九州市", domain: "www.city.minamikyushu.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_isa", label: "伊佐市", domain: "www.city.isa.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_aira", label: "姶良市", domain: "www.city.aira.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_satsuma", label: "さつま町", domain: "www.satsuma-net.jp" },
+  { pref: "鹿児島県", key: "kagoshima_nagashima", label: "長島町", domain: "www.town.nagashima.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_yusui", label: "湧水町", domain: "www.town.yusui.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_osaki", label: "大崎町", domain: "www.town.kagoshima-osaki.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_higashikushira", label: "東串良町", domain: "www.town.higashikushira.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_kinko", label: "錦江町", domain: "www.town.kinko.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_minamiosumi", label: "南大隅町", domain: "www.town.minamiosumi.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_kimotsuki", label: "肝付町", domain: "kimotsuki-town.jp" },
+  { pref: "鹿児島県", key: "kagoshima_nakatane", label: "中種子町", domain: "www.town.nakatane.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_minamitane", label: "南種子町", domain: "www.town.minamitane.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_yakushima", label: "屋久島町", domain: "www.town.yakushima.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_setouchi", label: "瀬戸内町", domain: "www.town.setouchi.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_tatsugo", label: "龍郷町", domain: "www.town.tatsugo.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_uken", label: "宇検村", domain: "www.vill.uken.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_yamato_ks", label: "大和村", domain: "www.vill.yamato.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_china", label: "知名町", domain: "www.town.china.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_wadomari", label: "和泊町", domain: "www.town.wadomari.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_yoron", label: "与論町", domain: "www.yoron.jp" },
+  { pref: "鹿児島県", key: "kagoshima_tokunoshima", label: "徳之島町", domain: "www.town.tokunoshima.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_amagi", label: "天城町", domain: "www.town.amagi.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_isen", label: "伊仙町", domain: "www.town.isen.kagoshima.jp" },
+  { pref: "鹿児島県", key: "kagoshima_kikai", label: "喜界町", domain: "www.town.kikai.lg.jp" },
+  { pref: "鹿児島県", key: "kagoshima_toshima", label: "十島村", domain: "www.tokara.jp" },
+  { pref: "鹿児島県", key: "kagoshima_mishima", label: "三島村", domain: "mishimamura.com" },
+
+  // ========== 沖縄県 (41) ==========
+  { pref: "沖縄県", key: "okinawa_naha", label: "那覇市", domain: "www.city.naha.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_ginowan", label: "宜野湾市", domain: "www.city.ginowan.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_ishigaki", label: "石垣市", domain: "www.city.ishigaki.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_urasoe", label: "浦添市", domain: "www.city.urasoe.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_nago", label: "名護市", domain: "www.city.nago.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_itoman", label: "糸満市", domain: "www.city.itoman.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_okinawa", label: "沖縄市", domain: "www.city.okinawa.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_tomigusuku", label: "豊見城市", domain: "www.city.tomigusuku.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_uruma", label: "うるま市", domain: "www.city.uruma.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_miyakojima", label: "宮古島市", domain: "www.city.miyakojima.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_nanjo", label: "南城市", domain: "www.city.nanjo.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_kunigami", label: "国頭村", domain: "www.vill.kunigami.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_ogimi", label: "大宜味村", domain: "www.vill.ogimi.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_higashi", label: "東村", domain: "www.vill.higashi.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_nakijin", label: "今帰仁村", domain: "www.nakijin.jp" },
+  { pref: "沖縄県", key: "okinawa_motobu", label: "本部町", domain: "www.town.motobu.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_onna", label: "恩納村", domain: "www.vill.onna.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_ginoza", label: "宜野座村", domain: "www.vill.ginoza.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_kin", label: "金武町", domain: "www.town.kin.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_ie", label: "伊江村", domain: "www.iejima.org" },
+  { pref: "沖縄県", key: "okinawa_yomitan", label: "読谷村", domain: "www.vill.yomitan.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_kadena", label: "嘉手納町", domain: "www.town.kadena.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_chatan", label: "北谷町", domain: "www.chatan.jp" },
+  { pref: "沖縄県", key: "okinawa_kitanakagusuku", label: "北中城村", domain: "www.vill.kitanakagusuku.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_nakagusuku", label: "中城村", domain: "www.vill.nakagusuku.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_nishihara", label: "西原町", domain: "www.town.nishihara.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_yonabaru", label: "与那原町", domain: "www.town.yonabaru.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_haebaru", label: "南風原町", domain: "www.town.haebaru.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_tokashiki", label: "渡嘉敷村", domain: "www.vill.tokashiki.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_zamami", label: "座間味村", domain: "www.vill.zamami.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_aguni", label: "粟国村", domain: "www.vill.aguni.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_tonaki", label: "渡名喜村", domain: "www.vill.tonaki.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_kumejima", label: "久米島町", domain: "www.town.kumejima.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_yaese", label: "八重瀬町", domain: "www.town.yaese.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_tarama", label: "多良間村", domain: "www.vill.tarama.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_taketomi", label: "竹富町", domain: "www.town.taketomi.lg.jp" },
+  { pref: "沖縄県", key: "okinawa_yonaguni", label: "与那国町", domain: "www.town.yonaguni.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_minami_daito", label: "南大東村", domain: "www.vill.minamidaito.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_kita_daito", label: "北大東村", domain: "www.vill.kitadaito.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_iheya", label: "伊平屋村", domain: "www.vill.iheya.okinawa.jp" },
+  { pref: "沖縄県", key: "okinawa_izena", label: "伊是名村", domain: "www.vill.izena.okinawa.jp" },
+];
+
+const ACTIVE = KYUSHU.filter(m => !m.skip);
+
+async function fetchWithTimeout(url, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }, signal: controller.signal, redirect: "follow" });
+    clearTimeout(timer); return res;
+  } catch (e) { clearTimeout(timer); return { ok: false, status: 0, text: async () => "", error: e.message }; }
+}
+
+async function probeOne(muni) {
+  const results = { key: muni.key, label: muni.label, pref: muni.pref, hits: [] };
+  const base = `https://${muni.domain}`;
+  const now = new Date();
+  const ym = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}`;
+
+  try { const res = await fetchWithTimeout(`${base}/calendar.json`); if (res.ok) { const text = await res.text(); if (text.startsWith("[") || text.startsWith("{")) { const data = JSON.parse(text); results.hits.push({ type: "calendar.json", url: `${base}/calendar.json`, count: Array.isArray(data) ? data.length : 0 }); } } } catch {}
+  for (const path of [`/cal.php?ym=${ym}`, `/cgi/cal.php?ym=${ym}`]) { try { const res = await fetchWithTimeout(`${base}${path}`); if (res.ok) { const text = await res.text(); if (text.includes("calendarlist") || text.includes("calendar_day") || text.includes("<table")) { results.hits.push({ type: "cal.php", url: `${base}${path}`, eventCount: (text.match(/<a\s+href=/gi) || []).length }); } } } catch {} }
+  for (const path of [`/event/kosodate/calendar/list_calendar${ym}.html`, `/event/kosodate/calendar/list_calendar.html`, `/event/calendar/list_calendar${ym}.html`, `/event/list_calendar${ym}.html`]) { try { const res = await fetchWithTimeout(`${base}${path}`); if (res.ok) { const text = await res.text(); if (text.includes("calendarlist") || text.includes("calendar_day")) { results.hits.push({ type: "list_calendar", url: `${base}${path}`, eventCount: (text.match(/<a\s+href=/gi) || []).length }); break; } } } catch {} }
+  for (const path of [`/event/${ym}.html`, `/event2/${ym}.html`]) { try { const res = await fetchWithTimeout(`${base}${path}`); if (res.ok) { const text = await res.text(); if (text.includes("event_day") || text.includes("calendar") || text.includes("イベント")) { results.hits.push({ type: "municipal-calendar", url: `${base}${path}`, eventCount: (text.match(/<a\s+href=/gi) || []).length }); break; } } } catch {} }
+  try { const res = await fetchWithTimeout(`${base}/wp-json/wp/v2/posts?per_page=5`); if (res.ok) { const text = await res.text(); if (text.startsWith("[")) { results.hits.push({ type: "wordpress", url: `${base}/wp-json/wp/v2/posts`, count: JSON.parse(text).length }); } } } catch {}
+  for (const path of ["/calendar/event_j.js", "/event_j.js"]) { try { const res = await fetchWithTimeout(`${base}${path}`); if (res.ok) { const text = await res.text(); if (text.includes("eventlist") || text.includes("var ")) { results.hits.push({ type: "event_j.js", url: `${base}${path}` }); break; } } } catch {} }
+
+  return results;
+}
+
+async function main() {
+  console.log(`九州・沖縄8県 CMS probe: ${ACTIVE.length} municipalities`);
+  console.log("=".repeat(60));
+  const BATCH = 10; const allResults = [];
+  for (let i = 0; i < ACTIVE.length; i += BATCH) {
+    const batch = ACTIVE.slice(i, i + BATCH);
+    const batchResults = await Promise.all(batch.map(m => probeOne(m)));
+    allResults.push(...batchResults);
+    for (const r of batchResults) { if (r.hits.length > 0) { console.log(`✓ ${r.pref} ${r.label} (${r.key})`); for (const h of r.hits) console.log(`  ${h.type}: ${h.url} ${h.count != null ? `(${h.count} entries)` : ""} ${h.eventCount != null ? `(${h.eventCount} links)` : ""}`); } }
+  }
+  console.log("\n" + "=".repeat(60)); console.log("SUMMARY");
+  const byType = {};
+  for (const r of allResults) for (const h of r.hits) { if (!byType[h.type]) byType[h.type] = []; byType[h.type].push({ ...r, hit: h }); }
+  for (const [type, entries] of Object.entries(byType)) { console.log(`\n${type} (${entries.length} hits):`); for (const e of entries) console.log(`  ${e.pref} ${e.label}: ${e.hit.url} ${e.hit.count != null ? `(${e.hit.count})` : ""} ${e.hit.eventCount != null ? `(${e.hit.eventCount} links)` : ""}`); }
+  console.log(`\nTotal: ${allResults.filter(r => r.hits.length > 0).length}/${ACTIVE.length} municipalities with at least one CMS pattern`);
+}
+main().catch(console.error);

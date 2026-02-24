@@ -98,7 +98,24 @@ function parsePlace2(raw, cityLabel) {
  * @param {string} cityLabel - 市名
  * @param {Object} knownFacilities - 既知施設マップ
  */
-function detectPrefecture(cityLabel) {
+const PREF_DOMAIN_MAP = {
+  hokkaido: "北海道", tokyo: "東京都",
+  aomori: "青森県", iwate: "岩手県", miyagi: "宮城県", akita: "秋田県", yamagata: "山形県", fukushima: "福島県",
+  ibaraki: "茨城県", tochigi: "栃木県", gunma: "群馬県", saitama: "埼玉県", chiba: "千葉県", kanagawa: "神奈川県",
+  niigata: "新潟県", toyama: "富山県", ishikawa: "石川県", fukui: "福井県", yamanashi: "山梨県", nagano: "長野県", gifu: "岐阜県", shizuoka: "静岡県", aichi: "愛知県",
+  mie: "三重県", shiga: "滋賀県", kyoto: "京都府", osaka: "大阪府", hyogo: "兵庫県", nara: "奈良県", wakayama: "和歌山県",
+  tottori: "鳥取県", shimane: "島根県", okayama: "岡山県", hiroshima: "広島県", yamaguchi: "山口県",
+  tokushima: "徳島県", kagawa: "香川県", ehime: "愛媛県", kochi: "高知県",
+  fukuoka: "福岡県", saga: "佐賀県", nagasaki: "長崎県", kumamoto: "熊本県", oita: "大分県", miyazaki: "宮崎県", kagoshima: "鹿児島県", okinawa: "沖縄県",
+};
+const PREF_KEY_RE = new RegExp("^(" + Object.keys(PREF_DOMAIN_MAP).join("|") + ")_");
+function detectPrefecture(cityLabel, sourceKey) {
+  // key-prefix detection (全国対応)
+  if (sourceKey) {
+    const km = sourceKey.match(PREF_KEY_RE);
+    if (km) return PREF_DOMAIN_MAP[km[1]] || "東京都";
+  }
+  // 既存の市名ベース判定 (関東+東北)
   if (/^(横浜市|川崎市|相模原市|海老名市|鎌倉市|横須賀市|茅ヶ崎市|座間市|逗子市|大和市|平塚市|小田原市|秦野市|綾瀬市|厚木市|伊勢原市|南足柄市)/.test(cityLabel)) return "神奈川県";
   if (/^(千葉市|船橋市|松戸市|市川市|柏市|市原市|八千代市|流山市|習志野市|浦安市|野田市|成田市|木更津市|白井市|四街道市|袖ケ浦市|鎌ケ谷市|我孫子市|印西市|富津市|君津市|佐倉市|東金市|旭市|銚子市|香取市|匝瑳市|山武市|勝浦市|鴨川市|南房総市|富里市|大網白里市|いすみ市|茂原市)/.test(cityLabel)) return "千葉県";
   if (/^(東庄町|大多喜町|酒々井町|栄町|神崎町|多古町|九十九里町|芝山町|横芝光町|一宮町|白子町|長柄町|長南町|長生村|睦沢町|御宿町)/.test(cityLabel)) return "千葉県";
@@ -109,7 +126,6 @@ function detectPrefecture(cityLabel) {
   if (/^(宇都宮市|足利市|栃木市|佐野市|鹿沼市|日光市|小山市|真岡市|大田原市|矢板市|那須塩原市|さくら市|那須烏山市|下野市)/.test(cityLabel)) return "栃木県";
   if (/^(上三川町|益子町|茂木町|市貝町|芳賀町|壬生町|野木町|塩谷町|高根沢町|那須町|那珂川町)/.test(cityLabel)) return "栃木県";
   if (/^(水戸市|日立市|ひたちなか市|土浦市|つくば市|古河市|取手市|守谷市|神栖市|筑西市|石岡市|常総市|那珂市|坂東市|常陸太田市|結城市|つくばみらい市|稲敷市|桜川市|常陸大宮市|下妻市|鉾田市|行方市|潮来市|かすみがうら市|高萩市|鹿嶋市|笠間市|龍ケ崎市|東海村|城里町|境町|大子町|小美玉市|茨城町)/.test(cityLabel)) return "茨城県";
-  // 東北6県
   if (/^(青森市|弘前市|八戸市|黒石市|五所川原市|十和田市|三沢市|むつ市|つがる市|平川市)/.test(cityLabel)) return "青森県";
   if (/^(盛岡市|宮古市|大船渡市|花巻市|北上市|久慈市|遠野市|一関市|陸前高田市|釜石市|二戸市|八幡平市|奥州市|滝沢市)/.test(cityLabel)) return "岩手県";
   if (/^(仙台市|石巻市|塩竈市|気仙沼市|白石市|名取市|角田市|多賀城市|岩沼市|登米市|栗原市|東松島市|大崎市|富谷市)/.test(cityLabel)) return "宮城県";

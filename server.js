@@ -417,6 +417,16 @@ const {
   YOKOTE_SOURCE, YURIHONJYO_SOURCE, OGA_SOURCE, KOSAKA_SOURCE, HACHIROGATA_SOURCE,
   YONEZAWA_SOURCE, SAKATA_SOURCE, SHINJO_SOURCE, NAGAI_SOURCE, NAKAYAMA_YM_SOURCE, KAHOKU_SOURCE, ASAHI_YM_SOURCE, KANEYAMA_YM_SOURCE, MAMUROGAWA_SOURCE, OKURA_SOURCE, SHIRATAKA_SOURCE,
   FUKUSHIMA_CITY_SOURCE, SOMA_SOURCE, MINAMISOMA_SOURCE, OTAMA_SOURCE, SHIMOGO_SOURCE, AIZUMISATO_SOURCE, FURUDONO_SOURCE,
+  // 北海道
+  HOKKAIDO_IWAMIZAWA_SOURCE, HOKKAIDO_SHIBETSU_SOURCE, HOKKAIDO_CHITOSE_SOURCE, HOKKAIDO_MORI_SOURCE, HOKKAIDO_OZORA_SOURCE, HOKKAIDO_TSUBETSU_SOURCE, HOKKAIDO_TAIKI_SOURCE, HOKKAIDO_NISEKO_SOURCE, HOKKAIDO_SHIRAOI_SOURCE, HOKKAIDO_HIGASHIKAGURA_SOURCE, HOKKAIDO_OTOINEPPU_SOURCE, HOKKAIDO_YUBETSU_SOURCE, HOKKAIDO_NAKASATSUNAI_SOURCE, HOKKAIDO_SARABETSU_SOURCE, HOKKAIDO_HONBETSU_SOURCE, HOKKAIDO_HIROO_SOURCE, HOKKAIDO_SHIKAOI_SOURCE, HOKKAIDO_AKKESHI_SOURCE, HOKKAIDO_BETSUKAI_SOURCE, HOKKAIDO_NAKASHIBETSU_SOURCE, HOKKAIDO_SHIBETSU_CHO_SOURCE, HOKKAIDO_SHINTOKU_SOURCE, HOKKAIDO_KUTCHAN_SOURCE, HOKKAIDO_HABORO_SOURCE,
+  // 中部
+  NIIGATA_SANJO_SOURCE, NIIGATA_KASHIWAZAKI_SOURCE, NIIGATA_TSUBAME_SOURCE, NIIGATA_AGANO_SOURCE, NIIGATA_SEIRO_SOURCE, NIIGATA_YUZAWA_SOURCE, NIIGATA_KAMO_SOURCE, NIIGATA_MINAMIUONUMA_SOURCE, NIIGATA_TAGAMI_SOURCE, TOYAMA_HIMI_SOURCE, TOYAMA_NAMERIKAWA_SOURCE, TOYAMA_KUROBE_SOURCE, TOYAMA_NYUZEN_SOURCE, TOYAMA_ASAHI_TY_SOURCE, ISHIKAWA_KANAZAWA_SOURCE, ISHIKAWA_KOMATSU_SOURCE, ISHIKAWA_KAGA_SOURCE, ISHIKAWA_NAKANOTO_SOURCE, FUKUI_SABAE_SOURCE, YAMANASHI_CHUO_SOURCE, YAMANASHI_MINAMIALPS_SOURCE, YAMANASHI_HOKUTO_SOURCE, NAGANO_SUZAKA_SOURCE, NAGANO_KOMAGANE_SOURCE, NAGANO_CHIKUMA_SOURCE, NAGANO_IIJIMACHO_SOURCE, NAGANO_MATSUKAWA_SOURCE, NAGANO_IKEDA_SOURCE, GIFU_OGAKI_SOURCE, GIFU_SEKI_SOURCE, GIFU_ENA_SOURCE, GIFU_MOTOSU_SOURCE, GIFU_KAIZU_SOURCE, GIFU_ANPACHI_SOURCE, GIFU_IBIGAWA_SOURCE, GIFU_ONO_GF_SOURCE, SHIZUOKA_FUJIEDA_SOURCE, SHIZUOKA_SUSONO_SOURCE, SHIZUOKA_KOSAI_SOURCE, SHIZUOKA_IZU_SOURCE, SHIZUOKA_OMAEZAKI_SOURCE, SHIZUOKA_NAGAIZUMI_SOURCE, SHIZUOKA_KANNAMI_SOURCE, AICHI_TOYOKAWA_SOURCE, AICHI_HEKINAN_SOURCE, AICHI_SHINSHIRO_SOURCE, AICHI_CHIRYU_SOURCE, AICHI_INAZAWA_SOURCE, AICHI_IWAKURA_SOURCE, AICHI_NISSHIN_SOURCE, AICHI_AISAI_SOURCE, AICHI_MIYOSHI_SOURCE, AICHI_NAGAKUTE_SOURCE, AICHI_TOGO_SOURCE, AICHI_AGUI_SOURCE, AICHI_HIGASHIURA_SOURCE,
+  // 近畿
+  MIE_TOBA_SOURCE, MIE_OWASE_SOURCE, MIE_IGA_SOURCE, MIE_KISOSAKI_SOURCE, MIE_TAKI_SOURCE, MIE_MEIWA_SOURCE, SHIGA_HIKONE_SOURCE, SHIGA_NAGAHAMA_SOURCE, SHIGA_OMIHACHIMAN_SOURCE, SHIGA_KOKA_SOURCE, SHIGA_MAIBARA_SOURCE, SHIGA_AISHO_SOURCE, SHIGA_HINO_SOURCE, SHIGA_TOYOSATO_SOURCE, KYOTO_MAIZURU_SOURCE, KYOTO_AYABE_SOURCE, KYOTO_JOYO_SOURCE, KYOTO_NAGAOKAKYO_SOURCE, KYOTO_YAWATA_SOURCE, KYOTO_SEIKA_SOURCE, KYOTO_KUMIYAMA_SOURCE, KYOTO_MINAMIYAMASHIRO_SOURCE, OSAKA_IKEDA_SOURCE, OSAKA_IZUMIOTSU_SOURCE, OSAKA_KAIZUKA_SOURCE, OSAKA_MORIGUCHI_SOURCE, OSAKA_IBARAKI_SOURCE, OSAKA_HIRAKATA_SOURCE, OSAKA_NEYAGAWA_SOURCE, OSAKA_IZUMI_SOURCE, OSAKA_HABIKINO_SOURCE, OSAKA_FUJIIDERA_SOURCE, OSAKA_HIGASHIOSAKA_SOURCE, OSAKA_SENNAN_SOURCE, OSAKA_HANNAN_SOURCE, OSAKA_KUMATORI_SOURCE, OSAKA_TADAOKA_SOURCE, OSAKA_TAISHI_SOURCE, HYOGO_HIMEJI_SOURCE, HYOGO_ITAMI_SOURCE, HYOGO_KAKOGAWA_SOURCE, HYOGO_TATSUNO_SOURCE, HYOGO_ONO_SOURCE, HYOGO_SHISO_SOURCE, HYOGO_KATO_SOURCE, HYOGO_INAGAWA_SOURCE, HYOGO_INAMI_SOURCE, HYOGO_FUKUSAKI_SOURCE, HYOGO_KAMIKAWA_SOURCE, NARA_TENRI_SOURCE, NARA_KASHIHARA_SOURCE, NARA_GOJO_SOURCE, NARA_GOSE_SOURCE, NARA_IKOMA_SOURCE, NARA_IKARUGA_SOURCE, NARA_ANDO_SOURCE, NARA_KAWANISHI_NR_SOURCE, NARA_TAWARAMOTO_SOURCE, NARA_OJI_SOURCE, NARA_KORYO_SOURCE, NARA_ASUKA_SOURCE, NARA_TOTSUKAWA_SOURCE, NARA_SHIMOICHI_SOURCE, WAKAYAMA_HASHIMOTO_SOURCE, WAKAYAMA_INAMI_WK_SOURCE,
+  // 中国・四国
+  TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, YAMAGUCHI_HIKARI_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, KOCHI_MUROTO_SOURCE,
+  // 九州・沖縄
+  FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE,
 } = require("./src/config/wards");
 
 const PORT = process.env.PORT || 8787;
@@ -1528,6 +1538,251 @@ const collectOtamaEvents = createMunicipalCalendarCollector({ source: OTAMA_SOUR
 const collectShimogoEvents = createCalendarJsonCollector({ source: SHIMOGO_SOURCE, childKeywords: TOHOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectAizumisatoEvents = createCalendarJsonCollector({ source: AIZUMISATO_SOURCE, childKeywords: TOHOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectFurudonoEvents = createMunicipalCalendarCollector({ source: FURUDONO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: TOHOKU_CHILD_KW }, geoFmDeps);
+
+// --- Child keyword constants (add after other CHILD_KW definitions) ---
+const HOKKAIDO_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+const CHUBU_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+const KINKI_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+const CHUGOKU_SHIKOKU_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+const KYUSHU_OKINAWA_CHILD_KW = ["子育て", "親子", "幼児", "乳幼児", "健診", "キッズ", "児童", "おはなし", "広場", "赤ちゃん", "読み聞かせ", "教室", "サロン", "相談", "工作"];
+
+// --- Collector instantiation ---
+// 北海道
+// 北海道
+const collectHokkaidoIwamizawaEvents = createCalendarJsonCollector({ source: HOKKAIDO_IWAMIZAWA_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoShibetsuEvents = createCalendarJsonCollector({ source: HOKKAIDO_SHIBETSU_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoChitoseEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_CHITOSE_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoMoriEvents = createCalendarJsonCollector({ source: HOKKAIDO_MORI_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoOzoraEvents = createCalendarJsonCollector({ source: HOKKAIDO_OZORA_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoTsubetsuEvents = createCalendarJsonCollector({ source: HOKKAIDO_TSUBETSU_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoTaikiEvents = createCalendarJsonCollector({ source: HOKKAIDO_TAIKI_SOURCE, childKeywords: HOKKAIDO_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHokkaidoNisekoEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_NISEKO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoShiraoiEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_SHIRAOI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoHigashikaguraEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_HIGASHIKAGURA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoOtoineppuEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_OTOINEPPU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoYubetsuEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_YUBETSU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoNakasatsunaiEvents = createCalPhpCollector({ source: HOKKAIDO_NAKASATSUNAI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoSarabetsuEvents = createCalPhpCollector({ source: HOKKAIDO_SARABETSU_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoHonbetsuEvents = createCalPhpCollector({ source: HOKKAIDO_HONBETSU_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoHirooEvents = createCalPhpCollector({ source: HOKKAIDO_HIROO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoShikaoiEvents = createCalPhpCollector({ source: HOKKAIDO_SHIKAOI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoAkkeshiEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_AKKESHI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoBetsukaiEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_BETSUKAI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoNakashibetsuEvents = createCalPhpCollector({ source: HOKKAIDO_NAKASHIBETSU_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoShibetsuChoEvents = createCalPhpCollector({ source: HOKKAIDO_SHIBETSU_CHO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoShintokuEvents = createMunicipalCalendarCollector({ source: HOKKAIDO_SHINTOKU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+const collectHokkaidoKutchanEvents = createEventJsCollector({ source: HOKKAIDO_KUTCHAN_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, eventJsDeps);
+const collectHokkaidoHaboroEvents = createCalPhpCollector({ source: HOKKAIDO_HABORO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: HOKKAIDO_CHILD_KW }, geoFmDeps);
+
+// 中部
+// 新潟県
+const collectNiigataSanjoEvents = createCalendarJsonCollector({ source: NIIGATA_SANJO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataKashiwazakiEvents = createCalendarJsonCollector({ source: NIIGATA_KASHIWAZAKI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataTsubameEvents = createCalendarJsonCollector({ source: NIIGATA_TSUBAME_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataAganoEvents = createCalendarJsonCollector({ source: NIIGATA_AGANO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataSeiroEvents = createCalendarJsonCollector({ source: NIIGATA_SEIRO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataYuzawaEvents = createCalendarJsonCollector({ source: NIIGATA_YUZAWA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNiigataKamoEvents = createMunicipalCalendarCollector({ source: NIIGATA_KAMO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectNiigataMinamiuonumaEvents = createMunicipalCalendarCollector({ source: NIIGATA_MINAMIUONUMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectNiigataTagamiEvents = createMunicipalCalendarCollector({ source: NIIGATA_TAGAMI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+// 富山県
+const collectToyamaHimiEvents = createCalendarJsonCollector({ source: TOYAMA_HIMI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectToyamaNamerikawaEvents = createCalendarJsonCollector({ source: TOYAMA_NAMERIKAWA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectToyamaKurobeEvents = createEventJsCollector({ source: TOYAMA_KUROBE_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, eventJsDeps);
+const collectToyamaNyuzenEvents = createCalendarJsonCollector({ source: TOYAMA_NYUZEN_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectToyamaAsahiTyEvents = createCalendarJsonCollector({ source: TOYAMA_ASAHI_TY_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 石川県
+const collectIshikawaKanazawaEvents = createCalendarJsonCollector({ source: ISHIKAWA_KANAZAWA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectIshikawaKomatsuEvents = createCalendarJsonCollector({ source: ISHIKAWA_KOMATSU_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectIshikawaKagaEvents = createCalendarJsonCollector({ source: ISHIKAWA_KAGA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectIshikawaNakanotoEvents = createCalendarJsonCollector({ source: ISHIKAWA_NAKANOTO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 福井県
+const collectFukuiSabaeEvents = createListCalendarCollector({ source: FUKUI_SABAE_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
+// 山梨県
+const collectYamanashiChuoEvents = createCalendarJsonCollector({ source: YAMANASHI_CHUO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectYamanashiMinamialpsEvents = createMunicipalCalendarCollector({ source: YAMANASHI_MINAMIALPS_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectYamanashiHokutoEvents = createMunicipalCalendarCollector({ source: YAMANASHI_HOKUTO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+// 長野県
+const collectNaganoSuzakaEvents = createCalendarJsonCollector({ source: NAGANO_SUZAKA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaganoKomaganeEvents = createCalendarJsonCollector({ source: NAGANO_KOMAGANE_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaganoChikumaEvents = createCalendarJsonCollector({ source: NAGANO_CHIKUMA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaganoIijimachoEvents = createCalendarJsonCollector({ source: NAGANO_IIJIMACHO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaganoMatsukawaEvents = createCalendarJsonCollector({ source: NAGANO_MATSUKAWA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaganoIkedaEvents = createMunicipalCalendarCollector({ source: NAGANO_IKEDA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+// 岐阜県
+const collectGifuOgakiEvents = createMunicipalCalendarCollector({ source: GIFU_OGAKI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuSekiEvents = createMunicipalCalendarCollector({ source: GIFU_SEKI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuEnaEvents = createCalendarJsonCollector({ source: GIFU_ENA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectGifuMotosuEvents = createMunicipalCalendarCollector({ source: GIFU_MOTOSU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuKaizuEvents = createMunicipalCalendarCollector({ source: GIFU_KAIZU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuAnpachiEvents = createMunicipalCalendarCollector({ source: GIFU_ANPACHI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuIbigawaEvents = createMunicipalCalendarCollector({ source: GIFU_IBIGAWA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectGifuOnoGfEvents = createMunicipalCalendarCollector({ source: GIFU_ONO_GF_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+// 静岡県
+const collectShizuokaFujiedaEvents = createCalendarJsonCollector({ source: SHIZUOKA_FUJIEDA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaSusonoEvents = createCalendarJsonCollector({ source: SHIZUOKA_SUSONO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaKosaiEvents = createCalendarJsonCollector({ source: SHIZUOKA_KOSAI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaIzuEvents = createCalendarJsonCollector({ source: SHIZUOKA_IZU_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaOmaezakiEvents = createCalendarJsonCollector({ source: SHIZUOKA_OMAEZAKI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaNagaizumiEvents = createCalendarJsonCollector({ source: SHIZUOKA_NAGAIZUMI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShizuokaKannamiEvents = createCalendarJsonCollector({ source: SHIZUOKA_KANNAMI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 愛知県
+const collectAichiToyokawaEvents = createCalendarJsonCollector({ source: AICHI_TOYOKAWA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiHekinanEvents = createCalendarJsonCollector({ source: AICHI_HEKINAN_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiShinshiroEvents = createListCalendarCollector({ source: AICHI_SHINSHIRO_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
+const collectAichiChiryuEvents = createCalendarJsonCollector({ source: AICHI_CHIRYU_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiInazawaEvents = createMunicipalCalendarCollector({ source: AICHI_INAZAWA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectAichiIwakuraEvents = createMunicipalCalendarCollector({ source: AICHI_IWAKURA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectAichiNisshinEvents = createCalendarJsonCollector({ source: AICHI_NISSHIN_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiAisaiEvents = createMunicipalCalendarCollector({ source: AICHI_AISAI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectAichiMiyoshiEvents = createCalendarJsonCollector({ source: AICHI_MIYOSHI_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiNagakuteEvents = createCalendarJsonCollector({ source: AICHI_NAGAKUTE_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiTogoEvents = createCalendarJsonCollector({ source: AICHI_TOGO_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectAichiAguiEvents = createMunicipalCalendarCollector({ source: AICHI_AGUI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUBU_CHILD_KW }, geoFmDeps);
+const collectAichiHigashiuraEvents = createCalendarJsonCollector({ source: AICHI_HIGASHIURA_SOURCE, childKeywords: CHUBU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+
+// 近畿
+// 三重県
+const collectMieTobaEvents = createCalendarJsonCollector({ source: MIE_TOBA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectMieOwaseEvents = createMunicipalCalendarCollector({ source: MIE_OWASE_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectMieIgaEvents = createMunicipalCalendarCollector({ source: MIE_IGA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectMieKisosakiEvents = createMunicipalCalendarCollector({ source: MIE_KISOSAKI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectMieTakiEvents = createCalendarJsonCollector({ source: MIE_TAKI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectMieMeiwaEvents = createCalendarJsonCollector({ source: MIE_MEIWA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 滋賀県
+const collectShigaHikoneEvents = createCalendarJsonCollector({ source: SHIGA_HIKONE_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShigaNagahamaEvents = createMunicipalCalendarCollector({ source: SHIGA_NAGAHAMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectShigaOmihachimanEvents = createCalendarJsonCollector({ source: SHIGA_OMIHACHIMAN_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShigaKokaEvents = createMunicipalCalendarCollector({ source: SHIGA_KOKA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectShigaMaibaraEvents = createCalendarJsonCollector({ source: SHIGA_MAIBARA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShigaAishoEvents = createCalendarJsonCollector({ source: SHIGA_AISHO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShigaHinoEvents = createMunicipalCalendarCollector({ source: SHIGA_HINO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectShigaToyosatoEvents = createMunicipalCalendarCollector({ source: SHIGA_TOYOSATO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+// 京都府
+const collectKyotoMaizuruEvents = createMunicipalCalendarCollector({ source: KYOTO_MAIZURU_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoAyabeEvents = createMunicipalCalendarCollector({ source: KYOTO_AYABE_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoJoyoEvents = createMunicipalCalendarCollector({ source: KYOTO_JOYO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoNagaokakyoEvents = createMunicipalCalendarCollector({ source: KYOTO_NAGAOKAKYO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoYawataEvents = createMunicipalCalendarCollector({ source: KYOTO_YAWATA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoSeikaEvents = createCalendarJsonCollector({ source: KYOTO_SEIKA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectKyotoKumiyamaEvents = createMunicipalCalendarCollector({ source: KYOTO_KUMIYAMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectKyotoMinamiyamashiroEvents = createMunicipalCalendarCollector({ source: KYOTO_MINAMIYAMASHIRO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+// 大阪府
+const collectOsakaIkedaEvents = createCalendarJsonCollector({ source: OSAKA_IKEDA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaIzumiotsuEvents = createCalendarJsonCollector({ source: OSAKA_IZUMIOTSU_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaKaizukaEvents = createCalendarJsonCollector({ source: OSAKA_KAIZUKA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaMoriguchiEvents = createCalendarJsonCollector({ source: OSAKA_MORIGUCHI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaIbarakiEvents = createCalendarJsonCollector({ source: OSAKA_IBARAKI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaHirakataEvents = createMunicipalCalendarCollector({ source: OSAKA_HIRAKATA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectOsakaNeyagawaEvents = createCalendarJsonCollector({ source: OSAKA_NEYAGAWA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaIzumiEvents = createCalendarJsonCollector({ source: OSAKA_IZUMI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaHabikinoEvents = createCalendarJsonCollector({ source: OSAKA_HABIKINO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaFujiideraEvents = createCalendarJsonCollector({ source: OSAKA_FUJIIDERA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaHigashiosakaEvents = createMunicipalCalendarCollector({ source: OSAKA_HIGASHIOSAKA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectOsakaSennanEvents = createCalendarJsonCollector({ source: OSAKA_SENNAN_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaHannanEvents = createCalendarJsonCollector({ source: OSAKA_HANNAN_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaKumatoriEvents = createCalendarJsonCollector({ source: OSAKA_KUMATORI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaTadaokaEvents = createCalendarJsonCollector({ source: OSAKA_TADAOKA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOsakaTaishiEvents = createCalendarJsonCollector({ source: OSAKA_TAISHI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 兵庫県
+const collectHyogoHimejiEvents = createMunicipalCalendarCollector({ source: HYOGO_HIMEJI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectHyogoItamiEvents = createCalendarJsonCollector({ source: HYOGO_ITAMI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoKakogawaEvents = createCalendarJsonCollector({ source: HYOGO_KAKOGAWA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoTatsunoEvents = createCalendarJsonCollector({ source: HYOGO_TATSUNO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoOnoEvents = createCalendarJsonCollector({ source: HYOGO_ONO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoShisoEvents = createCalendarJsonCollector({ source: HYOGO_SHISO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoKatoEvents = createCalendarJsonCollector({ source: HYOGO_KATO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoInagawaEvents = createCalendarJsonCollector({ source: HYOGO_INAGAWA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHyogoInamiEvents = createMunicipalCalendarCollector({ source: HYOGO_INAMI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectHyogoFukusakiEvents = createMunicipalCalendarCollector({ source: HYOGO_FUKUSAKI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectHyogoKamikawaEvents = createMunicipalCalendarCollector({ source: HYOGO_KAMIKAWA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+// 奈良県
+const collectNaraTenriEvents = createCalendarJsonCollector({ source: NARA_TENRI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaraKashiharaEvents = createCalendarJsonCollector({ source: NARA_KASHIHARA_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaraGojoEvents = createCalendarJsonCollector({ source: NARA_GOJO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaraGoseEvents = createMunicipalCalendarCollector({ source: NARA_GOSE_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraIkomaEvents = createMunicipalCalendarCollector({ source: NARA_IKOMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraIkarugaEvents = createMunicipalCalendarCollector({ source: NARA_IKARUGA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraAndoEvents = createMunicipalCalendarCollector({ source: NARA_ANDO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraKawanishiNrEvents = createMunicipalCalendarCollector({ source: NARA_KAWANISHI_NR_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraTawaramotoEvents = createCalendarJsonCollector({ source: NARA_TAWARAMOTO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaraOjiEvents = createCalendarJsonCollector({ source: NARA_OJI_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNaraKoryoEvents = createMunicipalCalendarCollector({ source: NARA_KORYO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraAsukaEvents = createMunicipalCalendarCollector({ source: NARA_ASUKA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraTotsukawaEvents = createCalPhpCollector({ source: NARA_TOTSUKAWA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+const collectNaraShimoichiEvents = createMunicipalCalendarCollector({ source: NARA_SHIMOICHI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+// 和歌山県
+const collectWakayamaHashimotoEvents = createCalendarJsonCollector({ source: WAKAYAMA_HASHIMOTO_SOURCE, childKeywords: KINKI_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectWakayamaInamiWkEvents = createMunicipalCalendarCollector({ source: WAKAYAMA_INAMI_WK_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KINKI_CHILD_KW }, geoFmDeps);
+
+// 中国・四国
+// 鳥取県
+const collectTottoriNichinanEvents = createCalendarJsonCollector({ source: TOTTORI_NICHINAN_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectTottoriSakaiminatoEvents = createEventJsCollector({ source: TOTTORI_SAKAIMINATO_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, eventJsDeps);
+// 島根県
+const collectShimaneMasudaEvents = createCalendarJsonCollector({ source: SHIMANE_MASUDA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectShimaneAmaEvents = createMunicipalCalendarCollector({ source: SHIMANE_AMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW }, geoFmDeps);
+// 岡山県
+const collectOkayamaOkayamaEvents = createMunicipalCalendarCollector({ source: OKAYAMA_OKAYAMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW }, geoFmDeps);
+const collectOkayamaAkaiwaEvents = createCalendarJsonCollector({ source: OKAYAMA_AKAIWA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOkayamaMimasakaEvents = createCalendarJsonCollector({ source: OKAYAMA_MIMASAKA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOkayamaHayashimaEvents = createCalendarJsonCollector({ source: OKAYAMA_HAYASHIMA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 広島県
+const collectHiroshimaFuchuEvents = createCalendarJsonCollector({ source: HIROSHIMA_FUCHU_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHiroshimaOtakeEvents = createCalendarJsonCollector({ source: HIROSHIMA_OTAKE_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectHiroshimaHigashihiroshimaEvents = createCalendarJsonCollector({ source: HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 山口県
+const collectYamaguchiHikariEvents = createCalendarJsonCollector({ source: YAMAGUCHI_HIKARI_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 徳島県
+const collectTokushimaTokushimaEvents = createListCalendarCollector({ source: TOKUSHIMA_TOKUSHIMA_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
+const collectTokushimaNakaEvents = createCalendarJsonCollector({ source: TOKUSHIMA_NAKA_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectTokushimaHigashimiyoshiEvents = createMunicipalCalendarCollector({ source: TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW }, geoFmDeps);
+// 香川県
+const collectKagawaTakamatsuEvents = createListCalendarCollector({ source: KAGAWA_TAKAMATSU_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
+const collectKagawaSanukiEvents = createCalPhpCollector({ source: KAGAWA_SANUKI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW }, geoFmDeps);
+const collectKagawaMitoyoEvents = createCalendarJsonCollector({ source: KAGAWA_MITOYO_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectKagawaTonoshoEvents = createCalendarJsonCollector({ source: KAGAWA_TONOSHO_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 愛媛県
+const collectEhimeSeiyoEvents = createCalendarJsonCollector({ source: EHIME_SEIYO_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectEhimeTobeEvents = createCalendarJsonCollector({ source: EHIME_TOBE_SOURCE, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 高知県
+const collectKochiMurotoEvents = createMunicipalCalendarCollector({ source: KOCHI_MUROTO_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHUGOKU_SHIKOKU_CHILD_KW }, geoFmDeps);
+
+// 九州・沖縄
+// 福岡県
+const collectFukuokaFukutsuEvents = createCalendarJsonCollector({ source: FUKUOKA_FUKUTSU_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectFukuokaShinguFkEvents = createCalendarJsonCollector({ source: FUKUOKA_SHINGU_FK_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectFukuokaHirokawaEvents = createCalendarJsonCollector({ source: FUKUOKA_HIROKAWA_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectFukuokaKawaraEvents = createMunicipalCalendarCollector({ source: FUKUOKA_KAWARA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KYUSHU_OKINAWA_CHILD_KW }, geoFmDeps);
+// 長崎県
+const collectNagasakiTsushimaEvents = createCalendarJsonCollector({ source: NAGASAKI_TSUSHIMA_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNagasakiIkiEvents = createCalendarJsonCollector({ source: NAGASAKI_IKI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNagasakiSaikaiEvents = createCalendarJsonCollector({ source: NAGASAKI_SAIKAI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNagasakiTogitsuEvents = createCalendarJsonCollector({ source: NAGASAKI_TOGITSU_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectNagasakiHigashisonogiEvents = createCalendarJsonCollector({ source: NAGASAKI_HIGASHISONOGI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 熊本県
+const collectKumamotoTakamoriEvents = createMunicipalCalendarCollector({ source: KUMAMOTO_TAKAMORI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KYUSHU_OKINAWA_CHILD_KW }, geoFmDeps);
+// 大分県
+const collectOitaHitaEvents = createCalendarJsonCollector({ source: OITA_HITA_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOitaTaketaEvents = createCalendarJsonCollector({ source: OITA_TAKETA_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOitaKitsukiEvents = createCalendarJsonCollector({ source: OITA_KITSUKI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOitaKusuEvents = createCalendarJsonCollector({ source: OITA_KUSU_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 宮崎県
+const collectMiyazakiMiyazakiEvents = createMunicipalCalendarCollector({ source: MIYAZAKI_MIYAZAKI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KYUSHU_OKINAWA_CHILD_KW }, geoFmDeps);
+const collectMiyazakiNichinanEvents = createCalendarJsonCollector({ source: MIYAZAKI_NICHINAN_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectMiyazakiKijoEvents = createCalendarJsonCollector({ source: MIYAZAKI_KIJO_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectMiyazakiKadogawaEvents = createCalPhpCollector({ source: MIYAZAKI_KADOGAWA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: KYUSHU_OKINAWA_CHILD_KW }, geoFmDeps);
+const collectMiyazakiMiyakojimaEvents = createMunicipalCalendarCollector({ source: MIYAZAKI_MIYAKOJIMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: KYUSHU_OKINAWA_CHILD_KW }, geoFmDeps);
+// 鹿児島県
+const collectKagoshimaSatsumasendaiEvents = createCalendarJsonCollector({ source: KAGOSHIMA_SATSUMASENDAI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectKagoshimaMinamikyushuEvents = createCalendarJsonCollector({ source: KAGOSHIMA_MINAMIKYUSHU_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectKagoshimaSatsumaEvents = createCalendarJsonCollector({ source: KAGOSHIMA_SATSUMA_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectKagoshimaKimotsukiEvents = createCalendarJsonCollector({ source: KAGOSHIMA_KIMOTSUKI_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+// 沖縄県
+const collectOkinawaYomitanEvents = createCalendarJsonCollector({ source: OKINAWA_YOMITAN_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOkinawaKitanakagusukuEvents = createCalendarJsonCollector({ source: OKINAWA_KITANAKAGUSUKU_SOURCE, childKeywords: KYUSHU_OKINAWA_CHILD_KW, useKeywordFilter: true }, geoFmDeps);
+const collectOkinawaIeEvents = createEventJsCollector({ source: OKINAWA_IE_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, eventJsDeps);
+
 const collectAdditionalWardsEvents = createCollectAdditionalWardsEvents({
   collectChuoAkachanTengokuEvents,
   collectKitaJidokanEvents,
@@ -1896,6 +2151,16 @@ const getEvents = createGetEvents({
   collectYokoteEvents, collectYurihonjyoEvents, collectOgaEvents, collectKosakaEvents, collectHachirogataEvents,
   collectYonezawaEvents, collectSakataEvents, collectShinjoEvents, collectNagaiEvents, collectNakayamaYmEvents, collectKahokuEvents, collectAsahiYmEvents, collectKaneyamaYmEvents, collectMamurogawaEvents, collectOkuraEvents, collectShiratakaEvents,
   collectFukushimaCityEvents, collectSomaEvents, collectMinamisomaEvents, collectOtamaEvents, collectShimogoEvents, collectAizumisatoEvents, collectFurudonoEvents,
+  // 北海道
+  collectHokkaidoIwamizawaEvents, collectHokkaidoShibetsuEvents, collectHokkaidoChitoseEvents, collectHokkaidoMoriEvents, collectHokkaidoOzoraEvents, collectHokkaidoTsubetsuEvents, collectHokkaidoTaikiEvents, collectHokkaidoNisekoEvents, collectHokkaidoShiraoiEvents, collectHokkaidoHigashikaguraEvents, collectHokkaidoOtoineppuEvents, collectHokkaidoYubetsuEvents, collectHokkaidoNakasatsunaiEvents, collectHokkaidoSarabetsuEvents, collectHokkaidoHonbetsuEvents, collectHokkaidoHirooEvents, collectHokkaidoShikaoiEvents, collectHokkaidoAkkeshiEvents, collectHokkaidoBetsukaiEvents, collectHokkaidoNakashibetsuEvents, collectHokkaidoShibetsuChoEvents, collectHokkaidoShintokuEvents, collectHokkaidoKutchanEvents, collectHokkaidoHaboroEvents,
+  // 中部
+  collectNiigataSanjoEvents, collectNiigataKashiwazakiEvents, collectNiigataTsubameEvents, collectNiigataAganoEvents, collectNiigataSeiroEvents, collectNiigataYuzawaEvents, collectNiigataKamoEvents, collectNiigataMinamiuonumaEvents, collectNiigataTagamiEvents, collectToyamaHimiEvents, collectToyamaNamerikawaEvents, collectToyamaKurobeEvents, collectToyamaNyuzenEvents, collectToyamaAsahiTyEvents, collectIshikawaKanazawaEvents, collectIshikawaKomatsuEvents, collectIshikawaKagaEvents, collectIshikawaNakanotoEvents, collectFukuiSabaeEvents, collectYamanashiChuoEvents, collectYamanashiMinamialpsEvents, collectYamanashiHokutoEvents, collectNaganoSuzakaEvents, collectNaganoKomaganeEvents, collectNaganoChikumaEvents, collectNaganoIijimachoEvents, collectNaganoMatsukawaEvents, collectNaganoIkedaEvents, collectGifuOgakiEvents, collectGifuSekiEvents, collectGifuEnaEvents, collectGifuMotosuEvents, collectGifuKaizuEvents, collectGifuAnpachiEvents, collectGifuIbigawaEvents, collectGifuOnoGfEvents, collectShizuokaFujiedaEvents, collectShizuokaSusonoEvents, collectShizuokaKosaiEvents, collectShizuokaIzuEvents, collectShizuokaOmaezakiEvents, collectShizuokaNagaizumiEvents, collectShizuokaKannamiEvents, collectAichiToyokawaEvents, collectAichiHekinanEvents, collectAichiShinshiroEvents, collectAichiChiryuEvents, collectAichiInazawaEvents, collectAichiIwakuraEvents, collectAichiNisshinEvents, collectAichiAisaiEvents, collectAichiMiyoshiEvents, collectAichiNagakuteEvents, collectAichiTogoEvents, collectAichiAguiEvents, collectAichiHigashiuraEvents,
+  // 近畿
+  collectMieTobaEvents, collectMieOwaseEvents, collectMieIgaEvents, collectMieKisosakiEvents, collectMieTakiEvents, collectMieMeiwaEvents, collectShigaHikoneEvents, collectShigaNagahamaEvents, collectShigaOmihachimanEvents, collectShigaKokaEvents, collectShigaMaibaraEvents, collectShigaAishoEvents, collectShigaHinoEvents, collectShigaToyosatoEvents, collectKyotoMaizuruEvents, collectKyotoAyabeEvents, collectKyotoJoyoEvents, collectKyotoNagaokakyoEvents, collectKyotoYawataEvents, collectKyotoSeikaEvents, collectKyotoKumiyamaEvents, collectKyotoMinamiyamashiroEvents, collectOsakaIkedaEvents, collectOsakaIzumiotsuEvents, collectOsakaKaizukaEvents, collectOsakaMoriguchiEvents, collectOsakaIbarakiEvents, collectOsakaHirakataEvents, collectOsakaNeyagawaEvents, collectOsakaIzumiEvents, collectOsakaHabikinoEvents, collectOsakaFujiideraEvents, collectOsakaHigashiosakaEvents, collectOsakaSennanEvents, collectOsakaHannanEvents, collectOsakaKumatoriEvents, collectOsakaTadaokaEvents, collectOsakaTaishiEvents, collectHyogoHimejiEvents, collectHyogoItamiEvents, collectHyogoKakogawaEvents, collectHyogoTatsunoEvents, collectHyogoOnoEvents, collectHyogoShisoEvents, collectHyogoKatoEvents, collectHyogoInagawaEvents, collectHyogoInamiEvents, collectHyogoFukusakiEvents, collectHyogoKamikawaEvents, collectNaraTenriEvents, collectNaraKashiharaEvents, collectNaraGojoEvents, collectNaraGoseEvents, collectNaraIkomaEvents, collectNaraIkarugaEvents, collectNaraAndoEvents, collectNaraKawanishiNrEvents, collectNaraTawaramotoEvents, collectNaraOjiEvents, collectNaraKoryoEvents, collectNaraAsukaEvents, collectNaraTotsukawaEvents, collectNaraShimoichiEvents, collectWakayamaHashimotoEvents, collectWakayamaInamiWkEvents,
+  // 中国・四国
+  collectTottoriNichinanEvents, collectTottoriSakaiminatoEvents, collectShimaneMasudaEvents, collectShimaneAmaEvents, collectOkayamaOkayamaEvents, collectOkayamaAkaiwaEvents, collectOkayamaMimasakaEvents, collectOkayamaHayashimaEvents, collectHiroshimaFuchuEvents, collectHiroshimaOtakeEvents, collectHiroshimaHigashihiroshimaEvents, collectYamaguchiHikariEvents, collectTokushimaTokushimaEvents, collectTokushimaNakaEvents, collectTokushimaHigashimiyoshiEvents, collectKagawaTakamatsuEvents, collectKagawaSanukiEvents, collectKagawaMitoyoEvents, collectKagawaTonoshoEvents, collectEhimeSeiyoEvents, collectEhimeTobeEvents, collectKochiMurotoEvents,
+  // 九州・沖縄
+  collectFukuokaFukutsuEvents, collectFukuokaShinguFkEvents, collectFukuokaHirokawaEvents, collectFukuokaKawaraEvents, collectNagasakiTsushimaEvents, collectNagasakiIkiEvents, collectNagasakiSaikaiEvents, collectNagasakiTogitsuEvents, collectNagasakiHigashisonogiEvents, collectKumamotoTakamoriEvents, collectOitaHitaEvents, collectOitaTaketaEvents, collectOitaKitsukiEvents, collectOitaKusuEvents, collectMiyazakiMiyazakiEvents, collectMiyazakiNichinanEvents, collectMiyazakiKijoEvents, collectMiyazakiKadogawaEvents, collectMiyazakiMiyakojimaEvents, collectKagoshimaSatsumasendaiEvents, collectKagoshimaMinamikyushuEvents, collectKagoshimaSatsumaEvents, collectKagoshimaKimotsukiEvents, collectOkinawaYomitanEvents, collectOkinawaKitanakagusukuEvents, collectOkinawaIeEvents,
 });
 
 // --- HTTP server ---

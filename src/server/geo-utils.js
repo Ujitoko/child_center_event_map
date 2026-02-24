@@ -61,9 +61,8 @@ function createGeoHelpers(deps) {
 
   function isLikelyLocalPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    // 関東 + 東北全域をカバー
-    // (南: 湯河原町 34.97, 北: 青森県大間町 41.53, 西: 嬬恋村 138.48, 東: 宮城県気仙沼 141.68)
-    return point.lat >= 34.9 && point.lat <= 41.6 && point.lng >= 138.4 && point.lng <= 141.7;
+    // 日本全国をカバー (沖縄~北海道)
+    return point.lat >= 24.0 && point.lat <= 45.6 && point.lng >= 122.9 && point.lng <= 145.9;
   }
 
   function isNearWardCenter(point, wardCenter, maxKm) {
@@ -310,6 +309,204 @@ function createGeoHelpers(deps) {
       fukushima_shimogo: 20,
       fukushima_aizumisato: 15,
       fukushima_furudono: 12,
+      // 北海道
+      hokkaido_iwamizawa: 20,
+      hokkaido_shibetsu: 25,
+      hokkaido_chitose: 20,
+      hokkaido_mori: 12,
+      hokkaido_ozora: 12,
+      hokkaido_tsubetsu: 12,
+      hokkaido_taiki: 15,
+      hokkaido_niseko: 12,
+      hokkaido_shiraoi: 15,
+      hokkaido_higashikagura: 10,
+      hokkaido_otoineppu: 15,
+      hokkaido_yubetsu: 15,
+      hokkaido_nakasatsunai: 10,
+      hokkaido_sarabetsu: 10,
+      hokkaido_honbetsu: 15,
+      hokkaido_hiroo: 15,
+      hokkaido_shikaoi: 15,
+      hokkaido_akkeshi: 15,
+      hokkaido_betsukai: 25,
+      hokkaido_nakashibetsu: 15,
+      hokkaido_shibetsu_cho: 12,
+      hokkaido_shintoku: 25,
+      hokkaido_kutchan: 12,
+      hokkaido_haboro: 15,
+      // 中部
+      niigata_sanjo: 20,
+      niigata_kashiwazaki: 20,
+      niigata_tsubame: 15,
+      niigata_agano: 15,
+      niigata_seiro: 10,
+      niigata_yuzawa: 15,
+      niigata_kamo: 15,
+      niigata_minamiuonuma: 25,
+      niigata_tagami: 10,
+      toyama_himi: 15,
+      toyama_namerikawa: 12,
+      toyama_kurobe: 15,
+      toyama_nyuzen: 10,
+      toyama_asahi_ty: 10,
+      ishikawa_kanazawa: 20,
+      ishikawa_komatsu: 15,
+      ishikawa_kaga: 15,
+      ishikawa_nakanoto: 12,
+      fukui_sabae: 12,
+      yamanashi_chuo: 12,
+      yamanashi_minamialps: 25,
+      yamanashi_hokuto: 30,
+      nagano_suzaka: 15,
+      nagano_komagane: 15,
+      nagano_chikuma: 15,
+      nagano_iijimacho: 10,
+      nagano_matsukawa: 10,
+      nagano_ikeda: 10,
+      gifu_ogaki: 15,
+      gifu_seki: 20,
+      gifu_ena: 20,
+      gifu_motosu: 20,
+      gifu_kaizu: 15,
+      gifu_anpachi: 10,
+      gifu_ibigawa: 25,
+      gifu_ono_gf: 10,
+      shizuoka_fujieda: 15,
+      shizuoka_susono: 15,
+      shizuoka_kosai: 12,
+      shizuoka_izu: 20,
+      shizuoka_omaezaki: 12,
+      shizuoka_nagaizumi: 8,
+      shizuoka_kannami: 10,
+      aichi_toyokawa: 15,
+      aichi_hekinan: 10,
+      aichi_shinshiro: 20,
+      aichi_chiryu: 8,
+      aichi_inazawa: 12,
+      aichi_iwakura: 8,
+      aichi_nisshin: 10,
+      aichi_aisai: 12,
+      aichi_miyoshi: 10,
+      aichi_nagakute: 8,
+      aichi_togo: 8,
+      aichi_agui: 8,
+      aichi_higashiura: 10,
+      // 近畿
+      mie_toba: 15,
+      mie_owase: 15,
+      mie_iga: 20,
+      mie_kisosaki: 8,
+      mie_taki: 12,
+      mie_meiwa: 10,
+      shiga_hikone: 15,
+      shiga_nagahama: 20,
+      shiga_omihachiman: 15,
+      shiga_koka: 20,
+      shiga_maibara: 15,
+      shiga_aisho: 10,
+      shiga_hino: 12,
+      shiga_toyosato: 8,
+      kyoto_maizuru: 20,
+      kyoto_ayabe: 20,
+      kyoto_joyo: 10,
+      kyoto_nagaokakyo: 8,
+      kyoto_yawata: 10,
+      kyoto_seika: 8,
+      kyoto_kumiyama: 8,
+      kyoto_minamiyamashiro: 12,
+      osaka_ikeda: 10,
+      osaka_izumiotsu: 8,
+      osaka_kaizuka: 12,
+      osaka_moriguchi: 8,
+      osaka_ibaraki: 12,
+      osaka_hirakata: 12,
+      osaka_neyagawa: 10,
+      osaka_izumi: 12,
+      osaka_habikino: 10,
+      osaka_fujiidera: 8,
+      osaka_higashiosaka: 12,
+      osaka_sennan: 10,
+      osaka_hannan: 10,
+      osaka_kumatori: 8,
+      osaka_tadaoka: 6,
+      osaka_taishi: 8,
+      hyogo_himeji: 25,
+      hyogo_itami: 8,
+      hyogo_kakogawa: 15,
+      hyogo_tatsuno: 15,
+      hyogo_ono: 12,
+      hyogo_shiso: 25,
+      hyogo_kato: 15,
+      hyogo_inagawa: 12,
+      hyogo_inami: 8,
+      hyogo_fukusaki: 10,
+      hyogo_kamikawa: 15,
+      nara_tenri: 12,
+      nara_kashihara: 10,
+      nara_gojo: 20,
+      nara_gose: 12,
+      nara_ikoma: 10,
+      nara_ikaruga: 8,
+      nara_ando: 6,
+      nara_kawanishi_nr: 8,
+      nara_tawaramoto: 8,
+      nara_oji: 6,
+      nara_koryo: 8,
+      nara_asuka: 8,
+      nara_totsukawa: 30,
+      nara_shimoichi: 12,
+      wakayama_hashimoto: 15,
+      wakayama_inami_wk: 12,
+      // 中国・四国
+      tottori_nichinan: 15,
+      tottori_sakaiminato: 10,
+      shimane_masuda: 20,
+      shimane_ama: 15,
+      okayama_okayama: 25,
+      okayama_akaiwa: 15,
+      okayama_mimasaka: 20,
+      okayama_hayashima: 6,
+      hiroshima_fuchu: 15,
+      hiroshima_otake: 12,
+      hiroshima_higashihiroshima: 20,
+      yamaguchi_hikari: 12,
+      tokushima_tokushima: 15,
+      tokushima_naka: 25,
+      tokushima_higashimiyoshi: 15,
+      kagawa_takamatsu: 20,
+      kagawa_sanuki: 15,
+      kagawa_mitoyo: 15,
+      kagawa_tonosho: 12,
+      ehime_seiyo: 20,
+      ehime_tobe: 12,
+      kochi_muroto: 20,
+      // 九州・沖縄
+      fukuoka_fukutsu: 12,
+      fukuoka_shingu_fk: 10,
+      fukuoka_hirokawa: 10,
+      fukuoka_kawara: 12,
+      nagasaki_tsushima: 30,
+      nagasaki_iki: 15,
+      nagasaki_saikai: 20,
+      nagasaki_togitsu: 8,
+      nagasaki_higashisonogi: 12,
+      kumamoto_takamori: 15,
+      oita_hita: 25,
+      oita_taketa: 25,
+      oita_kitsuki: 15,
+      oita_kusu: 15,
+      miyazaki_miyazaki: 25,
+      miyazaki_nichinan: 20,
+      miyazaki_kijo: 12,
+      miyazaki_kadogawa: 10,
+      miyazaki_miyakojima: 25,
+      kagoshima_satsumasendai: 25,
+      kagoshima_minamikyushu: 20,
+      kagoshima_satsuma: 15,
+      kagoshima_kimotsuki: 15,
+      okinawa_yomitan: 10,
+      okinawa_kitanakagusuku: 8,
+      okinawa_ie: 8,
     };
     return overrides[key] || 10;
   }
@@ -332,23 +529,11 @@ function createGeoHelpers(deps) {
   function isGenericMunicipalityGeocode(point) {
     if (!point || !point.address) return false;
     const addr = String(point.address).trim();
-    // 東京都の区市のみ (「東京都世田谷区」のような市区単位の結果を除外)
+    // 全国対応: 都道府県+自治体名のみ（番地等なし）の結果を除外
+    // 東京都の区市
     if (/^東京都[^\s\d丁番号区市]+[区市]$/.test(addr)) return true;
-    // 神奈川/埼玉/千葉/群馬/栃木の自治体単位のみ除外
-    // [^\s\d丁番号市町村] で市町村文字を除外し、「XX市YY町」のような町域結果を誤って除外しない
-    if (/^神奈川県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^埼玉県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^千葉県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^群馬県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^栃木県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^茨城県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    // 東北6県
-    if (/^青森県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^岩手県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^宮城県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^秋田県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^山形県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
-    if (/^福島県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    // 北海道/XX府/XX県 + 市町村のみ
+    if (/^(?:北海道|(?:京都|大阪)府|.+?県)[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     return false;
   }
 
