@@ -1854,7 +1854,7 @@ const collectAichiKiyosuEvents = createMamafreCollector({ source: AICHI_KIYOSU_S
 const collectOkayamaKibichuoEvents = createMamafreCollector({ source: OKAYAMA_KIBICHUO_SOURCE, mamafre_base: "https://kibichuo-town.mamafre.jp", pref: "岡山県", city: "吉備中央町" }, geoFmDeps);
 // いこーよ (不足都道府県カバー)
 const IKOYO_CHILD_KW = ["子ども","子育て","親子","キッズ","ベビー","赤ちゃん","幼児","児童","乳幼児","ファミリー","小学生","未就学","おはなし","工作","体験","ワークショップ"];
-const collectIkoyoEvents = createIkoyoCollector({ source: IKOYO_SOURCE, prefectureIds: [15, 24, 32, 38, 41, 43, 45, 46], childKeywords: IKOYO_CHILD_KW }, geoFmDeps);
+const collectIkoyoEvents = createIkoyoCollector({ source: IKOYO_SOURCE, prefectureIds: [4, 15, 18, 21, 23, 24, 26, 27, 32, 34, 35, 38, 39, 40, 41, 43, 45, 46], childKeywords: IKOYO_CHILD_KW }, geoFmDeps);
 // 札幌市 (SMART CMS API)
 const collectHokkaidoSapporoEvents = createSapporoKosodateCollector({ source: HOKKAIDO_SAPPORO_SOURCE }, geoFmDeps);
 // 大分市 (naana)
