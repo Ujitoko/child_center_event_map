@@ -64,10 +64,10 @@ function createMamafreCollector(config, deps) {
       // Time range
       const endMatch = (item.end_datetime || "").match(/(\d{2}):(\d{2})/);
       const timeRange = {
-        startH: Number(startMatch[4]),
-        startM: Number(startMatch[5]),
-        endH: endMatch ? Number(endMatch[1]) : null,
-        endM: endMatch ? Number(endMatch[2]) : null,
+        startHour: Number(startMatch[4]),
+        startMinute: Number(startMatch[5]),
+        endHour: endMatch ? Number(endMatch[1]) : null,
+        endMinute: endMatch ? Number(endMatch[2]) : null,
       };
 
       // Venue
