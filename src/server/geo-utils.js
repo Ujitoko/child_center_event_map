@@ -61,9 +61,9 @@ function createGeoHelpers(deps) {
 
   function isLikelyLocalPoint(point) {
     if (!point || !Number.isFinite(point.lat) || !Number.isFinite(point.lng)) return false;
-    // 東京都 + 神奈川県 + 千葉県 + 埼玉県 + 群馬県 + 栃木県 + 茨城県全域をカバー
-    // (南: 湯河原町 35.14, 北: 北茨城市 36.87/那須町 37.12, 西: 嬬恋村 138.48, 東: 神栖市 140.87)
-    return point.lat >= 34.9 && point.lat <= 37.2 && point.lng >= 138.4 && point.lng <= 140.9;
+    // 関東 + 東北全域をカバー
+    // (南: 湯河原町 34.97, 北: 青森県大間町 41.53, 西: 嬬恋村 138.48, 東: 宮城県気仙沼 141.68)
+    return point.lat >= 34.9 && point.lat <= 41.6 && point.lng >= 138.4 && point.lng <= 141.7;
   }
 
   function isNearWardCenter(point, wardCenter, maxKm) {
@@ -267,6 +267,49 @@ function createGeoHelpers(deps) {
       ibaraki_ushiku: 10,
       ibaraki_ami: 10,
       ibaraki_tone: 8,
+      // 東北6県
+      aomori_hachinohe: 20,
+      aomori_tsugaru: 20,
+      aomori_hiranai: 15,
+      aomori_nakadomari: 15,
+      aomori_yomogita: 10,
+      aomori_itayanagi: 10,
+      iwate_kitakami: 15,
+      iwate_kuji: 20,
+      iwate_oshu: 25,
+      iwate_nishiwaga: 25,
+      iwate_ichinohe: 15,
+      iwate_otsuchi: 15,
+      miyagi_ishinomaki: 25,
+      miyagi_higashimatsushima: 12,
+      miyagi_zao: 15,
+      miyagi_shichikashuku: 20,
+      miyagi_shichigahama: 8,
+      miyagi_taiwa: 12,
+      miyagi_shikama: 10,
+      akita_yokote: 25,
+      akita_yurihonjyo: 30,
+      akita_oga: 20,
+      akita_kosaka: 15,
+      akita_hachirogata: 8,
+      yamagata_yonezawa: 20,
+      yamagata_sakata: 25,
+      yamagata_shinjo: 15,
+      yamagata_nagai: 15,
+      yamagata_nakayama: 10,
+      yamagata_kahoku: 10,
+      yamagata_asahi_ym: 15,
+      yamagata_kaneyama: 15,
+      yamagata_mamurogawa: 15,
+      yamagata_okura: 20,
+      yamagata_shirataka: 12,
+      fukushima_fukushima: 20,
+      fukushima_soma: 15,
+      fukushima_minamisoma: 20,
+      fukushima_otama: 10,
+      fukushima_shimogo: 20,
+      fukushima_aizumisato: 15,
+      fukushima_furudono: 12,
     };
     return overrides[key] || 10;
   }
@@ -299,6 +342,13 @@ function createGeoHelpers(deps) {
     if (/^群馬県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     if (/^栃木県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     if (/^茨城県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    // 東北6県
+    if (/^青森県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^岩手県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^宮城県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^秋田県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^山形県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
+    if (/^福島県[^\s\d丁番号市町村]+[市町村]$/.test(addr)) return true;
     return false;
   }
 

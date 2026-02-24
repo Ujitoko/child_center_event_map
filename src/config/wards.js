@@ -1243,6 +1243,49 @@ const WARD_LABEL_BY_KEY = {
   ibaraki_ushiku: "牛久市",
   ibaraki_ami: "阿見町",
   ibaraki_tone: "利根町",
+  // 東北6県
+  aomori_hachinohe: "八戸市",
+  aomori_tsugaru: "つがる市",
+  aomori_hiranai: "平内町",
+  aomori_nakadomari: "中泊町",
+  aomori_yomogita: "蓬田村",
+  aomori_itayanagi: "板柳町",
+  iwate_kitakami: "北上市",
+  iwate_kuji: "久慈市",
+  iwate_oshu: "奥州市",
+  iwate_nishiwaga: "西和賀町",
+  iwate_ichinohe: "一戸町",
+  iwate_otsuchi: "大槌町",
+  miyagi_ishinomaki: "石巻市",
+  miyagi_higashimatsushima: "東松島市",
+  miyagi_zao: "蔵王町",
+  miyagi_shichikashuku: "七ヶ宿町",
+  miyagi_shichigahama: "七ヶ浜町",
+  miyagi_taiwa: "大和町",
+  miyagi_shikama: "色麻町",
+  akita_yokote: "横手市",
+  akita_yurihonjyo: "由利本荘市",
+  akita_oga: "男鹿市",
+  akita_kosaka: "小坂町",
+  akita_hachirogata: "八郎潟町",
+  yamagata_yonezawa: "米沢市",
+  yamagata_sakata: "酒田市",
+  yamagata_shinjo: "新庄市",
+  yamagata_nagai: "長井市",
+  yamagata_nakayama: "中山町",
+  yamagata_kahoku: "河北町",
+  yamagata_asahi_ym: "朝日町",
+  yamagata_kaneyama: "金山町",
+  yamagata_mamurogawa: "真室川町",
+  yamagata_okura: "大蔵村",
+  yamagata_shirataka: "白鷹町",
+  fukushima_fukushima: "福島市",
+  fukushima_soma: "相馬市",
+  fukushima_minamisoma: "南相馬市",
+  fukushima_otama: "大玉村",
+  fukushima_shimogo: "下郷町",
+  fukushima_aizumisato: "会津美里町",
+  fukushima_furudono: "古殿町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -4015,6 +4058,56 @@ const USHIKU_SOURCE = { key: "ibaraki_ushiku", label: "牛久市", baseUrl: "htt
 const AMI_SOURCE = { key: "ibaraki_ami", label: "阿見町", baseUrl: "https://www.town.ami.lg.jp", center: { lat: 36.0300, lng: 140.2130 } };
 const TONE_IB_SOURCE = { key: "ibaraki_tone", label: "利根町", baseUrl: "https://www.town.tone.ibaraki.jp", center: { lat: 35.8603, lng: 140.1464 } };
 
+// ========== 東北6県 ==========
+// 青森県
+const HACHINOHE_SOURCE = { key: "aomori_hachinohe", label: "八戸市", baseUrl: "https://www.city.hachinohe.aomori.jp", center: { lat: 40.5122, lng: 141.4883 } };
+const TSUGARU_SOURCE = { key: "aomori_tsugaru", label: "つがる市", baseUrl: "https://www.city.tsugaru.aomori.jp", center: { lat: 40.8079, lng: 140.3800 } };
+const HIRANAI_SOURCE = { key: "aomori_hiranai", label: "平内町", baseUrl: "https://www.town.hiranai.aomori.jp", center: { lat: 40.9262, lng: 140.9571 } };
+const NAKADOMARI_SOURCE = { key: "aomori_nakadomari", label: "中泊町", baseUrl: "https://www.town.nakadomari.lg.jp", center: { lat: 41.0494, lng: 140.4314 } };
+const YOMOGITA_SOURCE = { key: "aomori_yomogita", label: "蓬田村", baseUrl: "https://www.vill.yomogita.lg.jp", center: { lat: 41.0087, lng: 140.6551 } };
+const ITAYANAGI_SOURCE = { key: "aomori_itayanagi", label: "板柳町", baseUrl: "https://www.town.itayanagi.aomori.jp", center: { lat: 40.6935, lng: 140.4581 } };
+// 岩手県
+const KITAKAMI_SOURCE = { key: "iwate_kitakami", label: "北上市", baseUrl: "https://www.city.kitakami.iwate.jp", center: { lat: 39.2866, lng: 141.1129 } };
+const KUJI_SOURCE = { key: "iwate_kuji", label: "久慈市", baseUrl: "https://www.city.kuji.iwate.jp", center: { lat: 40.1904, lng: 141.7766 } };
+const OSHU_SOURCE = { key: "iwate_oshu", label: "奥州市", baseUrl: "https://www.city.oshu.iwate.jp", center: { lat: 39.1441, lng: 141.1388 } };
+const NISHIWAGA_SOURCE = { key: "iwate_nishiwaga", label: "西和賀町", baseUrl: "https://www.town.nishiwaga.lg.jp", center: { lat: 39.3197, lng: 140.6909 } };
+const ICHINOHE_SOURCE = { key: "iwate_ichinohe", label: "一戸町", baseUrl: "https://www.town.ichinohe.iwate.jp", center: { lat: 40.2117, lng: 141.2978 } };
+const OTSUCHI_SOURCE = { key: "iwate_otsuchi", label: "大槌町", baseUrl: "https://www.town.otsuchi.iwate.jp", center: { lat: 39.3590, lng: 141.8966 } };
+// 宮城県
+const ISHINOMAKI_SOURCE = { key: "miyagi_ishinomaki", label: "石巻市", baseUrl: "https://www.city.ishinomaki.lg.jp", center: { lat: 38.4341, lng: 141.3029 } };
+const HIGASHIMATSUSHIMA_SOURCE = { key: "miyagi_higashimatsushima", label: "東松島市", baseUrl: "https://www.city.higashimatsushima.miyagi.jp", center: { lat: 38.4256, lng: 141.2108 } };
+const ZAO_SOURCE = { key: "miyagi_zao", label: "蔵王町", baseUrl: "https://www.town.zao.miyagi.jp", center: { lat: 38.1005, lng: 140.6583 } };
+const SHICHIKASHUKU_SOURCE = { key: "miyagi_shichikashuku", label: "七ヶ宿町", baseUrl: "https://www.town.shichikashuku.miyagi.jp", center: { lat: 37.9813, lng: 140.3516 } };
+const SHICHIGAHAMA_SOURCE = { key: "miyagi_shichigahama", label: "七ヶ浜町", baseUrl: "https://www.shichigahama.com", center: { lat: 38.2979, lng: 141.0573 } };
+const TAIWA_SOURCE = { key: "miyagi_taiwa", label: "大和町", baseUrl: "https://www.town.taiwa.miyagi.jp", center: { lat: 38.4399, lng: 140.8849 } };
+const SHIKAMA_SOURCE = { key: "miyagi_shikama", label: "色麻町", baseUrl: "https://www.town.shikama.miyagi.jp", center: { lat: 38.5713, lng: 140.8459 } };
+// 秋田県
+const YOKOTE_SOURCE = { key: "akita_yokote", label: "横手市", baseUrl: "https://www.city.yokote.lg.jp", center: { lat: 39.3112, lng: 140.5539 } };
+const YURIHONJYO_SOURCE = { key: "akita_yurihonjyo", label: "由利本荘市", baseUrl: "https://www.city.yurihonjo.lg.jp", center: { lat: 39.3859, lng: 140.0485 } };
+const OGA_SOURCE = { key: "akita_oga", label: "男鹿市", baseUrl: "https://www.city.oga.akita.jp", center: { lat: 39.8868, lng: 139.8492 } };
+const KOSAKA_SOURCE = { key: "akita_kosaka", label: "小坂町", baseUrl: "https://www.town.kosaka.akita.jp", center: { lat: 40.3296, lng: 140.7393 } };
+const HACHIROGATA_SOURCE = { key: "akita_hachirogata", label: "八郎潟町", baseUrl: "https://www.town.hachirogata.akita.jp", center: { lat: 39.9414, lng: 140.0644 } };
+// 山形県
+const YONEZAWA_SOURCE = { key: "yamagata_yonezawa", label: "米沢市", baseUrl: "https://www.city.yonezawa.yamagata.jp", center: { lat: 37.9227, lng: 140.1166 } };
+const SAKATA_SOURCE = { key: "yamagata_sakata", label: "酒田市", baseUrl: "https://www.city.sakata.lg.jp", center: { lat: 38.9145, lng: 139.8364 } };
+const SHINJO_SOURCE = { key: "yamagata_shinjo", label: "新庄市", baseUrl: "https://www.city.shinjo.yamagata.jp", center: { lat: 38.7632, lng: 140.3068 } };
+const NAGAI_SOURCE = { key: "yamagata_nagai", label: "長井市", baseUrl: "https://www.city.nagai.yamagata.jp", center: { lat: 38.1078, lng: 140.0421 } };
+const NAKAYAMA_YM_SOURCE = { key: "yamagata_nakayama", label: "中山町", baseUrl: "https://www.town.nakayama.yamagata.jp", center: { lat: 38.3063, lng: 140.2726 } };
+const KAHOKU_SOURCE = { key: "yamagata_kahoku", label: "河北町", baseUrl: "https://www.town.kahoku.yamagata.jp", center: { lat: 38.4167, lng: 140.3114 } };
+const ASAHI_YM_SOURCE = { key: "yamagata_asahi_ym", label: "朝日町", baseUrl: "https://www.town.asahi.yamagata.jp", center: { lat: 38.2879, lng: 140.1492 } };
+const KANEYAMA_YM_SOURCE = { key: "yamagata_kaneyama", label: "金山町", baseUrl: "https://www.town.kaneyama.yamagata.jp", center: { lat: 38.8823, lng: 140.3396 } };
+const MAMUROGAWA_SOURCE = { key: "yamagata_mamurogawa", label: "真室川町", baseUrl: "https://www.town.mamurogawa.yamagata.jp", center: { lat: 38.8580, lng: 140.2536 } };
+const OKURA_SOURCE = { key: "yamagata_okura", label: "大蔵村", baseUrl: "https://www.vill.ohkura.yamagata.jp", center: { lat: 38.6685, lng: 140.1920 } };
+const SHIRATAKA_SOURCE = { key: "yamagata_shirataka", label: "白鷹町", baseUrl: "https://www.town.shirataka.lg.jp", center: { lat: 38.1893, lng: 140.0994 } };
+// 福島県
+const FUKUSHIMA_CITY_SOURCE = { key: "fukushima_fukushima", label: "福島市", baseUrl: "https://www.city.fukushima.fukushima.jp", center: { lat: 37.7608, lng: 140.4748 } };
+const SOMA_SOURCE = { key: "fukushima_soma", label: "相馬市", baseUrl: "https://www.city.soma.fukushima.jp", center: { lat: 37.7963, lng: 140.9197 } };
+const MINAMISOMA_SOURCE = { key: "fukushima_minamisoma", label: "南相馬市", baseUrl: "https://www.city.minamisoma.lg.jp", center: { lat: 37.6422, lng: 140.9574 } };
+const OTAMA_SOURCE = { key: "fukushima_otama", label: "大玉村", baseUrl: "https://www.vill.otama.fukushima.jp", center: { lat: 37.5340, lng: 140.3587 } };
+const SHIMOGO_SOURCE = { key: "fukushima_shimogo", label: "下郷町", baseUrl: "https://www.town.shimogo.fukushima.jp", center: { lat: 37.2249, lng: 139.8630 } };
+const AIZUMISATO_SOURCE = { key: "fukushima_aizumisato", label: "会津美里町", baseUrl: "https://www.town.aizumisato.fukushima.jp", center: { lat: 37.4590, lng: 139.8422 } };
+const FURUDONO_SOURCE = { key: "fukushima_furudono", label: "古殿町", baseUrl: "https://www.town.furudono.fukushima.jp", center: { lat: 37.0934, lng: 140.5600 } };
+
 // Ibaraki KNOWN_FACILITIES
 const KNOWN_MITO_FACILITIES = {
   "水戸市総合教育研究所": "水戸市笠原町978-5",
@@ -4502,4 +4595,11 @@ module.exports = {
   USHIKU_SOURCE, KNOWN_USHIKU_FACILITIES,
   AMI_SOURCE, KNOWN_AMI_FACILITIES,
   TONE_IB_SOURCE, KNOWN_TONE_IB_FACILITIES,
+  // 東北6県
+  HACHINOHE_SOURCE, TSUGARU_SOURCE, HIRANAI_SOURCE, NAKADOMARI_SOURCE, YOMOGITA_SOURCE, ITAYANAGI_SOURCE,
+  KITAKAMI_SOURCE, KUJI_SOURCE, OSHU_SOURCE, NISHIWAGA_SOURCE, ICHINOHE_SOURCE, OTSUCHI_SOURCE,
+  ISHINOMAKI_SOURCE, HIGASHIMATSUSHIMA_SOURCE, ZAO_SOURCE, SHICHIKASHUKU_SOURCE, SHICHIGAHAMA_SOURCE, TAIWA_SOURCE, SHIKAMA_SOURCE,
+  YOKOTE_SOURCE, YURIHONJYO_SOURCE, OGA_SOURCE, KOSAKA_SOURCE, HACHIROGATA_SOURCE,
+  YONEZAWA_SOURCE, SAKATA_SOURCE, SHINJO_SOURCE, NAGAI_SOURCE, NAKAYAMA_YM_SOURCE, KAHOKU_SOURCE, ASAHI_YM_SOURCE, KANEYAMA_YM_SOURCE, MAMUROGAWA_SOURCE, OKURA_SOURCE, SHIRATAKA_SOURCE,
+  FUKUSHIMA_CITY_SOURCE, SOMA_SOURCE, MINAMISOMA_SOURCE, OTAMA_SOURCE, SHIMOGO_SOURCE, AIZUMISATO_SOURCE, FURUDONO_SOURCE,
 };

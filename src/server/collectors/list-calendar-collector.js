@@ -69,6 +69,18 @@ function detectPrefecture(source) {
   if (/katori|abiko|kamagaya/.test(source.key || "")) return "千葉県";
   if (/ibaraki\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "茨城県";
   if (/^ibaraki_/.test(source.key || "")) return "茨城県";
+  if (/aomori\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "青森県";
+  if (/^aomori_/.test(source.key || "")) return "青森県";
+  if (/iwate\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "岩手県";
+  if (/^iwate_/.test(source.key || "")) return "岩手県";
+  if (/miyagi\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "宮城県";
+  if (/^miyagi_/.test(source.key || "")) return "宮城県";
+  if (/akita\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "秋田県";
+  if (/^akita_/.test(source.key || "")) return "秋田県";
+  if (/yamagata\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "山形県";
+  if (/^yamagata_/.test(source.key || "")) return "山形県";
+  if (/fukushima\.(jp|lg\.jp)/.test(source.baseUrl || "")) return "福島県";
+  if (/^fukushima_/.test(source.key || "")) return "福島県";
   return "神奈川県";
 }
 
