@@ -12,4 +12,6 @@ data/*
 *.log
 .env
 nul
+scripts/_*
+scripts/probe_*
 .claude/
