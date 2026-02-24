@@ -1527,9 +1527,16 @@ const WARD_LABEL_BY_KEY = {
   kagoshima_minamikyushu: "南九州市",
   kagoshima_satsuma: "さつま町",
   kagoshima_kimotsuki: "肝付町",
+  hokkaido_sapporo: "札幌市",
+  oita_oita: "大分市",
+  okinawa_naha: "那覇市",
   okinawa_yomitan: "読谷村",
   okinawa_kitanakagusuku: "北中城村",
   okinawa_ie: "伊江村",
+  shizuoka_atami: "熱海市",
+  shizuoka_ito: "伊東市",
+  aichi_kiyosu: "清須市",
+  okayama_kibichuo: "吉備中央町",
 };
 
 const KNOWN_OTA_FACILITIES = {
@@ -4631,9 +4638,17 @@ const KAGOSHIMA_MINAMIKYUSHU_SOURCE = { key: "kagoshima_minamikyushu", label: "�
 const KAGOSHIMA_SATSUMA_SOURCE = { key: "kagoshima_satsuma", label: "さつま町", baseUrl: "https://www.satsuma-net.jp", center: { lat: 31.8992, lng: 130.4589 } };
 const KAGOSHIMA_KIMOTSUKI_SOURCE = { key: "kagoshima_kimotsuki", label: "肝付町", baseUrl: "https://www.town.kimotsuki.lg.jp", center: { lat: 31.3417, lng: 131.0853 } };
 // 沖縄県
+const HOKKAIDO_SAPPORO_SOURCE = { key: "hokkaido_sapporo", label: "札幌市", baseUrl: "https://kosodate.city.sapporo.jp", center: { lat: 43.0621, lng: 141.3544 } };
+const OITA_OITA_SOURCE = { key: "oita_oita", label: "大分市(naana)", baseUrl: "https://naana-oita.jp", center: { lat: 33.2382, lng: 131.6126 } };
+const OKINAWA_NAHA_SOURCE = { key: "okinawa_naha", label: "那覇市", baseUrl: "https://www.city.naha.okinawa.jp", center: { lat: 26.2124, lng: 127.6809 } };
 const OKINAWA_YOMITAN_SOURCE = { key: "okinawa_yomitan", label: "読谷村", baseUrl: "https://www.vill.yomitan.okinawa.jp", center: { lat: 26.395, lng: 127.7442 } };
 const OKINAWA_KITANAKAGUSUKU_SOURCE = { key: "okinawa_kitanakagusuku", label: "北中城村", baseUrl: "https://www.vill.kitanakagusuku.lg.jp", center: { lat: 26.3367, lng: 127.7892 } };
 const OKINAWA_IE_SOURCE = { key: "okinawa_ie", label: "伊江村", baseUrl: "https://www.iejima.org", center: { lat: 26.71, lng: 127.8063 } };
+// 追加ママフレ都市
+const SHIZUOKA_ATAMI_SOURCE = { key: "shizuoka_atami", label: "熱海市", baseUrl: "https://atami-city.mamafre.jp", center: { lat: 35.0964, lng: 139.0715 } };
+const SHIZUOKA_ITO_SOURCE = { key: "shizuoka_ito", label: "伊東市", baseUrl: "https://ito-city.mamafre.jp", center: { lat: 34.9656, lng: 139.1017 } };
+const AICHI_KIYOSU_SOURCE = { key: "aichi_kiyosu", label: "清須市", baseUrl: "https://kiyosu-city.mamafre.jp", center: { lat: 35.2003, lng: 136.8511 } };
+const OKAYAMA_KIBICHUO_SOURCE = { key: "okayama_kibichuo", label: "吉備中央町", baseUrl: "https://kibichuo-town.mamafre.jp", center: { lat: 34.8574, lng: 133.6928 } };
 
 // Ibaraki KNOWN_FACILITIES
 const KNOWN_MITO_FACILITIES = {
@@ -5294,7 +5309,7 @@ module.exports = {
   // 中国・四国
   TOTTORI_KOSODATE_SOURCE, TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_IKUCHAN_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, HIROSHIMA_FUKUYAMA_SOURCE, HIROSHIMA_KURE_SOURCE, HIROSHIMA_ONOMICHI_SOURCE, HIROSHIMA_MIHARA_SOURCE, HIROSHIMA_HATSUKAICHI_SOURCE, YAMAGUCHI_HIKARI_SOURCE, YAMAGUCHI_SHIMONOSEKI_SOURCE, YAMAGUCHI_YAMAGUCHI_SOURCE, YAMAGUCHI_SHUNAN_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, KOCHI_MUROTO_SOURCE, KOCHI_KOKOHARE_SOURCE,
   // 九州・沖縄
-  FUKUOKA_KITAKYUSHU_SOURCE, FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, FUKUOKA_CHIKUSHINO_SOURCE, FUKUOKA_NAKAGAWA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, SAGA_KARATSU_SOURCE, SAGA_TOSU_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, KUMAMOTO_KIKUCHI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE,
+  FUKUOKA_KITAKYUSHU_SOURCE, FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, FUKUOKA_CHIKUSHINO_SOURCE, FUKUOKA_NAKAGAWA_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, SAGA_KARATSU_SOURCE, SAGA_TOSU_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, KUMAMOTO_KIKUCHI_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE, HOKKAIDO_SAPPORO_SOURCE, OITA_OITA_SOURCE, OKINAWA_NAHA_SOURCE, SHIZUOKA_ATAMI_SOURCE, SHIZUOKA_ITO_SOURCE, AICHI_KIYOSU_SOURCE, OKAYAMA_KIBICHUO_SOURCE,
   // Metadata for frontend
   REGION_GROUPS,
   PREF_CENTERS,

@@ -408,7 +408,7 @@ function createGetEvents(deps) {
     // 中国・四国
     collectTottoriKosodateEvents, collectTottoriNichinanEvents, collectTottoriSakaiminatoEvents, collectShimaneMasudaEvents, collectShimaneAmaEvents, collectOkayamaOkayamaEvents, collectOkayamaAkaiwaEvents, collectOkayamaMimasakaEvents, collectOkayamaHayashimaEvents, collectHiroshimaIkuchanEvents, collectHiroshimaFuchuEvents, collectHiroshimaOtakeEvents, collectHiroshimaHigashihiroshimaEvents, collectHiroshimaFukuyamaEvents, collectHiroshimaKureEvents, collectHiroshimaOnomichiEvents, collectHiroshimaMiharaEvents, collectHiroshimaHatsukaichiEvents, collectYamaguchiHikariEvents, collectYamaguchiShimonosekiEvents, collectYamaguchiYamaguchiEvents, collectYamaguchiShunanEvents, collectTokushimaTokushimaEvents, collectTokushimaNakaEvents, collectTokushimaHigashimiyoshiEvents, collectKagawaTakamatsuEvents, collectKagawaSanukiEvents, collectKagawaMitoyoEvents, collectKagawaTonoshoEvents, collectEhimeSeiyoEvents, collectEhimeTobeEvents, collectKochiMurotoEvents, collectKochiKokohareEvents,
     // 九州・沖縄
-    collectFukuokaKitakyushuEvents, collectFukuokaFukutsuEvents, collectFukuokaShinguFkEvents, collectFukuokaHirokawaEvents, collectFukuokaKawaraEvents, collectFukuokaChikushinoEvents, collectFukuokaNakagawaEvents, collectNagasakiTsushimaEvents, collectNagasakiIkiEvents, collectNagasakiSaikaiEvents, collectNagasakiTogitsuEvents, collectNagasakiHigashisonogiEvents, collectSagaKaratsuEvents, collectSagaTosuEvents, collectKumamotoTakamoriEvents, collectKumamotoKikuchiEvents, collectOitaHitaEvents, collectOitaTaketaEvents, collectOitaKitsukiEvents, collectOitaKusuEvents, collectMiyazakiMiyazakiEvents, collectMiyazakiNichinanEvents, collectMiyazakiKijoEvents, collectMiyazakiKadogawaEvents, collectMiyazakiMiyakojoEvents, collectKagoshimaSatsumasendaiEvents, collectKagoshimaMinamikyushuEvents, collectKagoshimaSatsumaEvents, collectKagoshimaKimotsukiEvents, collectOkinawaYomitanEvents, collectOkinawaKitanakagusukuEvents, collectOkinawaIeEvents,
+    collectFukuokaKitakyushuEvents, collectFukuokaFukutsuEvents, collectFukuokaShinguFkEvents, collectFukuokaHirokawaEvents, collectFukuokaKawaraEvents, collectFukuokaChikushinoEvents, collectFukuokaNakagawaEvents, collectNagasakiTsushimaEvents, collectNagasakiIkiEvents, collectNagasakiSaikaiEvents, collectNagasakiTogitsuEvents, collectNagasakiHigashisonogiEvents, collectSagaKaratsuEvents, collectSagaTosuEvents, collectKumamotoTakamoriEvents, collectKumamotoKikuchiEvents, collectOitaHitaEvents, collectOitaTaketaEvents, collectOitaKitsukiEvents, collectOitaKusuEvents, collectMiyazakiMiyazakiEvents, collectMiyazakiNichinanEvents, collectMiyazakiKijoEvents, collectMiyazakiKadogawaEvents, collectMiyazakiMiyakojoEvents, collectKagoshimaSatsumasendaiEvents, collectKagoshimaMinamikyushuEvents, collectKagoshimaSatsumaEvents, collectKagoshimaKimotsukiEvents, collectHokkaidoSapporoEvents, collectOitaOitaEvents, collectOkinawaNahaEvents, collectOkinawaYomitanEvents, collectOkinawaKitanakagusukuEvents, collectOkinawaIeEvents, collectShizuokaAtamiEvents, collectShizuokaItoEvents, collectAichiKiyosuEvents, collectOkayamaKibichuoEvents,
   } = deps;
 
   return async function getEvents(maxDays, refresh) {
@@ -1088,6 +1088,13 @@ function createGetEvents(deps) {
     () => collectOkinawaYomitanEvents(days),
     () => collectOkinawaKitanakagusukuEvents(days),
     () => collectOkinawaIeEvents(days),
+    () => collectHokkaidoSapporoEvents(days),
+    () => collectOitaOitaEvents(days),
+    () => collectOkinawaNahaEvents(days),
+    () => collectShizuokaAtamiEvents(days),
+    () => collectShizuokaItoEvents(days),
+    () => collectAichiKiyosuEvents(days),
+    () => collectOkayamaKibichuoEvents(days),
   ], 5);
   // Flatten all collector results into a single array.
   // Most collectors return an array; additional-wards returns an object of arrays.
