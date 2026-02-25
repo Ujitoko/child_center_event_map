@@ -34,8 +34,8 @@ const WARD_MAP = {
  */
 function parseListHtml(html) {
   const events = [];
-  // Match each <li> with cate_n (乳幼児対象)
-  const liRe = /<li\s+class='([^']*cate_n[^']*)'>([\s\S]*?)<\/li>/gi;
+  // Match each <li> with cate_n (乳幼児対象) or cate_c (企画・定例イベント)
+  const liRe = /<li\s+class='([^']*cate_[nc][^']*)'>([\s\S]*?)<\/li>/gi;
   let m;
   while ((m = liRe.exec(html)) !== null) {
     const cls = m[1];
