@@ -79,11 +79,15 @@ function createGetEvents(deps) {
   }
 
   // refresh=1 (cron only): actually scrape
+  const memBefore = process.memoryUsage();
+  console.log(`[refresh] start — heap: ${Math.round(memBefore.heapUsed / 1024 / 1024)}MB, rss: ${Math.round(memBefore.rss / 1024 / 1024)}MB, geoCache: ${geoCache?.size || 0}`);
 
   const allCollectorResults = await batchCollect(
     collectors.map(fn => () => fn(days)),
-    5
+    3
   );
+  const memAfter = process.memoryUsage();
+  console.log(`[refresh] done — heap: ${Math.round(memAfter.heapUsed / 1024 / 1024)}MB, rss: ${Math.round(memAfter.rss / 1024 / 1024)}MB, geoCache: ${geoCache?.size || 0}`);
   // Flatten all collector results into a single array.
   // Most collectors return an array; additional-wards returns an object of arrays.
   const rawItems = [];

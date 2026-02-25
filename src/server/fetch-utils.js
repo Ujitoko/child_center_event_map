@@ -1,6 +1,6 @@
 const { scoreJapaneseText } = require("./text-utils");
 
-const MAX_CONCURRENT = 12;
+const MAX_CONCURRENT = 6;
 let active = 0;
 const queue = [];
 const lastFetchByDomain = new Map();

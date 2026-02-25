@@ -3,8 +3,30 @@ const path = require("path");
 const { normalizeText } = require("./text-utils");
 const { sanitizeAddressText } = require("./text-utils");
 
+const GEO_CACHE_MAX = 10000;
+
 function createGeoHelpers(deps) {
   const geoCache = deps?.geoCache instanceof Map ? deps.geoCache : new Map();
+
+  function geoCacheSet(key, value) {
+    // LRU-like eviction: remove oldest 20% when cap is reached
+    if (geoCache.size >= GEO_CACHE_MAX && !geoCache.has(key)) {
+      const toRemove = Math.floor(GEO_CACHE_MAX * 0.2);
+      let removed = 0;
+      for (const k of geoCache.keys()) {
+        if (removed >= toRemove) break;
+        // Prioritize removing null entries
+        if (geoCache.get(k) === null) { geoCache.delete(k); removed++; }
+      }
+      if (removed < toRemove) {
+        for (const k of geoCache.keys()) {
+          if (removed >= toRemove) break;
+          geoCache.delete(k); removed++;
+        }
+      }
+    }
+    geoCache.set(key, value);
+  }
 
   async function geocodeQuery(query) {
     const q = normalizeText(query);
@@ -17,18 +39,18 @@ function createGeoHelpers(deps) {
         signal: AbortSignal.timeout(12000),
       });
       if (!res.ok) {
-        geoCache.set(q, null);
+        geoCacheSet(q, null);
         return null;
       }
       const data = await res.json();
       if (!Array.isArray(data) || data.length === 0) {
-        geoCache.set(q, null);
+        geoCacheSet(q, null);
         return null;
       }
       const top = data[0] || {};
       const c = top?.geometry?.coordinates;
       if (!Array.isArray(c) || c.length < 2) {
-        geoCache.set(q, null);
+        geoCacheSet(q, null);
         return null;
       }
       const point = {
@@ -37,13 +59,13 @@ function createGeoHelpers(deps) {
         address: sanitizeAddressText(top?.properties?.title || top?.properties?.address || ""),
       };
       if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) {
-        geoCache.set(q, null);
+        geoCacheSet(q, null);
         return null;
       }
-      geoCache.set(q, point);
+      geoCacheSet(q, point);
       return point;
     } catch {
-      geoCache.set(q, null);
+      geoCacheSet(q, null);
       return null;
     }
   }
