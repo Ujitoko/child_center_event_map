@@ -970,7 +970,7 @@ const collectYomogitaEvents = createMunicipalCalendarCollector({ source: YOMOGIT
 const collectItayanagiEvents = createEventJsCollector({ source: ITAYANAGI_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, geoFmDeps);
 // 岩手県
 const collectIchinosekiEvents = createIchinosekiCollector({ source: IWATE_ICHINOSEKI_SOURCE }, geoFmDeps);
-const collectIwateMoriokaEvents = createEventJsCollector({ source: IWATE_MORIOKA_SOURCE, jsFile: "event_data.js", childCategoryIds: [], useKeywordFilter: true }, geoFmDeps);
+const collectIwateMoriokaEvents = createEventJsCollector({ source: IWATE_MORIOKA_SOURCE, jsFile: "event_data.js", childCategoryIds: ["7"], useKeywordFilter: true }, geoFmDeps);
 const collectKitakamiEvents = createCalendarJsonCollector({ source: KITAKAMI_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectKujiEvents = createCalendarJsonCollector({ source: KUJI_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectOshuEvents = createCalendarJsonCollector({ source: OSHU_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
@@ -1247,7 +1247,7 @@ const collectYamaguchiHikariEvents = createCalendarJsonCollector({ source: YAMAG
 const collectYamaguchiShimonosekiEvents = createMunicipalCalendarCollector({ source: YAMAGUCHI_SHIMONOSEKI_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectYamaguchiYamaguchiEvents = createMunicipalCalendarCollector({ source: YAMAGUCHI_YAMAGUCHI_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectYamaguchiShunanEvents = createMunicipalCalendarCollector({ source: YAMAGUCHI_SHUNAN_SOURCE, childCategoryIndex: null }, geoFmDeps);
-const collectYamaguchiUbeEvents = createEventJsCollector({ source: YAMAGUCHI_UBE_SOURCE, jsFile: "event.js", childCategoryIds: [], useKeywordFilter: true }, geoFmDeps);
+const collectYamaguchiUbeEvents = createEventJsCollector({ source: YAMAGUCHI_UBE_SOURCE, jsFile: "event.js", childCategoryIds: ["50"], useKeywordFilter: true }, geoFmDeps);
 // 徳島県
 const collectTokushimaTokushimaEvents = createListCalendarCollector({ source: TOKUSHIMA_TOKUSHIMA_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
 const collectTokushimaNakaEvents = createCalendarJsonCollector({ source: TOKUSHIMA_NAKA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
