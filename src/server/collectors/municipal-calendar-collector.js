@@ -95,8 +95,11 @@ function parseCalendarPage(html, baseUrl, pageYear, pageMonth, childCategoryInde
     // 次の calendar_day の手前 or ページ末尾まで
     const dayBlock = dayParts[i];
 
-    // 日付を抽出: <span class="t_day"><span>16</span>日</span>
-    const dayNumMatch = dayBlock.match(/<span\s+class="t_day">\s*<span>(\d{1,2})<\/span>\s*日\s*<\/span>/);
+    // 日付を抽出: <span class="t_day"><span>16</span>日</span> or <span>16日</span>
+    let dayNumMatch = dayBlock.match(/<span\s+class="t_day">\s*<span>(\d{1,2})<\/span>\s*日\s*<\/span>/);
+    if (!dayNumMatch) {
+      dayNumMatch = dayBlock.match(/<span>(\d{1,2})日<\/span>/);
+    }
     if (!dayNumMatch) continue;
     const dayNum = Number(dayNumMatch[1]);
 
@@ -180,12 +183,24 @@ function parseEventBox(eventBox, baseUrl, childCategoryIndex) {
   while ((metaMatch = metaRe.exec(eventBox)) !== null) {
     const altText = metaMatch[1].trim();
     const ddContent = stripTags(metaMatch[2]).trim();
-    if (/開催時間/.test(altText)) {
+    if (/開催時間|時間/.test(altText)) {
       timeText = ddContent;
-    } else if (/開催場所/.test(altText)) {
+    } else if (/開催場所|場所/.test(altText)) {
       venue = ddContent;
     } else if (/開催期間/.test(altText)) {
       dateRangeText = ddContent;
+    }
+  }
+  // Fallback: <dl><dt>時間</dt><dd>...</dd></dl> (text-based dt, no img)
+  if (!timeText && !venue) {
+    const textMetaRe = /<dl>\s*<dt>([^<]+)<\/dt>\s*<dd>([\s\S]*?)<\/dd>\s*<\/dl>/gi;
+    let tm;
+    while ((tm = textMetaRe.exec(eventBox)) !== null) {
+      const label = tm[1].trim();
+      const val = stripTags(tm[2]).trim();
+      if (/^時間$|開催時間/.test(label) && !timeText) timeText = val;
+      else if (/^場所$|開催場所/.test(label) && !venue) venue = val;
+      else if (/^日$|開催期間/.test(label) && !dateRangeText) dateRangeText = val;
     }
   }
 
