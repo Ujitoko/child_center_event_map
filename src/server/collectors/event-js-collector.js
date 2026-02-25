@@ -27,7 +27,7 @@ function parsePlace2(raw, cityLabel) {
   // 「各〜」(不特定多数の場所)はスキップ
   if (/各(歯科|医院|施設|店舗|学校)/.test(text)) return { venue: "", address: "" };
   // 県外会場はスキップ
-  if (/^(岩手県|新潟県|鳥取県|静岡県|福島県)/.test(text)) return { venue: "", address: "" };
+  if (/^(新潟県|鳥取県|静岡県|福島県)/.test(text)) return { venue: "", address: "" };
   // 複数施設の列挙はスキップ
   if (/【クイズポイント】|【スタンプ/.test(text)) return { venue: "", address: "" };
   // "(1)A (2)B" 形式 → 最初の会場のみ

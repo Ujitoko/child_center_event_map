@@ -221,6 +221,8 @@ const { createToyamaKosodateNetCollector } = require("./src/server/collectors/to
 const { createMarugameNetCollector } = require("./src/server/collectors/marugame-net-collector");
 const { createMieKodomonoShiroCollector } = require("./src/server/collectors/mie-kodomono-shiro-collector");
 const { createYokkaichiKodomoCollector } = require("./src/server/collectors/yokkaichi-kodomo-collector");
+const { createHaguhaguYokoteCollector } = require("./src/server/collectors/haguhagu-yokote-collector");
+const { createHappymamaToyamaCollector } = require("./src/server/collectors/happymama-toyama-collector");
 const { createCollectMitoEvents, createCollectKashimaIbEvents } = require("./src/server/collectors/ibaraki-remaining");
 const {
   createCollectYachiyoIbEvents, createCollectGokaEvents, createCollectOaraiEvents,
@@ -438,7 +440,7 @@ const {
   // 中国・四国
   TOTTORI_KOSODATE_SOURCE, TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_HIROSHIMA_SOURCE, HIROSHIMA_IKUCHAN_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, HIROSHIMA_FUKUYAMA_SOURCE, HIROSHIMA_KURE_SOURCE, HIROSHIMA_ONOMICHI_SOURCE, HIROSHIMA_MIHARA_SOURCE, HIROSHIMA_HATSUKAICHI_SOURCE, YAMAGUCHI_HIKARI_SOURCE, YAMAGUCHI_SHIMONOSEKI_SOURCE, YAMAGUCHI_YAMAGUCHI_SOURCE, YAMAGUCHI_SHUNAN_SOURCE, YAMAGUCHI_UBE_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, KAGAWA_MARUGAME_SOURCE, KAGAWA_SAKAIDE_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, EHIME_NIIHAMA_SOURCE, EHIME_SAIJO_SOURCE, KOCHI_MUROTO_SOURCE, KOCHI_KOKOHARE_SOURCE,
   // 九州・沖縄
-  FUKUOKA_KITAKYUSHU_SOURCE, FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, FUKUOKA_CHIKUSHINO_SOURCE, FUKUOKA_NAKAGAWA_SOURCE, NAGASAKI_NAGASAKI_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, SAGA_KARATSU_SOURCE, SAGA_TOSU_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, KUMAMOTO_KIKUCHI_SOURCE, KUMAMOTO_KOSODATE_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_SUKUSUKU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, IKOYO_SOURCE, HOKKAIDO_SAPPORO_SOURCE, IWATE_MORIOKA_SOURCE, OITA_OITA_SOURCE, WAKAYAMA_WAKAYAMA_SOURCE, OKINAWA_NAHA_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE, SHIZUOKA_ATAMI_SOURCE, SHIZUOKA_ITO_SOURCE, AICHI_KIYOSU_SOURCE, OKAYAMA_KIBICHUO_SOURCE, MIYAGI_SENDAI_JIDOUKAN_SOURCE, KAGAWA_TAKAMATSU_MIRAIE_SOURCE, OKAYAMA_KURASHIKI_SOURCE, TOYAMA_TOYAMA_SOURCE, YAMAGATA_YAMAGATA_SOURCE, ISHIKAWA_HAKUSAN_SOURCE, TOKYO_OTA_MAMAFRE_SOURCE, IBARAKI_KAMISU_MAMAFRE_SOURCE, NARA_SUPERAPP_SOURCE, YAMAGATA_SUKUSUKU_SOURCE, NAGANO_CHEERFUL_SOURCE, HOKKAIDO_KUSHIRO_SOURCE, HOKKAIDO_OBIHIRO_SOURCE, FUKUOKA_KODOMO_SOURCE, ISHIKAWA_OYACOMI_SOURCE, OKINAWA_KOSODATE_SOURCE, HAPPYMAMA_ISHIKAWA_SOURCE, SAGA_KOSODATE_SOURCE, NAGAHAPI_SOURCE, YAMANASHI_PREF_SOURCE, KITAKYUSHU_GENKINOMORI_SOURCE, OKAYAMA_KOSODATE_SOURCE, TOYAMA_KOSODATE_NET_SOURCE, MARUGAME_NET_SOURCE, MIE_KODOMONO_SHIRO_SOURCE, YOKKAICHI_KODOMO_SOURCE, FUKUSHIMA_SHIRAKAWA_SOURCE, YAMAGUCHI_IWAKUNI_SOURCE, YAMAGUCHI_SANYOONODA_SOURCE, KAGAWA_HIGASHIKAGAWA_SOURCE, EHIME_MOCOBOX_SOURCE,
+  FUKUOKA_KITAKYUSHU_SOURCE, FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, FUKUOKA_CHIKUSHINO_SOURCE, FUKUOKA_NAKAGAWA_SOURCE, NAGASAKI_NAGASAKI_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, SAGA_KARATSU_SOURCE, SAGA_TOSU_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, KUMAMOTO_KIKUCHI_SOURCE, KUMAMOTO_KOSODATE_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_SUKUSUKU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, IKOYO_SOURCE, HOKKAIDO_SAPPORO_SOURCE, IWATE_MORIOKA_SOURCE, OITA_OITA_SOURCE, WAKAYAMA_WAKAYAMA_SOURCE, OKINAWA_NAHA_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE, SHIZUOKA_ATAMI_SOURCE, SHIZUOKA_ITO_SOURCE, AICHI_KIYOSU_SOURCE, OKAYAMA_KIBICHUO_SOURCE, MIYAGI_SENDAI_JIDOUKAN_SOURCE, KAGAWA_TAKAMATSU_MIRAIE_SOURCE, OKAYAMA_KURASHIKI_SOURCE, TOYAMA_TOYAMA_SOURCE, YAMAGATA_YAMAGATA_SOURCE, ISHIKAWA_HAKUSAN_SOURCE, TOKYO_OTA_MAMAFRE_SOURCE, IBARAKI_KAMISU_MAMAFRE_SOURCE, NARA_SUPERAPP_SOURCE, YAMAGATA_SUKUSUKU_SOURCE, NAGANO_CHEERFUL_SOURCE, HOKKAIDO_KUSHIRO_SOURCE, HOKKAIDO_OBIHIRO_SOURCE, FUKUOKA_KODOMO_SOURCE, ISHIKAWA_OYACOMI_SOURCE, OKINAWA_KOSODATE_SOURCE, HAPPYMAMA_ISHIKAWA_SOURCE, SAGA_KOSODATE_SOURCE, NAGAHAPI_SOURCE, YAMANASHI_PREF_SOURCE, KITAKYUSHU_GENKINOMORI_SOURCE, OKAYAMA_KOSODATE_SOURCE, TOYAMA_KOSODATE_NET_SOURCE, MARUGAME_NET_SOURCE, MIE_KODOMONO_SHIRO_SOURCE, YOKKAICHI_KODOMO_SOURCE, FUKUSHIMA_SHIRAKAWA_SOURCE, YAMAGUCHI_IWAKUNI_SOURCE, YAMAGUCHI_SANYOONODA_SOURCE, KAGAWA_HIGASHIKAGAWA_SOURCE, EHIME_MOCOBOX_SOURCE, IWATE_PREF_SOURCE, IWATE_HANAMAKI_SOURCE, AKITA_HAGUHAGU_SOURCE, TOYAMA_HAPPYMAMA_SOURCE,
   CHILD_KW, IKOYO_CHILD_KW,
   REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 } = require("./src/config/wards");
@@ -1000,6 +1002,8 @@ const collectOshuEvents = createCalendarJsonCollector({ source: OSHU_SOURCE, chi
 const collectNishiwagaEvents = createCalendarJsonCollector({ source: NISHIWAGA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectIchinoheEvents = createCalendarJsonCollector({ source: ICHINOHE_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectOtsuchiEvents = createMunicipalCalendarCollector({ source: OTSUCHI_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
+const collectIwatePrefEvents = createEventJsCollector({ source: IWATE_PREF_SOURCE, jsFile: "event_d.js", childCategoryIds: [], useKeywordFilter: true }, geoFmDeps);
+const collectIwateHanamakiEvents = createEventJsCollector({ source: IWATE_HANAMAKI_SOURCE, jsFile: "event_d.js", childCategoryIds: ["10"], useKeywordFilter: true }, geoFmDeps);
 // 宮城県
 const collectMiyagiSendaiEvents = createMamafreCollector({ source: MIYAGI_SENDAI_SOURCE, mamafre_base: "https://sendai-city.mamafre.jp", pref: "宮城県", city: "仙台市" }, geoFmDeps);
 const collectSendaiJidoukanEvents = createSendaiJidoukanCollector({ source: MIYAGI_SENDAI_JIDOUKAN_SOURCE }, geoFmDeps);
@@ -1010,7 +1014,7 @@ const collectShichikashukuEvents = createMunicipalCalendarCollector({ source: SH
 const collectShichigahamaEvents = createMunicipalCalendarCollector({ source: SHICHIGAHAMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectTaiwaEvents = createCalendarJsonCollector({ source: TAIWA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectShikamaEvents = createCalendarJsonCollector({ source: SHIKAMA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
-const collectNatoriEvents = createMunicipalCalendarCollector({ source: NATORI_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectNatoriEvents = createMunicipalCalendarCollector({ source: NATORI_SOURCE, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectShiogamaEvents = createMunicipalCalendarCollector({ source: SHIOGAMA_SOURCE, childCategoryIndex: null }, geoFmDeps);
 // 秋田県
 const collectAkitaKosodateEvents = createAkitaKosodateCollector({ source: AKITA_KOSODATE_SOURCE }, geoFmDeps);
@@ -1019,6 +1023,7 @@ const collectYurihonjyoEvents = createMunicipalCalendarCollector({ source: YURIH
 const collectOgaEvents = createCalendarJsonCollector({ source: OGA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectKosakaEvents = createCalendarJsonCollector({ source: KOSAKA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectHachirogataEvents = createMunicipalCalendarCollector({ source: HACHIROGATA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
+const collectHaguhaguYokoteEvents = createHaguhaguYokoteCollector({ source: AKITA_HAGUHAGU_SOURCE }, geoFmDeps);
 // 山形県
 const collectYonezawaEvents = createCalendarJsonCollector({ source: YONEZAWA_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 const collectSakataEvents = createEventJsCollector({ source: SAKATA_SOURCE, jsFile: "calendar/event_j.js", childCategoryIds: [], useKeywordFilter: true }, geoFmDeps);
@@ -1386,6 +1391,7 @@ const collectKitakyushuGenkinomoriEvents = createKitakyushuGenkinomoriCollector(
 const collectOkayamaKosodateEvents = createOkayamaKosodateCollector({ source: OKAYAMA_KOSODATE_SOURCE }, geoFmDeps);
 // 富山県子育てネッ!とやま
 const collectToyamaKosodateNetEvents = createToyamaKosodateNetCollector({ source: TOYAMA_KOSODATE_NET_SOURCE }, geoFmDeps);
+const collectToyamaHappymamaEvents = createHappymamaToyamaCollector({ source: TOYAMA_HAPPYMAMA_SOURCE }, geoFmDeps);
 // まるがめ子育て応援 (Kagawa)
 const collectMarugameNetEvents = createMarugameNetCollector({ source: MARUGAME_NET_SOURCE }, geoFmDeps);
 // みえこどもの城 (Mie)
@@ -1656,9 +1662,9 @@ const collectors = [
   collectIbarakimachiEvents, collectKitaibarakiEvents, collectUshikuEvents, collectAmiEvents, collectToneIbEvents,
   // 東北6県
   collectAomoriAomoriEvents, collectHachinoheEvents, collectTsugaruEvents,
-  collectIchinosekiEvents, collectIwateMoriokaEvents,
+  collectIchinosekiEvents, collectIwateMoriokaEvents, collectIwatePrefEvents, collectIwateHanamakiEvents,
   collectMiyagiSendaiEvents, collectSendaiJidoukanEvents, collectTaiwaEvents, collectNatoriEvents, collectShiogamaEvents,
-  collectAkitaKosodateEvents, collectYokoteEventJsEvents,
+  collectAkitaKosodateEvents, collectYokoteEventJsEvents, collectHaguhaguYokoteEvents,
   collectYamagataYamagataEvents, collectYamagataSukusukuEvents, collectYonezawaEvents, collectKahokuEvents, collectOkuraEvents, collectFukushimaKoriyamaEvents, collectFukushimaShirakawaEvents, collectSomaEvents, collectMinamisomaEvents, collectAizumisatoEvents,
   // 北海道
   collectHokkaidoIwamizawaEvents, collectHokkaidoShibetsuEvents, collectHokkaidoMoriEvents, collectHokkaidoTaikiEvents, collectHokkaidoSapporoEvents, collectHokkaidoKushiroEvents, collectHokkaidoObihiroEvents,
@@ -1666,7 +1672,7 @@ const collectors = [
   collectFukuiFukuikuEvents, collectGifuKakamigaharaEvents, collectGifuGifuEvents,
   collectShizuokaHamamatsuEvents, collectShizuokaCityEvents,
   collectAichiNagoyaEvents, collectAichiToyotaEvents, collectAichiKasugaiEvents, collectAichiIchinomiyaEvents,
-  collectMieTsuEvents, collectNiigataCityKosodateEvents, collectToyamaToyamaEvents, collectToyamaKosodateNetEvents, collectIshikawaHakusanEvents, collectIshikawaOyacomiEvents, collectHappymamaIshikawaEvents, collectNaganoCheerfulEvents, collectYamanashiPrefEvents,
+  collectMieTsuEvents, collectNiigataCityKosodateEvents, collectToyamaToyamaEvents, collectToyamaKosodateNetEvents, collectToyamaHappymamaEvents, collectIshikawaHakusanEvents, collectIshikawaOyacomiEvents, collectHappymamaIshikawaEvents, collectNaganoCheerfulEvents, collectYamanashiPrefEvents,
   // 中部(dead): collectNiigataKashiwazakiEvents, collectNiigataAganoEvents, collectNiigataSeiroEvents, collectToyamaHimiEvents, collectToyamaNamerikawaEvents, collectToyamaNyuzenEvents, collectToyamaAsahiTyEvents, collectIshikawaKomatsuEvents, collectIshikawaKagaEvents, collectIshikawaNakanotoEvents, collectYamanashiChuoEvents, collectNaganoMatsumotoEvents, collectNaganoSuzakaEvents, collectNaganoKomaganeEvents, collectNaganoIijimachoEvents, collectShizuokaFujiedaEvents, collectShizuokaSusonoEvents, collectShizuokaKosaiEvents, collectShizuokaIzuEvents, collectShizuokaKannamiEvents, collectAichiToyokawaEvents, collectAichiChiryuEvents, collectAichiMiyoshiEvents, collectAichiNagakuteEvents, collectAichiHigashiuraEvents, collectAichiOwariasahiEvents,
   // 近畿
   collectShigaOtsuEvents, collectShigaMoriyamaEvents, collectMieSuzukaEvents, collectMieMeiwaEvents, collectMieKodomonoShiroEvents, collectYokkaichiKodomoEvents, collectShigaHikoneEvents, collectShigaMaibaraEvents, collectKyotoMamafreEvents, collectKyotoWakutobiEvents, collectKyotoKameokaEvents, collectKyotoUjiEvents, collectOsakaIzumiotsuEvents, collectOsakaKaizukaEvents, collectOsakaMoriguchiEvents, collectOsakaIbarakiEvents, collectOsakaNeyagawaEvents, collectOsakaIzumiEvents, collectOsakaFujiideraEvents, collectOsakaSennanEvents, collectOsakaHannanEvents, collectOsakaKumatoriEvents, collectOsakaTakatsukiEvents, collectOsakaKishiwadaEvents, collectOsakaKawachinaganoEvents, collectOsakaSakaiEvents, collectOsakaSuitaEvents, collectHyogoAshiyaEvents, collectHyogoItamiEvents, collectHyogoKakogawaEvents, collectHyogoTatsunoEvents, collectHyogoShisoEvents, collectHyogoKatoEvents, collectHyogoInagawaEvents, collectNaraKashiharaEvents, collectNaraGojoEvents, collectNaraTawaramotoEvents, collectNaraOjiEvents, collectNaraSuperappEvents, collectWakayamaWakayamaEvents, collectWakayamaHashimotoEvents,
