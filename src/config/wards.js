@@ -1003,6 +1003,58 @@ const WARD_LABEL_BY_KEY = {
   toyama_miraikan: "こどもみらい館(富山)",
   hiroshima_pyonta: "こども文化科学館(広島)",
   hokkaido_satsuibe: "サツイベ(札幌)",
+  niigata_joetsu: "上越市",
+  hokkaido_tomakomai: "苫小牧市",
+  okinawa_urasoe: "浦添市",
+  fukuoka_dazaifu: "太宰府市",
+  gifu_minokamo: "美濃加茂市",
+  nagano_iida: "飯田市",
+  yamanashi_linkids: "リンキッズやまなし",
+  aichi_hagumin: "はぐみんNet(愛知)",
+  // Phase 2: 28 municipal calendar cities
+  niigata_mitsuke: "見附市",
+  niigata_murakami: "村上市",
+  niigata_ojiya: "小千谷市",
+  niigata_itoigawa: "糸魚川市",
+  niigata_sado: "佐渡市",
+  okinawa_nago: "名護市",
+  okinawa_itoman: "糸満市",
+  okinawa_nanjo: "南城市",
+  okinawa_nishihara: "西原町",
+  okayama_tamano: "玉野市",
+  okayama_soja: "総社市",
+  okayama_kasaoka: "笠岡市",
+  hiroshima_miyoshi: "三次市",
+  hyogo_awaji: "淡路市",
+  hyogo_miki: "三木市",
+  ehime_uwajima: "宇和島市",
+  ehime_shikokuchuo: "四国中央市",
+  aichi_gamagori: "蒲郡市",
+  aichi_takahama: "高浜市",
+  fukushima_aizu: "会津若松市",
+  fukushima_kitakata: "喜多方市",
+  fukuoka_yanagawa: "柳川市",
+  nagano_chino: "茅野市",
+  mie_matsusaka: "松阪市",
+  kochi_shimanto: "四万十市",
+  iwate_kamaishi: "釜石市",
+  // Phase 3: Tier 1 viable endpoints
+  aichi_obu: "大府市",
+  aichi_tokai: "東海市",
+  aichi_handa: "半田市",
+  gifu_toki: "土岐市",
+  gifu_mizunami: "瑞浪市",
+  gifu_nakatsugawa: "中津川市",
+  mie_inabe: "いなべ市",
+  mie_kuwana: "桑名市",
+  kagoshima_kanoya: "鹿屋市",
+  kagoshima_hioki: "日置市",
+  hiroshima_fuchu_town: "府中町(広島)",
+  hyogo_nishinomiya: "西宮市",
+  // Phase 3: Tier 2 custom collectors
+  niigata_nagaoka: "長岡市(子育ての駅)",
+  hokkaido_kitahiroshima: "北広島市",
+  fukuoka_koga: "古賀市",
 };
 
 const SAGAMIHARA_SOURCE = {
@@ -2685,6 +2737,84 @@ const FUKUOKA_IKIGAI_SOURCE = { key: "fukuoka_ikigai", label: "久留米市児�
 const KAGOSHIMA_MERUHENKAN_SOURCE = { key: "kagoshima_meruhenkan", label: "かごしまメルヘン館", baseUrl: "https://www.k-kb.or.jp", center: { lat: 31.5930, lng: 130.5507 } };
 const GIFU_KANKYORAKUEN_SOURCE = { key: "gifu_kankyorakuen", label: "河川環境楽園", baseUrl: "https://kankyorakuen.jp", center: { lat: 35.3782, lng: 136.8325 } };
 
+// 低カバレッジ都道府県 追加 (municipal-calendar)
+const NIIGATA_JOETSU_SOURCE = { key: "niigata_joetsu", label: "上越市", baseUrl: "https://www.city.joetsu.niigata.jp", center: { lat: 37.1482, lng: 138.2361 } };
+const HOKKAIDO_TOMAKOMAI_SOURCE = { key: "hokkaido_tomakomai", label: "苫小牧市", baseUrl: "https://www.city.tomakomai.hokkaido.jp", center: { lat: 42.6340, lng: 141.6052 } };
+const OKINAWA_URASOE_SOURCE = { key: "okinawa_urasoe", label: "浦添市", baseUrl: "https://www.city.urasoe.lg.jp", center: { lat: 26.3453, lng: 127.7227 } };
+const FUKUOKA_DAZAIFU_SOURCE = { key: "fukuoka_dazaifu", label: "太宰府市", baseUrl: "https://www.city.dazaifu.lg.jp", center: { lat: 33.5123, lng: 130.5236 } };
+const GIFU_MINOKAMO_SOURCE = { key: "gifu_minokamo", label: "美濃加茂市", baseUrl: "https://www.city.minokamo.lg.jp", center: { lat: 35.4411, lng: 137.0165 } };
+const NAGANO_IIDA_SOURCE = { key: "nagano_iida", label: "飯田市", baseUrl: "https://www.city.iida.lg.jp", center: { lat: 35.5147, lng: 136.9530 } };
+// リンキッズやまなし (WP REST API)
+const YAMANASHI_LINKIDS_SOURCE = { key: "yamanashi_linkids", label: "リンキッズやまなし", baseUrl: "https://linkids.net", center: { lat: 35.6642, lng: 138.5684 }, geoMaxKm: 50 };
+// はぐみんNet (愛知県)
+const AICHI_HAGUMIN_SOURCE = { key: "aichi_hagumin", label: "はぐみんNet(愛知)", baseUrl: "https://hagumin-net.pref.aichi.jp", center: { lat: 35.1802, lng: 136.9066 }, geoMaxKm: 60 };
+
+// --- Phase 2: 28 municipal calendar sources (低カバレッジ都道府県) ---
+// 新潟県
+const NIIGATA_MITSUKE_SOURCE = { key: "niigata_mitsuke", label: "見附市", baseUrl: "https://www.city.mitsuke.niigata.jp", center: { lat: 37.5310, lng: 138.9360 } };
+const NIIGATA_MURAKAMI_SOURCE = { key: "niigata_murakami", label: "村上市", baseUrl: "https://www.city.murakami.lg.jp", center: { lat: 38.2234, lng: 139.4802 } };
+const NIIGATA_OJIYA_SOURCE = { key: "niigata_ojiya", label: "小千谷市", baseUrl: "https://www.city.ojiya.niigata.jp", center: { lat: 37.3119, lng: 138.7954 } };
+const NIIGATA_ITOIGAWA_SOURCE = { key: "niigata_itoigawa", label: "糸魚川市", baseUrl: "https://www.city.itoigawa.lg.jp", center: { lat: 37.0439, lng: 137.8606 } };
+const NIIGATA_SADO_SOURCE = { key: "niigata_sado", label: "佐渡市", baseUrl: "https://www.city.sado.niigata.jp", center: { lat: 38.0184, lng: 138.3688 } };
+// 沖縄県
+const OKINAWA_NAGO_SOURCE = { key: "okinawa_nago", label: "名護市", baseUrl: "https://www.city.nago.okinawa.jp", center: { lat: 26.5917, lng: 127.9774 } };
+const OKINAWA_ITOMAN_SOURCE = { key: "okinawa_itoman", label: "糸満市", baseUrl: "https://www.city.itoman.lg.jp", center: { lat: 26.1236, lng: 127.6652 } };
+const OKINAWA_NANJO_SOURCE = { key: "okinawa_nanjo", label: "南城市", baseUrl: "https://www.city.nanjo.okinawa.jp", center: { lat: 26.1469, lng: 127.7697 } };
+const OKINAWA_NISHIHARA_SOURCE = { key: "okinawa_nishihara", label: "西原町", baseUrl: "https://www.town.nishihara.okinawa.jp", center: { lat: 26.3375, lng: 127.7622 } };
+// 岡山県
+const OKAYAMA_TAMANO_SOURCE = { key: "okayama_tamano", label: "玉野市", baseUrl: "https://www.city.tamano.lg.jp", center: { lat: 34.4923, lng: 133.9516 } };
+const OKAYAMA_SOJA_SOURCE = { key: "okayama_soja", label: "総社市", baseUrl: "https://www.city.soja.okayama.jp", center: { lat: 34.6723, lng: 133.7464 } };
+const OKAYAMA_KASAOKA_SOURCE = { key: "okayama_kasaoka", label: "笠岡市", baseUrl: "https://www.city.kasaoka.okayama.jp", center: { lat: 34.5063, lng: 133.5062 } };
+// 広島県 (hiroshima_kure, hiroshima_mihara already defined above)
+const HIROSHIMA_MIYOSHI_SOURCE = { key: "hiroshima_miyoshi", label: "三次市", baseUrl: "https://www.city.miyoshi.hiroshima.jp", center: { lat: 34.8013, lng: 132.8543 } };
+// 兵庫県
+const HYOGO_AWAJI_SOURCE = { key: "hyogo_awaji", label: "淡路市", baseUrl: "https://www.city.awaji.lg.jp", center: { lat: 34.4390, lng: 134.9178 } };
+const HYOGO_MIKI_SOURCE = { key: "hyogo_miki", label: "三木市", baseUrl: "https://www.city.miki.lg.jp", center: { lat: 34.7950, lng: 135.0095 } };
+// 愛媛県
+const EHIME_UWAJIMA_SOURCE = { key: "ehime_uwajima", label: "宇和島市", baseUrl: "https://www.city.uwajima.ehime.jp", center: { lat: 33.2236, lng: 132.5606 } };
+const EHIME_SHIKOKUCHUO_SOURCE = { key: "ehime_shikokuchuo", label: "四国中央市", baseUrl: "https://www.city.shikokuchuo.ehime.jp", center: { lat: 33.9808, lng: 133.5497 } };
+// 愛知県
+const AICHI_GAMAGORI_SOURCE = { key: "aichi_gamagori", label: "蒲郡市", baseUrl: "https://www.city.gamagori.lg.jp", center: { lat: 34.8265, lng: 137.2217 } };
+const AICHI_TAKAHAMA_SOURCE = { key: "aichi_takahama", label: "高浜市", baseUrl: "https://www.city.takahama.lg.jp", center: { lat: 34.9312, lng: 136.9886 } };
+// 福島県
+const FUKUSHIMA_AIZU_SOURCE = { key: "fukushima_aizu", label: "会津若松市", baseUrl: "https://www.city.aizuwakamatsu.fukushima.jp", center: { lat: 37.4948, lng: 139.9298 } };
+const FUKUSHIMA_KITAKATA_SOURCE = { key: "fukushima_kitakata", label: "喜多方市", baseUrl: "https://www.city.kitakata.fukushima.jp", center: { lat: 37.6513, lng: 139.8746 } };
+// 福岡県
+const FUKUOKA_YANAGAWA_SOURCE = { key: "fukuoka_yanagawa", label: "柳川市", baseUrl: "https://www.city.yanagawa.fukuoka.jp", center: { lat: 33.1629, lng: 130.4067 } };
+// 長野県
+const NAGANO_CHINO_SOURCE = { key: "nagano_chino", label: "茅野市", baseUrl: "https://www.city.chino.lg.jp", center: { lat: 35.9955, lng: 138.1577 } };
+// 三重県
+const MIE_MATSUSAKA_SOURCE = { key: "mie_matsusaka", label: "松阪市", baseUrl: "https://www.city.matsusaka.mie.jp", center: { lat: 34.5780, lng: 136.5314 } };
+// 高知県
+const KOCHI_SHIMANTO_SOURCE = { key: "kochi_shimanto", label: "四万十市", baseUrl: "https://www.city.shimanto.lg.jp", center: { lat: 32.9877, lng: 132.9375 } };
+// 岩手県
+const IWATE_KAMAISHI_SOURCE = { key: "iwate_kamaishi", label: "釜石市", baseUrl: "https://www.city.kamaishi.iwate.jp", center: { lat: 39.2755, lng: 141.8857 } };
+
+// --- Phase 3: Tier 1 viable endpoints (event-js / municipal-cal / calendar-json) ---
+// 愛知県
+const AICHI_OBU_SOURCE = { key: "aichi_obu", label: "大府市", baseUrl: "https://www.city.obu.aichi.jp", center: { lat: 35.0133, lng: 136.9633 } };
+const AICHI_TOKAI_SOURCE = { key: "aichi_tokai", label: "東海市", baseUrl: "https://www.city.tokai.aichi.jp", center: { lat: 35.0234, lng: 136.9010 } };
+const AICHI_HANDA_SOURCE = { key: "aichi_handa", label: "半田市", baseUrl: "https://www.city.handa.lg.jp", center: { lat: 34.8921, lng: 136.9382 } };
+// 岐阜県 (gifu_gifu, gifu_kakamigahara already defined)
+const GIFU_TOKI_SOURCE = { key: "gifu_toki", label: "土岐市", baseUrl: "https://www.city.toki.lg.jp", center: { lat: 35.3526, lng: 137.1780 } };
+const GIFU_MIZUNAMI_SOURCE = { key: "gifu_mizunami", label: "瑞浪市", baseUrl: "https://www.city.mizunami.lg.jp", center: { lat: 35.3627, lng: 137.2529 } };
+const GIFU_NAKATSUGAWA_SOURCE = { key: "gifu_nakatsugawa", label: "中津川市", baseUrl: "https://www.city.nakatsugawa.lg.jp", center: { lat: 35.4875, lng: 137.5004 } };
+// 三重県 (mie_suzuka already defined)
+const MIE_INABE_SOURCE = { key: "mie_inabe", label: "いなべ市", baseUrl: "https://www.city.inabe.mie.jp", center: { lat: 35.1145, lng: 136.5613 } };
+const MIE_KUWANA_SOURCE = { key: "mie_kuwana", label: "桑名市", baseUrl: "https://www.city.kuwana.lg.jp", center: { lat: 35.0639, lng: 136.6886 } };
+// 鹿児島県
+const KAGOSHIMA_KANOYA_SOURCE = { key: "kagoshima_kanoya", label: "鹿屋市", baseUrl: "https://www.city.kanoya.lg.jp", center: { lat: 31.3833, lng: 130.8520 } };
+const KAGOSHIMA_HIOKI_SOURCE = { key: "kagoshima_hioki", label: "日置市", baseUrl: "https://www.city.hioki.kagoshima.jp", center: { lat: 31.6294, lng: 130.3863 } };
+// 広島県 (府中町 = 安芸郡府中町, NOT 府中市)
+const HIROSHIMA_FUCHU_TOWN_SOURCE = { key: "hiroshima_fuchu_town", label: "府中町(広島)", baseUrl: "https://www.town.fuchu.hiroshima.jp", center: { lat: 34.3749, lng: 132.5040 } };
+// 兵庫県
+const HYOGO_NISHINOMIYA_SOURCE = { key: "hyogo_nishinomiya", label: "西宮市", baseUrl: "https://www.nishi.or.jp", center: { lat: 34.7378, lng: 135.3416 } };
+
+// Phase 3: Tier 2 custom collectors
+const NIIGATA_NAGAOKA_SOURCE = { key: "niigata_nagaoka", label: "長岡市(子育ての駅)", baseUrl: "https://www.city.nagaoka.niigata.jp", center: { lat: 37.4481, lng: 138.8509 } };
+const HOKKAIDO_KITAHIROSHIMA_SOURCE = { key: "hokkaido_kitahiroshima", label: "北広島市", baseUrl: "https://www.city.kitahiroshima.hokkaido.jp", center: { lat: 43.3414, lng: 141.5636 } };
+const FUKUOKA_KOGA_SOURCE = { key: "fukuoka_koga", label: "古賀市", baseUrl: "https://www.city.koga.fukuoka.jp", center: { lat: 33.7298, lng: 130.4703 } };
+
 // Ibaraki KNOWN_FACILITIES
 
 // --- Metadata for frontend (nationwide) ---
@@ -3206,6 +3336,31 @@ module.exports = {
   TOTTORI_KOSODATE_SOURCE, TOTTORI_NICHINAN_SOURCE, TOTTORI_SAKAIMINATO_SOURCE, TOTTORI_KODOMONOKUNI_SOURCE, SHIMANE_MATSUE_SOURCE, SHIMANE_MASUDA_SOURCE, SHIMANE_AMA_SOURCE, SHIMANE_IZUMO_KAGAKUKAN_SOURCE, OKAYAMA_OKAYAMA_SOURCE, OKAYAMA_AKAIWA_SOURCE, OKAYAMA_MIMASAKA_SOURCE, OKAYAMA_HAYASHIMA_SOURCE, HIROSHIMA_HIROSHIMA_SOURCE, HIROSHIMA_IKUCHAN_SOURCE, HIROSHIMA_FUCHU_SOURCE, HIROSHIMA_OTAKE_SOURCE, HIROSHIMA_HIGASHIHIROSHIMA_SOURCE, HIROSHIMA_FUKUYAMA_SOURCE, HIROSHIMA_KURE_SOURCE, HIROSHIMA_ONOMICHI_SOURCE, HIROSHIMA_MIHARA_SOURCE, HIROSHIMA_HATSUKAICHI_SOURCE, YAMAGUCHI_HIKARI_SOURCE, YAMAGUCHI_SHIMONOSEKI_SOURCE, YAMAGUCHI_YAMAGUCHI_SOURCE, YAMAGUCHI_SHUNAN_SOURCE, YAMAGUCHI_UBE_SOURCE, YAMAGUCHI_CALENDAR_SOURCE, TOKUSHIMA_TOKUSHIMA_SOURCE, TOKUSHIMA_NAKA_SOURCE, TOKUSHIMA_HIGASHIMIYOSHI_SOURCE, TOKUSHIMA_ASUTAMULAND_SOURCE, KAGAWA_TAKAMATSU_SOURCE, KAGAWA_SANUKI_SOURCE, KAGAWA_MITOYO_SOURCE, KAGAWA_TONOSHO_SOURCE, KAGAWA_MARUGAME_SOURCE, KAGAWA_SAKAIDE_SOURCE, EHIME_SEIYO_SOURCE, EHIME_TOBE_SOURCE, EHIME_NIIHAMA_SOURCE, EHIME_SAIJO_SOURCE, EHIME_KIRAKIRA_SOURCE, EHIME_KODOMONO_SHIRO_SOURCE, KOCHI_MUROTO_SOURCE, KOCHI_KOKOHARE_SOURCE, KOCHI_OTEPIA_SOURCE,
   // 九州・沖縄
   FUKUOKA_KITAKYUSHU_SOURCE, FUKUOKA_FUKUTSU_SOURCE, FUKUOKA_SHINGU_FK_SOURCE, FUKUOKA_HIROKAWA_SOURCE, FUKUOKA_KAWARA_SOURCE, FUKUOKA_CHIKUSHINO_SOURCE, FUKUOKA_NAKAGAWA_SOURCE, NAGASAKI_NAGASAKI_SOURCE, NAGASAKI_TSUSHIMA_SOURCE, NAGASAKI_IKI_SOURCE, NAGASAKI_SAIKAI_SOURCE, NAGASAKI_TOGITSU_SOURCE, NAGASAKI_HIGASHISONOGI_SOURCE, NAGASAKI_ISAHAYA_SOURCE, SAGA_KARATSU_SOURCE, SAGA_TOSU_SOURCE, KUMAMOTO_TAKAMORI_SOURCE, KUMAMOTO_KIKUCHI_SOURCE, KUMAMOTO_KOSODATE_SOURCE, OITA_HITA_SOURCE, OITA_TAKETA_SOURCE, OITA_KITSUKI_SOURCE, OITA_KUSU_SOURCE, MIYAZAKI_SUKUSUKU_SOURCE, MIYAZAKI_MIYAZAKI_SOURCE, MIYAZAKI_NICHINAN_SOURCE, MIYAZAKI_KIJO_SOURCE, MIYAZAKI_KADOGAWA_SOURCE, MIYAZAKI_MIYAKOJIMA_SOURCE, KAGOSHIMA_SATSUMASENDAI_SOURCE, KAGOSHIMA_MINAMIKYUSHU_SOURCE, KAGOSHIMA_SATSUMA_SOURCE, KAGOSHIMA_KIMOTSUKI_SOURCE, KAGOSHIMA_YUMESUKUSUKU_SOURCE, OKINAWA_YOMITAN_SOURCE, OKINAWA_KITANAKAGUSUKU_SOURCE, OKINAWA_IE_SOURCE, HOKKAIDO_SAPPORO_SOURCE, OITA_OITA_SOURCE, OKINAWA_NAHA_SOURCE, SHIZUOKA_ATAMI_SOURCE, SHIZUOKA_ITO_SOURCE, AICHI_KIYOSU_SOURCE, OKAYAMA_KIBICHUO_SOURCE, MIYAGI_SENDAI_JIDOUKAN_SOURCE, KAGAWA_TAKAMATSU_MIRAIE_SOURCE, OKAYAMA_KURASHIKI_SOURCE, TOYAMA_TOYAMA_SOURCE, YAMAGATA_YAMAGATA_SOURCE, ISHIKAWA_HAKUSAN_SOURCE, TOKYO_OTA_MAMAFRE_SOURCE, IBARAKI_KAMISU_MAMAFRE_SOURCE, NARA_SUPERAPP_SOURCE, YAMAGATA_SUKUSUKU_SOURCE, NAGANO_CHEERFUL_SOURCE, HOKKAIDO_KUSHIRO_SOURCE, HOKKAIDO_OBIHIRO_SOURCE, FUKUOKA_KODOMO_SOURCE, ISHIKAWA_OYACOMI_SOURCE, OKINAWA_KOSODATE_SOURCE, HAPPYMAMA_ISHIKAWA_SOURCE, SAGA_KOSODATE_SOURCE, NAGAHAPI_SOURCE, YAMANASHI_PREF_SOURCE, KITAKYUSHU_GENKINOMORI_SOURCE, OKAYAMA_KOSODATE_SOURCE, TOYAMA_KOSODATE_NET_SOURCE, MARUGAME_NET_SOURCE, MIE_KODOMONO_SHIRO_SOURCE, YOKKAICHI_KODOMO_SOURCE, FUKUSHIMA_SHIRAKAWA_SOURCE, YAMAGUCHI_IWAKUNI_SOURCE, YAMAGUCHI_SANYOONODA_SOURCE, KAGAWA_HIGASHIKAGAWA_SOURCE, EHIME_MOCOBOX_SOURCE, KUMAMOTO_KODOMOBUNKA_SOURCE, KODOMO_SMILE_SOURCE, OSAKA_KOSODATE_PLAZA_SOURCE, NOBISUKU_SENDAI_SOURCE, MIYAZAKI_SFJ_SOURCE, KODOMO_MIRAIKAN_SOURCE, PYONTA_SOURCE, SATSUIBE_SOURCE, OKINAWA_OKZM_SOURCE, OKINAWA_PREF_SOURCE, OKINAWA_GOYAH_SOURCE, KUMAMOTO_ZOO_SOURCE, HIROSHIMA_KINSAI_SOURCE, NAGANO_UEDA_SOURCE, NAGANO_AZUMINO_SOURCE, NAGANO_SHIOJIRI_SOURCE, NAGANO_SUWA_SOURCE, FUKUOKA_KAMA_SOURCE, FUKUOKA_YUKUHASHI_SOURCE, FUKUOKA_IKIGAI_SOURCE, KAGOSHIMA_MERUHENKAN_SOURCE, GIFU_KANKYORAKUEN_SOURCE, IKOYO_SOURCE, IWATE_MORIOKA_SOURCE, WAKAYAMA_WAKAYAMA_SOURCE,
+  NIIGATA_JOETSU_SOURCE, HOKKAIDO_TOMAKOMAI_SOURCE, OKINAWA_URASOE_SOURCE, FUKUOKA_DAZAIFU_SOURCE, GIFU_MINOKAMO_SOURCE, NAGANO_IIDA_SOURCE,
+  YAMANASHI_LINKIDS_SOURCE, AICHI_HAGUMIN_SOURCE,
+  // Phase 2: 28 municipal calendar sources
+  NIIGATA_MITSUKE_SOURCE, NIIGATA_MURAKAMI_SOURCE, NIIGATA_OJIYA_SOURCE, NIIGATA_ITOIGAWA_SOURCE, NIIGATA_SADO_SOURCE,
+  OKINAWA_NAGO_SOURCE, OKINAWA_ITOMAN_SOURCE, OKINAWA_NANJO_SOURCE, OKINAWA_NISHIHARA_SOURCE,
+  OKAYAMA_TAMANO_SOURCE, OKAYAMA_SOJA_SOURCE, OKAYAMA_KASAOKA_SOURCE,
+  HIROSHIMA_MIYOSHI_SOURCE,
+  HYOGO_AWAJI_SOURCE, HYOGO_MIKI_SOURCE,
+  EHIME_UWAJIMA_SOURCE, EHIME_SHIKOKUCHUO_SOURCE,
+  AICHI_GAMAGORI_SOURCE, AICHI_TAKAHAMA_SOURCE,
+  FUKUSHIMA_AIZU_SOURCE, FUKUSHIMA_KITAKATA_SOURCE,
+  FUKUOKA_YANAGAWA_SOURCE,
+  NAGANO_CHINO_SOURCE,
+  MIE_MATSUSAKA_SOURCE,
+  KOCHI_SHIMANTO_SOURCE,
+  IWATE_KAMAISHI_SOURCE,
+  // Phase 3: Tier 1 viable endpoints
+  AICHI_OBU_SOURCE, AICHI_TOKAI_SOURCE, AICHI_HANDA_SOURCE,
+  GIFU_TOKI_SOURCE, GIFU_MIZUNAMI_SOURCE, GIFU_NAKATSUGAWA_SOURCE,
+  MIE_INABE_SOURCE, MIE_KUWANA_SOURCE,
+  KAGOSHIMA_KANOYA_SOURCE, KAGOSHIMA_HIOKI_SOURCE,
+  HIROSHIMA_FUCHU_TOWN_SOURCE,
+  HYOGO_NISHINOMIYA_SOURCE,
+  // Phase 3: Tier 2 custom collectors
+  NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE,
   // Metadata for frontend
   REGION_GROUPS,
   PREF_CENTERS,
