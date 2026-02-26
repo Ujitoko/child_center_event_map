@@ -12,7 +12,7 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const BASE_URL = "https://wakutobi.city.kyoto.lg.jp";
 const SEARCH_URL = `${BASE_URL}/event/search/`;
-const DETAIL_BATCH = 5;
+const DETAIL_BATCH = 8;
 
 /** リストページからイベントカードを抽出 */
 function parseListPage(html) {

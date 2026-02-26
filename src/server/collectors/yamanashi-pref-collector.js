@@ -12,7 +12,7 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const CGI_BASE = "https://www.pref.yamanashi.jp/cgi-bin/event_cal_multi/calendar.cgi";
 const SITE_BASE = "https://www.pref.yamanashi.jp";
-const DETAIL_BATCH = 3;
+const DETAIL_BATCH = 5;
 
 /**
  * CGIリストページからイベントを抽出

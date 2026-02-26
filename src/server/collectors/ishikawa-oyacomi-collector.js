@@ -13,7 +13,7 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const SITE_BASE = "https://www.i-oyacomi.net";
 const MAX_LIST_PAGES = 2;
-const DETAIL_BATCH = 3;
+const DETAIL_BATCH = 5;
 
 /**
  * リストページからイベントカード情報を抽出
@@ -21,38 +21,30 @@ const DETAIL_BATCH = 3;
  */
 function parseListPage(html) {
   const events = [];
-  const liRe = /<li>\s*<a\s+href="(\/event\/[^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/li>/gi;
-  let m;
-  while ((m = liRe.exec(html)) !== null) {
-    const href = m[1];
-    const content = m[2];
-
-    // Extract divs
-    const divs = [];
-    const divRe = /<div[^>]*>([\s\S]*?)<\/div>/gi;
-    let dm;
-    while ((dm = divRe.exec(content)) !== null) {
-      divs.push(stripTags(dm[1]).trim());
-    }
-
-    // First div: date like "2026 3月14日"
-    // Last div: title
-    if (divs.length < 2) continue;
-
-    const dateText = divs[0];
-    const title = divs[divs.length - 1];
-    if (!title) continue;
-
-    // Parse date from list
-    const dateM = dateText.match(/(\d{4})\s*(\d{1,2})月(\d{1,2})日/);
+  // Split by event-list-item links
+  const blocks = html.split(/<a\s+href="(\/event\/[^"]+)"\s+class="event-list-item">/i);
+  // blocks: [before, href1, content1, href2, content2, ...]
+  for (let i = 1; i < blocks.length; i += 2) {
+    const href = blocks[i];
+    const content = blocks[i + 1] || "";
+    // Year
+    const yearM = content.match(/<span\s+class="year"[^>]*>\s*(\d{4})\s*<\/span>/i);
+    if (!yearM) continue;
+    // Date: <span class="val">M</span>月<span class="val">D</span>日
+    const dateM = content.match(/<span\s+class="val">(\d{1,2})<\/span\s*>\s*月\s*<span\s+class="val">(\d{1,2})<\/span>\s*日/i);
     if (!dateM) continue;
+    // Title
+    const titleM = content.match(/<div\s+class="title">([^<]+)<\/div>/i);
+    if (!titleM) continue;
+    const title = titleM[1].trim();
+    if (!title) continue;
 
     events.push({
       url: `${SITE_BASE}${href}`,
       title,
-      y: Number(dateM[1]),
-      mo: Number(dateM[2]),
-      d: Number(dateM[3]),
+      y: Number(yearM[1]),
+      mo: Number(dateM[1]),
+      d: Number(dateM[2]),
     });
   }
   return events;

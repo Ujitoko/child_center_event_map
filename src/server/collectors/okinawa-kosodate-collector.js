@@ -12,7 +12,7 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const SITE_BASE = "https://www.kosodate.pref.okinawa.jp";
 const LIST_URL = `${SITE_BASE}/events`;
-const DETAIL_BATCH = 3;
+const DETAIL_BATCH = 5;
 
 /**
  * リストページからイベントリンクを抽出

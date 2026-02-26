@@ -17,15 +17,17 @@ const MAX_PAGES = 3;
 /** リストページからイベントURLを抽出 */
 function parseListPage(html) {
   const events = [];
-  // <div class="post"><a href="URL">...<h3>TITLE</h3>...開催日...<p>DATE</p>...場所...<p>VENUE</p>...</a></div>
-  const cardRe = /<div\s+class="post">\s*<a\s+href="(https:\/\/sapporo\.magazine\.events\/area\/[a-z-]+\/(\d+)\.html)">([\s\S]*?)<\/a>\s*<\/div>/gi;
-  let m;
-  while ((m = cardRe.exec(html)) !== null) {
-    const url = m[1];
-    const eventId = m[2];
-    const block = m[3];
-
-    const titleM = block.match(/<h3>([^<]+)<\/h3>/i);
+  // Split by post blocks
+  const blocks = html.split(/<div\s+class="post">/i).slice(1);
+  for (const raw of blocks) {
+    const block = raw.split(/<div\s+class="post">/i)[0]; // stop at next post
+    // URL
+    const urlM = block.match(/<a\s+href="(https:\/\/sapporo\.magazine\.events\/area\/[a-z-]+\/(\d+)\.html)"/i);
+    if (!urlM) continue;
+    const url = urlM[1];
+    const eventId = urlM[2];
+    // Title
+    const titleM = block.match(/<h3[^>]*>([^<]+)<\/h3>/i);
     const title = titleM ? titleM[1].trim() : "";
     if (!title) continue;
 

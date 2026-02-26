@@ -12,7 +12,7 @@ const { stripTags } = require("../html-utils");
 const { sanitizeVenueText } = require("../text-utils");
 
 const SITE_BASE = "https://kodomo.city.fukuoka.lg.jp";
-const DETAIL_BATCH = 3;
+const DETAIL_BATCH = 6;
 
 /**
  * リストページから日付+イベントURLを抽出

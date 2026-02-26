@@ -13,8 +13,8 @@ const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const SITE_BASE = "https://www.cheerful-nagano.com";
 const API_BASE = `${SITE_BASE}/wp-json/wp/v2/child_event`;
-const MAX_API_PAGES = 4; // 100 per page × 4 = 400 items max
-const DETAIL_BATCH = 3;
+const MAX_API_PAGES = 2; // 100 per page × 2 = 200 items max
+const DETAIL_BATCH = 6;
 
 /**
  * WP REST API からイベントリストを取得

@@ -21,20 +21,24 @@ function saveSnapshot(snapshotPath, data) {
   }
 }
 
-const COLLECTOR_TIMEOUT_MS = 45000; // 45s per collector
+const COLLECTOR_TIMEOUT_MS = 180000; // 180s per collector (some portal collectors need 120-150s)
 
 async function batchCollect(fns, size) {
   const results = [];
   for (let i = 0; i < fns.length; i += size) {
     const batch = await Promise.all(fns.slice(i, i + size).map(async (f, j) => {
+      const t0 = Date.now();
       try {
         return await Promise.race([
           f(),
           new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), COLLECTOR_TIMEOUT_MS)),
         ]);
       } catch (e) {
-        if (e.message !== "timeout") {
-          console.error(`[batchCollect] collector #${i + j} failed:`, e.message, e.stack?.split("\n")[1]);
+        const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+        if (e.message === "timeout") {
+          console.warn(`[batchCollect] collector #${i + j} timed out after ${elapsed}s`);
+        } else {
+          console.error(`[batchCollect] collector #${i + j} failed (${elapsed}s):`, e.message, e.stack?.split("\n")[1]);
         }
         return [];
       }
