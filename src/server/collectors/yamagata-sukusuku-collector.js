@@ -152,7 +152,7 @@ function createYamagataSukusukuCollector(config, deps) {
 
         const { startsAt, endsAt } = buildStartsEndsForDate(dd, dd.timeRange);
 
-        const timeUnknown = dd.timeRange.startHour === null;
+        const timeUnknown = !dd.timeRange || dd.timeRange.startHour === null;
 
         byId.set(id, {
           id,

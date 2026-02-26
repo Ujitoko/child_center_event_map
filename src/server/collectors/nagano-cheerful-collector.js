@@ -221,7 +221,7 @@ function createNaganoCheerfulCollector(config, deps) {
         if (byId.has(id)) continue;
 
         const { startsAt, endsAt } = buildStartsEndsForDate(dd, timeRange);
-        const timeUnknown = timeRange.startHour === null;
+        const timeUnknown = !timeRange || timeRange.startHour === null;
 
         byId.set(id, {
           id,

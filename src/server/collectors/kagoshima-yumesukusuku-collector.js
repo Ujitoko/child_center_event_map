@@ -29,13 +29,13 @@ function parseEventList(html) {
     const title = stripTags(linkMatch[2]).trim();
     if (!title) continue;
 
-    // Date from <p>開催日時...</p>
-    const dateMatch = rest.match(/開催日時\s*(\d{4})年(\d{1,2})月(\d{1,2})日/);
+    // Date from <p><span class="date">開催日時</span>2026年2月26日...</p>
+    const dateMatch = rest.match(/開催日時[\s\S]*?(\d{4})年(\d{1,2})月(\d{1,2})日/);
     if (!dateMatch) continue;
     const date = { y: Number(dateMatch[1]), mo: Number(dateMatch[2]), d: Number(dateMatch[3]) };
 
     // Time
-    const timeText = stripTags(rest.match(/<p>開催日時([\s\S]*?)<\/p>/i)?.[1] || "").trim();
+    const timeText = stripTags(rest.match(/<p>[\s\S]*?開催日時[\s\S]*?<\/span>([\s\S]*?)<\/p>/i)?.[1] || "").trim();
     const timeRange = parseTimeRangeFromText(timeText);
 
     // Venue from <p>場所...</p>

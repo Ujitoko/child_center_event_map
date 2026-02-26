@@ -169,7 +169,7 @@ function createHappymamaIshikawaCollector(config, deps) {
           url: `${LIST_BASE}?date=${dd.y}-${String(dd.mo).padStart(2, "0")}`,
           lat: point ? point.lat : null,
           lng: point ? point.lng : null,
-          time_unknown: ev.timeRange.startHour === null,
+          time_unknown: !ev.timeRange || ev.timeRange.startHour === null,
         });
       }
     }

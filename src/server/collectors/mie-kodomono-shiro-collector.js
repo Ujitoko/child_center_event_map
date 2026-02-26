@@ -14,7 +14,7 @@ const {
   parseTimeRangeFromText,
 } = require("../date-utils");
 const { stripTags } = require("../html-utils");
-const { normalizeToHalfWidth } = require("../text-utils");
+const { normalizeJaDigits } = require("../text-utils");
 
 const RSS_URL = "https://www.mie-cc.or.jp/map/event/feed/";
 const FACILITY_NAME = "みえこどもの城";
@@ -63,9 +63,9 @@ function parseDetailPage(html) {
     const value = stripTags(m[2]).trim();
 
     if (label === "開催期間" || label === "開催日") {
-      result.dates = parseDateRange(normalizeToHalfWidth(value));
+      result.dates = parseDateRange(normalizeJaDigits(value));
     } else if (label === "開催時間") {
-      result.time = parseTimeRangeFromText(normalizeToHalfWidth(value));
+      result.time = parseTimeRangeFromText(normalizeJaDigits(value));
     } else if (label === "開催会場") {
       result.venue = value;
     }
@@ -213,7 +213,7 @@ function createMieKodomonoShiroCollector(config, deps) {
           url: ev.url,
           lat: point ? point.lat : FACILITY_POINT.lat,
           lng: point ? point.lng : FACILITY_POINT.lng,
-          time_unknown: timeRange.startHour === null,
+          time_unknown: !timeRange || timeRange.startHour === null,
         });
       }
     }

@@ -121,7 +121,7 @@ function createKitakyushuGenkinomoriCollector(config, deps) {
         url: `${BASE_URL}/event/${ev.y}/${String(ev.mo).padStart(2, "0")}`,
         lat: FACILITY_POINT.lat,
         lng: FACILITY_POINT.lng,
-        time_unknown: ev.timeRange.startHour === null,
+        time_unknown: !ev.timeRange || ev.timeRange.startHour === null,
       });
     }
 

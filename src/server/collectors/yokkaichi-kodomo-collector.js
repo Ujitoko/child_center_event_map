@@ -13,7 +13,7 @@ const {
   parseTimeRangeFromText,
 } = require("../date-utils");
 const { stripTags } = require("../html-utils");
-const { normalizeToHalfWidth } = require("../text-utils");
+const { normalizeJaDigits } = require("../text-utils");
 
 const API_BASE = "https://yokkaichi-kodomoportal.com/wp-json/wp/v2/event";
 const PER_PAGE = 100;
@@ -80,7 +80,7 @@ function parseDetailPage(html) {
   let m;
   while ((m = trRe.exec(html)) !== null) {
     const hdr = stripTags(m[1]).trim();
-    const val = normalizeToHalfWidth(stripTags(m[2]).trim());
+    const val = normalizeJaDigits(stripTags(m[2]).trim());
 
     if (hdr === "開催日") {
       result.dates = parseDateText(val);
@@ -262,7 +262,7 @@ function createYokkaichiKodomoCollector(config, deps) {
           url: ev.url,
           lat: point ? point.lat : null,
           lng: point ? point.lng : null,
-          time_unknown: timeRange.startHour === null,
+          time_unknown: !timeRange || timeRange.startHour === null,
         });
       }
     }

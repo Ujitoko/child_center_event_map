@@ -2,20 +2,38 @@
  * naana大分（大分市子育て支援サイト）コレクター
  * https://naana-oita.jp/events
  *
- * イベント一覧ページをAJAXページネーションで日別に巡回し、
- * 詳細ページから住所・座標・時間を取得する。
+ * イベント一覧ページをAJAXページネーションで日別に巡回。
+ * 会場名→KNOWN_FACILITIES で座標・住所を解決（詳細ページ不要）。
  *
  * - メイン一覧: GET /events (HTML table)
  * - AJAX次日: GET /events/next-event/{YYYY-MM-DD} (HTML table rows)
- * - 詳細: GET /events/detail/{UUID} (dl/dt/dd + Google Maps link)
- * - ~470 events/30日
+ * - ~500 events/30日
  */
 const { fetchText } = require("../fetch-utils");
-const { inRangeJst, buildStartsEndsForDate, parseTimeRangeFromText, parseYmdFromJst } = require("../date-utils");
+const { inRangeJst, buildStartsEndsForDate, parseYmdFromJst } = require("../date-utils");
 const { stripTags } = require("../html-utils");
-const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
+const { sanitizeVenueText } = require("../text-utils");
 
 const SITE_BASE = "https://www.naana-oita.jp";
+
+/**
+ * 会場→住所・座標のマスタ (詳細ページから事前取得済み)
+ * 住所は大分県プレフィクス付き、郵便番号除去済み。
+ */
+const KNOWN_FACILITIES = {
+  "大南こどもルーム":     { address: "大分県大分市中戸次5115番地の1", point: { lat: 33.151754, lng: 131.654484 } },
+  "明治明野こどもルーム": { address: "大分県大分市明野北4丁目7番8号", point: { lat: 33.2286549, lng: 131.6583212 } },
+  "稙田こどもルーム":     { address: "大分県大分市大字玉沢743番地の2", point: { lat: 33.1883556, lng: 131.5782282 } },
+  "府内こどもルーム":     { address: "大分県大分市荷揚町3番45号", point: { lat: 33.2406579, lng: 131.6083756 } },
+  "中央こどもルーム":     { address: "大分県大分市金池南1丁目5番1号", point: { lat: 33.2304335, lng: 131.6061753 } },
+  "佐賀関こどもルーム":   { address: "大分県大分市大字佐賀関1407番地の27", point: { lat: 33.24906868, lng: 131.8733435 } },
+  "坂ノ市こどもルーム":   { address: "大分県大分市坂ノ市南3丁目5番33号", point: { lat: 33.2308212, lng: 131.7517072 } },
+  "大在こどもルーム":     { address: "大分県大分市政所1丁目4番3号", point: { lat: 33.2466077, lng: 131.7230649 } },
+  "鶴崎こどもルーム":     { address: "大分県大分市東鶴崎1丁目2番3号", point: { lat: 33.2405137, lng: 131.6945593 } },
+  "大分南部こどもルーム":  { address: "大分県大分市大字曲1113番地", point: { lat: 33.2020285, lng: 131.6120613 } },
+  "原新町こどもルーム":   { address: "大分県大分市原新町1番31号", point: { lat: 33.24688223, lng: 131.6496769 } },
+  "大分県立美術館（OPAM）": { address: "大分県大分市寿町2番1号", point: { lat: 33.23948, lng: 131.6013373 } },
+};
 
 /**
  * naanaのAJAXエンドポイントは X-Requested-With ヘッダーが必要
@@ -32,7 +50,7 @@ async function fetchNaanaAjax(url) {
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return Buffer.from(await res.arrayBuffer()).toString("utf8");
 }
-const DETAIL_BATCH = 5;
+
 const MAX_PAGES = 100; // 日数上限ガード
 
 /**
@@ -122,84 +140,6 @@ function parseDateFromEventDate(dateText, baseYear, baseMonth) {
   return { y, mo, d };
 }
 
-/**
- * 詳細ページの <dl> から key→value を抽出
- * <dt>開催時間</dt><dd>11時から11時20分</dd>
- */
-function parseDetailDl(html) {
-  const meta = {};
-  if (!html) return meta;
-  const dlM = html.match(/<dl[^>]*>([\s\S]*?)<\/dl>/i);
-  if (!dlM) return meta;
-  const pairRe = /<dt[^>]*>([\s\S]*?)<\/dt>\s*<dd[^>]*>([\s\S]*?)<\/dd>/gi;
-  let m;
-  while ((m = pairRe.exec(dlM[1])) !== null) {
-    const key = stripTags(m[1]).replace(/\s+/g, "").trim();
-    const val = stripTags(m[2]).replace(/\s+/g, " ").trim();
-    if (key && val) meta[key] = val;
-  }
-  return meta;
-}
-
-/**
- * Google Maps リンクから座標を抽出
- * <a href="https://www.google.com/maps/dir/?api=1&destination=33.2406579,131.6083756">
- */
-function parseGoogleMapsPoint(html) {
-  const m = html.match(/google\.com\/maps[^"]*destination=([\d.]+),([\d.]+)/i);
-  if (!m) return null;
-  const lat = parseFloat(m[1]);
-  const lng = parseFloat(m[2]);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  // 日本国内の簡易バウンディングボックス
-  if (lat < 24.0 || lat > 45.6 || lng < 122.9 || lng > 145.9) return null;
-  return { lat, lng };
-}
-
-/**
- * 詳細ページから住所テキストを抽出
- * <dd>〒870-0046大分市荷揚町３番45号</dd>
- */
-function parseAddress(text) {
-  if (!text) return "";
-  // 郵便番号を除去
-  let addr = text.replace(/〒?\d{3}-?\d{4}\s*/, "").trim();
-  // 大分県プレフィクスがなければ追加
-  if (addr && !addr.startsWith("大分県")) {
-    addr = `大分県${addr}`;
-  }
-  return sanitizeAddressText(addr);
-}
-
-/**
- * 開催時間テキストをparseTimeRangeFromText用に正規化
- * "11時から11時20分" → "11時~11時20分"
- */
-function normalizeTimeText(text) {
-  if (!text) return "";
-  return text
-    .replace(/から/g, "~")
-    .replace(/まで/g, "")
-    .replace(/[〜～]/g, "~");
-}
-
-function buildGeoCandidates(venue, address) {
-  const pref = "大分県";
-  const city = "大分市";
-  const candidates = [];
-  if (address) {
-    const full = address.includes("大分") ? address : `${pref}${address}`;
-    candidates.push(full);
-  }
-  if (venue) {
-    candidates.push(`${pref}${city} ${venue}`);
-  }
-  if (!address && !venue) {
-    candidates.push(`${pref}${city}`);
-  }
-  return [...new Set(candidates)];
-}
-
 function createNaanaOitaCollector(config, deps) {
   const { source } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress } = deps;
@@ -212,10 +152,10 @@ function createNaanaOitaCollector(config, deps) {
     const baseMonth = now.m;
 
     // Step 1: AJAX ページネーションで日別イベント一覧を収集
-    // uuid → { uuid, title, venueName, dates: Set<dateText>, url }
+    // uuid → { uuid, title, venueName, url }
     const eventMap = new Map();
-    // 日付ごとの uuid → dateObj マッピング
-    const uuidDates = new Map(); // uuid → [{ y, mo, d }, ...]
+    // uuid → [{ y, mo, d }, ...]
+    const uuidDates = new Map();
 
     let pagesWalked = 0;
 
@@ -296,29 +236,11 @@ function createNaanaOitaCollector(config, deps) {
     if (eventMap.size === 0) return [];
     console.log(`[${label}] Found ${eventMap.size} unique events across ${pagesWalked} pages`);
 
-    // Step 2: 詳細ページをバッチ取得 (座標・住所・時間を取得)
-    const entries = Array.from(eventMap.values());
-    // detailMap: uuid → { meta, point, rawHtml }
-    const detailMap = new Map();
-
-    for (let i = 0; i < entries.length; i += DETAIL_BATCH) {
-      const batch = entries.slice(i, i + DETAIL_BATCH);
-      const results = await Promise.allSettled(
-        batch.map(async (e) => {
-          const html = await fetchText(e.url);
-          const meta = parseDetailDl(html);
-          const point = parseGoogleMapsPoint(html);
-          return { uuid: e.uuid, meta, point };
-        })
-      );
-      for (const r of results) {
-        if (r.status === "fulfilled") {
-          detailMap.set(r.value.uuid, {
-            meta: r.value.meta,
-            point: r.value.point,
-          });
-        }
-      }
+    // Step 2: KNOWN_FACILITIES で座標・住所を解決 (詳細ページ不要)
+    // 未知の会場名はジオコーディングにフォールバック
+    const venueCache = new Map(); // venueName → { point, address }
+    for (const [name, fac] of Object.entries(KNOWN_FACILITIES)) {
+      venueCache.set(name, { point: fac.point, address: fac.address });
     }
 
     // Step 3: イベントレコード生成
@@ -328,29 +250,23 @@ function createNaanaOitaCollector(config, deps) {
       const dates = uuidDates.get(uuid) || [];
       if (dates.length === 0) continue;
 
-      const detail = detailMap.get(uuid) || { meta: {}, point: null };
-      const { meta, point: gmapsPoint } = detail;
+      const venue = sanitizeVenueText(entry.venueName || "");
 
-      // 会場名: 詳細ページ優先、なければリスト一覧から
-      const detailVenue = meta["会場"] || "";
-      const venue = sanitizeVenueText(detailVenue || entry.venueName || "");
-
-      // 住所
-      const rawAddress = meta["所在地"] || "";
-      const address = parseAddress(rawAddress);
-
-      // 時間
-      const timeText = meta["開催時間"] || "";
-      const timeRange = parseTimeRangeFromText(normalizeTimeText(timeText));
-
-      // 座標: Google Maps座標がある場合はそれを使用、なければジオコーディング
-      let point = gmapsPoint;
-      if (!point) {
-        const geoCandidates = buildGeoCandidates(venue, address);
-        point = await geocodeForWard(geoCandidates.slice(0, 5), source);
+      // 座標・住所: KNOWN_FACILITIES キャッシュ → ジオコーディング
+      let resolved = venueCache.get(entry.venueName);
+      if (!resolved) {
+        // 未知会場: ジオコーディングで解決し、キャッシュ
+        const candidates = [`大分県大分市 ${venue}`];
+        if (venue) candidates.unshift(`大分県${venue}`);
+        const point = await geocodeForWard(candidates.slice(0, 5), source);
+        resolved = { point, address: `大分県大分市 ${venue}` };
+        venueCache.set(entry.venueName, resolved);
       }
-      point = resolveEventPoint(source, venue, point, address || `大分県大分市 ${venue}`);
-      const resolvedAddress = resolveEventAddress(source, venue, address || `大分県大分市 ${venue}`, point);
+
+      let point = resolved.point;
+      const address = resolved.address;
+      point = resolveEventPoint(source, venue, point, address);
+      const resolvedAddress = resolveEventAddress(source, venue, address, point);
 
       // 日付ごとにイベントレコード生成 (同一UUID でも日が異なればそれぞれ)
       // 日付の重複排除
@@ -360,7 +276,7 @@ function createNaanaOitaCollector(config, deps) {
         if (seenDateKeys.has(dateKey)) continue;
         seenDateKeys.add(dateKey);
 
-        const { startsAt, endsAt } = buildStartsEndsForDate(dd, timeRange);
+        const { startsAt, endsAt } = buildStartsEndsForDate(dd, null);
         const id = `${srcKey}:${uuid}:${entry.title}:${dateKey}`;
 
         if (byId.has(id)) continue;

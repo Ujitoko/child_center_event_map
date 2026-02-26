@@ -14,7 +14,7 @@ const {
   parseTimeRangeFromText,
 } = require("../date-utils");
 const { stripTags } = require("../html-utils");
-const { normalizeToHalfWidth } = require("../text-utils");
+const { normalizeJaDigits } = require("../text-utils");
 
 const SITE_BASE = "https://marugame.net";
 const LIST_PATH = "/event/";
@@ -129,7 +129,7 @@ function parseDetailPage(html) {
     const hdr = stripTags(m[1]).replace(/\s+/g, "");
     const val = stripTags(m[2]).trim();
     if (hdr === "日時") {
-      const normalized = normalizeToHalfWidth(val);
+      const normalized = normalizeJaDigits(val);
       result.time = parseTimeRangeFromText(normalized);
     } else if (hdr === "場所") {
       result.venue = val;
@@ -257,7 +257,7 @@ function createMarugameNetCollector(config, deps) {
         url: ev.url,
         lat: point ? point.lat : null,
         lng: point ? point.lng : null,
-        time_unknown: timeRange.startHour === null,
+        time_unknown: !timeRange || timeRange.startHour === null,
       });
     }
 

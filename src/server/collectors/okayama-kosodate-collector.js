@@ -229,7 +229,7 @@ function createOkayamaKosodateCollector(config, deps) {
         url: ev.url,
         lat: point ? point.lat : null,
         lng: point ? point.lng : null,
-        time_unknown: timeRange.startHour === null,
+        time_unknown: !timeRange || timeRange.startHour === null,
       });
     }
 

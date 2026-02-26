@@ -20,25 +20,32 @@ const DETAIL_BATCH = 3;
  */
 function parseListPage(html) {
   const events = [];
-  const cardRe = /<a\s+href="(\/events\/view\/\d+)"[^>]*>([\s\S]*?)<\/a>/gi;
+  // Each event is in a <li class="clearfix"> block
+  const liRe = /<li\s+class="clearfix">([\s\S]*?)<\/li>/gi;
   let m;
-  while ((m = cardRe.exec(html)) !== null) {
-    const href = m[1];
-    const content = m[2];
+  while ((m = liRe.exec(html)) !== null) {
+    const content = m[1];
 
     // Skip past events (have 終了しました badge)
     if (content.includes("終了しました")) continue;
 
-    // Extract title from <h4>
-    const titleM = content.match(/<h4[^>]*>([\s\S]*?)<\/h4>/i);
+    // Extract URL from href="/events/view/NNN"
+    const hrefM = content.match(/href="(\/events\/view\/\d+)"/);
+    if (!hrefM) continue;
+    const href = hrefM[1];
+
+    // Extract title from <h4><a>TITLE</a></h4>
+    const titleM = content.match(/<h4[^>]*><a[^>]*>([\s\S]*?)<\/a><\/h4>/i);
     const title = titleM ? stripTags(titleM[1]).trim() : "";
     if (!title) continue;
 
-    // Extract date from "YYYY-MM-DD ~ YYYY-MM-DD" pattern
-    const dateM = content.match(/(\d{4})-(\d{2})-(\d{2})\s*~\s*(\d{4})-(\d{2})-(\d{2})/);
+    // Extract date from "YYYY-MM-DD ～ YYYY-MM-DD" pattern (fullwidth ～ or ASCII ~)
+    const dateM = content.match(/(\d{4})-(\d{2})-(\d{2})\s*[~～]\s*(\d{4})-(\d{2})-(\d{2})/);
     let startDate = null;
+    let endDate = null;
     if (dateM) {
       startDate = { y: Number(dateM[1]), mo: Number(dateM[2]), d: Number(dateM[3]) };
+      endDate = { y: Number(dateM[4]), mo: Number(dateM[5]), d: Number(dateM[6]) };
     }
 
     // Extract venue+address from 開催場所 line
@@ -47,7 +54,6 @@ function parseListPage(html) {
     const placeM = content.match(/開催場所[：:]\s*([\s\S]*?)(?:<\/p>|<img)/i);
     if (placeM) {
       const placeText = stripTags(placeM[1]).trim();
-      // Pattern: "Venue（Address）" or "Venue(Address)"
       const parenM = placeText.match(/^(.+?)[（(](.*?)[）)]\s*$/);
       if (parenM) {
         venue = parenM[1].trim();
@@ -61,6 +67,7 @@ function parseListPage(html) {
       url: `${SITE_BASE}${href}`,
       title,
       startDate,
+      endDate,
       venue,
       address,
     });
@@ -126,7 +133,7 @@ function createOkinawaKosodateCollector(config, deps) {
     // Step 1: Fetch list page (page 1 only — has most recent events)
     let listEvents;
     try {
-      const html = await fetchText(LIST_URL);
+      const html = await fetchText(LIST_URL, { timeout: 30000 });
       if (!html) return [];
       listEvents = parseListPage(html);
     } catch (e) {
@@ -136,10 +143,11 @@ function createOkinawaKosodateCollector(config, deps) {
 
     if (listEvents.length === 0) return [];
 
-    // Pre-filter to future events using list dates
-    const futureEvents = listEvents.filter(ev =>
-      ev.startDate && inRangeJst(ev.startDate.y, ev.startDate.mo, ev.startDate.d, maxDays)
-    );
+    // Pre-filter to future events using endDate (period events: endDate >= today)
+    const futureEvents = listEvents.filter(ev => {
+      const d = ev.endDate || ev.startDate;
+      return d && inRangeJst(d.y, d.mo, d.d, maxDays);
+    });
     if (futureEvents.length === 0) return [];
 
     // Step 2: Fetch detail pages for JSON-LD
@@ -149,7 +157,7 @@ function createOkinawaKosodateCollector(config, deps) {
       const batch = futureEvents.slice(i, i + DETAIL_BATCH);
       const results = await Promise.allSettled(
         batch.map(async (ev) => {
-          const html = await fetchText(ev.url);
+          const html = await fetchText(ev.url, { timeout: 30000 });
           const jsonLd = parseDetailJsonLd(html);
           return { ev, jsonLd };
         })
@@ -220,7 +228,7 @@ function createOkinawaKosodateCollector(config, deps) {
           url: ev.url,
           lat: point ? point.lat : null,
           lng: point ? point.lng : null,
-          time_unknown: timeRange.startHour === null,
+          time_unknown: !timeRange || timeRange.startHour === null,
         });
       }
     }

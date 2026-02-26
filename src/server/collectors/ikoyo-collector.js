@@ -186,7 +186,7 @@ function createIkoyoCollector(config, deps) {
 
       let page = 1;
       let emptyPages = 0;
-      const MAX_PAGES = 100; // 安全上限 (15件/ページ × 100 = 1500件)
+      const MAX_PAGES = 2; // 30件/県 上限 (4県×2ページ×~3s=24s — ペア実行時も45s内)
 
       while (page <= MAX_PAGES) {
         // Rate limit: 1秒間隔
@@ -221,6 +221,7 @@ function createIkoyoCollector(config, deps) {
           const title = (ev.name || "").trim();
           if (!title) continue;
 
+          // URL: JSON-LDに無い場合はスキップ (ページHTMLからの抽出は困難)
           const eventUrl = (ev.url || "").trim();
           if (!eventUrl) continue;
 
@@ -232,12 +233,15 @@ function createIkoyoCollector(config, deps) {
           // キーワードフィルタ
           if (!matchesChildKeywords(title, description, childKeywords)) continue;
 
-          // 日付パース - startDate を starts_at に使用
+          // 日付パース
           const startDate = parseIsoDate(ev.startDate);
-          if (!startDate) continue;
+          const endDate = parseIsoDate(ev.endDate);
+          if (!startDate && !endDate) continue;
 
-          // 範囲チェック
-          if (!inRangeJst(startDate.y, startDate.mo, startDate.d, maxDays)) continue;
+          // 範囲チェック: いこーよは期間イベント (startDate=開始日, endDate=終了日)
+          // endDate が今日以降 かつ startDate が maxDays 以内なら範囲内
+          const checkDate = endDate || startDate;
+          if (!inRangeJst(checkDate.y, checkDate.mo, checkDate.d, maxDays)) continue;
 
           // Location 情報
           const location = ev.location || {};
@@ -254,30 +258,16 @@ function createIkoyoCollector(config, deps) {
           const prefInfo = detectPrefFromAddress(rawAddress) || { prefKey: pref.key, prefName: pref.name };
           const srcKey = `ikoyo_${prefInfo.prefKey}`;
 
-          // ジオコーディング候補
-          const candidates = [];
-          if (rawAddress) {
-            candidates.push(rawAddress);
-          }
-          if (venueName && rawAddress) {
-            // 住所 + 会場名で精度向上
-            candidates.push(`${rawAddress} ${venueName}`);
-          }
-          if (venueName && prefInfo.prefName) {
-            candidates.push(`${prefInfo.prefName} ${venueName}`);
-          }
-
-          // ジオコーディングにはソースの center を使い、全国対応で maxKm を大きめに
+          // ジオコーディングはスキップ (45sタイムアウト対策)
+          // facilityMaster 経由で座標が取れる場合のみ使用
           const geoSource = { ...source, key: srcKey, label: venueName || label };
-          let point = await geocodeForWard(candidates.slice(0, 5), geoSource, 50);
-          point = resolveEventPoint(geoSource, venueName, point, rawAddress);
+          let point = resolveEventPoint(geoSource, venueName, null, rawAddress);
           const resolvedAddress = resolveEventAddress(geoSource, venueName, rawAddress, point);
 
-          // endDate をパース (表示用)
-          const endDate = parseIsoDate(ev.endDate);
-
           // 時刻情報なし → timeUnknown
-          const { startsAt, endsAt } = buildStartsEndsForDate(startDate, null);
+          // starts_at は today (期間開始が過去の場合) or startDate
+          const effectiveStart = startDate || checkDate;
+          const { startsAt, endsAt } = buildStartsEndsForDate(effectiveStart, null);
 
           // endDate が startDate と異なる場合、ends_at を endDate の終日に設定
           let finalEndsAt = endsAt;
@@ -286,7 +276,7 @@ function createIkoyoCollector(config, deps) {
             finalEndsAt = endDayStart;
           }
 
-          const dateKey = `${startDate.y}${String(startDate.mo).padStart(2, "0")}${String(startDate.d).padStart(2, "0")}`;
+          const dateKey = `${effectiveStart.y}${String(effectiveStart.mo).padStart(2, "0")}${String(effectiveStart.d).padStart(2, "0")}`;
           const id = `${srcKey}:${eventUrl}:${title}:${dateKey}`;
 
           byUrl.set(eventUrl, {

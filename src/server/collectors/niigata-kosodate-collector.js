@@ -32,13 +32,13 @@ function parseCalendarPage(html, year, month) {
     while ((cellMatch = cellRe.exec(row)) !== null) {
       const cell = cellMatch[1];
       // 日付を取得（セル内の最初の数字）
-      const dayMatch = cell.match(/>(\d{1,2})</);
+      const dayMatch = cell.match(/>(\d{1,2})日?</);
       if (!dayMatch) continue;
       const day = Number(dayMatch[1]);
       if (day < 1 || day > 31) continue;
 
       // セル内のイベントリンクを取得
-      const linkRe = /<a\s+href="(\/kosodate[^"]*)"[^>]*>([^<]*(?:<[^>]*>[^<]*)*)/gi;
+      const linkRe = /<a\s+href="(\/kosodate[^"]*)"[^>]*>([^<]*)<\/a>/gi;
       let linkMatch;
       while ((linkMatch = linkRe.exec(cell)) !== null) {
         const href = linkMatch[1];
