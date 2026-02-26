@@ -1055,6 +1055,8 @@ const WARD_LABEL_BY_KEY = {
   niigata_nagaoka: "長岡市(子育ての駅)",
   hokkaido_kitahiroshima: "北広島市",
   fukuoka_koga: "古賀市",
+  // Phase 3: Tier 3 additional municipal-calendar
+  niigata_uonuma: "魚沼市",
 };
 
 const SAGAMIHARA_SOURCE = {
@@ -2815,6 +2817,9 @@ const NIIGATA_NAGAOKA_SOURCE = { key: "niigata_nagaoka", label: "長岡市(子�
 const HOKKAIDO_KITAHIROSHIMA_SOURCE = { key: "hokkaido_kitahiroshima", label: "北広島市", baseUrl: "https://www.city.kitahiroshima.hokkaido.jp", center: { lat: 43.3414, lng: 141.5636 } };
 const FUKUOKA_KOGA_SOURCE = { key: "fukuoka_koga", label: "古賀市", baseUrl: "https://www.city.koga.fukuoka.jp", center: { lat: 33.7298, lng: 130.4703 } };
 
+// Phase 3: Tier 3 additional municipal-calendar
+const NIIGATA_UONUMA_SOURCE = { key: "niigata_uonuma", label: "魚沼市", baseUrl: "https://www.city.uonuma.lg.jp", center: { lat: 37.2300, lng: 138.9600 } };
+
 // Ibaraki KNOWN_FACILITIES
 
 // --- Metadata for frontend (nationwide) ---
@@ -3361,6 +3366,8 @@ module.exports = {
   HYOGO_NISHINOMIYA_SOURCE,
   // Phase 3: Tier 2 custom collectors
   NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE,
+  // Phase 3: Tier 3 additional municipal-calendar
+  NIIGATA_UONUMA_SOURCE,
   // Metadata for frontend
   REGION_GROUPS,
   PREF_CENTERS,

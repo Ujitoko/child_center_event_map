@@ -421,9 +421,12 @@ const {
   MIE_INABE_SOURCE, MIE_KUWANA_SOURCE,
   KAGOSHIMA_KANOYA_SOURCE, KAGOSHIMA_HIOKI_SOURCE,
   HIROSHIMA_FUCHU_TOWN_SOURCE,
+  OKAYAMA_AKAIWA_SOURCE, YAMANASHI_CHUO_SOURCE,
   HYOGO_NISHINOMIYA_SOURCE,
   // Phase 3: Tier 2 custom collectors
-  NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE,
+  NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE, HYOGO_HIMEJI_SOURCE,
+  // Phase 3: Tier 3 additional municipal-calendar
+  NIIGATA_UONUMA_SOURCE,
   CHILD_KW, IKOYO_CHILD_KW,
   REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 } = require("./src/config/wards");
@@ -1507,6 +1510,9 @@ const collectKitahiroshimaKosodateEvents = createKitahiroshimaKosodateCollector(
 const collectKogaKosodateEvents = createKogaKosodateCollector({ source: FUKUOKA_KOGA_SOURCE }, geoFmDeps);
 const collectHimejiKosodateEvents = createHimejiKosodateCollector({ source: HYOGO_HIMEJI_SOURCE }, geoFmDeps);
 
+// Phase 3: Tier 3 additional municipal-calendar
+const collectNiigataUonumaEvents = createMunicipalCalendarCollector({ source: NIIGATA_UONUMA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+
 const collectors = [
   collectSetagayaJidokanEvents,
   collectOtaJidokanEvents,
@@ -1947,7 +1953,9 @@ const collectors = [
   collectHyogoNishinomiyaEvents,
   // Phase 3: Tier 2 custom collectors
   collectNagaokaKosodateEvents, collectKitahiroshimaKosodateEvents,
-  collectKogaKosodateEvents, collectHimejiKosodateEvents];
+  collectKogaKosodateEvents, collectHimejiKosodateEvents,
+  // Phase 3: Tier 3 additional municipal-calendar
+  collectNiigataUonumaEvents];
 const getEvents = createGetEvents({
   CACHE_TTL_MS, cache, snapshotPath: SNAPSHOT_PATH,
   geoCache, geoCachePath: GEO_CACHE_PATH,
