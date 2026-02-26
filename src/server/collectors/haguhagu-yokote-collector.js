@@ -11,8 +11,8 @@ const { stripTags } = require("../html-utils");
 const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
 
 const BASE = "https://www.haguhagu-yokote.jp";
-const DETAIL_BATCH = 5;
-const MAX_PAGES = 15;
+const DETAIL_BATCH = 8;
+const MAX_PAGES = 10;
 
 /** リストページからイベントカードを抽出 */
 function parseListPage(html) {

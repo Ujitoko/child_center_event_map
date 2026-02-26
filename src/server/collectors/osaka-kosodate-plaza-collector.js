@@ -10,7 +10,7 @@ const { inRangeJst, buildStartsEndsForDate, parseTimeRangeFromText } = require("
 const { stripTags } = require("../html-utils");
 
 const BASE = "https://osaka-kosodate-plaza.jp";
-const DETAIL_BATCH = 5;
+const DETAIL_BATCH = 8;
 
 const WARDS = [
   { path: "kita", name: "北区子ども・子育てプラザ", address: "大阪府大阪市北区本庄東1-24-11", lat: 34.7106, lng: 135.5128 },
@@ -82,65 +82,68 @@ function createOsakaKosodatePlazaCollector(config, deps) {
 
     const byId = new Map();
 
-    for (const ward of WARDS) {
-      // 今月+来月+再来月
-      const allCards = [];
-      for (let i = 0; i < 3; i++) {
-        let mm = mo + i;
-        let yy = y;
-        if (mm > 12) { mm -= 12; yy++; }
-        try {
-          const url = `${BASE}/${ward.path}/event/${yy}/${String(mm).padStart(2, "0")}/`;
-          const html = await fetchText(url);
-          if (html) allCards.push(...parseListPage(html));
-        } catch (e) {
-          console.warn(`[${label}] ${ward.path} ${yy}/${mm} failed:`, e.message || e);
+    // Process wards in batches of 3 to parallelize network calls
+    const WARD_BATCH = 3;
+    for (let wi = 0; wi < WARDS.length; wi += WARD_BATCH) {
+      const wardBatch = WARDS.slice(wi, wi + WARD_BATCH);
+      await Promise.allSettled(wardBatch.map(async (ward) => {
+        const allCards = [];
+        for (let i = 0; i < 3; i++) {
+          let mm = mo + i;
+          let yy = y;
+          if (mm > 12) { mm -= 12; yy++; }
+          try {
+            const url = `${BASE}/${ward.path}/event/${yy}/${String(mm).padStart(2, "0")}/`;
+            const html = await fetchText(url);
+            if (html) allCards.push(...parseListPage(html));
+          } catch (e) {
+            console.warn(`[${label}] ${ward.path} ${yy}/${mm} failed:`, e.message || e);
+          }
         }
-      }
 
-      // 詳細ページバッチ取得 (時間のみ)
-      const detailMap = new Map();
-      const urls = [...new Set(allCards.map(c => c.href))].slice(0, 60);
-      for (let i = 0; i < urls.length; i += DETAIL_BATCH) {
-        const batch = urls.slice(i, i + DETAIL_BATCH);
-        const results = await Promise.allSettled(
-          batch.map(async (href) => {
-            const html = await fetchText(`${BASE}${href}`);
-            return { href, time: parseDetailTime(html) };
-          })
-        );
-        for (const r of results) {
-          if (r.status === "fulfilled") detailMap.set(r.value.href, r.value.time);
+        const detailMap = new Map();
+        const urls = [...new Set(allCards.map(c => c.href))].slice(0, 60);
+        for (let i = 0; i < urls.length; i += DETAIL_BATCH) {
+          const batch = urls.slice(i, i + DETAIL_BATCH);
+          const results = await Promise.allSettled(
+            batch.map(async (href) => {
+              const html = await fetchText(`${BASE}${href}`);
+              return { href, time: parseDetailTime(html) };
+            })
+          );
+          for (const r of results) {
+            if (r.status === "fulfilled") detailMap.set(r.value.href, r.value.time);
+          }
         }
-      }
 
-      const point = { lat: ward.lat, lng: ward.lng };
+        const point = { lat: ward.lat, lng: ward.lng };
 
-      for (const card of allCards) {
-        const dates = parseDates(card.dateText);
-        const timeText = detailMap.get(card.href) || "";
-        const timeRange = parseTimeRangeFromText(timeText);
+        for (const card of allCards) {
+          const dates = parseDates(card.dateText);
+          const timeText = detailMap.get(card.href) || "";
+          const timeRange = parseTimeRangeFromText(timeText);
 
-        for (const dd of dates) {
-          if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
-          const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
-          const eventUrl = `${BASE}${card.href}`;
-          const id = `${srcKey}:${eventUrl}:${card.title}:${dateKey}`;
-          if (byId.has(id)) continue;
+          for (const dd of dates) {
+            if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
+            const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
+            const eventUrl = `${BASE}${card.href}`;
+            const id = `${srcKey}:${eventUrl}:${card.title}:${dateKey}`;
+            if (byId.has(id)) continue;
 
-          const { startsAt, endsAt } = buildStartsEndsForDate(dd, timeRange);
-          const resolvedAddr = resolveEventAddress(source, ward.name, ward.address, point);
+            const { startsAt, endsAt } = buildStartsEndsForDate(dd, timeRange);
+            const resolvedAddr = resolveEventAddress(source, ward.name, ward.address, point);
 
-          byId.set(id, {
-            id, source: srcKey, source_label: label,
-            title: card.title,
-            starts_at: startsAt, ends_at: endsAt,
-            venue_name: ward.name, address: resolvedAddr || ward.address,
-            url: eventUrl,
-            lat: point.lat, lng: point.lng,
-          });
+            byId.set(id, {
+              id, source: srcKey, source_label: label,
+              title: card.title,
+              starts_at: startsAt, ends_at: endsAt,
+              venue_name: ward.name, address: resolvedAddr || ward.address,
+              url: eventUrl,
+              lat: point.lat, lng: point.lng,
+            });
+          }
         }
-      }
+      }));
     }
 
     const results = Array.from(byId.values());

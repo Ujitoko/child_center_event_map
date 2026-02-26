@@ -21,7 +21,7 @@ function saveSnapshot(snapshotPath, data) {
   }
 }
 
-const COLLECTOR_TIMEOUT_MS = 180000; // 180s per collector (some portal collectors need 120-150s)
+const COLLECTOR_TIMEOUT_MS = 300000; // 300s per collector (portal collectors need 120-200s with network contention)
 
 async function batchCollect(fns, size) {
   const results = [];

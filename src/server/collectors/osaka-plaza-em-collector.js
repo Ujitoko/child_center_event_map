@@ -128,54 +128,57 @@ function createOsakaPlazaEmCollector(config, deps) {
 
     const byId = new Map();
 
-    for (const ward of WARDS) {
-      // miokoko-net の AJAX パスはドメインルートから
-      const ajaxBase = ward.ajax.startsWith("/") && ward.base.includes("miokoko-net")
-        ? "https://miokoko-net.miotsukushi.or.jp"
-        : ward.base;
+    // Process wards in batches of 4 to reduce total sequential time
+    const WARD_BATCH = 4;
+    for (let wi = 0; wi < WARDS.length; wi += WARD_BATCH) {
+      const wardBatch = WARDS.slice(wi, wi + WARD_BATCH);
+      await Promise.allSettled(wardBatch.map(async (ward) => {
+        const ajaxBase = ward.ajax.startsWith("/") && ward.base.includes("miokoko-net")
+          ? "https://miokoko-net.miotsukushi.or.jp"
+          : ward.base;
 
-      // 今月+来月+再来月
-      for (let i = 0; i < 3; i++) {
-        let mm = mo + i;
-        let yy = y;
-        if (mm > 12) { mm -= 12; yy++; }
+        for (let i = 0; i < 3; i++) {
+          let mm = mo + i;
+          let yy = y;
+          if (mm > 12) { mm -= 12; yy++; }
 
-        try {
-          const url = `${ajaxBase}${ward.ajax}?action=WP_FullCalendar&type=event&month=${mm}&year=${yy}`;
-          const json = await fetchText(url);
-          if (!json || json.startsWith("<!") || json.startsWith("<html")) continue;
+          try {
+            const url = `${ajaxBase}${ward.ajax}?action=WP_FullCalendar&type=event&month=${mm}&year=${yy}`;
+            const json = await fetchText(url);
+            if (!json || json.startsWith("<!") || json.startsWith("<html")) continue;
 
-          const events = parseAjaxEvents(json, ward);
-          const point = { lat: ward.lat, lng: ward.lng };
+            const events = parseAjaxEvents(json, ward);
+            const point = { lat: ward.lat, lng: ward.lng };
 
-          for (const ev of events) {
-            const resolvedAddr = resolveEventAddress(source, ward.name, ward.address, point);
-            let count = 0;
-            for (const dd of ev.dates) {
-              if (count >= 30) break;
-              if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
-              count++;
+            for (const ev of events) {
+              const resolvedAddr = resolveEventAddress(source, ward.name, ward.address, point);
+              let count = 0;
+              for (const dd of ev.dates) {
+                if (count >= 30) break;
+                if (!inRangeJst(dd.y, dd.mo, dd.d, maxDays)) continue;
+                count++;
 
-              const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
-              const { startsAt, endsAt } = buildStartsEndsForDate(dd, ev.timeRange);
-              const id = `${srcKey}:${ward.name}:${ev.title}:${dateKey}`;
+                const dateKey = `${dd.y}${String(dd.mo).padStart(2, "0")}${String(dd.d).padStart(2, "0")}`;
+                const { startsAt, endsAt } = buildStartsEndsForDate(dd, ev.timeRange);
+                const id = `${srcKey}:${ward.name}:${ev.title}:${dateKey}`;
 
-              if (byId.has(id)) continue;
-              byId.set(id, {
-                id, source: srcKey, source_label: label,
-                title: ev.title,
-                starts_at: startsAt, ends_at: endsAt,
-                venue_name: ward.name,
-                address: resolvedAddr || ward.address,
-                url: ev.url || ward.base,
-                lat: point.lat, lng: point.lng,
-              });
+                if (byId.has(id)) continue;
+                byId.set(id, {
+                  id, source: srcKey, source_label: label,
+                  title: ev.title,
+                  starts_at: startsAt, ends_at: endsAt,
+                  venue_name: ward.name,
+                  address: resolvedAddr || ward.address,
+                  url: ev.url || ward.base,
+                  lat: point.lat, lng: point.lng,
+                });
+              }
             }
+          } catch (e) {
+            // Skip ward/month on error
           }
-        } catch (e) {
-          // Skip ward/month on error
         }
-      }
+      }));
     }
 
     const results = Array.from(byId.values());
