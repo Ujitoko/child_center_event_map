@@ -429,6 +429,8 @@ const {
   NIIGATA_UONUMA_SOURCE,
   // Phase 3: Tier 3 custom collectors
   FUKUOKA_KASUGA_JIDOCENTER_SOURCE, FUKUOKA_KURUME_EVENT_SOURCE, NAGANO_JYANKENPON_SOURCE,
+  // Phase 4: Under-50/M probe collectors
+  FUKUOKA_IIZUKA_SOURCE, NIIGATA_GOSEN_SOURCE, FUKUOKA_SHIME_SOURCE,
   CHILD_KW, IKOYO_CHILD_KW,
   REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 } = require("./src/config/wards");
@@ -1519,10 +1521,16 @@ const collectNiigataUonumaEvents = createMunicipalCalendarCollector({ source: NI
 const { createKasugaJidocenterCollector } = require("./src/server/collectors/kasuga-jidocenter-collector");
 const { createKurumeEventCollector } = require("./src/server/collectors/kurume-event-collector");
 const { createJyankenponCollector } = require("./src/server/collectors/jyankenpon-collector");
+const { createIizukaKosodateCollector } = require("./src/server/collectors/iizuka-kosodate-collector");
+const { createNikosapoCollector } = require("./src/server/collectors/nikosapo-collector");
+const { createShimeCalendarCollector } = require("./src/server/collectors/shime-calendar-collector");
 
 const collectKasugaJidocenterEvents = createKasugaJidocenterCollector({ source: FUKUOKA_KASUGA_JIDOCENTER_SOURCE }, geoFmDeps);
 const collectKurumeEvents = createKurumeEventCollector({ source: FUKUOKA_KURUME_EVENT_SOURCE }, geoFmDeps);
 const collectJyankenponEvents = createJyankenponCollector({ source: NAGANO_JYANKENPON_SOURCE }, geoFmDeps);
+const collectIizukaKosodateEvents = createIizukaKosodateCollector({ source: FUKUOKA_IIZUKA_SOURCE }, geoFmDeps);
+const collectNikosapoEvents = createNikosapoCollector({ source: NIIGATA_GOSEN_SOURCE }, geoFmDeps);
+const collectShimeCalendarEvents = createShimeCalendarCollector({ source: FUKUOKA_SHIME_SOURCE }, geoFmDeps);
 
 const collectors = [
   collectSetagayaJidokanEvents,
@@ -1968,7 +1976,9 @@ const collectors = [
   // Phase 3: Tier 3 additional municipal-calendar
   collectNiigataUonumaEvents,
   // Phase 3: Tier 3 custom collectors
-  collectKasugaJidocenterEvents, collectKurumeEvents, collectJyankenponEvents];
+  collectKasugaJidocenterEvents, collectKurumeEvents, collectJyankenponEvents,
+  // Phase 4: Under-50/M probe collectors
+  collectIizukaKosodateEvents, collectNikosapoEvents, collectShimeCalendarEvents];
 const getEvents = createGetEvents({
   CACHE_TTL_MS, cache, snapshotPath: SNAPSHOT_PATH,
   geoCache, geoCachePath: GEO_CACHE_PATH,

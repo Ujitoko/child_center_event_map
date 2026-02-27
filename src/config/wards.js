@@ -2829,6 +2829,11 @@ const FUKUOKA_KASUGA_JIDOCENTER_SOURCE = { key: "fukuoka_kasuga_jidocenter", lab
 const FUKUOKA_KURUME_EVENT_SOURCE = { key: "fukuoka_kurume_event", label: "久留米市イベント", baseUrl: "https://www.city.kurume.fukuoka.jp", center: { lat: 33.3166, lng: 130.5083 } };
 const NAGANO_JYANKENPON_SOURCE = { key: "nagano_jyankenpon", label: "じゃん・けん・ぽん(長野)", baseUrl: "https://www.na-kodomo.com", center: { lat: 36.2325, lng: 138.1886 } };
 
+// Phase 4: Under-50/M probe collectors
+const FUKUOKA_IIZUKA_SOURCE = { key: "fukuoka_iizuka", label: "飯塚市(子育て支援)", baseUrl: "https://www.city.iizuka.lg.jp", center: { lat: 33.6461, lng: 130.6914 } };
+const NIIGATA_GOSEN_SOURCE = { key: "niigata_gosen", label: "五泉市(にこサポ)", baseUrl: "https://www.nikosapo.jp", center: { lat: 37.7441, lng: 139.1825 } };
+const FUKUOKA_SHIME_SOURCE = { key: "fukuoka_shime", label: "志免町", baseUrl: "https://www.town.shime.lg.jp", center: { lat: 33.5859, lng: 130.4817 } };
+
 // Ibaraki KNOWN_FACILITIES
 
 // --- Metadata for frontend (nationwide) ---
@@ -3379,6 +3384,8 @@ module.exports = {
   NIIGATA_UONUMA_SOURCE,
   // Phase 3: Tier 3 custom collectors
   FUKUOKA_KASUGA_JIDOCENTER_SOURCE, FUKUOKA_KURUME_EVENT_SOURCE, NAGANO_JYANKENPON_SOURCE,
+  // Phase 4: Under-50/M probe collectors
+  FUKUOKA_IIZUKA_SOURCE, NIIGATA_GOSEN_SOURCE, FUKUOKA_SHIME_SOURCE,
   // Metadata for frontend
   REGION_GROUPS,
   PREF_CENTERS,
