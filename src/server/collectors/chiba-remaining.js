@@ -650,6 +650,196 @@ function createCollectTateyamaEvents(deps) {
   return createTateyamaCollector(TATEYAMA_SOURCE, deps);
 }
 
+// ---- 鴨川市 のびのびカモッコ + 図書館コレクター ----
+
+const KAMOGAWA_KNOWN_FACILITIES = {
+  "ふれあいセンター": "鴨川市横渚1301-7",
+  "子ども家庭センター": "鴨川市横渚1301-7",
+  "鴨川市立図書館": "鴨川市横渚1506",
+  "市立図書館": "鴨川市横渚1506",
+  "鴨川市30記念公園": "鴨川市横渚808",
+  "長狭子育て支援室": "鴨川市松尾寺417",
+  "江見子育て支援室": "鴨川市宮1455",
+  "天津小湊子育て支援室": "鴨川市天津1208-1",
+};
+
+/**
+ * h3メタデータ型の詳細ページを解析。
+ * <h3>日時</h3><p>3月11日（水曜日）午前9時30分から...</p>
+ * <h3>場所</h3><p>ふれあいセンター1階...</p>
+ */
+function parseKamogawaDetail(html) {
+  const h3Parts = html.split(/<h3[^>]*>/i);
+  const meta = {};
+  for (let i = 1; i < h3Parts.length; i++) {
+    const endH3 = h3Parts[i].indexOf("</h3>");
+    if (endH3 < 0) continue;
+    const key = stripTags(h3Parts[i].substring(0, endH3)).trim();
+    const content = h3Parts[i].substring(endH3 + 5);
+    const nextH = content.search(/<h[23]/i);
+    const block = nextH > 0 ? content.substring(0, nextH) : content.substring(0, 500);
+    const value = stripTags(block).trim();
+    if (key && value) meta[key] = value;
+  }
+
+  // 日時からの日付抽出
+  let eventDate = null;
+  let timeRange = null;
+  const dateText = meta["日時"] || meta["とき"] || "";
+  if (dateText) {
+    const dm = dateText.match(/(\d{1,2})月(\d{1,2})日/);
+    if (dm) eventDate = { mo: Number(dm[1]), d: Number(dm[2]) };
+    timeRange = parseTimeRangeFromText(dateText);
+  }
+
+  // 場所
+  const venue = meta["場所"] || meta["ところ"] || meta["会場"] || "";
+
+  return { eventDate, timeRange, venue, meta };
+}
+
+/**
+ * p要素ベースの詳細ページを解析（図書館ページ等）。
+ */
+function parseKamogawaPlainDetail(html) {
+  let eventDate = null;
+  let timeRange = null;
+  let venue = "";
+
+  const pRe = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+  let pm;
+  while ((pm = pRe.exec(html)) !== null) {
+    const t = stripTags(pm[1]).trim();
+    if (!t || t.length < 3) continue;
+    // 日付
+    if (!eventDate) {
+      const dm = t.match(/(\d{1,2})月(\d{1,2})日/);
+      if (dm && /[（(].*曜日[)）]/.test(t)) {
+        eventDate = { mo: Number(dm[1]), d: Number(dm[2]) };
+        timeRange = parseTimeRangeFromText(t);
+      }
+    }
+    // 場所: 施設名を含む短い段落
+    if (!venue) {
+      for (const name of Object.keys(KAMOGAWA_KNOWN_FACILITIES)) {
+        if (t.includes(name) && t.length < 80) { venue = t; break; }
+      }
+    }
+  }
+
+  return { eventDate, timeRange, venue };
+}
+
+function createCollectKamogawaEvents(deps) {
+  const { KAMOGAWA_SOURCE } = require("../../config/wards");
+  const {
+    geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+  } = deps;
+
+  return async function collectKamogawaEvents(maxDays) {
+    const sourceObj = KAMOGAWA_SOURCE;
+    const label = sourceObj.label;
+    const byId = new Map();
+    const now = parseYmdFromJst(new Date());
+    const baseUrl = sourceObj.baseUrl;
+
+    // イベントリンク収集元ページ
+    const listPages = [
+      `${baseUrl}/site/nobinobi-kamokko/`,
+      `${baseUrl}/site/library/`,
+    ];
+
+    const seen = new Set();
+    const eventLinks = [];
+
+    for (const pageUrl of listPages) {
+      let html;
+      try { html = await fetchText(pageUrl); } catch { continue; }
+
+      const linkRe = /<a\b[^>]*href="(\/site\/[^"]*\.html)"[^>]*>([\s\S]*?)<\/a>/gi;
+      let lm;
+      while ((lm = linkRe.exec(html)) !== null) {
+        const title = stripTags(lm[2]).trim();
+        const href = lm[1];
+        if (seen.has(href) || title.length < 4 || title.length > 100) continue;
+        seen.add(href);
+
+        // のびのびカモッコ(子育てサイト)は全リンクを対象、図書館は子育て関連のみ
+        const isKosodateSite = pageUrl.includes("nobinobi-kamokko");
+        const hasDate = /【\d{1,2}月\d{1,2}日】/.test(title);
+        const isChild = isChildEvent(title, "");
+        if (!isKosodateSite && !hasDate && !isChild) continue;
+        // 施設情報ページ・一覧ページは除外
+        if (/遊びにおいでよ|支援室$|page100|list\d+-/.test(title + href)) continue;
+
+        eventLinks.push({ href: `${baseUrl}${href}`, title });
+      }
+    }
+
+    // 詳細ページ取得
+    for (let i = 0; i < eventLinks.length; i += DETAIL_BATCH_SIZE) {
+      const batch = eventLinks.slice(i, i + DETAIL_BATCH_SIZE);
+      const results = await Promise.allSettled(
+        batch.map(async ({ href, title }) => {
+          const dhtml = await fetchText(href);
+
+          // h3メタデータ型を優先、なければp要素型
+          let detail = parseKamogawaDetail(dhtml);
+          if (!detail.eventDate) {
+            const plain = parseKamogawaPlainDetail(dhtml);
+            if (plain.eventDate) detail = plain;
+          }
+
+          // タイトルから日付抽出（フォールバック）
+          if (!detail.eventDate) {
+            const titleDm = title.match(/(\d{1,2})月(\d{1,2})日/);
+            if (titleDm) detail.eventDate = { mo: Number(titleDm[1]), d: Number(titleDm[2]) };
+          }
+          if (!detail.eventDate) return null;
+
+          // 年推定
+          let y = now.y;
+          const diff = detail.eventDate.mo - now.m;
+          if (diff > 6) y = now.y - 1;
+          else if (diff < -6) y = now.y + 1;
+          const eventDate = { y, mo: detail.eventDate.mo, d: detail.eventDate.d };
+
+          if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) return null;
+
+          // 施設名・住所特定
+          let venue = sanitizeVenueText(detail.venue || "");
+          let address = "";
+          for (const [name, addr] of Object.entries(KAMOGAWA_KNOWN_FACILITIES)) {
+            if (venue.includes(name) || title.includes(name)) {
+              venue = venue || name;
+              address = addr;
+              break;
+            }
+          }
+
+          return { href, title, eventDate, venue, address, timeRange: detail.timeRange };
+        })
+      );
+
+      for (const r of results) {
+        if (r.status !== "fulfilled" || !r.value) continue;
+        const { href, title, eventDate, venue, address, timeRange } = r.value;
+
+        await addEventRecord(byId, {
+          sourceObj, eventDate, title, url: href,
+          venue, rawAddress: sanitizeAddressText(address),
+          timeRange, cityName: "鴨川市", prefixLabel: "鴨川市",
+          geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+        });
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
 function createCollectMinamibosoEvents(deps) {
   const { MINAMIBOSO_SOURCE } = require("../../config/wards");
   return createKosodatePageCollector(MINAMIBOSO_SOURCE, {
@@ -2453,6 +2643,7 @@ function createCollectInzaiLibraryEvents(deps) {
 module.exports = {
   createCollectMobaraEvents,
   createCollectTateyamaEvents,
+  createCollectKamogawaEvents,
   createCollectMinamibosoEvents,
   createCollectOamishirasatoEvents,
   createCollectShisuiEvents,

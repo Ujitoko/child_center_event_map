@@ -62,7 +62,7 @@ const { createRdfEventCollector } = require("./src/server/collectors/rdf-event-c
 const { createCollectIchinomiyaEvents } = require("./src/server/collectors/ichinomiya");
 const { createCollectChoshiEvents } = require("./src/server/collectors/choshi");
 const {
-  createCollectMobaraEvents, createCollectTateyamaEvents,
+  createCollectMobaraEvents, createCollectTateyamaEvents, createCollectKamogawaEvents,
   createCollectMinamibosoEvents, createCollectOamishirasatoEvents,
   createCollectShisuiEvents, createCollectKozakiEvents,
   createCollectTakoEvents, createCollectShibayamaEvents,
@@ -654,7 +654,7 @@ const collectKashiwaEvents = createCollectKashiwaEvents(geoFmDeps);
 // --- 千葉県 municipal-calendar-collector ---
 const collectYachiyoEvents = createMunicipalCalendarCollector({ source: YACHIYO_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectAsahiEvents = createMunicipalCalendarCollector({ source: ASAHI_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
-const collectKamogawaEvents = createMunicipalCalendarCollector({ source: KAMOGAWA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectKamogawaEvents = createCollectKamogawaEvents(geoFmDeps);
 const collectYokoshibahikariEvents = createMunicipalCalendarCollector({ source: YOKOSHIBAHIKARI_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectIchikawaEvents = createCollectIchikawaEvents(geoFmDeps);
 const collectIchikawaIkujiEvents = createCollectIchikawaIkujiEvents(geoFmDeps);
