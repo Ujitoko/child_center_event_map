@@ -29,16 +29,47 @@ const DETAIL_BATCH_SIZE = 6;
  *   </td>
  * </tr>
  */
+/**
+ * ページ内の複数タブ（月別）からイベントを抽出。
+ * タブ構造: <div class="tab" id="tab12"> ... <table class="schedule"> ...
+ * tabCurrent = 当月, tabN = N月。年は現在日時から推定。
+ */
 function parseSchedulePage(html, baseUrl) {
   const events = [];
-
-  // 年月をページから取得
-  const ymMatch = html.match(/(\d{4})年\s*(\d{1,2})月/);
   const now = parseYmdFromJst(new Date());
-  const y = ymMatch ? Number(ymMatch[1]) : now.y;
-  const mo = ymMatch ? Number(ymMatch[2]) : now.m;
 
-  const trParts = html.split(/<tr\b[^>]*>/i);
+  // 各タブセクションを抽出: <div class="tab..." id="tabXX"> ... </div>
+  const tabRe = /<div class="tab[^"]*" id="(tab\w+)">([\s\S]*?)(?=<div class="tab[^"]*" id="tab|<\/div>\s*<\/div>\s*<\/section)/gi;
+  let tm;
+  while ((tm = tabRe.exec(html)) !== null) {
+    const tabId = tm[1];
+    const section = tm[2];
+
+    // タブIDから月を決定
+    let mo;
+    if (tabId === "tabCurrent") {
+      mo = now.m;
+    } else {
+      const moM = tabId.match(/tab(\d{1,2})/);
+      if (!moM) continue;
+      mo = Number(moM[1]);
+    }
+
+    // 年を推定: 当月±6ヶ月以内の最も近い年を選択
+    let y = now.y;
+    const diff = mo - now.m;
+    if (diff > 6) y = now.y - 1;    // e.g. tab12 when current=2 → Dec of prev year
+    else if (diff < -6) y = now.y + 1; // e.g. tab1 when current=11 → Jan of next year
+
+    parseTabSection(section, baseUrl, y, mo, events);
+  }
+
+  return events;
+}
+
+/** 単一タブセクション内の schedule テーブルからイベントを抽出 */
+function parseTabSection(section, baseUrl, y, mo, events) {
+  const trParts = section.split(/<tr\b[^>]*>/i);
   for (let i = 1; i < trParts.length; i++) {
     const tr = trParts[i];
 
@@ -72,8 +103,6 @@ function parseSchedulePage(html, baseUrl) {
       events.push({ title, url: absUrl, y, mo, d });
     }
   }
-
-  return events;
 }
 
 function buildGeoCandidates(venue, address) {
