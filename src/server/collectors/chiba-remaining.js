@@ -12,6 +12,7 @@ const { fetchText } = require("../fetch-utils");
 const { stripTags } = require("../html-utils");
 const {
   inRangeJst,
+  parseYmdFromJst,
   parseTimeRangeFromText,
   buildStartsEndsForDate,
 } = require("../date-utils");
@@ -430,7 +431,56 @@ function createShisuiCollector(sourceObj, deps) {
 }
 
 
-// ---- 館山市 CGI カレンダー型コレクター ----
+// ---- 館山市 子育て親子の交流の場ページ型コレクター ----
+
+/** 曜日文字 → JS dayOfWeek (0=日,1=月,...,6=土) */
+const DAY_OF_WEEK_MAP = { "日": 0, "月": 1, "火": 2, "水": 3, "木": 4, "金": 5, "土": 6 };
+
+/**
+ * 「毎週X曜日」→ maxDays 以内の全該当日を列挙。
+ * 祝日はスキップしない（ページ内の休日注記は無視）。
+ */
+function expandWeekly(dow, maxDays) {
+  const dates = [];
+  const jstNow = new Date(Date.now() + 9 * 3600000);
+  for (let offset = 0; offset <= maxDays; offset++) {
+    const d = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate() + offset);
+    if (d.getDay() === dow) {
+      dates.push({ y: d.getFullYear(), mo: d.getMonth() + 1, d: d.getDate() });
+    }
+  }
+  return dates;
+}
+
+/**
+ * 「毎月第N X曜日」→ maxDays 以内の全該当日を列挙。
+ */
+function expandNthWeekday(nth, dow, maxDays) {
+  const dates = [];
+  const jstNow = new Date(Date.now() + 9 * 3600000);
+  const endDate = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate() + maxDays);
+  let cursor = new Date(jstNow.getFullYear(), jstNow.getMonth(), 1);
+  while (cursor <= endDate) {
+    const y = cursor.getFullYear(), mo = cursor.getMonth();
+    // 第N X曜日を算出
+    let first = new Date(y, mo, 1);
+    let firstDow = first.getDay();
+    let dayNum = 1 + ((dow - firstDow + 7) % 7) + (nth - 1) * 7;
+    const target = new Date(y, mo, dayNum);
+    if (target.getMonth() === mo && target >= jstNow && target <= endDate) {
+      dates.push({ y, mo: mo + 1, d: dayNum });
+    }
+    cursor = new Date(y, mo + 1, 1);
+  }
+  return dates;
+}
+
+const TATEYAMA_KNOWN_FACILITIES = {
+  "船形地区公民館": "館山市船形405-2",
+  "那古地区公民館": "館山市那古1125-1",
+  "館山市図書館": "館山市北条1740",
+  "館山市元気な広場": "館山市北条1145-1",
+};
 
 function createTateyamaCollector(sourceObj, deps) {
   const {
@@ -440,105 +490,137 @@ function createTateyamaCollector(sourceObj, deps) {
   return async function collectTateyamaEvents(maxDays) {
     const label = sourceObj.label;
     const byId = new Map();
+    const pageUrl = `${sourceObj.baseUrl}/kodomo/page100032.html`;
 
-    // cal.cgi は公開ページなので試行
-    const now = new Date(Date.now() + 9 * 60 * 60 * 1000);
-    const months = [];
-    for (let offset = 0; offset <= 2; offset++) {
-      const d = new Date(now.getFullYear(), now.getMonth() + offset, 1);
-      months.push({ y: d.getFullYear(), mo: d.getMonth() + 1 });
+    let html;
+    try {
+      html = await fetchText(pageUrl);
+    } catch (e) {
+      console.warn(`[${label}] page fetch failed:`, e.message || e);
+      return [];
     }
 
-    for (const { y, mo } of months) {
-      // cal.cgi をHTMLカレンダーとしてフェッチ
-      const url = `${sourceObj.baseUrl}/cgi-bin/event/cal.cgi?year=${y}&month=${mo}`;
-      let html;
-      try {
-        html = await fetchText(url);
-      } catch (e) {
-        console.warn(`[${label}] cal.cgi fetch failed:`, e.message || e);
-        continue;
+    const now = parseYmdFromJst(new Date());
+
+    // h3 セクションに分割
+    const h3Parts = html.split(/<h3>/i);
+    for (let si = 1; si < h3Parts.length; si++) {
+      const section = h3Parts[si];
+      const titleM = section.match(/<span>([\s\S]*?)<\/span>/);
+      const sectionTitle = titleM ? stripTags(titleM[1]).trim() : "";
+      if (!sectionTitle) continue;
+      // ちびっ子デーは「令和8年度の日程は決定次第」なのでスキップ
+      if (/日程.*決定次第/.test(stripTags(section))) continue;
+
+      const plainText = stripTags(section);
+
+      // セクション内の施設・住所を特定
+      let sectionVenue = "";
+      let sectionAddress = "";
+      for (const [name, addr] of Object.entries(TATEYAMA_KNOWN_FACILITIES)) {
+        if (section.includes(name)) {
+          if (!sectionVenue) { sectionVenue = name; sectionAddress = addr; }
+        }
+      }
+      // 場所[：/] パターン
+      if (!sectionVenue) {
+        const placeM = plainText.match(/場所[：:／/]\s*([^\n]{2,40})/);
+        if (placeM) sectionVenue = placeM[1].trim();
       }
 
-      // カレンダーHTML内のイベントリンクを抽出
-      const linkRe = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-      let lm;
-      while ((lm = linkRe.exec(html)) !== null) {
-        const href = lm[1].replace(/&amp;/g, "&").trim();
-        const title = stripTags(lm[2]).trim();
-        if (!href || !title || title.length < 2) continue;
-        if (!isChildEvent(title, "")) continue;
+      // 1) 特定日付: N月D日（X曜日）
+      const specificRe = /(\d{1,2})月(\d{1,2})日（[月火水木金土日]曜日）/g;
+      let sm;
+      while ((sm = specificRe.exec(plainText)) !== null) {
+        const mo = Number(sm[1]);
+        const d = Number(sm[2]);
+        let y = now.y;
+        const diff = mo - now.m;
+        if (diff > 6) y = now.y - 1;
+        else if (diff < -6) y = now.y + 1;
+        if (!inRangeJst(y, mo, d, maxDays)) continue;
 
-        // 日付をhrefから推定 (?date=YYYYMMDD 等)
-        let eventDate = null;
-        const dateParam = href.match(/date=(\d{4})(\d{2})(\d{2})/);
-        if (dateParam) {
-          eventDate = { y: Number(dateParam[1]), mo: Number(dateParam[2]), d: Number(dateParam[3]) };
-        }
-        // テキストからの日付パース
-        if (!eventDate) {
-          eventDate = parseDateFromText(title);
-        }
-        if (!eventDate) continue;
-        if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
+        // 近傍の時間を取得
+        const nearby = plainText.substring(sm.index, sm.index + 100);
+        const timeRange = parseTimeRangeFromText(nearby);
 
-        let absUrl;
-        if (href.startsWith("http")) {
-          absUrl = href;
-        } else if (href.startsWith("/")) {
-          absUrl = `${sourceObj.baseUrl}${href}`;
-        } else {
-          absUrl = `${sourceObj.baseUrl}/cgi-bin/event/${href}`;
+        // 近傍の場所をチェック (同じ段落内)
+        let venue = sectionVenue;
+        let address = sectionAddress;
+        const nearbyBefore = plainText.substring(Math.max(0, sm.index - 200), sm.index + sm[0].length + 200);
+        for (const [name, addr] of Object.entries(TATEYAMA_KNOWN_FACILITIES)) {
+          if (nearbyBefore.includes(name)) { venue = name; address = addr; break; }
+        }
+
+        // タイトル: 近傍の小見出し（○図書館まつり 等）から取得、なければセクションタイトル
+        let eventTitle = sectionTitle;
+        const subHeadM = plainText.substring(Math.max(0, sm.index - 80), sm.index).match(/[○❍◆●■]\s*(.+?)(?:\s|$)/);
+        if (subHeadM && !/^(?:場所|日時|住所|対象|費用|申込)/.test(subHeadM[1].trim())) {
+          eventTitle = subHeadM[1].trim();
         }
 
         await addEventRecord(byId, {
-          sourceObj, eventDate, title, url: absUrl,
-          venue: "", rawAddress: "",
-          timeRange: null, cityName: "館山市", prefixLabel: "館山市",
+          sourceObj, eventDate: { y, mo, d }, title: eventTitle, url: pageUrl,
+          venue: sanitizeVenueText(venue), rawAddress: sanitizeAddressText(address),
+          timeRange, cityName: "館山市", prefixLabel: "館山市",
           geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
         });
       }
-    }
 
-    // フォールバック: 子育てページからもリンク収集
-    const kosodateUrls = [
-      `${sourceObj.baseUrl}/kosodate/`,
-      `${sourceObj.baseUrl}/soshiki/kosodate/`,
-    ];
-    for (const pageUrl of kosodateUrls) {
-      let html;
-      try {
-        html = await fetchText(pageUrl);
-      } catch { continue; }
+      // 2) 毎週X曜日
+      const weeklyRe = /毎週([月火水木金土日])曜日/g;
+      let wm;
+      while ((wm = weeklyRe.exec(plainText)) !== null) {
+        const dow = DAY_OF_WEEK_MAP[wm[1]];
+        if (dow === undefined) continue;
+        const nearby = plainText.substring(wm.index, wm.index + 100);
+        const timeRange = parseTimeRangeFromText(nearby);
+        // 近傍の場所
+        let venue = sectionVenue;
+        let address = sectionAddress;
+        const nearbyCtx = plainText.substring(Math.max(0, wm.index - 200), wm.index + wm[0].length + 200);
+        for (const [name, addr] of Object.entries(TATEYAMA_KNOWN_FACILITIES)) {
+          if (nearbyCtx.includes(name)) { venue = name; address = addr; break; }
+        }
+        const dates = expandWeekly(dow, maxDays);
+        for (const ed of dates) {
+          if (!inRangeJst(ed.y, ed.mo, ed.d, maxDays)) continue;
+          await addEventRecord(byId, {
+            sourceObj, eventDate: ed, title: sectionTitle, url: pageUrl,
+            venue: sanitizeVenueText(venue), rawAddress: sanitizeAddressText(address),
+            timeRange, cityName: "館山市", prefixLabel: "館山市",
+            geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+          });
+        }
+      }
 
-      const linkRe = /<a\s+[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi;
-      let lm;
-      while ((lm = linkRe.exec(html)) !== null) {
-        const href = lm[1].replace(/&amp;/g, "&").trim();
-        const title = stripTags(lm[2]).trim();
-        if (!href || !title || title.length < 3) continue;
-        if (!isChildEvent(title, "")) continue;
-
-        let absUrl = href.startsWith("http") ? href :
-          href.startsWith("/") ? `${sourceObj.baseUrl}${href}` :
-          `${sourceObj.baseUrl}/kosodate/${href}`;
-
-        // 詳細ページから日付取得
-        let detail;
-        try {
-          detail = await fetchDetailInfo(absUrl);
-        } catch { continue; }
-        if (!detail.eventDate) continue;
-        if (!inRangeJst(detail.eventDate.y, detail.eventDate.mo, detail.eventDate.d, maxDays)) continue;
-
-        const venue = sanitizeVenueText(detail.venue || "");
-        const rawAddress = sanitizeAddressText(detail.address || "");
-        await addEventRecord(byId, {
-          sourceObj, eventDate: detail.eventDate, title, url: absUrl,
-          venue, rawAddress, timeRange: detail.timeRange,
-          cityName: "館山市", prefixLabel: "館山市",
-          geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
-        });
+      // 3) 毎月第N X曜日
+      const monthlyRe = /毎月第(\d)([月火水木金土日])曜日/g;
+      let mm;
+      while ((mm = monthlyRe.exec(plainText)) !== null) {
+        const nth = Number(mm[1]);
+        const dow = DAY_OF_WEEK_MAP[mm[2]];
+        if (dow === undefined) continue;
+        const nearby = plainText.substring(mm.index, mm.index + 100);
+        const timeRange = parseTimeRangeFromText(nearby);
+        // 月例イベントのタイトル: 直前のテキストブロックから取得
+        // テーブル構造: "おはなし会（幼児） 毎月第1金曜日" のパターン
+        let eventTitle = sectionTitle;
+        const before = plainText.substring(Math.max(0, mm.index - 60), mm.index);
+        const nameM = before.match(/\s([\u3000-\u9FFF\uFF00-\uFFEFa-zA-Z（）ー〜・\d]{2,30})\s*$/);
+        if (nameM && !/場所|日時|対象|毎月|午前|午後|\d+時/.test(nameM[1].trim())) {
+          eventTitle = nameM[1].trim();
+        }
+        const dates = expandNthWeekday(nth, dow, maxDays);
+        for (const ed of dates) {
+          if (!inRangeJst(ed.y, ed.mo, ed.d, maxDays)) continue;
+          await addEventRecord(byId, {
+            sourceObj, eventDate: ed, title: eventTitle, url: pageUrl,
+            venue: sanitizeVenueText(sectionVenue), rawAddress: sanitizeAddressText(sectionAddress),
+            timeRange, cityName: "館山市", prefixLabel: "館山市",
+            geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+          });
+        }
       }
     }
 
