@@ -217,4 +217,5 @@ function createGetEvents(deps) {
 
 module.exports = {
   createGetEvents,
+  batchCollect,
 };

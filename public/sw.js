@@ -1,11 +1,13 @@
-const CACHE_NAME = "kids-play-v3";
+const CACHE_NAME = "kids-play-v4";
 const STATIC_ASSETS = [
-  "/",
-  "/styles.css",
-  "/app.js",
-  "/manifest.json",
-  "/icon-192.svg",
-  "/icon-512.svg",
+  "./",
+  "./styles.css",
+  "./app.js",
+  "./manifest.json",
+  "./icon-192.svg",
+  "./icon-512.svg",
+  "./data/events.json",
+  "./data/metadata.json",
 ];
 
 // インストール時に静的アセットをキャッシュ

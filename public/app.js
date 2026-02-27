@@ -661,7 +661,7 @@ function applyFiltersAndRender(options = {}) {
 
 async function loadMetadata() {
   try {
-    const res = await fetch("/api/metadata");
+    const res = await fetch("./data/metadata.json");
     const data = await res.json();
     REGION_GROUPS = data.regions || [];
     PREF_CENTERS = data.pref_centers || {};
@@ -677,7 +677,7 @@ async function loadMetadata() {
 
 async function loadEvents() {
   setStatus("データ取得中...");
-  const url = "/api/events?days=90";
+  const url = "./data/events.json";
 
   try {
     const res = await fetch(url);

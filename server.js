@@ -1975,61 +1975,91 @@ const getEvents = createGetEvents({
   collectors,
 });
 
-// --- HTTP server ---
-const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
+// --- Export for collect.js ---
+module.exports = {
+  collectors, geoCache, cache,
+  GEO_CACHE_PATH, SNAPSHOT_PATH,
+  REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap, _wardsExports,
+};
 
-  if (url.pathname === "/api/health") {
-    sendJson(res, 200, {
-      status: "ok",
-      uptime_s: Math.floor(process.uptime()),
-      cache_age_s: cache.savedAt ? Math.floor((Date.now() - cache.savedAt) / 1000) : null,
-      cached_items: cache.data?.items?.length ?? 0,
-    }, req);
-    return;
-  }
+// --- HTTP server (only when run directly) ---
+if (require.main === module) {
+  const server = http.createServer(async (req, res) => {
+    const url = new URL(req.url, `http://${req.headers.host}`);
 
-  if (url.pathname === "/api/metadata") {
-    if (!metadataCache) {
-      metadataCache = {
-        regions: REGION_GROUPS,
-        pref_centers: PREF_CENTERS,
-        source_to_pref: buildSourceToPrefMap(_wardsExports),
-      };
-    }
-    sendJson(res, 200, metadataCache, req);
-    return;
-  }
-
-  if (url.pathname === "/api/events") {
-    try {
-      const days = Number(url.searchParams.get("days") || "30");
-      const refresh = url.searchParams.get("refresh") === "1";
-      const data = await getEvents(days, refresh);
-      sendJson(res, 200, data, req);
-    } catch (err) {
-      sendJson(res, 500, {
-        error: "failed_to_fetch_events",
-        message: err instanceof Error ? err.message : String(err),
+    if (url.pathname === "/api/health") {
+      sendJson(res, 200, {
+        status: "ok",
+        uptime_s: Math.floor(process.uptime()),
+        cache_age_s: cache.savedAt ? Math.floor((Date.now() - cache.savedAt) / 1000) : null,
+        cached_items: cache.data?.items?.length ?? 0,
       }, req);
+      return;
     }
-    return;
-  }
 
-  if (url.pathname === "/" || url.pathname === "/index.html") {
-    sendFile(res, path.join(PUBLIC_DIR, "index.html"), req);
-    return;
-  }
+    if (url.pathname === "/api/metadata") {
+      if (!metadataCache) {
+        metadataCache = {
+          regions: REGION_GROUPS,
+          pref_centers: PREF_CENTERS,
+          source_to_pref: buildSourceToPrefMap(_wardsExports),
+        };
+      }
+      sendJson(res, 200, metadataCache, req);
+      return;
+    }
 
-  const candidate = path.join(PUBLIC_DIR, url.pathname);
-  if (!candidate.startsWith(PUBLIC_DIR)) {
-    res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
-    res.end("Forbidden");
-    return;
-  }
-  sendFile(res, candidate, req);
-});
+    if (url.pathname === "/api/events") {
+      try {
+        const days = Number(url.searchParams.get("days") || "30");
+        const refresh = url.searchParams.get("refresh") === "1";
+        const data = await getEvents(days, refresh);
+        sendJson(res, 200, data, req);
+      } catch (err) {
+        sendJson(res, 500, {
+          error: "failed_to_fetch_events",
+          message: err instanceof Error ? err.message : String(err),
+        }, req);
+      }
+      return;
+    }
 
-server.listen(PORT, () => {
-  console.log(`kids-play-map running on http://localhost:${PORT}`);
-});
+    // Serve static data files for local development (frontend fetches ./data/*.json)
+    if (url.pathname === "/data/events.json") {
+      const snapshot = cache.data || (() => {
+        try { return JSON.parse(fs.readFileSync(SNAPSHOT_PATH, "utf8")); } catch { return null; }
+      })();
+      if (snapshot) sendJson(res, 200, snapshot, req);
+      else sendJson(res, 404, { error: "no data" }, req);
+      return;
+    }
+    if (url.pathname === "/data/metadata.json") {
+      if (!metadataCache) {
+        metadataCache = {
+          regions: REGION_GROUPS,
+          pref_centers: PREF_CENTERS,
+          source_to_pref: buildSourceToPrefMap(_wardsExports),
+        };
+      }
+      sendJson(res, 200, metadataCache, req);
+      return;
+    }
+
+    if (url.pathname === "/" || url.pathname === "/index.html") {
+      sendFile(res, path.join(PUBLIC_DIR, "index.html"), req);
+      return;
+    }
+
+    const candidate = path.join(PUBLIC_DIR, url.pathname);
+    if (!candidate.startsWith(PUBLIC_DIR)) {
+      res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Forbidden");
+      return;
+    }
+    sendFile(res, candidate, req);
+  });
+
+  server.listen(PORT, () => {
+    console.log(`kids-play-map running on http://localhost:${PORT}`);
+  });
+}

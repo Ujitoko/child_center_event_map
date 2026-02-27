@@ -5,6 +5,7 @@
   "description": "Same-day event map MVP using Doorkeeper real data",
   "scripts": {
     "start": "node --max-old-space-size=384 server.js",
+    "collect": "node --max-old-space-size=4096 scripts/collect.js",
     "test": "node --test tests/*.test.js"
   }
 }
