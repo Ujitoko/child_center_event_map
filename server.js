@@ -427,6 +427,8 @@ const {
   NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE, HYOGO_HIMEJI_SOURCE,
   // Phase 3: Tier 3 additional municipal-calendar
   NIIGATA_UONUMA_SOURCE,
+  // Phase 3: Tier 3 custom collectors
+  FUKUOKA_KASUGA_JIDOCENTER_SOURCE, FUKUOKA_KURUME_EVENT_SOURCE, NAGANO_JYANKENPON_SOURCE,
   CHILD_KW, IKOYO_CHILD_KW,
   REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 } = require("./src/config/wards");
@@ -1513,6 +1515,15 @@ const collectHimejiKosodateEvents = createHimejiKosodateCollector({ source: HYOG
 // Phase 3: Tier 3 additional municipal-calendar
 const collectNiigataUonumaEvents = createMunicipalCalendarCollector({ source: NIIGATA_UONUMA_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 
+// Phase 3: Tier 3 custom collectors
+const { createKasugaJidocenterCollector } = require("./src/server/collectors/kasuga-jidocenter-collector");
+const { createKurumeEventCollector } = require("./src/server/collectors/kurume-event-collector");
+const { createJyankenponCollector } = require("./src/server/collectors/jyankenpon-collector");
+
+const collectKasugaJidocenterEvents = createKasugaJidocenterCollector({ source: FUKUOKA_KASUGA_JIDOCENTER_SOURCE }, geoFmDeps);
+const collectKurumeEvents = createKurumeEventCollector({ source: FUKUOKA_KURUME_EVENT_SOURCE }, geoFmDeps);
+const collectJyankenponEvents = createJyankenponCollector({ source: NAGANO_JYANKENPON_SOURCE }, geoFmDeps);
+
 const collectors = [
   collectSetagayaJidokanEvents,
   collectOtaJidokanEvents,
@@ -1955,7 +1966,9 @@ const collectors = [
   collectNagaokaKosodateEvents, collectKitahiroshimaKosodateEvents,
   collectKogaKosodateEvents, collectHimejiKosodateEvents,
   // Phase 3: Tier 3 additional municipal-calendar
-  collectNiigataUonumaEvents];
+  collectNiigataUonumaEvents,
+  // Phase 3: Tier 3 custom collectors
+  collectKasugaJidocenterEvents, collectKurumeEvents, collectJyankenponEvents];
 const getEvents = createGetEvents({
   CACHE_TTL_MS, cache, snapshotPath: SNAPSHOT_PATH,
   geoCache, geoCachePath: GEO_CACHE_PATH,

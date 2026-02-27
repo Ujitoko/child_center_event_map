@@ -1057,6 +1057,10 @@ const WARD_LABEL_BY_KEY = {
   fukuoka_koga: "古賀市",
   // Phase 3: Tier 3 additional municipal-calendar
   niigata_uonuma: "魚沼市",
+  // Phase 3: Tier 3 custom collectors
+  fukuoka_kasuga_jidocenter: "春日市児童センター",
+  fukuoka_kurume_event: "久留米市イベント",
+  nagano_jyankenpon: "じゃん・けん・ぽん(長野)",
 };
 
 const SAGAMIHARA_SOURCE = {
@@ -2820,6 +2824,11 @@ const FUKUOKA_KOGA_SOURCE = { key: "fukuoka_koga", label: "古賀市", baseUrl: 
 // Phase 3: Tier 3 additional municipal-calendar
 const NIIGATA_UONUMA_SOURCE = { key: "niigata_uonuma", label: "魚沼市", baseUrl: "https://www.city.uonuma.lg.jp", center: { lat: 37.2300, lng: 138.9600 } };
 
+// Phase 3: Tier 3 custom collectors
+const FUKUOKA_KASUGA_JIDOCENTER_SOURCE = { key: "fukuoka_kasuga_jidocenter", label: "春日市児童センター", baseUrl: "https://kasugashijidocenter.jp", center: { lat: 33.5300, lng: 130.4600 } };
+const FUKUOKA_KURUME_EVENT_SOURCE = { key: "fukuoka_kurume_event", label: "久留米市イベント", baseUrl: "https://www.city.kurume.fukuoka.jp", center: { lat: 33.3166, lng: 130.5083 } };
+const NAGANO_JYANKENPON_SOURCE = { key: "nagano_jyankenpon", label: "じゃん・けん・ぽん(長野)", baseUrl: "https://www.na-kodomo.com", center: { lat: 36.2325, lng: 138.1886 } };
+
 // Ibaraki KNOWN_FACILITIES
 
 // --- Metadata for frontend (nationwide) ---
@@ -3368,6 +3377,8 @@ module.exports = {
   NIIGATA_NAGAOKA_SOURCE, HOKKAIDO_KITAHIROSHIMA_SOURCE, FUKUOKA_KOGA_SOURCE,
   // Phase 3: Tier 3 additional municipal-calendar
   NIIGATA_UONUMA_SOURCE,
+  // Phase 3: Tier 3 custom collectors
+  FUKUOKA_KASUGA_JIDOCENTER_SOURCE, FUKUOKA_KURUME_EVENT_SOURCE, NAGANO_JYANKENPON_SOURCE,
   // Metadata for frontend
   REGION_GROUPS,
   PREF_CENTERS,
