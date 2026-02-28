@@ -877,9 +877,9 @@ layoutEl.addEventListener("touchend", (e) => {
   }
 }, { passive: true });
 
-// 初期状態: モバイルではリストタブをアクティブに + フィルター折りたたみ
+// 初期状態: モバイルではマップタブをアクティブに + フィルター折りたたみ
 if (isMobile()) {
-  switchTab("list");
+  switchTab("map");
   const controlsSection = document.querySelector(".controls-section");
   if (controlsSection) controlsSection.removeAttribute("open");
 }
