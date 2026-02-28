@@ -202,6 +202,8 @@ const { createCollectKotoJidokanEvents } = require("./src/server/collectors/koto
 const { createCollectKodomonokuniEvents } = require("./src/server/collectors/kodomonokuni-collector");
 const { createCollectKawaguchiJidokanEvents } = require("./src/server/collectors/kawaguchi-jidokan-collector");
 const { createCollectKasukabeJidokanEvents } = require("./src/server/collectors/kasukabe-jidokan-collector");
+const { createCollectSakadoJidokanEvents } = require("./src/server/collectors/sakado-jidokan-collector");
+const { createCollectHigashimatsuyamaKosodateEvents } = require("./src/server/collectors/higashimatsuyama-kosodate-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const FACILITY_REGISTRY = require("./src/config/known-facilities");
 const {
@@ -562,7 +564,9 @@ const collectKukiEvents = createEventJsCollector({
 // --- 埼玉県 municipal-calendar-collector (追加) ---
 const collectKounosuEvents = createMunicipalCalendarCollector({ source: KOUNOSU_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
 const collectSakadoEvents = createMunicipalCalendarCollector({ source: SAKADO_SOURCE, childCategoryIndex: 2 }, geoFmDeps);
+const collectSakadoJidokanEvents = createCollectSakadoJidokanEvents(geoFmDeps);
 const collectHigashimatsuyamaEvents = createMunicipalCalendarCollector({ source: HIGASHIMATSUYAMA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectHigashimatsuyamaKosodateEvents = createCollectHigashimatsuyamaKosodateEvents(geoFmDeps);
 // --- 埼玉県 calendar-json-collector (追加) ---
 const collectHannoEvents = createCalendarJsonCollector({ source: HANNO_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectGyodaEvents = createCalendarJsonCollector({ source: GYODA_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
@@ -1055,9 +1059,9 @@ const collectors = [
   collectKukiEvents,
   collectKumagayaEvents,
   collectKounosuEvents,
-  collectSakadoEvents,
+  collectSakadoEvents, collectSakadoJidokanEvents,
   collectHannoEvents,
-  collectHigashimatsuyamaEvents,
+  collectHigashimatsuyamaEvents, collectHigashimatsuyamaKosodateEvents,
   collectGyodaEvents,
   collectHonjoEvents,
   collectHidakaEvents,

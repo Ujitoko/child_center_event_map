@@ -3,6 +3,7 @@ const {
   inRangeJst,
   buildStartsEndsForDate,
 } = require("../date-utils");
+const { normalizeJaDigits } = require("../text-utils");
 
 const CHILD_RE =
   /子育て|子ども|こども|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|保育|離乳食|おはなし|絵本|紙芝居|リトミック|ママ|パパ|マタニティ|ひろば|誕生|手形|ハイハイ|ねんねこ|よちよち|てくてく|ぐんぐん|わんぱく|ベビーマッサージ|育児|栄養相談|壁面|豆まき|ひな|お楽しみ|身体測定|工作|製作|ふれあい遊び|読み聞かせ/;
@@ -50,20 +51,32 @@ function parseSienCenterPdf(text, y, mo) {
   let currentTitle = "";
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i].trim();
 
-    // タイトル行候補（★◆●等で始まる、または前行にタイトルがある）
-    const titleMatch = line.match(/^[★☆◆●◎]\s*(.+)/);
-    if (titleMatch) {
-      currentTitle = titleMatch[1].trim();
+    // タイトル行候補（★◆●◎等で始まる行）
+    const markerMatch = line.match(/^[★☆◆●◎]\s*(.+)/);
+    if (markerMatch) {
+      currentTitle = markerMatch[1].replace(/[～〜~].+$/, "").trim();
+      continue;
     }
 
-    // 日時行: "日時…M月D日(曜日)" or "日時：M月D日（曜日）"
-    const dateMatch = line.match(/日\s*時\s*[…：:．]\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日\s*[（(]([月火水木金土日])[）)]/);
+    // 日時行: "日時" + optional separator + "M月D日(曜日)"
+    // セパレータは ...…：:．スペース いずれでもOK
+    const dateMatch = line.match(/日\s*時\s*[.…：:．\s]+\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日\s*[（(]\s*[月火水木金土日]\s*[）)]/);
     if (dateMatch) {
       const evMo = Number(dateMatch[1]);
       const d = Number(dateMatch[2]);
-      // 時刻を同行または次行から抽出
+      // タイトルが未設定なら前数行をさかのぼってタイトルを探す
+      if (!currentTitle && i > 0) {
+        for (let k = i - 1; k >= Math.max(0, i - 5); k--) {
+          const prevLine = lines[k].trim();
+          if (prevLine && !/日\s*時|場\s*所|対\s*象|定\s*員|持\s*物|申\s*込|^\d|^>|^[（(]|^※|^~/.test(prevLine)) {
+            currentTitle = prevLine.replace(/^[★☆◆●◎『「]\s*/, "").replace(/[』」]\s*$/, "").replace(/[～〜~].+$/, "").trim();
+            break;
+          }
+        }
+      }
+      // 時刻を同行または次数行から抽出
       let timeRange = null;
       const timeInLine = line.match(/(\d{1,2})\s*[：:]\s*(\d{2})\s*[～〜~-]\s*(\d{1,2})\s*[：:]\s*(\d{2})/);
       if (timeInLine) {
@@ -71,18 +84,31 @@ function parseSienCenterPdf(text, y, mo) {
           startHour: Number(timeInLine[1]), startMin: Number(timeInLine[2]),
           endHour: Number(timeInLine[3]), endMin: Number(timeInLine[4]),
         };
-      } else if (i + 1 < lines.length) {
-        const nextTime = lines[i + 1].match(/(\d{1,2})\s*[：:]\s*(\d{2})\s*[～〜~-]\s*(\d{1,2})\s*[：:]\s*(\d{2})/);
-        if (nextTime) {
-          timeRange = {
-            startHour: Number(nextTime[1]), startMin: Number(nextTime[2]),
-            endHour: Number(nextTime[3]), endMin: Number(nextTime[4]),
-          };
+      } else {
+        // 次の数行から時刻を探す
+        for (let j = i + 1; j < Math.min(i + 3, lines.length); j++) {
+          const nextTime = lines[j].match(/(\d{1,2})\s*[：:]\s*(\d{2})\s*[～〜~-]\s*(\d{1,2})\s*[：:]\s*(\d{2})/);
+          if (nextTime) {
+            timeRange = {
+              startHour: Number(nextTime[1]), startMin: Number(nextTime[2]),
+              endHour: Number(nextTime[3]), endMin: Number(nextTime[4]),
+            };
+            break;
+          }
         }
       }
       if (currentTitle) {
         events.push({ y, mo: evMo, d, title: currentTitle, timeRange });
       }
+      continue;
+    }
+
+    // 日時行でもマーカー行でもない → 次のイベントのタイトル候補かもしれない
+    // blockquote(>)・装飾(~)行はスキップ
+    if (/^>|^~/.test(line)) continue;
+    // 短い行（3-60文字）かつキーワードっぽい行をタイトル候補に
+    if (line.length >= 3 && line.length <= 60 && !/日\s*時|場\s*所|対\s*象|定\s*員|持\s*物|申\s*込|^\d|^[（(]|^※/.test(line)) {
+      currentTitle = line.replace(/^[★☆◆●◎『「]\s*/, "").replace(/[』」]\s*$/, "").replace(/[～〜~].+$/, "").trim();
     }
   }
   return events;
@@ -214,19 +240,21 @@ function createCollectKitamotoEvents(deps) {
         const markdown = await fetchChiyodaPdfMarkdown(pdfUrl);
         if (!markdown || markdown.length < 50) continue;
 
-        const detected = detectYearMonth(markdown);
+        // NFKC正規化で全角数字→半角に変換
+        const normalized = normalizeJaDigits(markdown.normalize("NFKC"));
+
+        const detected = detectYearMonth(normalized);
         const y = detected.y || currentYear;
         const mo = detected.mo || currentMonth;
 
         let events = [];
-        if (facilityId === "1") {
-          events = parseJidoukanPdf(markdown, y, mo);
-        } else if (facilityId === "7") {
-          events = parseNakamaruPdf(markdown, y, mo);
+        if (facilityId === "7") {
+          events = parseNakamaruPdf(normalized, y, mo);
         } else if (facilityId === "5") {
-          events = parseCoccoPdf(markdown, y, mo);
+          events = parseCoccoPdf(normalized, y, mo);
         } else {
-          events = parseSienCenterPdf(markdown, y, mo);
+          // 児童館(1)・子育て支援センター(2,3) 共通パーサー
+          events = parseSienCenterPdf(normalized, y, mo);
         }
 
         for (const ev of events) {

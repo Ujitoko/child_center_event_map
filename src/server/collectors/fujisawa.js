@@ -171,7 +171,7 @@ const FMIRAI_FACILITIES = {
 };
 
 const FMIRAI_CHILD_RE =
-  /親子|子育て|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|おはなし|リトミック|ママ|パパ|ぴーか・ぶー|ちびっこ|0歳|1歳|2歳|3歳|未就学|未就園/;
+  /親子|子育て|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|おはなし|リトミック|ママ|パパ|ぴーか・ぶー|ちびっこ|0歳|1歳|2歳|3歳|未就学|未就園|小学|青少年|こども|子ども|ファミリー|中学生|学童/;
 
 /**
  * f-mirai.jp WordPress REST API からイベント記事を取得
@@ -220,7 +220,7 @@ async function fetchFmiraiEvents(maxDays) {
         const d = Number(dm[2]);
         if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
         let y = now.y;
-        if (mo < now.mo - 2) y = now.y + 1;
+        if (mo < now.m - 2) y = now.y + 1;
         const key = `${y}-${mo}-${d}`;
         if (found.has(key)) continue;
         found.add(key);
