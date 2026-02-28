@@ -49,21 +49,11 @@ function parseEventPage(html) {
   const events = [];
   const nHtml = html.normalize("NFKC");
 
-  // 年を推定
-  let year;
-  const reiwaMatch = nHtml.match(/令和\s*(\d{1,2})\s*年/);
-  if (reiwaMatch) {
-    year = 2018 + Number(reiwaMatch[1]);
-  } else {
-    const westernMatch = nHtml.match(/(20\d{2})\s*年/);
-    if (westernMatch) {
-      year = Number(westernMatch[1]);
-    } else {
-      const now = new Date();
-      const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-      year = jst.getUTCFullYear();
-    }
-  }
+  // 年を推定: ページ内の令和N年は対象年齢の記述であることが多いため、
+  // 現在年をデフォルトとし、「日時」フィールドに明示的な年がある場合のみ上書き
+  const now = new Date();
+  const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const defaultYear = jst.getUTCFullYear();
 
   // h2でイベントブロックを分割
   const h2Re = /<h2[^>]*>([\s\S]*?)<\/h2>/gi;
@@ -72,8 +62,8 @@ function parseEventPage(html) {
   while ((hm = h2Re.exec(nHtml)) !== null) {
     const text = stripTags(hm[1]).normalize("NFKC").trim();
     if (!text) continue;
-    // ナビゲーション等を除外（短すぎるもの、「ページ」等）
-    if (text.length < 3 || /ページ|メニュー|トップ|ホーム/.test(text)) continue;
+    // ナビゲーション等を除外
+    if (text.length < 3 || /ページ|メニュー|トップ|ホーム|検索|目次|アンケート|お問い合わせ/.test(text)) continue;
     h2Positions.push({ title: text, startIndex: hm.index + hm[0].length });
   }
 
@@ -111,6 +101,16 @@ function parseEventPage(html) {
     const month = Number(dateMatch[1]);
     const day = Number(dateMatch[2]);
     if (month < 1 || month > 12 || day < 1 || day > 31) continue;
+
+    // 日時フィールド内に明示的な年がある場合はそれを使う
+    let year = defaultYear;
+    const yearInDate = dateText.match(/令和\s*(\d{1,2})\s*年/);
+    if (yearInDate) {
+      year = 2018 + Number(yearInDate[1]);
+    } else {
+      const westernYear = dateText.match(/(20\d{2})\s*年/);
+      if (westernYear) year = Number(westernYear[1]);
+    }
 
     const timeRange = parseTimeRangeFromText(dateText);
 
