@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A web app that aggregates children's/family events across Tokyo's 23 wards and displays them on an interactive Leaflet.js map. Events are scraped from municipal ward websites, geocoded via GSI (国土地理院) API, and served through a Node.js HTTP server.
+A web app that aggregates children's/family events across the Kanto region (東京/神奈川/千葉/埼玉/茨城/栃木/群馬) and displays them on an interactive Leaflet.js map. Events are scraped from municipal websites, geocoded via GSI (国土地理院) API, and served through a Node.js HTTP server. ~415 collectors cover 7 prefectures.
 
 **Language:** Japanese (UI, data, comments). All event data is in Japanese.
 
@@ -69,8 +69,8 @@ Three in-memory Maps cache results: `geoCache`, `facilityAddressMaster`, `facili
 
 Single-page app: `index.html` + `app.js` + `styles.css`. Uses Leaflet.js (CDN) with OpenStreetMap tiles. No build tools.
 
-- Ward filter checkboxes (23 wards) with bulk select/deselect
-- Date range slider (1-90 days)
+- Region/prefecture filter checkboxes (7 prefectures) with bulk select/deselect
+- Date range filter
 - Event list panel (max 250 items) + map markers
 - Fetches `GET /api/events?days=N`
 

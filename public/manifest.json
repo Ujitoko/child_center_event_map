@@ -1,7 +1,7 @@
 {
   "name": "こどもイベントマップ",
   "short_name": "こどもイベント",
-  "description": "全国の児童向けイベントをマップ上に表示",
+  "description": "関東の児童向けイベントをマップ上に表示",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f6eee1",

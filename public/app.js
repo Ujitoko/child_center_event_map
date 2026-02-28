@@ -1,4 +1,4 @@
-const map = L.map("map").setView([36.5, 138.0], 6);
+const map = L.map("map").setView([35.9, 139.7], 8);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors",
@@ -298,7 +298,7 @@ function fitMapToSelection() {
     }
   }
   // Multiple regions: fit to nationwide
-  map.setView([36.5, 138.0], 6);
+  map.setView([35.9, 139.7], 8);
 }
 
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
@@ -898,7 +898,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   }
   initDateRange();
   updatePresetHighlight();
-  map.setView([36.5, 138.0], 6);
+  map.setView([35.9, 139.7], 8);
   applyFiltersAndRender({ autoFit: false });
 });
 
