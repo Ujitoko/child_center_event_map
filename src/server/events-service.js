@@ -61,7 +61,7 @@ function createGetEvents(deps) {
 
     const allCollectorResults = await batchCollect(
       collectors.map(fn => () => fn(days)),
-      2
+      3
     );
     const memAfter = process.memoryUsage();
     console.log(`[refresh] done — heap: ${Math.round(memAfter.heapUsed / 1024 / 1024)}MB, rss: ${Math.round(memAfter.rss / 1024 / 1024)}MB, geoCache: ${geoCache?.size || 0}`);

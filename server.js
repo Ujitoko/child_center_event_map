@@ -193,6 +193,11 @@ const {
   createCollectKawachiIbEvents, createCollectIbarakimachiEvents, createCollectKitaibarakiEvents,
   createCollectUshikuEvents, createCollectAmiEvents, createCollectToneIbEvents,
 } = require("./src/server/collectors/ibaraki-extra");
+const { createCollectTorideKosodateEvents } = require("./src/server/collectors/toride-kosodate-collector");
+const { createCollectTsuchiuraJidokanEvents } = require("./src/server/collectors/tsuchiura-jidokan-collector");
+const { createCollectKogaKosodateEvents } = require("./src/server/collectors/koga-kosodate-collector");
+const { createCollectJosoKosodateEvents } = require("./src/server/collectors/joso-kosodate-collector");
+const { createCollectYukiKosodateEvents } = require("./src/server/collectors/yuki-kosodate-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const FACILITY_REGISTRY = require("./src/config/known-facilities");
 const {
@@ -218,7 +223,7 @@ const {
   RANZAN_SOURCE, MATSUBUSHI_SOURCE, MINANO_SOURCE, MOROYAMA_SOURCE, HANYU_SOURCE, MISATO_SAITAMA_SOURCE,
   NIKKO_SOURCE, NASUSHIOBARA_SOURCE, YAITA_SOURCE, MAEBASHI_SOURCE, TAKASAKI_SOURCE, ISESAKI_SOURCE,
   NAKANOJO_SOURCE, KIRYU_SOURCE, MEIWA_SOURCE, HITACHI_IB_SOURCE, HITACHINAKA_SOURCE, TSUKUBA_SOURCE,
-  MORIYA_SOURCE, KAMISU_SOURCE, TOKAI_IB_SOURCE, RYUGASAKI_SOURCE, CHIKUSEI_SOURCE, TSUCHIURA_SOURCE,
+  MORIYA_SOURCE, KAMISU_SOURCE, TOKAI_IB_SOURCE, TORIDE_SOURCE, RYUGASAKI_SOURCE, CHIKUSEI_SOURCE, TSUCHIURA_SOURCE,
   ISHIOKA_SOURCE, JOSO_SOURCE, NAKA_IB_SOURCE, BANDO_SOURCE, HITACHIOTA_SOURCE, YUKI_SOURCE,
   TSUKUBAMIRAI_SOURCE, INASHIKI_SOURCE, SAKURAGAWA_SOURCE, HITACHIOMIYA_SOURCE, SHIMOTSUMA_SOURCE, HOKOTA_SOURCE,
   NAMEGATA_SOURCE, ITAKO_SOURCE, KASUMIGAURA_SOURCE, TAKAHAGI_SOURCE, KASAMA_SOURCE, SHIRO_IB_SOURCE,
@@ -735,7 +740,7 @@ const collectTsukubaEvents = createCalendarJsonCollector({ source: TSUKUBA_SOURC
 const collectRyugasakiEvents = createListCalendarCollector({ source: RYUGASAKI_SOURCE, calendarPath: "/event/kosodate/calendar/" }, geoFmDeps);
 // Tier2: cal.php コレクター (21自治体)
 const collectChikuseiEvents = createCalPhpCollector({ source: CHIKUSEI_SOURCE, category: 6, childCategoryLabels: ["子育て", "教育"] }, geoFmDeps);
-const collectTsuchiuraEvents = createCalPhpCollector({ source: TSUCHIURA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
+const collectTsuchiuraEvents = createCollectTsuchiuraJidokanEvents(geoFmDeps);
 const collectIshiokaEvents = createCalPhpCollector({ source: ISHIOKA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectJosoEvents = createCalPhpCollector({ source: JOSO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectNakaIbEvents = createCalPhpCollector({ source: NAKA_IB_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
@@ -754,9 +759,9 @@ const collectKasumigauraEvents = createCalPhpCollector({ source: KASUMIGAURA_SOU
 const collectTakahagiEvents = createCalPhpCollector({ source: TAKAHAGI_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectShiroIbEvents = createCalPhpCollector({ source: SHIRO_IB_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectDaigoEvents = createCalPhpCollector({ source: DAIGO_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
-// Tier1: CGI calendar (取手市) - ward-generic経由
+const collectTorideKosodateEvents = createCollectTorideKosodateEvents(geoFmDeps);
 // Tier2: 水戸市 + 鹿嶋市 (カスタムPHP) + 笠間市 (cal.php)
-const collectKasamaEvents = createCalPhpCollector({ source: KASAMA_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW, calPath: "/cal.php" }, geoFmDeps);
+const collectKasamaEvents = createCalPhpCollector({ source: KASAMA_SOURCE, category: 4 }, geoFmDeps);
 // --- 茨城県 追加9自治体 ---
 const collectYachiyoIbEvents = createCollectYachiyoIbEvents(geoFmDeps);
 const collectGokaEvents = createCollectGokaEvents(geoFmDeps);
@@ -767,6 +772,10 @@ const collectKitaibarakiEvents = createCollectKitaibarakiEvents(geoFmDeps);
 const collectUshikuEvents = createCollectUshikuEvents(geoFmDeps);
 const collectAmiEvents = createCollectAmiEvents(geoFmDeps);
 const collectToneIbEvents = createCollectToneIbEvents(geoFmDeps);
+// --- 茨城県 カスタムコレクター（古河・常総・結城）---
+const collectKogaKosodateEvents = createCollectKogaKosodateEvents(geoFmDeps);
+const collectJosoKosodateEvents = createCollectJosoKosodateEvents(geoFmDeps);
+const collectYukiKosodateEvents = createCollectYukiKosodateEvents(geoFmDeps);
 
 // --- Child keyword constants (add after other CHILD_KW definitions) ---
 
@@ -1130,6 +1139,7 @@ const collectors = [
   collectYachiyoIbEvents, collectGokaEvents, collectOaraiEvents, collectKawachiIbEvents,
   collectIbarakimachiEvents, collectKitaibarakiEvents, collectUshikuEvents, collectAmiEvents, collectToneIbEvents,
   collectTsuchiuraEvents,
+  collectTorideKosodateEvents,
   collectRyugasakiEvents,
   collectNakaIbEvents,
   collectIshiokaEvents,
@@ -1148,6 +1158,9 @@ const collectors = [
   collectDaigoEvents,
   collectKasamaEvents,
   collectKogaIbEvents,
+  collectKogaKosodateEvents,
+  collectJosoKosodateEvents,
+  collectYukiKosodateEvents,
   collectMitoEvents,
   collectKashimaIbEvents,
   collectTokyoOtaMamafreEvents, collectIbarakiKamisuMamafreEvents, // Supplemental CMS collectors

@@ -17,9 +17,9 @@ async function main() {
 
   console.log(`[collect] ${collectors.length} collectors, days=${days}`);
 
-  // 収集実行 (concurrency=2, 300s timeout — events-service.js と同じ)
+  // 収集実行 (concurrency=3, 300s timeout — events-service.js と同じ)
   const allResults = await batchCollect(
-    collectors.map(fn => () => fn(days)), 2
+    collectors.map(fn => () => fn(days)), 3
   );
 
   // Flatten (events-service.js runRefresh と同じロジック)
