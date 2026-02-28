@@ -4,6 +4,33 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
+// 現在地ボタン（マップ上）
+const LocateControl = L.Control.extend({
+  options: { position: "topleft" },
+  onAdd() {
+    const btn = L.DomUtil.create("div", "leaflet-bar leaflet-control locate-control");
+    btn.innerHTML = '<a href="#" title="現在地に移動" role="button" aria-label="現在地に移動">&#x1F4CD;</a>';
+    btn.querySelector("a").style.cssText = "display:flex;align-items:center;justify-content:center;width:34px;height:34px;font-size:20px;text-decoration:none;cursor:pointer;background:#fff;";
+    L.DomEvent.disableClickPropagation(btn);
+    L.DomEvent.on(btn, "click", (e) => {
+      L.DomEvent.preventDefault(e);
+      if (!navigator.geolocation) { alert("この端末では位置情報を利用できません"); return; }
+      const a = btn.querySelector("a");
+      a.style.opacity = "0.5";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          a.style.opacity = "1";
+          map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+        },
+        () => { a.style.opacity = "1"; alert("位置情報を取得できませんでした"); },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    });
+    return btn;
+  },
+});
+map.addControl(new LocateControl());
+
 const markerLayer = L.markerClusterGroup({
   maxClusterRadius: 40,
   spiderfyOnMaxZoom: true,
