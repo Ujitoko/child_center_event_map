@@ -89,6 +89,7 @@ async function main() {
   saveGeoCache(GEO_CACHE_PATH, geoCache);
 
   console.log(`[collect] Done. ${items.length} events, geo_cache: ${geoCache.size} entries`);
+  process.exit(0);
 }
 
 main().catch(e => { console.error("[collect] FATAL:", e); process.exit(1); });
