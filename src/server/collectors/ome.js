@@ -72,7 +72,8 @@ function createCollectOmeEvents(deps) {
 
     for (const ym of months) {
       const [yyyy, mm] = ym.split("-");
-      const url = `${source.baseUrl}/calendar/index.php?ym=${yyyy}/${mm}`;
+      const m = parseInt(mm, 10);
+      const url = `${source.baseUrl}/calendar/index.php?dsp=2&y=${yyyy}&m=${m}&d=1`;
       let html;
       try {
         html = await fetchText(url);
@@ -81,82 +82,45 @@ function createCollectOmeEvents(deps) {
         continue;
       }
 
-      // Parse spanning events table (行事予定の表)
-      const spanningRe = /<div\s+class="tbl_calendar1">([\s\S]*?)<\/div>/i;
-      const spanningMatch = html.match(spanningRe);
-      if (spanningMatch) {
-        const spanTbl = spanningMatch[1];
-        const rowRe = /<tr[^>]*>\s*<td[^>]*>.*?<span[^>]*>([\s\S]*?)<\/span>\s*<\/td>\s*<td[^>]*>([\s\S]*?)<\/td>\s*<\/tr>/gi;
-        let rm;
-        while ((rm = rowRe.exec(spanTbl)) !== null) {
-          const dateText = stripTags(rm[1]).trim();
-          const titleHtml = rm[2];
-          const title = stripTags(titleHtml).trim();
-          if (!title || !CHILD_KEYWORDS_RE.test(title)) continue;
+      // Parse event list boxes (visible + hidden)
+      const boxRe = /<div\s+class="calendar_event_box">([\s\S]*?)<!-- 一件分ここまで -->/gi;
+      let bm;
+      while ((bm = boxRe.exec(html)) !== null) {
+        const box = bm[1];
+        const titleMatch = box.match(/<h3>\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/i);
+        if (!titleMatch) continue;
+        const href = titleMatch[1];
+        const title = stripTags(titleMatch[2]).trim();
+        if (!title || !CHILD_KEYWORDS_RE.test(title)) continue;
 
-          const linkMatch = titleHtml.match(/href="([^"]+)"/);
-          const eventUrl = linkMatch
-            ? new URL(linkMatch[1], source.baseUrl).href
-            : "";
+        const eventUrl = new URL(href, source.baseUrl).href;
 
-          // Parse date range like "12月24日～2月16日"
-          const rangeMatch = dateText.match(/(\d+)月(\d+)日[～〜~](\d+)月(\d+)日/);
-          if (rangeMatch) {
-            const sm = parseInt(rangeMatch[1]);
-            const sd = parseInt(rangeMatch[2]);
-            const em = parseInt(rangeMatch[3]);
-            const ed = parseInt(rangeMatch[4]);
-            const sy = sm > parseInt(mm) ? parseInt(yyyy) - 1 : parseInt(yyyy);
-            const ey = em < sm ? parseInt(yyyy) + 1 : sy;
-            const startKey = `${sy}-${String(sm).padStart(2, "0")}-${String(sd).padStart(2, "0")}`;
-            const endKey = `${ey}-${String(em).padStart(2, "0")}-${String(ed).padStart(2, "0")}`;
-            if (endKey >= todayStr && startKey <= endStr) {
-              const effectiveStart = startKey < todayStr ? todayStr : startKey;
-              allEvents.push({ title, url: eventUrl, dateKey: effectiveStart });
-            }
+        // Extract date: 「YYYY年M月D日（曜日）」or range 「YYYY年M月D日（曜日）から YYYY年M月D日（曜日）」
+        const dateMatch = box.match(/icon_list_date[\s\S]*?<dd>([\s\S]*?)<\/dd>/i);
+        if (!dateMatch) continue;
+        const dateText = stripTags(dateMatch[1]).replace(/&nbsp;/g, " ").trim();
+
+        const rangeRe = /(\d{4})年(\d{1,2})月(\d{1,2})日/g;
+        const dates = [];
+        let dm;
+        while ((dm = rangeRe.exec(dateText)) !== null) {
+          dates.push({ y: parseInt(dm[1]), mo: parseInt(dm[2]), d: parseInt(dm[3]) });
+        }
+        if (dates.length === 0) continue;
+
+        if (dates.length >= 2) {
+          // Date range: use effective start
+          const startKey = `${dates[0].y}-${String(dates[0].mo).padStart(2, "0")}-${String(dates[0].d).padStart(2, "0")}`;
+          const endKey = `${dates[1].y}-${String(dates[1].mo).padStart(2, "0")}-${String(dates[1].d).padStart(2, "0")}`;
+          if (endKey >= todayStr && startKey <= endStr) {
+            const effectiveStart = startKey < todayStr ? todayStr : startKey;
+            allEvents.push({ title, url: eventUrl, dateKey: effectiveStart });
           }
-        }
-      }
-
-      // Parse day-by-day calendar table (カレンダーの表)
-      const calRe = /<div\s+class="tbl_calendar2">([\s\S]*?)<\/div>/i;
-      const calMatch = html.match(calRe);
-      if (!calMatch) continue;
-
-      const calTbl = calMatch[1];
-      let currentDay = 0;
-
-      // Process each row
-      const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-      let trm;
-      while ((trm = trRe.exec(calTbl)) !== null) {
-        const row = trm[1];
-        // Skip header row
-        if (/<th\b/i.test(row)) continue;
-
-        // Try to extract day number
-        const dayMatch = row.match(/<a\s+[^>]*id="day_(\d+)"/i);
-        if (dayMatch) {
-          currentDay = parseInt(dayMatch[1]);
-        }
-        if (currentDay === 0) continue;
-
-        // Extract event from calendar_style4 span
-        const eventSpanRe = /<span\s+class="calendar_style4">([\s\S]*?)<\/span>/gi;
-        let esm;
-        while ((esm = eventSpanRe.exec(row)) !== null) {
-          const content = esm[1];
-          const title = stripTags(content).replace(/\s*（[\d月日から]+）\s*$/, "").trim();
-          if (!title || !CHILD_KEYWORDS_RE.test(title)) continue;
-
-          const linkMatch = content.match(/href="([^"]+)"/);
-          const eventUrl = linkMatch
-            ? new URL(linkMatch[1], source.baseUrl).href
-            : "";
-
-          const dateKey = `${yyyy}-${mm}-${String(currentDay).padStart(2, "0")}`;
-          if (dateKey >= todayStr && dateKey <= endStr) {
-            allEvents.push({ title, url: eventUrl, dateKey });
+        } else {
+          // Single date
+          const dk = `${dates[0].y}-${String(dates[0].mo).padStart(2, "0")}-${String(dates[0].d).padStart(2, "0")}`;
+          if (dk >= todayStr && dk <= endStr) {
+            allEvents.push({ title, url: eventUrl, dateKey: dk });
           }
         }
       }

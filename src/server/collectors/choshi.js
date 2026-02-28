@@ -52,22 +52,30 @@ function parsePubDate(str) {
 }
 
 /**
- * 詳細ページからイベント日付を抽出
- * 「YYYY年M月D日」「令和N年M月D日」パターン
+ * 詳細ページからイベント日付を抽出（複数日対応）
+ * 「開催日」ラベル以降の日付を優先、なければ全体から「更新日」直後を除外
  */
-function parseDateFromDetail(text) {
+function parseDatesFromDetail(text) {
+  // 「開催日」セクションからの抽出を優先
+  const kaiIdx = text.indexOf("開催日");
+  const searchText = kaiIdx >= 0 ? text.slice(kaiIdx) : text;
+
+  const dates = [];
+
   // 西暦パターン
-  const isoMatch = text.match(/(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/);
-  if (isoMatch) {
-    return { y: Number(isoMatch[1]), mo: Number(isoMatch[2]), d: Number(isoMatch[3]) };
+  const isoRe = /(\d{4})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
+  let m;
+  while ((m = isoRe.exec(searchText)) !== null) {
+    dates.push({ y: Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
   }
+  if (dates.length > 0) return dates;
+
   // 令和パターン
-  const reMatch = text.match(/令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/);
-  if (reMatch) {
-    const y = 2018 + Number(reMatch[1]);
-    return { y, mo: Number(reMatch[2]), d: Number(reMatch[3]) };
+  const reRe = /令和\s*(\d{1,2})年\s*(\d{1,2})月\s*(\d{1,2})日/g;
+  while ((m = reRe.exec(searchText)) !== null) {
+    dates.push({ y: 2018 + Number(m[1]), mo: Number(m[2]), d: Number(m[3]) });
   }
-  return null;
+  return dates;
 }
 
 function buildGeoCandidates(venue, address) {
@@ -143,9 +151,9 @@ function createCollectChoshiEvents(deps) {
               if (!address && /(住所|所在地)/.test(k)) address = v;
             }
           }
-          const eventDate = parseDateFromDetail(text);
+          const eventDates = parseDatesFromDetail(text);
           const timeRange = parseTimeRangeFromText(text);
-          return { url, venue, address, eventDate, timeRange };
+          return { url, venue, address, eventDates, timeRange };
         })
       );
       for (const r of results) {
@@ -157,9 +165,15 @@ function createCollectChoshiEvents(deps) {
     const byId = new Map();
     for (const item of filtered) {
       const detail = detailMap.get(item.url);
-      const eventDate = (detail && detail.eventDate) || parsePubDate(item.pubDate);
-      if (!eventDate) continue;
-      if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
+      let eventDates = (detail && detail.eventDates && detail.eventDates.length > 0)
+        ? detail.eventDates
+        : null;
+      // フォールバック: pubDateから日付取得
+      if (!eventDates) {
+        const pd = parsePubDate(item.pubDate);
+        if (pd) eventDates = [pd];
+      }
+      if (!eventDates || eventDates.length === 0) continue;
 
       const venue = sanitizeVenueText((detail && detail.venue) || "");
       const rawAddress = sanitizeAddressText((detail && detail.address) || "");
@@ -177,26 +191,29 @@ function createCollectChoshiEvents(deps) {
       point = resolveEventPoint(CHOSHI_SOURCE, venue, point, rawAddress || `${label} ${venue}`);
       const resolvedAddr = resolveEventAddress(CHOSHI_SOURCE, venue, rawAddress || `${label} ${venue}`, point);
 
-      const dateKey = `${eventDate.y}${String(eventDate.mo).padStart(2, "0")}${String(eventDate.d).padStart(2, "0")}`;
-      const { startsAt, endsAt } = buildStartsEndsForDate(
-        { y: eventDate.y, mo: eventDate.mo, d: eventDate.d },
-        timeRange
-      );
-      const id = `${source}:${item.url}:${item.title}:${dateKey}`;
-      if (byId.has(id)) continue;
-      byId.set(id, {
-        id,
-        source,
-        source_label: label,
-        title: item.title,
-        starts_at: startsAt,
-        ends_at: endsAt,
-        venue_name: venue,
-        address: resolvedAddr || "",
-        url: item.url,
-        lat: point ? point.lat : CHOSHI_SOURCE.center.lat,
-        lng: point ? point.lng : CHOSHI_SOURCE.center.lng,
-      });
+      for (const eventDate of eventDates) {
+        if (!inRangeJst(eventDate.y, eventDate.mo, eventDate.d, maxDays)) continue;
+        const dateKey = `${eventDate.y}${String(eventDate.mo).padStart(2, "0")}${String(eventDate.d).padStart(2, "0")}`;
+        const { startsAt, endsAt } = buildStartsEndsForDate(
+          { y: eventDate.y, mo: eventDate.mo, d: eventDate.d },
+          timeRange
+        );
+        const id = `${source}:${item.url}:${item.title}:${dateKey}`;
+        if (byId.has(id)) continue;
+        byId.set(id, {
+          id,
+          source,
+          source_label: label,
+          title: item.title,
+          starts_at: startsAt,
+          ends_at: endsAt,
+          venue_name: venue,
+          address: resolvedAddr || "",
+          url: item.url,
+          lat: point ? point.lat : CHOSHI_SOURCE.center.lat,
+          lng: point ? point.lng : CHOSHI_SOURCE.center.lng,
+        });
+      }
     }
 
     const results = Array.from(byId.values());
