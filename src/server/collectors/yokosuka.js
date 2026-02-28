@@ -76,15 +76,20 @@ function createCollectYokosukaEvents(deps) {
     const label = YOKOSUKA_SOURCE.label;
     const months = getMonthsForRange(maxDays);
 
-    // 一覧ページ取得
+    // 一覧ページ取得 (通常 + category=6 子育て・教育フィルタ)
     const rawEvents = [];
     for (const ym of months) {
-      const url = `${YOKOSUKA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`;
-      try {
-        const html = await fetchText(url);
-        rawEvents.push(...parseListPage(html, YOKOSUKA_SOURCE.baseUrl));
-      } catch (e) {
-        console.warn(`[${label}] month ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+      const urls = [
+        `${YOKOSUKA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`,
+        `${YOKOSUKA_SOURCE.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}&category=6`,
+      ];
+      for (const url of urls) {
+        try {
+          const html = await fetchText(url);
+          rawEvents.push(...parseListPage(html, YOKOSUKA_SOURCE.baseUrl));
+        } catch (e) {
+          console.warn(`[${label}] month ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+        }
       }
     }
 

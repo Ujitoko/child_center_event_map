@@ -12,37 +12,48 @@ const { WARD_CHILD_HINT_RE, CHIBA_CITY_SOURCE } = require("../../config/wards");
 const DETAIL_BATCH_SIZE = 6;
 
 /**
- * CGI カレンダー一覧ページをパース
- * event_cal/calendar.cgi?type=2 のリスト表示形式
+ * CGI カレンダー月間グリッド (type=2) からイベントのある日を抽出
  */
-function parseListPage(html, baseUrl) {
+function parseGridDays(html, year, month) {
+  const days = new Set();
+  const dayRe = /calendar\.cgi\?type=3&(?:amp;)?year=\d+&(?:amp;)?month=\d+&(?:amp;)?day=(\d+)/g;
+  let m;
+  while ((m = dayRe.exec(html)) !== null) {
+    const d = Number(m[1]);
+    if (d >= 1 && d <= 31) days.add(d);
+  }
+  return Array.from(days).sort((a, b) => a - b);
+}
+
+/**
+ * CGI カレンダー日別ページ (type=3) からイベントを抽出
+ * 形式: <li><a href="/path/event.html">YYYY年M月D日（曜日） [時刻] TITLE</a></li>
+ */
+function parseDayPage(html, baseUrl, year, month, day) {
   const events = [];
-  const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-  let rm;
-  while ((rm = rowRe.exec(html)) !== null) {
-    const row = rm[1];
-    const dateMatch = row.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-    if (!dateMatch) continue;
-    const y = Number(dateMatch[1]);
-    const mo = Number(dateMatch[2]);
-    const d = Number(dateMatch[3]);
-    // 各 <li> からリンクを抽出
-    const liRe = /<li>([\s\S]*?)<\/li>/gi;
-    let lim;
-    while ((lim = liRe.exec(row)) !== null) {
-      const li = lim[1];
-      const linkMatch = li.match(/<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
-      if (!linkMatch) continue;
-      const href = linkMatch[1].replace(/&amp;/g, "&").trim();
-      let title = stripTags(linkMatch[2]).trim();
-      if (!href || !title) continue;
-      // 子育てフィルタ: タイトルキーワード
-      if (!WARD_CHILD_HINT_RE.test(title)) continue;
-      title = title.replace(/\s*事前申込(あり|なし).*$/, "").trim();
-      title = title.replace(/\s*【締切】.*$/, "").trim();
-      const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
-      events.push({ y, mo, d, title, url: absUrl });
-    }
+  const liRe = /<li>\s*<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/li>/gi;
+  let m;
+  while ((m = liRe.exec(html)) !== null) {
+    const href = m[1].replace(/&amp;/g, "&").trim();
+    const rawText = stripTags(m[2]).trim();
+    if (!rawText || rawText.length < 10) continue;
+    // 日付パターンを含むもののみ（ナビリンク除外）
+    if (!/\d{4}年\d{1,2}月\d{1,2}日/.test(rawText)) continue;
+    // タイトル抽出: 日付+時刻部分を除去
+    let title = rawText
+      .replace(/\d{4}年\d{1,2}月\d{1,2}日[（(][^）)]*[）)]/g, "")
+      .replace(/\s*から\s*/g, " ")
+      .replace(/\d{1,2}時\d{0,2}分?\s*/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!title || title.length < 2) continue;
+    // 子育てフィルタ
+    if (!WARD_CHILD_HINT_RE.test(title)) continue;
+    title = title.replace(/\s*事前申込(あり|なし).*$/, "").trim();
+    title = title.replace(/\s*【締切】.*$/, "").trim();
+    const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
+    events.push({ y: year, mo: month, d: day, title, url: absUrl });
   }
   return events;
 }
@@ -55,16 +66,33 @@ function createCollectChibaEvents(deps) {
 
   return async function collectChibaEvents(maxDays) {
     const months = getMonthsForRange(maxDays);
+    const DAY_BATCH = 6;
 
-    // 一覧ページ取得
+    // グリッド (type=2) → 日別ページ (type=3) の2段階取得
     const rawEvents = [];
     for (const ym of months) {
-      const url = `${source.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`;
+      const gridUrl = `${source.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=2&year=${ym.year}&month=${ym.month}`;
+      let gridHtml;
       try {
-        const html = await fetchText(url);
-        rawEvents.push(...parseListPage(html, source.baseUrl));
+        gridHtml = await fetchText(gridUrl);
       } catch (e) {
-        console.warn(`[${label}] month ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+        console.warn(`[${label}] grid ${ym.year}/${ym.month} fetch failed:`, e.message || e);
+        continue;
+      }
+      const eventDays = parseGridDays(gridHtml, ym.year, ym.month);
+      // 日別ページをバッチ取得
+      for (let i = 0; i < eventDays.length; i += DAY_BATCH) {
+        const batch = eventDays.slice(i, i + DAY_BATCH);
+        const results = await Promise.allSettled(
+          batch.map(async (day) => {
+            const dayUrl = `${source.baseUrl}/cgi-bin/event_cal/calendar.cgi?type=3&year=${ym.year}&month=${ym.month}&day=${day}`;
+            const html = await fetchText(dayUrl);
+            return parseDayPage(html, source.baseUrl, ym.year, ym.month, day);
+          })
+        );
+        for (const r of results) {
+          if (r.status === "fulfilled") rawEvents.push(...r.value);
+        }
       }
     }
 

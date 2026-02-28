@@ -290,7 +290,7 @@ function buildGeoCandidates(venue, address, source) {
  * @param {Object} deps - { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster }
  */
 function createMunicipalCalendarCollector(config, deps) {
-  const { source, childCategoryIndex, calendarPath } = config;
+  const { source, childCategoryIndex, calendarPath, useIndexPhpFormat } = config;
   const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
   const srcKey = `ward_${source.key}`;
   const label = source.label;
@@ -302,10 +302,17 @@ function createMunicipalCalendarCollector(config, deps) {
     // カレンダーページ取得 (月別)
     const rawEvents = [];
     for (const ym of months) {
-      // ?ym=YYYYMM で月を指定
-      const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-      // カテゴリフィルタ付きURL
-      const url = `${calBase}?ym=${ymParam}&s_d1%5B%5D=${childCategoryIndex}`;
+      // CMS種別により URL 形式が異なる
+      let url;
+      if (useIndexPhpFormat) {
+        // index.php?y=YYYY&m=M&d=1&dsp=1 形式 (志木市, 八千代市等)
+        url = `${calBase}index.php?y=${ym.year}&m=${ym.month}&d=1&dsp=1`;
+      } else {
+        // ?ym=YYYYMM で月を指定
+        const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
+        // カテゴリフィルタ付きURL
+        url = `${calBase}?ym=${ymParam}&s_d1%5B%5D=${childCategoryIndex}`;
+      }
       try {
         const html = await fetchText(url);
         const pageCtx = parsePageYearMonth(html);
@@ -319,8 +326,13 @@ function createMunicipalCalendarCollector(config, deps) {
     // フォールバック: フィルタなしのカレンダーページも取得 (カテゴリパラメータが効かない場合)
     if (rawEvents.length === 0) {
       for (const ym of months) {
-        const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
-        const url = `${calBase}?ym=${ymParam}`;
+        let url;
+        if (useIndexPhpFormat) {
+          url = `${calBase}index.php?y=${ym.year}&m=${ym.month}&d=1&dsp=1`;
+        } else {
+          const ymParam = `${ym.year}${String(ym.month).padStart(2, "0")}`;
+          url = `${calBase}?ym=${ymParam}`;
+        }
         try {
           const html = await fetchText(url);
           const pageCtx = parsePageYearMonth(html);

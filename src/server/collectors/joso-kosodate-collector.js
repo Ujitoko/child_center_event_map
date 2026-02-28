@@ -5,7 +5,7 @@
  * テーブル形式の月間スケジュールからイベントを抽出する。
  *
  * HTML構造:
- * - <table> 行: <td><strong>M月D日</strong></td><td>活動内容</td>
+ * - <table> 行: <th>M月D日</th><td>曜日</td><td>活動内容</td>
  * - 「自由開放」以外の活動名を抽出
  */
 const { fetchText } = require("../fetch-utils");
@@ -75,11 +75,11 @@ function parseSchedulePage(html) {
   while ((tm = trRe.exec(nHtml)) !== null) {
     const row = tm[1];
 
-    // <td>セルを抽出
-    const tdRe = /<td[^>]*>([\s\S]*?)<\/td>/gi;
+    // <th>/<td>セルを抽出（日付が<th>に入っているパターンに対応）
+    const cellRe = /<(?:td|th)[^>]*>([\s\S]*?)<\/(?:td|th)>/gi;
     const cells = [];
     let cm;
-    while ((cm = tdRe.exec(row)) !== null) {
+    while ((cm = cellRe.exec(row)) !== null) {
       cells.push(stripTags(cm[1]).normalize("NFKC").trim());
     }
     if (cells.length < 2) continue;

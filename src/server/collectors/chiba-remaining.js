@@ -856,8 +856,8 @@ function createCollectOamishirasatoEvents(deps) {
   return createKosodatePageCollector(OAMISHIRASATO_SOURCE, {
     cityName: "大網白里市", prefixLabel: "大網白里市",
     urls: [
-      "https://www.city.oamishirasato.lg.jp/category/7-1-0-0-0-0-0-0-0-0.html",
-      "https://www.city.oamishirasato.lg.jp/category/7-2-0-0-0-0-0-0-0-0.html",
+      "https://www.city.oamishirasato.lg.jp/category/62-8-2-4.html",
+      "https://www.city.oamishirasato.lg.jp/category/62-8-2-5.html",
     ],
   }, deps);
 }

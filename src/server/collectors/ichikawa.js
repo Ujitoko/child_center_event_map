@@ -8,7 +8,7 @@ const {
 const { sanitizeVenueText } = require("../text-utils");
 const { ICHIKAWA_SOURCE } = require("../../config/wards");
 
-const MAX_PAGES = 5;
+const MAX_PAGES = 7;
 
 /**
  * 市川市イベントポータル (JSP) から子育てイベントを収集

@@ -57,6 +57,13 @@ function parseDetailBlock(html, evIndex) {
   const targetIdx = evIndex + 1;
   const block = targetIdx < blocks.length ? blocks[targetIdx] : blocks[blocks.length - 1] || "";
 
+  // h2 内の map.php リンクから施設名を抽出 (鶴ヶ島CMSパターン)
+  const mapLinkMatch = block.match(/<a\s+[^>]*href="[^"]*map\.php[^"]*"[^>]*>([\s\S]*?)<\/a>/i);
+  if (mapLinkMatch) {
+    const v = stripTags(mapLinkMatch[1]).trim();
+    if (v.length >= 2) venue = v;
+  }
+
   // h3 + 直後の p からメタ情報抽出
   const sectionRe = /<h3[^>]*>([\s\S]*?)<\/h3>\s*(?:<p[^>]*>([\s\S]*?)<\/p>)?/gi;
   let sm;
@@ -66,6 +73,11 @@ function parseDetailBlock(html, evIndex) {
     if (!value) continue;
     if (!venue && /^(?:会場|場所|開催場所|ところ)$/.test(heading)) {
       venue = value;
+    }
+    // 「アクセス」h3 から住所を抽出 (鶴ヶ島CMSパターン)
+    if (!address && /^アクセス$/.test(heading)) {
+      const addrInAccess = value.match(/鶴ヶ島市[^\s（(、。,）)]{2,30}/);
+      if (addrInAccess) address = addrInAccess[0];
     }
   }
 

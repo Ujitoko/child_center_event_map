@@ -23,17 +23,17 @@ const FACILITIES = [
   {
     id: "popura",
     name: "ポプラ児童館",
-    pagePath: "/kosodate-kyoiku/kodomofukushi/jidoukan/jidokan/popura/page001460.html",
+    pagePath: "/kosodate-kyoiku/syussan-kosodate/jidofukushi-boshifushifukushi/shisetsu/jidokan/popura/page001460.html",
   },
   {
     id: "tsuwa",
     name: "都和児童館",
-    pagePath: "/kosodate-kyoiku/kodomofukushi/jidoukan/jidokan/tsuwa/page001465.html",
+    pagePath: "/kosodate-kyoiku/syussan-kosodate/jidofukushi-boshifushifukushi/shisetsu/jidokan/tsuwa/page001465.html",
   },
   {
     id: "nihari",
     name: "新治児童館",
-    pagePath: "/kosodate-kyoiku/kodomofukushi/jidoukan/jidokan/nihari/page002124.html",
+    pagePath: "/kosodate-kyoiku/syussan-kosodate/jidofukushi-boshifushifukushi/shisetsu/jidokan/nihari/page002124.html",
   },
 ];
 
