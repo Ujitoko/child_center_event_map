@@ -200,6 +200,7 @@ const { createCollectJosoKosodateEvents } = require("./src/server/collectors/jos
 const { createCollectYukiKosodateEvents } = require("./src/server/collectors/yuki-kosodate-collector");
 const { createCollectKotoJidokanEvents } = require("./src/server/collectors/koto-jidokan-collector");
 const { createCollectKodomonokuniEvents } = require("./src/server/collectors/kodomonokuni-collector");
+const { createCollectKawaguchiJidokanEvents } = require("./src/server/collectors/kawaguchi-jidokan-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const FACILITY_REGISTRY = require("./src/config/known-facilities");
 const {
@@ -517,6 +518,7 @@ const collectSakuraLibraryEvents = createCollectSakuraLibraryEvents(geoFmDeps);
 const collectInzaiLibraryEvents = createCollectInzaiLibraryEvents(geoFmDeps);
 // --- 埼玉県 calendar-json-collector ---
 const collectKawaguchiEvents = createCalendarJsonCollector({ source: KAWAGUCHI_SOURCE, childKeywords: ["おもちゃ", "工作", "映画会", "図書館", "広場", "子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童館", "赤ちゃん"] }, geoFmDeps);
+const collectKawaguchiJidokanEvents = createCollectKawaguchiJidokanEvents(geoFmDeps);
 const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOURCE, childKeywords: ["健診", "相談", "教室", "広場", "サロン", "映画会", "工作", "イチゴ", "図書館", "子育て", "親子", "幼児", "乳幼児", "キッズ", "児童", "赤ちゃん", "おはなし"] }, geoFmDeps);
 const collectFujiminoEvents = createCalendarJsonCollector({ source: FUJIMINO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん"] }, geoFmDeps);
 const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "おはなし会", "読み聞かせ", "教室", "相談", "健診", "キッズ", "児童", "サロン", "ひろば", "赤ちゃん"] }, geoFmDeps);
@@ -1027,7 +1029,7 @@ const collectors = [
   collectKamagayaKosodateEvents,
   collectSakuraLibraryEvents,
   collectInzaiLibraryEvents,
-  collectKawaguchiEvents,
+  collectKawaguchiEvents, collectKawaguchiJidokanEvents,
   collectKasukabeEvents,
   collectFujiminoEvents,
   collectMisatoEvents,
