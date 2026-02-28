@@ -512,7 +512,7 @@ function buildAdditionalWardConfigs(deps) {
     fuchu: {
       source: FUCHU_SOURCE,
       listUrls: (m, now) => [
-        buildListCalendarUrl(`${FUCHU_SOURCE.baseUrl}/event/kodomo/calendar`, m, now),
+        buildListCalendarUrl(`${FUCHU_SOURCE.baseUrl}/event/calendar`, m, now),
       ],
       parseOpts: {
         urlAllow: /city\.fuchu\.tokyo\.jp\/.+\.html?(?:\?|$)/i,
@@ -533,7 +533,6 @@ function buildAdditionalWardConfigs(deps) {
         `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/jidokan/jidoukan2/HP.html`,
         `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/hoikuen/minnadeasobo.html`,
         `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/kodomokateisiensenta/kodomosien.html`,
-        `${KOGANEI_SOURCE.baseUrl}/kosodatekyoiku/shisetsu/jidokan/jidoukan2/index.html`,
       ],
       parseOpts: {
         urlAllow: /city\.koganei\.lg\.jp\/kosodatekyoiku\/.+\.(?:html?|php|pdf)(?:\?|$)/i,
@@ -541,7 +540,7 @@ function buildAdditionalWardConfigs(deps) {
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
-      relaxChildFilter: false,
+      relaxChildFilter: true,
       requirePreHint: false,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
@@ -552,7 +551,7 @@ function buildAdditionalWardConfigs(deps) {
     nishitokyo: {
       source: NISHITOKYO_SOURCE,
       listUrls: (m, now) => [
-        buildListCalendarUrl(`${NISHITOKYO_SOURCE.baseUrl}/event/calendar`, m, now),
+        buildListCalendarUrl(`${NISHITOKYO_SOURCE.baseUrl}/event/kids_oyakomuke/calendar`, m, now),
       ],
       parseOpts: {
         urlAllow: /city\.nishitokyo\.lg\.jp\/.+\.html?(?:\?|$)/i,
@@ -560,13 +559,13 @@ function buildAdditionalWardConfigs(deps) {
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,
       },
-      relaxChildFilter: false,
+      relaxChildFilter: true,
       requirePreHint: false,
       appendFallbackDate: true,
       allowRowFallbackOnDetailError: true,
       maxRows: 500,
       titleDenyRe:
-        /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|^検索の使い方$|^子育て・保育|^歴史・文化$|^スポーツ$|^発表会|^健康・安全$|^創作|^体験・散策$|^事前申込必要$|^申込終了$|^学ぶ・考える|^有料$|^中高生年代$|^市役所の案内$|^お問い合わせ$|障害者.*養成研修|介護者の会|薬湯|占い入門|平和.*サミット|戦跡を探る|ディスコ$|卓球大会$)/i,
+        /(サイトマップ|個人情報|ウェブアクセシビリティ|RSS配信|^検索の使い方$|^市役所の案内$|^お問い合わせ$)/i,
     },
     machida: {
       source: MACHIDA_SOURCE,

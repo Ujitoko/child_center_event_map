@@ -190,29 +190,41 @@ async function fetchFmiraiEvents(maxDays) {
       const postUrl = post.link || "";
       if (!title || !FMIRAI_CHILD_RE.test(title + content)) continue;
 
-      // コンテンツからM月D日(曜日)を抽出
-      const dateRe = /(\d{1,2})月(\d{1,2})日\s*[(（][^)）]*[)）]/g;
-      let dm;
       const now = parseYmdFromJst(new Date());
-      while ((dm = dateRe.exec(content)) !== null) {
-        const mo = Number(dm[1]);
-        const d = Number(dm[2]);
-        let y = now.y;
-        if (mo < now.m - 2) y = now.y + 1;
-        events.push({ y, mo, d, title, url: postUrl, content });
-      }
+      const found = new Set();
 
-      // YYYY年M月D日 or YYYY/M/D パターンもチェック
-      const fullRe = /(\d{4})[年/](\d{1,2})[月/](\d{1,2})日?/g;
+      // YYYY年M月D日 パターン (年付きを優先)
+      const fullRe = /(\d{4})\s*[年/]\s*(\d{1,2})\s*[月/]\s*(\d{1,2})\s*日?/g;
       let fm;
       while ((fm = fullRe.exec(content)) !== null) {
+        // 申込・締切の日付を除外
+        const before = content.slice(Math.max(0, fm.index - 10), fm.index);
+        if (/申込|締切|受付|応募/.test(before)) continue;
         const y = Number(fm[1]);
         const mo = Number(fm[2]);
         const d = Number(fm[3]);
-        // 重複チェック
-        if (!events.find(e => e.y === y && e.mo === mo && e.d === d && e.title === title)) {
-          events.push({ y, mo, d, title, url: postUrl, content });
-        }
+        if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+        const key = `${y}-${mo}-${d}`;
+        if (found.has(key)) continue;
+        found.add(key);
+        events.push({ y, mo, d, title, url: postUrl, content });
+      }
+
+      // M月D日 パターン (年なし、曜日括弧はオプショナル)
+      const dateRe = /(\d{1,2})月\s*(\d{1,2})日/g;
+      let dm;
+      while ((dm = dateRe.exec(content)) !== null) {
+        const before = content.slice(Math.max(0, dm.index - 10), dm.index);
+        if (/申込|締切|受付|応募/.test(before)) continue;
+        const mo = Number(dm[1]);
+        const d = Number(dm[2]);
+        if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+        let y = now.y;
+        if (mo < now.mo - 2) y = now.y + 1;
+        const key = `${y}-${mo}-${d}`;
+        if (found.has(key)) continue;
+        found.add(key);
+        events.push({ y, mo, d, title, url: postUrl, content });
       }
     }
   } catch (e) {
