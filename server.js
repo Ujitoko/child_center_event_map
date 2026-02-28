@@ -204,6 +204,7 @@ const { createCollectKawaguchiJidokanEvents } = require("./src/server/collectors
 const { createCollectKasukabeJidokanEvents } = require("./src/server/collectors/kasukabe-jidokan-collector");
 const { createCollectSakadoJidokanEvents } = require("./src/server/collectors/sakado-jidokan-collector");
 const { createCollectHigashimatsuyamaKosodateEvents } = require("./src/server/collectors/higashimatsuyama-kosodate-collector");
+const { createCalendarCgiCollector } = require("./src/server/collectors/calendar-cgi-collector");
 const { createGetEvents } = require("./src/server/events-service");
 const FACILITY_REGISTRY = require("./src/config/known-facilities");
 const {
@@ -241,6 +242,8 @@ const {
   SHIBUKAWA_SOURCE, SHIOYA_SOURCE, SHISUI_SOURCE, TAKANEZAWA_SOURCE, TATEBAYASHI_SOURCE, TOCHIGI_CITY_SOURCE,
   TOCHIGI_SAKURA_SOURCE, TONE_IB_SOURCE, UENO_GUNMA_SOURCE, USHIKU_SOURCE, UTSUNOMIYA_SOURCE, YACHIYO_IB_SOURCE,
   NOGI_SOURCE, OYAMA_SOURCE, CHILD_KW, IKOYO_CHILD_KW, REGION_GROUPS, PREF_CENTERS,
+  ADACHI_SOURCE, EDOGAWA_SOURCE, SUGINAMI_SOURCE, ITABASHI_SOURCE, NERIMA_SOURCE, SHINJUKU_SOURCE,
+  NAKANO_SOURCE, TOSHIMA_SOURCE, SUMIDA_SOURCE, BUNKYO_SOURCE, TAITO_SOURCE, ARAKAWA_SOURCE,
   buildSourceToPrefMap,
 } = require("./src/config/wards");
 const _wardsExports = require("./src/config/wards");
@@ -732,6 +735,21 @@ const collectTakasakiNandemoEvents = createCollectTakasakiNandemoEvents(geoFmDep
 const collectKatsushikaScheduleEvents = createCollectKatsushikaScheduleEvents(geoFmDeps);
 // --- 江東区 児童館 collector ---
 const collectKotoJidokanEvents = createCollectKotoJidokanEvents(geoFmDeps);
+// --- 東京23区 calendar-cgi-collector (Joruri CMS) ---
+const collectAdachiEvents = createCalendarCgiCollector({ source: ADACHI_SOURCE, cgiPath: "/cgi-bin/event_cal_multi/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+const collectEdogawaEvents = createCalendarCgiCollector({ source: EDOGAWA_SOURCE, cgiPath: "/cgi-bin/event_cal_multi/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+const collectSuginamiEvents = createCalendarCgiCollector({ source: SUGINAMI_SOURCE, cgiPath: "/cgi-bin/event_cal_multi/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+const collectBunkyoEvents = createCalendarCgiCollector({ source: BUNKYO_SOURCE, cgiPath: "/cgi-bin/event_cal_multi/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+const collectArakawaEvents = createCalendarCgiCollector({ source: ARAKAWA_SOURCE, cgiPath: "/cgi-bin/event_cal_multi/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+const collectToshimaEvents = createCalendarCgiCollector({ source: TOSHIMA_SOURCE, cgiPath: "/cgi-bin/event_cal/calendar.cgi", useKeywordFilter: true }, geoFmDeps);
+// --- 東京23区 list-calendar (static HTML) ---
+const collectNakanoEvents = createListCalendarCollector({ source: NAKANO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
+const collectSumidaEvents = createListCalendarCollector({ source: SUMIDA_SOURCE, calendarPath: "/eventcalendar/kodomo_kosodate/calendar/", fallbackPath: "/eventcalendar/calendar/" }, geoFmDeps);
+const collectTaitoEvents = createListCalendarCollector({ source: TAITO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
+const collectNerimaEvents = createListCalendarCollector({ source: NERIMA_SOURCE, calendarPath: "/kankomoyoshi/event/kodomo/calendar/", fallbackPath: "/kankomoyoshi/event/calendar/" }, geoFmDeps);
+// --- 東京23区 calendar-cgi-collector (FourWeb / PHP) ---
+const collectItabashiEvents = createCalendarCgiCollector({ source: ITABASHI_SOURCE, cgiPath: "/cgi-evt/event.cgi", categoryParams: "c50=50", mode: "fourweb", useKeywordFilter: false, useUA: true }, geoFmDeps);
+const collectShinjukuEvents = createCalendarCgiCollector({ source: SHINJUKU_SOURCE, cgiPath: "/event/calendar/calendar.php", mode: "php", useKeywordFilter: true }, geoFmDeps);
 // --- 茨城県 ---
 // Tier1: event.js (4市)
 const collectHitachiIbEvents = createEventJsCollector({
@@ -1139,6 +1157,11 @@ const collectors = [
   collectKatsushikaScheduleEvents,
   // Koto jidokan supplement
   collectKotoJidokanEvents,
+  // 東京23区 CGI/list-calendar (12区)
+  collectAdachiEvents, collectEdogawaEvents, collectSuginamiEvents,
+  collectBunkyoEvents, collectArakawaEvents, collectToshimaEvents,
+  collectNakanoEvents, collectSumidaEvents, collectTaitoEvents, collectNerimaEvents,
+  collectItabashiEvents, collectShinjukuEvents,
   // Ibaraki
   collectHitachiIbEvents, collectHitachinakaEvents, collectMoriyaEvents, collectKamisuEvents,
   collectTokaiIbEvents, collectTsukubaEvents,
