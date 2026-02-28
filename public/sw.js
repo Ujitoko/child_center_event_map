@@ -1,4 +1,4 @@
-const CACHE_NAME = "kids-play-v4";
+const CACHE_NAME = "kids-play-v5";
 const STATIC_ASSETS = [
   "./",
   "./styles.css",
