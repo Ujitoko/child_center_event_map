@@ -27,7 +27,10 @@ const CENTERS = [
   { slug: "okubo",     name: "大久保東児童センター", address: "さいたま市桜区大久保領家131-6" },
   { slug: "nakamoto",  name: "仲本児童センター",     address: "さいたま市浦和区東仲町28-15" },
   { slug: "buzo",      name: "文蔵児童センター",     address: "さいたま市南区文蔵4-19-3" },
-  { slug: "iwatsuki",  name: "岩槻児童センター",     address: "さいたま市岩槻区本町1-11-11" },
+  { slug: "iwatsuki",    name: "岩槻児童センター",     address: "さいたま市岩槻区本町1-11-11" },
+  { slug: "katayanagi", name: "片柳児童センター",     address: "さいたま市見沼区東新井710-78" },
+  { slug: "urawabessyo",name: "浦和別所児童センター", address: "さいたま市南区別所2-15-6" },
+  { slug: "omagi",       name: "尾間木児童センター",   address: "さいたま市緑区大間木472" },
 ];
 
 // 行レベルのスキップ（この行自体を無視）
