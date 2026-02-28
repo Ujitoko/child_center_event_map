@@ -68,7 +68,8 @@ const {
   createCollectTakoEvents, createCollectShibayamaEvents,
   createCollectMutsuzawaEvents, createCollectChoseiEvents,
   createCollectNagaraEvents, createCollectOnjukuEvents,
-  createCollectChonanEvents, createCollectKimitsuKosodateEvents,
+  createCollectChonanEvents, createCollectKatoriEvents,
+  createCollectKimitsuKosodateEvents,
   createCollectMatsudoKosodateEvents, createCollectIchiharaKodomomiraiEvents,
   createCollectMatsudoLibraryEvents,
   createCollectIchiharaSalonEvents,
@@ -680,7 +681,7 @@ const collectChoshiEvents = createCollectChoshiEvents(geoFmDeps);
 const collectSakuraEvents = createCalendarJsonCollector({ source: SAKURA_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectFuttsuEvents = createEvent2CalendarCollector({ source: FUTTSU_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
 const collectInzaiEvents = createEvent2CalendarCollector({ source: INZAI_SOURCE, childIconAlts: ["子育て"] }, geoFmDeps);
-const collectKatoriEvents = createListCalendarCollector({ source: KATORI_SOURCE, calendarPath: "/yotei/kosodate/calendar/", fallbackPath: "/yotei/calendar/" }, geoFmDeps);
+const collectKatoriEvents = createCollectKatoriEvents(geoFmDeps);
 const collectToganeEvents = createEvent2CalendarCollector({ source: TOGANE_SOURCE, childIconAlts: ["子育て", "子ども"] }, geoFmDeps);
 const collectIchiharaEvents = createCalendarJsonCollector({ source: ICHIHARA_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectSosaEvents = createCalendarJsonCollector({ source: SOSA_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
@@ -1382,7 +1383,7 @@ const collectKashimaIbEvents = createMunicipalCalendarCollector({ source: KASHIM
 const collectAmiCalEvents = createMunicipalCalendarCollector({ source: AMI_SOURCE, calendarPath: "/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectAnnakaCalEvents = createMunicipalCalendarCollector({ source: ANNAKA_SOURCE, calendarPath: "/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectAshikagaCalEvents = createMunicipalCalendarCollector({ source: ASHIKAGA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
-const collectChonanCalEvents = createMunicipalCalendarCollector({ source: CHONAN_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
+// Chonan: now using RSS+table collector in chiba-remaining.js (municipal-calendar was empty)
 const collectChoseiCalEvents = createMunicipalCalendarCollector({ source: CHOSEI_SOURCE, calendarPath: "/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectHagaCalEvents = createMunicipalCalendarCollector({ source: HAGA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectIchikaiCalEvents = createMunicipalCalendarCollector({ source: ICHIKAI_SOURCE, calendarPath: "/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
@@ -1912,7 +1913,6 @@ const collectors = [
   collectAmiCalEvents,
   collectAnnakaCalEvents,
   collectAshikagaCalEvents,
-  collectChonanCalEvents,
   collectChoseiCalEvents,
   collectHagaCalEvents,
   collectIchikaiCalEvents,

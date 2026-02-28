@@ -943,15 +943,293 @@ function createCollectOnjukuEvents(deps) {
   }, deps);
 }
 
+/**
+ * 長南町: RSS フィード → 月間予定ページ → テーブル解析
+ *
+ * RSS: /yotei/feed/ → 「2026年3月の予定」等のページURLを取得
+ * テーブル: <tr><td>N日（X）</td><td>【event（venue）time】...</td></tr>
+ * 全角数字の日付、【】で区切られた複数イベント、（venue）time パターン
+ */
+const CHONAN_KNOWN_FACILITIES = {
+  "長南保育所": "長生郡長南町長南759",
+  "中央公民館": "長生郡長南町長南2125",
+  "保健センター": "長生郡長南町長南2110",
+  "長生学園幼稚園": "長生郡長南町長南2064-3",
+};
+const CHONAN_CHILD_KW = /園庭|園舎|ぴよぴよ|乳児|健康診査|歯科|保育|子育て|親子|児童|おはなし|読み聞かせ|ベビー|幼児|卒園|入園/;
+
 function createCollectChonanEvents(deps) {
   const { CHONAN_SOURCE } = require("../../config/wards");
-  return createKosodatePageCollector(CHONAN_SOURCE, {
-    cityName: "長南町", prefixLabel: "長生郡長南町",
-    urls: [
-      "https://www.town.chonan.chiba.jp/event/",
-      "https://www.town.chonan.chiba.jp/category/4-1-0-0-0-0-0-0-0-0.html",
-    ],
-  }, deps);
+  const {
+    geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+  } = deps;
+  const sourceObj = CHONAN_SOURCE;
+
+  return async function collectChonanEvents(maxDays) {
+    const label = sourceObj.label;
+    const byId = new Map();
+
+    // 1) RSS フィードから月間ページURLを取得
+    let rssItems;
+    try {
+      const rssXml = await fetchText(`${sourceObj.baseUrl}/yotei/feed/`);
+      rssItems = parseRssFeed(rssXml);
+    } catch (e) {
+      console.warn(`[${label}] RSS fetch failed:`, e.message || e);
+      return [];
+    }
+
+    // 月間ページURLを抽出（最新2ヶ月分）
+    const monthPages = rssItems
+      .filter(item => /\d+年\s*\d+月の予定/.test(item.title))
+      .slice(0, 2);
+
+    for (const page of monthPages) {
+      // タイトルから年月を抽出
+      const ymMatch = page.title.match(/(\d{4})年\s*(\d{1,2})月/);
+      if (!ymMatch) continue;
+      const pageYear = Number(ymMatch[1]);
+      const pageMonth = Number(ymMatch[2]);
+
+      let html;
+      try {
+        html = await fetchText(page.url);
+      } catch (e) {
+        console.warn(`[${label}] page fetch failed (${page.url}):`, e.message || e);
+        continue;
+      }
+
+      // テーブル行を解析
+      const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+      let tr;
+      while ((tr = trRe.exec(html)) !== null) {
+        const row = tr[1];
+        const tds = row.split(/<td[^>]*>/i);
+        if (tds.length < 3) continue;
+
+        // 日付: 全角・半角数字 + 日（曜日）
+        const dayText = stripTags(tds[1]).trim().normalize("NFKC");
+        const dayMatch = dayText.match(/^(\d{1,2})日/);
+        if (!dayMatch) continue;
+        const d = Number(dayMatch[1]);
+
+        // イベント列
+        const evText = stripTags(tds[2]).trim().normalize("NFKC");
+        if (!evText) continue;
+
+        // 【...】で区切られた個別イベントを抽出
+        const eventRe = /【([^】]+)】/g;
+        let em;
+        while ((em = eventRe.exec(evText)) !== null) {
+          const raw = em[1].trim();
+          if (!CHONAN_CHILD_KW.test(raw)) continue;
+          if (!inRangeJst(pageYear, pageMonth, d, maxDays)) continue;
+
+          // イベント名・会場・時間を分解
+          // パターン: "イベント名（会場）H:MM～H:MM" or "イベント名（会場）"
+          let title = raw;
+          let venue = "";
+          let timeRange = null;
+
+          // 会場抽出: （...）パターン
+          const venueMatch = raw.match(/（([^）]{2,20})）/);
+          if (venueMatch) {
+            venue = venueMatch[1].trim();
+            title = raw.replace(/（[^）]+）/, "").trim();
+          }
+
+          // 時間抽出: H:MM～H:MM or H：MM～
+          const timeMatch = raw.match(/(\d{1,2})[：:](\d{2})\s*[～~ー-]\s*(?:(\d{1,2})[：:](\d{2}))?/);
+          if (timeMatch) {
+            timeRange = {
+              startH: Number(timeMatch[1]),
+              startM: Number(timeMatch[2]),
+              endH: timeMatch[3] ? Number(timeMatch[3]) : null,
+              endM: timeMatch[4] ? Number(timeMatch[4]) : null,
+            };
+            // 時間部分をタイトルから除去
+            title = title.replace(/\d{1,2}[：:]\d{2}\s*[～~ー-]\s*(?:\d{1,2}[：:]\d{2})?/, "").trim();
+          }
+
+          // タイトルクリーンアップ
+          title = title.replace(/[[\]「」『』]/g, "").trim();
+          if (!title || title.length < 2) continue;
+
+          // 既知施設のアドレス解決
+          let rawAddress = "";
+          for (const [name, addr] of Object.entries(CHONAN_KNOWN_FACILITIES)) {
+            if (venue.includes(name) || raw.includes(name)) {
+              rawAddress = addr;
+              if (!venue) venue = name;
+              break;
+            }
+          }
+
+          await addEventRecord(byId, {
+            sourceObj, eventDate: { y: pageYear, mo: pageMonth, d },
+            title, url: page.url,
+            venue, rawAddress, timeRange,
+            cityName: "長南町", prefixLabel: "長生郡長南町",
+            geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+          });
+        }
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
+}
+
+/**
+ * 香取市: 山田児童館 定期教室・行事
+ *
+ * ページ: /kosodate/shien_sodan/yamadajidokan/index.html
+ * h3/h4 構造: プログラム名(h3) → 対象/日時/内容(h4)
+ * 日時パターン: 「毎月第N X曜日」「月N回 X曜日」→ expandNthWeekday/expandWeekly
+ * 全イベント単一施設: 山田児童館（香取市長岡1307-1）
+ */
+const KATORI_KNOWN_FACILITIES = {
+  "山田児童館": "香取市長岡1307番地1",
+  "子育て支援センターにこにこ": "香取市長岡1307番地1",
+};
+
+function createCollectKatoriEvents(deps) {
+  const { KATORI_SOURCE } = require("../../config/wards");
+  const {
+    geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+  } = deps;
+  const sourceObj = KATORI_SOURCE;
+
+  return async function collectKatoriEvents(maxDays) {
+    const label = sourceObj.label;
+    const byId = new Map();
+    const pageUrl = `${sourceObj.baseUrl}/kosodate/shien_sodan/yamadajidokan/index.html`;
+
+    let html;
+    try {
+      html = await fetchText(pageUrl);
+    } catch (e) {
+      console.warn(`[${label}] page fetch failed:`, e.message || e);
+      return [];
+    }
+
+    const defaultVenue = "山田児童館";
+    const rawAddress = "香取市長岡1307番地1";
+
+    // h3 セクションに分割し、各プログラムの日時を取得
+    const h3Parts = html.split(/<h3[^>]*>/i);
+    let inSection = false;
+    for (let si = 1; si < h3Parts.length; si++) {
+      const section = h3Parts[si];
+      const titleEnd = section.indexOf("</h3>");
+      if (titleEnd < 0) continue;
+      const sectionTitle = stripTags(section.substring(0, titleEnd)).trim();
+
+      // 「行事・教室案内」以降のセクションのみ処理
+      if (/行事・教室案内/.test(sectionTitle)) { inSection = true; continue; }
+      if (/子育て支援センター/.test(sectionTitle)) { inSection = true; continue; }
+      if (/関連情報|香取市役所/.test(sectionTitle)) break;
+      if (!inSection) continue;
+      // 利用案内/開館時間/休館日 等はスキップ
+      if (/利用案内|開館時間|休館日|利用対象|利用方法|山田児童館公式/.test(sectionTitle)) continue;
+
+      const title = sectionTitle.replace(/（要申し込み）/, "").trim();
+      if (!title || title.length < 2) continue;
+
+      // セクション内の h4 "日時" を探す
+      const h4Parts = section.split(/<h4[^>]*>/i);
+      let schedText = "";
+      for (let hi = 1; hi < h4Parts.length; hi++) {
+        const h4End = h4Parts[hi].indexOf("</h4>");
+        if (h4End < 0) continue;
+        const h4Title = stripTags(h4Parts[hi].substring(0, h4End)).trim();
+        if (h4Title !== "日時") continue;
+        // h4 本文: </h4> 直後から次の h4 まで
+        const bodyStart = h4End + 5;
+        const bodyHtml = h4Parts[hi].substring(bodyStart);
+        schedText = stripTags(bodyHtml).trim().normalize("NFKC");
+        break;
+      }
+      if (!schedText) continue;
+
+      // 会場判定: 子育て支援センター系
+      const currentVenue = /バブちゃんサロン|からだであそぼう|にこにこクラブ/.test(title)
+        ? "子育て支援センターにこにこ" : defaultVenue;
+
+      // 時間抽出
+      let timeRange = null;
+      const tMatch = schedText.match(/(?:午前|午後)?(\d{1,2})時(\d{0,2})分?\s*(?:から|～)/);
+      if (tMatch) {
+        let startH = Number(tMatch[1]);
+        const startM = Number(tMatch[2] || 0);
+        if (/午後/.test(schedText.substring(0, schedText.indexOf(tMatch[0]) + 5)) && startH < 12) startH += 12;
+
+        const endMatch = schedText.match(/(?:から|～)\s*(?:午前|午後)?(\d{1,2})時(\d{0,2})分?/);
+        let endH = null, endM = null;
+        if (endMatch) {
+          endH = Number(endMatch[1]);
+          endM = Number(endMatch[2] || 0);
+          if (/午後/.test(schedText.substring(schedText.indexOf(endMatch[0]) - 5, schedText.indexOf(endMatch[0]) + 3)) && endH < 12) endH += 12;
+        }
+        timeRange = { startH, startM, endH, endM };
+      }
+
+      // 1) 毎月第N・第M X曜日
+      const nthMatch = schedText.match(/毎月第(\d)[・・]?(?:第(\d))?\s*([月火水木金土日])曜日/);
+      if (nthMatch) {
+        const dow = DAY_OF_WEEK_MAP[nthMatch[3]];
+        if (dow !== undefined) {
+          const nth1 = Number(nthMatch[1]);
+          const dates1 = expandNthWeekday(nth1, dow, maxDays);
+          for (const ed of dates1) {
+            await addEventRecord(byId, {
+              sourceObj, eventDate: ed, title, url: pageUrl,
+              venue: currentVenue, rawAddress, timeRange,
+              cityName: "香取市", prefixLabel: "香取市",
+              geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+            });
+          }
+          if (nthMatch[2]) {
+            const nth2 = Number(nthMatch[2]);
+            const dates2 = expandNthWeekday(nth2, dow, maxDays);
+            for (const ed of dates2) {
+              await addEventRecord(byId, {
+                sourceObj, eventDate: ed, title, url: pageUrl,
+                venue: currentVenue, rawAddress, timeRange,
+                cityName: "香取市", prefixLabel: "香取市",
+                geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+              });
+            }
+          }
+          continue;
+        }
+      }
+
+      // 2) 毎月N回 X曜日 (expandWeekly で近似)
+      const monthlyMatch = schedText.match(/月\d+回\s*([月火水木金土日])曜日/);
+      if (monthlyMatch) {
+        const dow = DAY_OF_WEEK_MAP[monthlyMatch[1]];
+        if (dow !== undefined) {
+          const dates = expandWeekly(dow, maxDays);
+          for (const ed of dates) {
+            await addEventRecord(byId, {
+              sourceObj, eventDate: ed, title, url: pageUrl,
+              venue: currentVenue, rawAddress, timeRange,
+              cityName: "香取市", prefixLabel: "香取市",
+              geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster,
+            });
+          }
+          continue;
+        }
+      }
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}] ${results.length} events collected`);
+    return results;
+  };
 }
 
 
@@ -2655,6 +2933,7 @@ module.exports = {
   createCollectNagaraEvents,
   createCollectOnjukuEvents,
   createCollectChonanEvents,
+  createCollectKatoriEvents,
   createCollectKimitsuKosodateEvents,
   createCollectMatsudoKosodateEvents,
   createCollectIchiharaKodomomiraiEvents,
