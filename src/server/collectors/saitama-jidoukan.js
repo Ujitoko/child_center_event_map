@@ -36,7 +36,7 @@ const CENTERS = [
 // 行レベルのスキップ（この行自体を無視）
 const SKIP_RE = /休\s*館|閉\s*館|利用案内|お問い合わせ|電話|ＴＥＬ|TEL|FAX|アクセス|所在地|令和\d|発行|建国記念|天皇誕生|振替休|お休み|祝日|中\s*高\s*生\s*タイム延長|優先\s*タイム|交替制/;
 // タイトルとして無効なパターン
-const JUNK_TITLE_RE = /^[\d\s\-～〜:：（）()、。,.はの・＆&]+$|^.{0,2}$|申込|問合|持ち物|日\s*時|場\s*所|会\s*場|時\s*間\s*[：:]|定員|対象|費用|注意|詳細|毎週|毎月|お知らせ|カレンダー|^\d+\s*月|今月の|実施中|受付|内容[：:]|開\s*催|期間|HP|ホーム|ページ|インスタ|こちら|寄附|www\.|http|だより|月\s*号|センターだより|です。$|ます。$|ください|ましょう/;
+const JUNK_TITLE_RE = /^[\d\s\-～〜:：（）()、。,.はの・＆&]+$|^.{0,2}$|申込|問合|持ち物|日\s*時|場\s*所|会\s*場|時\s*間\s*[：:]|定員|対象|費用|注意|詳細|毎週|毎月|お知らせ|カレンダー|^\d+\s*月|今月の|実施中|受付|内容[：:]|開\s*催|期間|HP|ホーム|ページ|インスタ|こちら|寄附|www\.|http|だより|月\s*号|センターだより|です[。！]$|ます[。！]$|ください|ましょう|※印|利用ができません|春分\s*の\s*日|遊戯室|午前\s*\d|午後\s*\d|^\d+歳\s*…$|他の事業|のお\s*知|^みやはら$|^はるの$|^うえたけ$|^うえみず$|^ぶぞう$|…$/;
 
 /** 全角数字→半角数字 正規化 */
 function normalizeFullWidth(str) {
@@ -213,6 +213,46 @@ function parseJidoukanPdf(text, defaultY, defaultMo) {
       const combinedTitle = titles.join("・");
       events.push({ y: defaultY, mo: defaultMo, d, title: combinedTitle, timeRange: null });
       continue;
+    }
+  }
+
+  // 戦略E: カレンダーグリッド型PDF (宮原・三橋・仲本型)
+  // テキスト全体から「N・N・N日の曜日 イベント名」「イベント名は、N日（曜）」パターンを抽出
+  if (events.length === 0) {
+    const fullText = normalizeFullWidth(lines.join(" "));
+    // E1: "N・N・N日の曜日" → イベント名は直前or直後
+    const multiDateRe = /([\p{L}\p{N}ー・]{2,30})\s*(?:は\s*[、,]?\s*)?(\d{1,2}(?:\s*[・,、]\s*\d{1,2})+)\s*日\s*の?\s*([月火水木金土日])曜日/gu;
+    let em;
+    while ((em = multiDateRe.exec(fullText)) !== null) {
+      const candidateTitle = cleanTitle(em[1]);
+      if (!isValidTitle(candidateTitle)) continue;
+      const days = em[2].split(/[・,、]/).map(s => Number(s.trim())).filter(n => n >= 1 && n <= 31);
+      for (const d of days) {
+        events.push({ y: defaultY, mo: defaultMo, d, title: candidateTitle, timeRange: null });
+      }
+    }
+
+    // E2: "イベント名は、N日（曜）です" or "N日（曜）イベント名"
+    const singleDateRe = /([\p{L}\p{N}ー・]{2,30})\s*(?:は\s*[、,]?\s*)(\d{1,2})\s*日\s*[（(]\s*([月火水木金土日])\s*[）)]/gu;
+    while ((em = singleDateRe.exec(fullText)) !== null) {
+      const candidateTitle = cleanTitle(em[1]);
+      if (!isValidTitle(candidateTitle)) continue;
+      const d = Number(em[2]);
+      if (d < 1 || d > 31) continue;
+      events.push({ y: defaultY, mo: defaultMo, d, title: candidateTitle, timeRange: null });
+    }
+
+    // E3: "M月N日（曜）" followed by event name (nearby text)
+    const monthDateRe = /(\d{1,2})\s*月\s*(\d{1,2})\s*日\s*[（(]\s*([月火水木金土日])\s*[）)]/g;
+    while ((em = monthDateRe.exec(fullText)) !== null) {
+      const evMo = Number(em[1]);
+      const d = Number(em[2]);
+      if (d < 1 || d > 31 || evMo < 1 || evMo > 12) continue;
+      if (evMo !== defaultMo && evMo !== defaultMo + 1 && evMo !== defaultMo - 1) continue;
+      // Use currentTitle or look at nearby text
+      if (currentTitle) {
+        events.push({ y: defaultY, mo: evMo, d, title: currentTitle, timeRange: null });
+      }
     }
   }
 

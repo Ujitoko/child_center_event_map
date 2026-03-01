@@ -51,8 +51,11 @@ const { createCollectHinoharaEvents } = require("./src/server/collectors/hinohar
 const { createEventJsCollector } = require("./src/server/collectors/event-js-collector");
 const { createCollectFunabashiEvents } = require("./src/server/collectors/funabashi");
 const { createCollectFunabashiJidohomeEvents } = require("./src/server/collectors/funabashi-jidohome-collector");
+const { createCollectFunakkonaviEvents } = require("./src/server/collectors/funabashi-funakkonavi-collector");
+const { createCollectTokorozawaComaamEvents } = require("./src/server/collectors/tokorozawa-comaam-collector");
 const { createCollectNaritaEvents } = require("./src/server/collectors/narita");
-const { createCollectChibaEvents, createCollectChibaCityWardEvents } = require("./src/server/collectors/chiba");
+const { createCollectChibaEvents, createCollectChibaCityWardEvents, createCollectChibaKodomoEventPdf } = require("./src/server/collectors/chiba");
+const { createCollectChibaKoryukanEvents } = require("./src/server/collectors/chiba-koryukan-collector");
 const { createCollectKashiwaEvents } = require("./src/server/collectors/kashiwa");
 const { createCollectIchikawaEvents, createCollectIchikawaIkujiEvents } = require("./src/server/collectors/ichikawa");
 const { createCollectYotsukaidoEvents } = require("./src/server/collectors/yotsukaido");
@@ -463,9 +466,12 @@ const collectOtakiEvents = createCalendarJsonCollector({ source: OTAKI_SOURCE, c
 // --- 千葉県 custom collectors ---
 const collectFunabashiEvents = createCollectFunabashiEvents(geoFmDeps);
 const collectFunabashiJidohomeEvents = createCollectFunabashiJidohomeEvents(geoFmDeps);
+const collectFunakkonaviEvents = createCollectFunakkonaviEvents(geoFmDeps);
 const collectNaritaEvents = createCollectNaritaEvents(geoFmDeps);
 const collectChibaCityEvents = createCollectChibaEvents(geoFmDeps);
 const collectChibaCityWardEvents = createCollectChibaCityWardEvents(geoFmDeps);
+const collectChibaKodomoEventPdf = createCollectChibaKodomoEventPdf(geoFmDeps);
+const collectChibaKoryukanEvents = createCollectChibaKoryukanEvents(geoFmDeps);
 const collectKashiwaEvents = createCollectKashiwaEvents(geoFmDeps);
 // --- 千葉県 municipal-calendar-collector ---
 const collectYachiyoEvents = createMunicipalCalendarCollector({ source: YACHIYO_SOURCE, childCategoryIndex: null, useIndexPhpFormat: true }, geoFmDeps);
@@ -562,6 +568,7 @@ const collectSayamaEvents = createListCalendarCollector({ source: SAYAMA_SOURCE,
 const collectYashioEvents = createListCalendarCollector({ source: YASHIO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
 // --- 埼玉県 list-calendar-collector (追加) ---
 const collectTokorozawaEvents = createListCalendarCollector({ source: TOKOROZAWA_SOURCE, calendarPath: "/iitokoro/event/main/calendar/", fallbackPath: "/iitokoro/event/main/kodomo/calendar/" }, geoFmDeps);
+const collectTokorozawaComaamEvents = createCollectTokorozawaComaamEvents(geoFmDeps);
 const collectKumagayaEvents = createListCalendarCollector({ source: KUMAGAYA_SOURCE, calendarPath: "/kanko/event/kids/calendar/", fallbackPath: "/kanko/event/calendar/" }, geoFmDeps);
 // --- 埼玉県 event-js-collector (追加) ---
 const collectKukiEvents = createEventJsCollector({
@@ -1002,10 +1009,10 @@ const collectors = [
   collectIsumiEvents,
   collectTohnoshoEvents,
   collectOtakiEvents,
-  collectFunabashiEvents, collectFunabashiJidohomeEvents,
+  collectFunabashiEvents, collectFunabashiJidohomeEvents, collectFunakkonaviEvents,
   collectNaritaEvents,
-  collectChibaCityEvents,
-  collectChibaCityWardEvents,
+  collectChibaCityEvents, collectChibaCityWardEvents,
+  collectChibaKodomoEventPdf, collectChibaKoryukanEvents,
   collectKashiwaEvents,
   collectYachiyoEvents,
   collectAsahiEvents,
@@ -1079,7 +1086,7 @@ const collectors = [
   collectSaitamaHokenEvents,
   collectKoshigayaEvents,
   collectKoshigayaKosodateEvents,
-  collectTokorozawaEvents,
+  collectTokorozawaEvents, collectTokorozawaComaamEvents,
   collectKukiEvents,
   collectKumagayaEvents,
   collectKounosuEvents,

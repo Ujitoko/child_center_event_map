@@ -174,6 +174,65 @@ const FMIRAI_CHILD_RE =
   /親子|子育て|乳幼児|幼児|赤ちゃん|ベビー|キッズ|児童|おはなし|リトミック|ママ|パパ|ぴーか・ぶー|ちびっこ|0歳|1歳|2歳|3歳|未就学|未就園|小学|青少年|こども|子ども|ファミリー|中学生|学童/;
 
 /**
+ * コンテンツの「日時」セクションのみから日付を抽出（申込/締切の日付を除外）
+ */
+function extractEventDatesFromContent(content, title, now) {
+  const dates = [];
+  const found = new Set();
+
+  // 「日時」セクションを抽出（日時:〜 次のフィールドラベルまで）
+  // Content is typically a single line with fields separated by spaces
+  // Handle variants: 日時, 【日時】, 【大会日時】, 開催日・時間, ★開催日
+  const dateSectionMatch = content.match(/(?:★?開催日[・時間]*|【[^】]*日時】|日\s*時)[：:・\s]*([\s\S]{5,300}?)(?=\s+(?:【[^】]*】|(?:場所|会場|内容|コンテンツ|対象|費用|持ち物|定員|申込|問い合わせ|チケット|講師|備考|注意|主催|主管|後援)\s))/);
+  const dateText = dateSectionMatch ? dateSectionMatch[1] : "";
+
+  if (dateText) {
+    // YYYY年M月D日
+    const fullRe = /(\d{4})\s*[年/]\s*(\d{1,2})\s*[月/]\s*(\d{1,2})\s*日?/g;
+    let fm;
+    while ((fm = fullRe.exec(dateText)) !== null) {
+      const y = Number(fm[1]);
+      const mo = Number(fm[2]);
+      const d = Number(fm[3]);
+      if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+      const key = `${y}-${mo}-${d}`;
+      if (!found.has(key)) { found.add(key); dates.push({ y, mo, d }); }
+    }
+    // M月D日 (年なし)
+    const bareRe = /(\d{1,2})\s*月\s*(\d{1,2})\s*日/g;
+    let dm;
+    while ((dm = bareRe.exec(dateText)) !== null) {
+      const before = dateText.substring(Math.max(0, dm.index - 6), dm.index);
+      if (/\d年\s*$/.test(before)) continue; // already captured by fullRe
+      const mo = Number(dm[1]);
+      const d = Number(dm[2]);
+      if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+      let y = now.y;
+      if (mo < now.m - 2) y = now.y + 1;
+      const key = `${y}-${mo}-${d}`;
+      if (!found.has(key)) { found.add(key); dates.push({ y, mo, d }); }
+    }
+  }
+
+  // タイトルから日付抽出: "2/28（土）" パターン
+  if (dates.length === 0) {
+    const titleDateRe = /(\d{1,2})\s*[\/]\s*(\d{1,2})\s*[（(]/g;
+    let tm;
+    while ((tm = titleDateRe.exec(title)) !== null) {
+      const mo = Number(tm[1]);
+      const d = Number(tm[2]);
+      if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
+      let y = now.y;
+      if (mo < now.m - 2) y = now.y + 1;
+      const key = `${y}-${mo}-${d}`;
+      if (!found.has(key)) { found.add(key); dates.push({ y, mo, d }); }
+    }
+  }
+
+  return dates;
+}
+
+/**
  * f-mirai.jp WordPress REST API からイベント記事を取得
  */
 async function fetchFmiraiEvents(maxDays) {
@@ -184,47 +243,29 @@ async function fetchFmiraiEvents(maxDays) {
     const posts = JSON.parse(text);
     if (!Array.isArray(posts)) return events;
 
+    const now = parseYmdFromJst(new Date());
+
     for (const post of posts) {
       const title = stripTags((post.title && post.title.rendered) || "").trim();
       const content = stripTags((post.content && post.content.rendered) || "");
       const postUrl = post.link || "";
       if (!title || !FMIRAI_CHILD_RE.test(title + content)) continue;
 
-      const now = parseYmdFromJst(new Date());
-      const found = new Set();
+      const dates = extractEventDatesFromContent(content, title, now);
 
-      // YYYY年M月D日 パターン (年付きを優先)
-      const fullRe = /(\d{4})\s*[年/]\s*(\d{1,2})\s*[月/]\s*(\d{1,2})\s*日?/g;
-      let fm;
-      while ((fm = fullRe.exec(content)) !== null) {
-        // 申込・締切の日付を除外
-        const before = content.slice(Math.max(0, fm.index - 10), fm.index);
-        if (/申込|締切|受付|応募/.test(before)) continue;
-        const y = Number(fm[1]);
-        const mo = Number(fm[2]);
-        const d = Number(fm[3]);
-        if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
-        const key = `${y}-${mo}-${d}`;
-        if (found.has(key)) continue;
-        found.add(key);
-        events.push({ y, mo, d, title, url: postUrl, content });
+      // Fallback: use post.date (ISO) if no dates extracted from content
+      if (dates.length === 0 && post.date) {
+        const pd = new Date(post.date + "+09:00");
+        if (!isNaN(pd.getTime())) {
+          const y = pd.getFullYear();
+          const mo = pd.getMonth() + 1;
+          const d = pd.getDate();
+          dates.push({ y, mo, d });
+        }
       }
 
-      // M月D日 パターン (年なし、曜日括弧はオプショナル)
-      const dateRe = /(\d{1,2})月\s*(\d{1,2})日/g;
-      let dm;
-      while ((dm = dateRe.exec(content)) !== null) {
-        const before = content.slice(Math.max(0, dm.index - 10), dm.index);
-        if (/申込|締切|受付|応募/.test(before)) continue;
-        const mo = Number(dm[1]);
-        const d = Number(dm[2]);
-        if (mo < 1 || mo > 12 || d < 1 || d > 31) continue;
-        let y = now.y;
-        if (mo < now.m - 2) y = now.y + 1;
-        const key = `${y}-${mo}-${d}`;
-        if (found.has(key)) continue;
-        found.add(key);
-        events.push({ y, mo, d, title, url: postUrl, content });
+      for (const dt of dates) {
+        events.push({ y: dt.y, mo: dt.mo, d: dt.d, title, url: postUrl, content });
       }
     }
   } catch (e) {

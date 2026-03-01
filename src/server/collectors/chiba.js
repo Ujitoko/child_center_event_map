@@ -1,4 +1,4 @@
-const { fetchText } = require("../fetch-utils");
+const { fetchText, fetchChiyodaPdfMarkdown } = require("../fetch-utils");
 const { stripTags, parseDetailMeta } = require("../html-utils");
 const {
   getMonthsForRange,
@@ -438,4 +438,197 @@ function createCollectChibaCityWardEvents(deps) {
   };
 }
 
-module.exports = { createCollectChibaEvents, createCollectChibaCityWardEvents };
+/**
+ * 千葉市こどもイベント情報PDF (月刊) からイベントを抽出
+ * URL: kodomoevent{RRMM}.pdf (RR=令和年, MM=月)
+ */
+const PDF_BASE = "https://www.city.chiba.jp/kodomomirai/kodomomirai/kikaku/documents/kodomoevent";
+// 行単位のスキップ
+const PDF_SKIP_LINE_RE = /^[>～―\-#]+|こどもに関わるイベント情報|月\s*日\s*曜|どこで|参加できる|イベント名|当日参加|どんなこと|いつ|TEL[：:]|FAX[：:]|\d+人\s*$|必要\s|不要\s|不可$|可能$|先着|抽選|\d{1,2}[\/]\d{1,2}|^まで|^から$|https?:[/]|フェイスブック|ブログ|\d{4}年[/]|電子申請|申し込み[：:]|必要事項を明記/;
+// 対象者行
+const PDF_TARGET_RE = /^(?:どなたでも|小学|中学|高校|\d歳|未就|就学前|保護者[同伴]*$|親子$|幼児$|乳幼児|と保護者|の方$|の親子$|A[：:]|B[：:])/;
+// 場所候補
+const PDF_VENUE_RE = /(?:公園|センター|ホール|広場|館|プラザ|スクエア|自然の家|図書館|公民館|区役所|体育|アリーナ|競技場|きぼーる|調理室)/;
+// タイトルに不適切
+const PDF_TITLE_SKIP_RE = /^(?:※|TEL|FAX|http|問い合わせ|こども企画課|スポーツ振興|文化振興|生涯学習|動きやすい|詳細は|白い靴下)/;
+
+function parseChibaKodomoEventPdf(text, defaultYear) {
+  const events = [];
+  const lines = text.split("\n");
+  const dateLineRe = /^(\d{1,2})\s+(\d{1,2})\s+([月火水木金土日])/;
+
+  // セクション分割
+  const sections = [];
+  let currentSection = null;
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const dm = line.match(dateLineRe);
+    if (dm) {
+      if (currentSection) sections.push(currentSection);
+      currentSection = {
+        mo: Number(dm[1]), d: Number(dm[2]),
+        restOfDateLine: line.substring(dm[0].length).trim(),
+        bodyLines: [],
+      };
+    } else if (currentSection) {
+      currentSection.bodyLines.push(line);
+    }
+  }
+  if (currentSection) sections.push(currentSection);
+
+  for (const sec of sections) {
+    // 時間抽出
+    const rest = sec.restOfDateLine;
+    const timeMatch = rest.match(/(\d{1,2}):(\d{2})\s+(\d{1,2}):(\d{2})/);
+    let timeRange = null;
+    if (timeMatch) {
+      timeRange = {
+        startHour: Number(timeMatch[1]), startMin: Number(timeMatch[2]),
+        endHour: Number(timeMatch[3]), endMin: Number(timeMatch[4]),
+      };
+    }
+
+    // 日付行の時間を除去してパーツ分割
+    const afterTime = rest.replace(/\d{1,2}:\d{2}/g, "").trim();
+    const inlineParts = afterTime.split(/\s{2,}/).map(p => p.trim()).filter(p => p);
+
+    let venue = "";
+    let title = "";
+
+    // インライン形式: venue | target | title が1行に収まるケース
+    if (inlineParts.length >= 3) {
+      venue = inlineParts[0].replace(/\s+/g, "");
+      // inlineParts[1] は対象者（スキップ）
+      // inlineParts[2] 以降がタイトル候補
+      for (let k = 2; k < inlineParts.length; k++) {
+        const candidate = inlineParts[k].replace(/\s+/g, "");
+        if (PDF_SKIP_LINE_RE.test(candidate)) continue;
+        if (PDF_TARGET_RE.test(candidate)) continue;
+        if (candidate.length >= 3 && candidate.length < 60) {
+          title = candidate;
+          break;
+        }
+      }
+    }
+
+    // インラインで見つからない場合: 場所は日付行末尾、タイトルは本文行
+    if (!title) {
+      // 場所候補: 日付行の最初の場所っぽい語
+      for (const p of inlineParts) {
+        if (PDF_VENUE_RE.test(p)) { venue = p.replace(/\s+/g, ""); break; }
+      }
+      // 本文行からタイトルを探す
+      for (const bodyLine of sec.bodyLines) {
+        const l = bodyLine.trim();
+        if (!l || l.length < 3 || /^>\s/.test(l)) continue;
+        if (PDF_SKIP_LINE_RE.test(l)) continue;
+        if (PDF_TARGET_RE.test(l)) continue;
+        if (PDF_TITLE_SKIP_RE.test(l)) continue;
+        // 場所行をスキップ
+        if (!venue && PDF_VENUE_RE.test(l) && l.length < 30) {
+          venue = l.replace(/\s+/g, "").replace(/[（(][^）)]*[）)]/g, "");
+          continue;
+        }
+        if (PDF_TARGET_RE.test(l)) continue;
+        const cleaned = l.replace(/\s+/g, "");
+        if (cleaned.length >= 3 && cleaned.length < 60) {
+          title = cleaned;
+          break;
+        }
+      }
+    }
+
+    if (!title) continue;
+    // タイトル品質フィルタ
+    title = title.replace(/^[（(][^）)]*[）)]\s*/, ""); // 先頭の括弧を除去
+    title = title.replace(/どなたでも|小学生以?上?|中学生以?上?/g, "").trim(); // 対象者混入を除去
+    if (title.length < 4) continue;
+    if (/^\d{1,2}:\d{2}$/.test(title)) continue; // 時刻だけ
+    if (/^[もの可）)]+$/.test(title)) continue; // ゴミ
+    const y = (sec.mo < 3) ? defaultYear + 1 : defaultYear;
+    events.push({ y, mo: sec.mo, d: sec.d, title, venue, timeRange });
+  }
+
+  return events;
+}
+
+function createCollectChibaKodomoEventPdf(deps) {
+  const { geocodeForWard, resolveEventPoint, resolveEventAddress, getFacilityAddressFromMaster } = deps;
+  const source = CHIBA_CITY_SOURCE;
+  const srcKey = `ward_${source.key}`;
+  const label = source.label;
+
+  return async function collectChibaKodomoEventPdf(maxDays) {
+    const now = new Date(Date.now() + 9 * 3600 * 1000);
+    const currentYear = now.getUTCFullYear();
+    const currentMonth = now.getUTCMonth() + 1;
+
+    // 当月と来月のPDFを取得
+    const pdfMonths = [{ y: currentYear, m: currentMonth }];
+    if (currentMonth < 12) {
+      pdfMonths.push({ y: currentYear, m: currentMonth + 1 });
+    } else {
+      pdfMonths.push({ y: currentYear + 1, m: 1 });
+    }
+
+    const allEvents = [];
+    for (const { y, m } of pdfMonths) {
+      const rr = String(y - 2018).padStart(2, "0");
+      const mm = String(m).padStart(2, "0");
+      const pdfUrl = `${PDF_BASE}${rr}${mm}.pdf`;
+      try {
+        const markdown = await fetchChiyodaPdfMarkdown(pdfUrl);
+        if (!markdown || markdown.length < 200) continue;
+        const evts = parseChibaKodomoEventPdf(markdown, y);
+        allEvents.push(...evts);
+      } catch (e) {
+        console.warn(`[${label}/こどもイベントPDF] ${rr}${mm} failed:`, e.message || e);
+      }
+    }
+
+    // 重複除去 + 範囲フィルタ
+    const byId = new Map();
+    for (const ev of allEvents) {
+      if (!inRangeJst(ev.y, ev.mo, ev.d, maxDays)) continue;
+      const dateKey = `${ev.y}${String(ev.mo).padStart(2, "0")}${String(ev.d).padStart(2, "0")}`;
+      const id = `${srcKey}:kodomoevpdf:${ev.title}:${dateKey}`;
+      if (byId.has(id)) continue;
+
+      const venueName = sanitizeVenueText(ev.venue || "");
+      const candidates = [];
+      if (getFacilityAddressFromMaster && venueName) {
+        const fmAddr = getFacilityAddressFromMaster(source.key, venueName);
+        if (fmAddr) candidates.push(/千葉県/.test(fmAddr) ? fmAddr : `千葉県${fmAddr}`);
+      }
+      if (venueName) candidates.push(`千葉県千葉市 ${venueName}`);
+      candidates.push(`千葉県千葉市`);
+      let point = await geocodeForWard(candidates.slice(0, 5), source);
+      point = resolveEventPoint(source, venueName, point, `千葉市 ${venueName}`);
+      const address = resolveEventAddress(source, venueName, `千葉市 ${venueName}`, point);
+
+      const { startsAt, endsAt } = buildStartsEndsForDate(
+        { y: ev.y, mo: ev.mo, d: ev.d }, ev.timeRange
+      );
+      byId.set(id, {
+        id,
+        source: srcKey,
+        source_label: label,
+        title: ev.title,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        venue_name: venueName || label,
+        address: address || "",
+        url: `${PDF_BASE}${String(ev.y - 2018).padStart(2, "0")}${String(ev.mo).padStart(2, "0")}.pdf`,
+        lat: point ? point.lat : source.center.lat,
+        lng: point ? point.lng : source.center.lng,
+      });
+    }
+
+    const results = Array.from(byId.values());
+    console.log(`[${label}/こどもイベントPDF] ${results.length} events collected`);
+    return results;
+  };
+}
+
+module.exports = { createCollectChibaEvents, createCollectChibaCityWardEvents, createCollectChibaKodomoEventPdf };
