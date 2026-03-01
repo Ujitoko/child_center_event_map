@@ -32,8 +32,8 @@ const FACILITIES = [
   },
 ];
 
-const SKIP_RE = /休館|お休み|閉館|駐車場|利用停止|空き状況|年末年始/;
-const EVENT_TITLE_RE = /サロン|コンサート|講座|教室|相談|測定|カホン|リトミック|マッサージ|体操|ヨガ|遊ぼう|工作|製作|読み聞かせ|映画|お話|サークル|ひろば|はっぴー|すまいる|タイム|パパ|ママ|ベビー|赤ちゃん|離乳食|栄養|歯科|育児|手形|誕生/;
+const SKIP_RE = /休館|お休み|閉館|駐車場|利用停止|空き状況|年末年始|ありました|ありません/;
+const EVENT_TITLE_RE = /サロン|コンサート|講座|教室|相談|測定|カホン|リトミック|マッサージ|体操|ヨガ|遊ぼう|あそぼう|工作|製作|読み聞かせ|映画|お話|サークル|ひろば|広場|はっぴー|すまいる|タイム|パパ|ママ|お父さん|ベビー|赤ちゃん|離乳食|栄養|歯科|育児|手形|誕生|バースデー|おもちゃ|ふれあい|おはなし|絵本|クラブ|子育て|親子|音楽|ダンス/;
 const JUNK_RE = /^[\d\s\-～〜:：（）()、。,.]+$|^.{0,2}$|お知らせ|ご案内|だより|月号|発行|ください|お問い合わせ|TEL|FAX|http|www\.|駐車場|年末年始|利用停止/;
 
 /**
@@ -42,14 +42,14 @@ const JUNK_RE = /^[\d\s\-～〜:：（）()、。,.]+$|^.{0,2}$|お知らせ|ご
  */
 function extractPdfLinks(html, facility) {
   const links = [];
-  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([^<]*)<\/a>/gi;
+  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
     let href = m[1].replace(/&amp;/g, "&");
     if (!href.startsWith("http")) {
       href = href.startsWith("/") ? `${SITE_BASE}${href}` : `${SITE_BASE}/${href}`;
     }
-    const title = m[2].trim();
+    const title = m[2].replace(/<[^>]+>/g, "").trim();
     if (SKIP_RE.test(title)) continue;
     const isDayori = title.includes(facility.dayoriKeyword);
     links.push({ url: href, title, isDayori });
@@ -97,6 +97,17 @@ function parseDayoriPdf(text, defaultY, defaultMo) {
       }
     }
 
+    // プレーンテキストのタイトル候補（日時:等の行でなく、日付パターンを含まない行）
+    if (!bulletMatch && !/^#+/.test(line)
+        && !/^日\s*時|^場\s*所|^対\s*象|^定\s*員|^申\s*込|^持ち物|^受付|^講\s*師|^〒|^TEL|^FAX|^MAIL|^HP|^※|^✿|^✉/.test(line)) {
+      const plainTitle = line.replace(/^[●★◆◎☆■♪#\s\d○✿]+/, "").replace(/[「」『』]/g, "").replace(/\s*[（(].*$/, "").trim();
+      if (plainTitle.length >= 4 && plainTitle.length <= 30 && !JUNK_RE.test(plainTitle)
+          && EVENT_TITLE_RE.test(plainTitle)
+          && !/\d+[日月時]/.test(plainTitle) && !/社会福祉|法人|協議会|利用登録|行事カレンダー|年度|開室|開所|テーマ|ありました|ありません|おまちして/.test(plainTitle)) {
+        currentTitle = plainTitle;
+      }
+    }
+
     // 日付パターン: M月D日(曜)
     const dateRe = /(?:(\d{1,2})月\s*)?(\d{1,2})\s*日\s*[（(]\s*([月火水木金土日])\s*[）)]/g;
     let dm;
@@ -107,7 +118,8 @@ function parseDayoriPdf(text, defaultY, defaultMo) {
 
       // タイトル: 日付前のテキスト or currentTitle
       const beforeDate = line.substring(0, dm.index).replace(/^[●★◆◎☆■♪#\s]+/, "").trim();
-      let title = (beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
+      const isMetaLabel = /^(日\s*時|場\s*所|対\s*象|定\s*員|申\s*込|申し込み|受付|持ち物|講\s*師)\s*[:：]?\s*$/.test(beforeDate);
+      let title = (!isMetaLabel && beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
         ? beforeDate : currentTitle;
       if (!title || !EVENT_TITLE_RE.test(title)) continue;
 
@@ -130,7 +142,8 @@ function parseDayoriPdf(text, defaultY, defaultMo) {
       const d = Number(sm[2]);
       if (d < 1 || d > 31 || evMo < 1 || evMo > 12) continue;
       const beforeDate = line.substring(0, sm.index).replace(/^[●★◆◎☆■♪#\s]+/, "").trim();
-      let title = (beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
+      const isMetaLabel2 = /^(日\s*時|場\s*所|対\s*象|定\s*員|申\s*込|申し込み|受付|持ち物|講\s*師)\s*[:：]?\s*$/.test(beforeDate);
+      let title = (!isMetaLabel2 && beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
         ? beforeDate : currentTitle;
       if (!title || !EVENT_TITLE_RE.test(title)) continue;
       events.push({ y: defaultY, mo: evMo, d, title, timeRange: null });
@@ -150,12 +163,16 @@ function parseEventPdf(text, linkTitle, defaultY) {
     .replace(/(\d)\s+(日|月|時)/g, "$1$2")
     .replace(/(\d)\s*[：:]\s*(\d)/g, "$1:$2");
 
-  // タイトル: linkTitleを使用
-  const title = linkTitle.replace(/を開催します[★⭐♪]*$/, "").replace(/[「」⭐★♪]/g, "").trim();
+  // タイトル: linkTitleを使用（HTML実体参照を除去）
+  const title = linkTitle
+    .replace(/&#x[0-9a-fA-F]+;/g, "")
+    .replace(/を開催します[★⭐♪♡]*$/, "")
+    .replace(/[「」⭐★♪♡]/g, "")
+    .trim();
   if (!title || title.length < 3) return events;
 
-  // 日時行から日付抽出
-  const dateRe = /(\d{1,2})月\s*(\d{1,2})日\s*[（(]\s*([月火水木金土日])\s*[）)]/g;
+  // 日時行から日付抽出: M月D日(曜) or M月D日 曜
+  const dateRe = /(\d{1,2})月\s*(\d{1,2})日\s*(?:[（(]\s*([月火水木金土日])\s*[）)]|([月火水木金土日])\s)/g;
   let dm;
   while ((dm = dateRe.exec(normalized)) !== null) {
     const mo = Number(dm[1]);
@@ -164,9 +181,13 @@ function parseEventPdf(text, linkTitle, defaultY) {
 
     const afterDate = normalized.substring(dm.index + dm[0].length, dm.index + dm[0].length + 200);
     const timeMatch = afterDate.match(/(\d{1,2}):(\d{2})[～〜~\-](\d{1,2}):(\d{2})/);
+    const startMatch = !timeMatch && afterDate.match(/(\d{1,2}):(\d{2})/);
     const timeRange = timeMatch ? {
       startHour: Number(timeMatch[1]), startMin: Number(timeMatch[2]),
       endHour: Number(timeMatch[3]), endMin: Number(timeMatch[4]),
+    } : startMatch ? {
+      startHour: Number(startMatch[1]), startMin: Number(startMatch[2]),
+      endHour: null, endMin: null,
     } : null;
 
     events.push({ y: defaultY, mo, d, title, timeRange });

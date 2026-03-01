@@ -40,7 +40,7 @@ const FACILITY_KEYWORDS = {
   "アリス": "alice", "alice": "alice",
 };
 
-const CHILD_RE = /子育て|子ども|こども|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|リトミック|ママ|パパ|マタニティ|ひろば|誕生|手形|ハイハイ|ベビーマッサージ|育児|栄養相談|サロン|工作|製作|ふれあい|読み聞かせ|お楽しみ|身体測定|遊ぼう|教室|交流会|おはなし|絵本|紙芝居|すくすく|産後|抱っこ|エクササイズ|体操|測定|相談|講座/;
+const CHILD_RE = /子育て|子ども|こども|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|リトミック|ママ|パパ|マタニティ|ひろば|広場|誕生|バースデー|手形|ハイハイ|ベビーマッサージ|育児|栄養|サロン|工作|製作|ふれあい|読み聞かせ|お楽しみ|身体測定|遊ぼう|教室|交流|おはなし|絵本|紙芝居|すくすく|産後|抱っこ|エクササイズ|体操|測定|相談|講座|よちよち|とことこ|にこにこ|ぺったん|おもちゃ|クラブ/;
 
 const SKIP_RE = /休館|閉館|お休み|利用案内|お知らせ|月号|だより|発行|カレンダー|令和\d|中\s*高\s*生/;
 const JUNK_RE = /^[\d\s\-～〜:：（）()、。,.]+$|^.{0,2}$|日時|場所|対象|定員|持ち物|申込|受付|TEL|FAX|問い合わせ|http|www\.|^\d+月|令和|発行|開館|年度/;
@@ -53,13 +53,13 @@ function extractPdfLinksFromListing(html) {
 
   // HTMLをセクション分割（h3/h4等の見出しで施設名が変わる）
   // パターン: <a href="//...pdf">N月のおたより</a>
-  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([^<]*)<\/a>/gi;
+  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
     let href = m[1];
     if (href.startsWith("//")) href = `https:${href}`;
     else if (href.startsWith("/")) href = `${BASE_URL}${href}`;
-    const linkText = m[2].trim();
+    const linkText = m[2].replace(/<[^>]+>/g, "").trim();
 
     // ファイル名から施設キーを推定
     const filename = href.split("/").pop().replace(/\.pdf$/, "");
@@ -136,7 +136,8 @@ function parseMaebashiPdf(text, defaultY, defaultMo) {
       if (d < 1 || d > 31 || evMo < 1 || evMo > 12) continue;
 
       const beforeDate = line.substring(0, dm.index).replace(/^[●★◆◎☆■♪申◇#\s]+/, "").trim();
-      let title = (beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
+      const isMetaLabel = /^(日\s*時|場\s*所|対\s*象|定\s*員|申\s*込|申し込み|受付|持ち物|講\s*師)\s*[:：]?\s*$/.test(beforeDate);
+      let title = (!isMetaLabel && beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
         ? beforeDate : currentTitle;
       if (!title) continue;
       if (!CHILD_RE.test(title)) continue;

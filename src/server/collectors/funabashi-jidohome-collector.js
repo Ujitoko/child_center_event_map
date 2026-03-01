@@ -41,7 +41,7 @@ const FACILITIES = [
   { id: "0021", gyoji: "tsuboi-gyoji",        name: "坪井児童ホーム",     address: "船橋市坪井東2-18-1" },
 ];
 
-const CHILD_RE = /子育て|子ども|こども|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|リトミック|ママ|パパ|マタニティ|ひろば|誕生|手形|ハイハイ|ベビーマッサージ|育児|栄養|サロン|工作|製作|ふれあい|読み聞かせ|お楽しみ|身体測定|遊ぼう|教室|交流|おはなし|絵本|紙芝居|パネルシアター|エプロンシアター|すくすく|産後|抱っこ|体操|測定|相談|講座|ペープサート|マジック|コンサート|人形劇|映画/;
+const CHILD_RE = /子育て|子ども|こども|親子|乳幼児|幼児|赤ちゃん|ベビー|キッズ|リトミック|ママ|パパ|マタニティ|ひろば|広場|誕生|バースデー|手形|ハイハイ|ベビーマッサージ|育児|栄養|サロン|工作|製作|ふれあい|読み聞かせ|お楽しみ|身体測定|遊ぼう|教室|交流|おはなし|絵本|紙芝居|パネルシアター|エプロンシアター|すくすく|産後|抱っこ|体操|測定|相談|講座|ペープサート|マジック|コンサート|人形劇|映画|よちよち|とことこ|にこにこ|ぺったん|おもちゃ|クラブ/;
 
 const SKIP_RE = /休館|閉館|お休み|利用案内|令和\d|月号|だより|発行|開館|カレンダー|振替休|中\s*高\s*生|メディア利用|ランチタイム|自由来館|児童ホームのご案内/;
 const JUNK_RE = /^[\d\s\-～〜:：（）()、。,.]+$|^.{0,2}$|日時|場所|対象|定員|持ち物|申込|受付|TEL|FAX|問い合わせ|http|www\.|^\d+月|令和|発行|開館|年度|案内|注意|お知らせ|利用|交通/;
@@ -49,15 +49,22 @@ const JUNK_RE = /^[\d\s\-～〜:：（）()、。,.]+$|^.{0,2}$|日時|場所|�
 /**
  * 行事ページからPDFリンクを抽出（最新2件まで）
  */
-function extractPdfLinksFromGyoji(html) {
+function extractPdfLinksFromGyoji(html, gyojiUrl) {
   const links = [];
-  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([^<]*)<\/a>/gi;
+  const re = /<a\s+[^>]*href="([^"]*\.pdf)"[^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html)) !== null) {
     let href = m[1];
-    if (href.startsWith("//")) href = `https:${href}`;
-    else if (!href.startsWith("http")) href = `${BASE_URL}${href.startsWith("/") ? "" : "/"}${href}`;
-    const linkText = m[2].trim();
+    // 相対パス解決: "./kaijin-gyoji_d/fil/1803.pdf" → 絶対URL
+    if (href.startsWith("./") && gyojiUrl) {
+      const base = gyojiUrl.substring(0, gyojiUrl.lastIndexOf("/") + 1);
+      href = base + href.substring(2);
+    } else if (href.startsWith("//")) {
+      href = `https:${href}`;
+    } else if (!href.startsWith("http")) {
+      href = `${BASE_URL}${href.startsWith("/") ? "" : "/"}${href}`;
+    }
+    const linkText = m[2].replace(/<[^>]+>/g, "").trim();
     links.push({ url: href, linkText });
   }
   return links.slice(0, 2); // 最新2件（当月+先月）
@@ -74,12 +81,16 @@ function parseFunabashiPdf(text, defaultY, defaultMo) {
     .replace(/(\d)\s+(日|月|時)/g, "$1$2")
     .replace(/(\d)\s*[：:]\s*(\d)/g, "$1:$2");
 
-  // 年月推定
+  // 年月推定: "N月号" を優先（"N月発行" は発行月で内容月ではない）
   let y = defaultY;
   let mo = defaultMo;
-  const ymMatch = normalized.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
-  const reiwaMatch = !ymMatch && normalized.match(/令和\s*(\d{1,2})\s*年\s*(\d{1,2})\s*月/);
-  if (ymMatch) {
+  const gouMatch = normalized.match(/令和\s*(\d{1,2})\s*年\s*(\d{1,2})\s*月\s*号/);
+  const ymMatch = !gouMatch && normalized.match(/(\d{4})\s*年\s*(\d{1,2})\s*月/);
+  const reiwaMatch = !gouMatch && !ymMatch && normalized.match(/令和\s*(\d{1,2})\s*年\s*(\d{1,2})\s*月/);
+  if (gouMatch) {
+    y = 2018 + Number(gouMatch[1]);
+    mo = Number(gouMatch[2]);
+  } else if (ymMatch) {
     y = Number(ymMatch[1]);
     mo = Number(ymMatch[2]);
   } else if (reiwaMatch) {
@@ -123,7 +134,8 @@ function parseFunabashiPdf(text, defaultY, defaultMo) {
       if (d < 1 || d > 31 || evMo < 1 || evMo > 12) continue;
 
       const beforeDate = line.substring(0, dm.index).replace(/^[●★◆◎☆■♪♫♥♡申◇#\s]+/, "").trim();
-      let title = (beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
+      const isMetaLabel = /^(日\s*時|場\s*所|対\s*象|定\s*員|申\s*込|申し込み|受付|持ち物|講\s*師)\s*[:：]?\s*$/.test(beforeDate);
+      let title = (!isMetaLabel && beforeDate.length >= 3 && beforeDate.length <= 40 && !JUNK_RE.test(beforeDate))
         ? beforeDate : currentTitle;
       if (!title) continue;
 
@@ -169,7 +181,7 @@ function createCollectFunabashiJidohomeEvents(deps) {
         batch.map(async (facility) => {
           const gyojiUrl = `${BASE_URL}/shisetsu/kosodatesien/0005/${facility.id}/0002/${facility.gyoji}.html`;
           const html = await fetchText(gyojiUrl);
-          const pdfs = extractPdfLinksFromGyoji(html);
+          const pdfs = extractPdfLinksFromGyoji(html, gyojiUrl);
           return pdfs.map(pdf => ({ ...pdf, facility, gyojiUrl }));
         })
       );
