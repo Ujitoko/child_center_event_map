@@ -21,7 +21,7 @@ function createCollectKawasakiEvents() {
     while (page <= totalPages) {
       let json;
       try {
-        const url = `${KAWASAKI_SOURCE.baseUrl}/data/api/v1/events?page=${page}&format=JSON&type=8`;
+        const url = `${KAWASAKI_SOURCE.baseUrl}/data/api/v1/events?page=${page}&format=JSON&type=8,20,21,22`;
         const text = await fetchText(url);
         json = JSON.parse(text);
       } catch (e) {

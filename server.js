@@ -26,10 +26,12 @@ const { createCollectKunitachiEvents } = require("./src/server/collectors/kunita
 const { createCollectOmeEvents } = require("./src/server/collectors/ome");
 const { createCollectHamuraEvents } = require("./src/server/collectors/hamura");
 const { createCollectKawasakiEvents } = require("./src/server/collectors/kawasaki");
+const { createCollectKawasakiShiminkatsudoEvents } = require("./src/server/collectors/kawasaki-shiminkatsudo-collector");
 const { createCollectYokohamaEvents } = require("./src/server/collectors/yokohama");
 const { createCollectKamakuraEvents, createCollectKamakuraKmspotEvents } = require("./src/server/collectors/kamakura");
 const { createCollectYokosukaEvents } = require("./src/server/collectors/yokosuka");
 const { createCollectYamatoEvents } = require("./src/server/collectors/yamato");
+const { createCollectYamatoBunkaEvents } = require("./src/server/collectors/yamato-bunka-collector");
 const { createCollectHiratsukaEvents, createCollectHiratsukaLibraryEvents } = require("./src/server/collectors/hiratsuka");
 const { createCollectOdawaraEvents } = require("./src/server/collectors/odawara");
 const { createCollectHadanoEvents } = require("./src/server/collectors/hadano");
@@ -56,6 +58,7 @@ const { createCollectTokorozawaComaamEvents } = require("./src/server/collectors
 const { createCollectSagamiharaKosodateEvents } = require("./src/server/collectors/sagamihara-kosodate-collector");
 const { createCollectSokaBokkurunEvents } = require("./src/server/collectors/soka-bokkurun-collector");
 const { createCollectNerimaHeiwadaiEvents } = require("./src/server/collectors/nerima-heiwadai-collector");
+const { createCollectArakawaFureaiEvents } = require("./src/server/collectors/arakawa-fureai-collector");
 const { createCollectTsukubaKosodateEvents } = require("./src/server/collectors/tsukuba-kosodate-collector");
 const { createCollectNaritaEvents } = require("./src/server/collectors/narita");
 const { createCollectChibaEvents, createCollectChibaCityWardEvents, createCollectChibaKodomoEventPdf } = require("./src/server/collectors/chiba");
@@ -339,11 +342,13 @@ const collectKunitachiEvents = createCollectKunitachiEvents(geoFmDeps);
 const collectOmeEvents = createCollectOmeEvents(geoFmDeps);
 const collectHamuraEvents = createCollectHamuraEvents(geoFmDeps);
 const collectKawasakiEvents = createCollectKawasakiEvents();
+const collectKawasakiShiminkatsudoEvents = createCollectKawasakiShiminkatsudoEvents(geoFmDeps);
 const collectYokohamaEvents = createCollectYokohamaEvents();
 const collectKamakuraEvents = createCollectKamakuraEvents(geoFmDeps);
 const collectKamakuraKmspotEvents = createCollectKamakuraKmspotEvents(geoFmDeps);
 const collectYokosukaEvents = createCollectYokosukaEvents(geoFmDeps);
 const collectYamatoEvents = createCollectYamatoEvents(geoFmDeps);
+const collectYamatoBunkaEvents = createCollectYamatoBunkaEvents(geoFmDeps);
 const collectHiratsukaEvents = createCollectHiratsukaEvents(geoFmDeps);
 const collectHiratsukaLibraryEvents = createCollectHiratsukaLibraryEvents(geoFmDeps);
 const collectOdawaraEvents = createCollectOdawaraEvents(geoFmDeps);
@@ -767,6 +772,7 @@ const collectSumidaEvents = createListCalendarCollector({ source: SUMIDA_SOURCE,
 const collectTaitoEvents = createListCalendarCollector({ source: TAITO_SOURCE, calendarPath: "/event/kosodate/calendar/", fallbackPath: "/event/calendar/" }, geoFmDeps);
 const collectNerimaEvents = createListCalendarCollector({ source: NERIMA_SOURCE, calendarPath: "/kankomoyoshi/event/kodomo/calendar/", fallbackPath: "/kankomoyoshi/event/calendar/" }, geoFmDeps);
 const collectNerimaHeiwadaiEvents = createCollectNerimaHeiwadaiEvents(geoFmDeps);
+const collectArakawaFureaiEvents = createCollectArakawaFureaiEvents(geoFmDeps);
 // --- 東京23区 calendar-cgi-collector (FourWeb / PHP) ---
 const collectItabashiEvents = createCalendarCgiCollector({ source: ITABASHI_SOURCE, cgiPath: "/cgi-evt/event.cgi", categoryParams: "c50=50", mode: "fourweb", useKeywordFilter: false, useUA: true }, geoFmDeps);
 const collectShinjukuEvents = createCalendarCgiCollector({ source: SHINJUKU_SOURCE, cgiPath: "/event/calendar/calendar.php", mode: "php", useKeywordFilter: true }, geoFmDeps);
@@ -967,7 +973,7 @@ const collectors = [
   collectOmeEvents,
   collectHamuraEvents,
   collectKodomoSmileEvents,
-  collectKawasakiEvents,
+  collectKawasakiEvents, collectKawasakiShiminkatsudoEvents,
   collectYokohamaEvents,
   collectSagamiharaEvents,
   collectSagamiharaKosodateEvents,
@@ -978,7 +984,7 @@ const collectors = [
   collectChigasakiEvents,
   collectZamaEvents,
   collectZushiEvents,
-  collectYamatoEvents,
+  collectYamatoEvents, collectYamatoBunkaEvents,
   collectHiratsukaEvents,
   collectHiratsukaLibraryEvents,
   collectOdawaraEvents,
@@ -1182,7 +1188,7 @@ const collectors = [
   collectKotoJidokanEvents,
   // 東京23区 CGI/list-calendar (12区)
   collectAdachiEvents, collectEdogawaEvents, collectSuginamiEvents,
-  collectBunkyoEvents, collectArakawaEvents, collectToshimaEvents,
+  collectBunkyoEvents, collectArakawaEvents, collectArakawaFureaiEvents, collectToshimaEvents,
   collectNakanoEvents, collectSumidaEvents, collectTaitoEvents, collectNerimaEvents, collectNerimaHeiwadaiEvents,
   collectItabashiEvents, collectShinjukuEvents,
   // Ibaraki

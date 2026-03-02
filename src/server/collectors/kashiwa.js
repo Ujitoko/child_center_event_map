@@ -7,9 +7,7 @@ const {
   buildStartsEndsForDate,
 } = require("../date-utils");
 const { sanitizeVenueText, sanitizeAddressText } = require("../text-utils");
-const { WARD_CHILD_HINT_RE, KASHIWA_SOURCE } = require("../../config/wards");
-
-const CHILD_CATEGORY = "子ども向け";
+const { KASHIWA_SOURCE } = require("../../config/wards");
 const DETAIL_BATCH_SIZE = 6;
 
 /**
@@ -47,17 +45,13 @@ function parseListPage(html, baseUrl) {
     let lim;
     while ((lim = liRe.exec(row)) !== null) {
       const li = lim[1];
-      // カテゴリ判定: <span class="event_cate_N">Category</span> or <span class="event_categoryN">
-      const catMatch = li.match(/<span\s+class="event_cate[_gory]*\d+">([\s\S]*?)<\/span>/);
-      const hasChildCategory = catMatch && catMatch[1].trim() === CHILD_CATEGORY;
       // リンク抽出
       const linkMatch = li.match(/<a\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
       if (!linkMatch) continue;
       const href = linkMatch[1].replace(/&amp;/g, "&").trim();
       let title = stripTags(linkMatch[2]).trim();
       if (!href || !title) continue;
-      // カテゴリ一致またはタイトルキーワードマッチ
-      if (!hasChildCategory && !WARD_CHILD_HINT_RE.test(title)) continue;
+      // event_target=1 で子ども向けフィルタ済みなので全件受け入れ
       title = title.replace(/\s*事前申込(あり|なし).*$/, "").trim();
       title = title.replace(/\s*【締切】.*$/, "").trim();
       const absUrl = href.startsWith("http") ? href : `${baseUrl}${href}`;
