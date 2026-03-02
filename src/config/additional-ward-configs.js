@@ -447,9 +447,10 @@ function buildAdditionalWardConfigs(deps) {
         `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5b50\u3069\u3082")}`,
         `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&keyword=${encodeURIComponent("\u5150\u7ae5")}`,
         `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=1&year=${m.year}&month=${m.month}`,
+        `${EDOGAWA_SOURCE.baseUrl}/cgi-bin/event_cal_multi/calendar.cgi?type=2&year=${m.year}&month=${m.month}&siteid=7`,
       ],
       parseOpts: {
-        urlAllow: /city\.edogawa\.tokyo\.jp\/(?:event|kosodate|shisetsu)\/.+\.(?:html?|pdf)/i,
+        urlAllow: /city\.edogawa\.tokyo\.jp\/(?:event|kosodate|shisetsu|miraikan)\/.+\.(?:html?|pdf)/i,
         urlDeny: /\/(?:index|sitemap)\.html$/i,
         useAnchorFallback: true,
         fallbackWhenRowsExist: true,

@@ -158,6 +158,7 @@ const {
   createCollectShintoPdfScheduleEvents,
 } = require("./src/server/collectors/tochigi-remaining");
 const { createCollectOyamaOdekakeEvents } = require("./src/server/collectors/oyama-odekake-collector");
+const { createCollectNarashinoKodomoEvents } = require("./src/server/collectors/narashino-kodomo-collector");
 const { createCollectSanoJidokanEvents } = require("./src/server/collectors/sano-jidokan-collector");
 const { createCollectTatebayashiJidokanEvents } = require("./src/server/collectors/tatebayashi-jidokan-collector");
 const {
@@ -473,6 +474,7 @@ const collectNodaEvents = createEventJsCollector({
 }, geoFmDeps);
 // --- 千葉県 calendar-json-collector ---
 const collectNarashinoEvents = createCalendarJsonCollector({ source: NARASHINO_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
+const collectNarashinoKodomoEvents = createCollectNarashinoKodomoEvents(geoFmDeps);
 const collectShiroiEvents = createCalendarJsonCollector({ source: SHIROI_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectKisarazuEvents = createCalendarJsonCollector({ source: KISARAZU_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectIsumiEvents = createCalendarJsonCollector({ source: ISUMI_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
@@ -1028,7 +1030,7 @@ const collectors = [
   collectNagareyamaEvents,
   collectUrayasuEvents,
   collectNodaEvents,
-  collectNarashinoEvents,
+  collectNarashinoEvents, collectNarashinoKodomoEvents,
   collectShiroiEvents,
   collectKisarazuEvents,
   collectIsumiEvents,
