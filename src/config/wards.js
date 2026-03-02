@@ -603,6 +603,7 @@ const WARD_LABEL_BY_KEY = {
   ibaraki_tone: "利根町",
   tokyo_ota_mamafre: "大田区(ママフレ)",
   ibaraki_kamisu_mamafre: "神栖市(ママフレ)",
+  ibaraki_inashiki_mamafre: "稲敷市(ママフレ)",
   tokyo_kodomo_smile: "こどもスマイル(東京)",
 };
 
@@ -1829,6 +1830,7 @@ const IKOYO_SOURCE = { key: "ikoyo", label: "いこーよ", baseUrl: "https://ik
 const TOKYO_OTA_MAMAFRE_SOURCE = { key: "tokyo_ota_mamafre", label: "大田区(ママフレ)", baseUrl: "https://tokyo-ota-city.mamafre.jp", center: { lat: 35.5613, lng: 139.7160 } };
 const KODOMO_SMILE_SOURCE = { key: "tokyo_kodomo_smile", label: "こどもスマイル(東京)", baseUrl: "https://kodomo-smile.metro.tokyo.lg.jp", center: { lat: 35.6895, lng: 139.6917 }, geoMaxKm: 60 };
 const IBARAKI_KAMISU_MAMAFRE_SOURCE = { key: "ibaraki_kamisu_mamafre", label: "神栖市(ママフレ)", baseUrl: "https://kamisu-city.mamafre.jp", center: { lat: 35.89, lng: 140.66 } };
+const IBARAKI_INASHIKI_MAMAFRE_SOURCE = { key: "ibaraki_inashiki_mamafre", label: "稲敷市(ママフレ)", baseUrl: "https://inashiki-city.mamafre.jp", center: { lat: 35.9558, lng: 140.3217 } };
 const PREF_PREFIX_MAP = {
   tokyo: "東京都", kanagawa: "神奈川県", chiba: "千葉県",
   saitama: "埼玉県", ibaraki: "茨城県", tochigi: "栃木県", gunma: "群馬県",
@@ -2283,6 +2285,6 @@ module.exports = {
   USHIKU_SOURCE,
   AMI_SOURCE,
   TONE_IB_SOURCE,
-  IKOYO_SOURCE, TOKYO_OTA_MAMAFRE_SOURCE, KODOMO_SMILE_SOURCE, IBARAKI_KAMISU_MAMAFRE_SOURCE,
+  IKOYO_SOURCE, TOKYO_OTA_MAMAFRE_SOURCE, KODOMO_SMILE_SOURCE, IBARAKI_KAMISU_MAMAFRE_SOURCE, IBARAKI_INASHIKI_MAMAFRE_SOURCE,
   REGION_GROUPS, PREF_CENTERS, buildSourceToPrefMap,
 };

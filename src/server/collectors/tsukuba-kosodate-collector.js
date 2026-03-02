@@ -105,7 +105,87 @@ function parseTsunagu(html, year, month) {
       let title = stripTags(lm[1]).replace(/\s+/g, " ").trim();
       if (!title || title.length < 2) continue;
       if (/フリー開放|休み|祝日/.test(title)) continue;
-      events.push({ y: year, mo, d, title, timeRange: null, venue: "つなぐ" });
+      events.push({ y: year, mo: month, d, title, timeRange: null, venue: "つなぐ" });
+    }
+  }
+  return events;
+}
+
+/**
+ * 出張子育て広場: 市公式ページのテーブルから開催日を抽出
+ * caption: "出張子育て広場 M月予定"
+ * row: 開催場所 | 開催日時 | M月の開催日 | 担当
+ */
+function parseSyutchoHiroba(html) {
+  const events = [];
+  const tables = html.match(/<table[\s\S]*?<\/table>/gi) || [];
+  for (const table of tables) {
+    if (!/出張子育て広場/.test(table)) continue;
+
+    // caption から月を抽出: "出張子育て広場 3月予定"
+    const capM = table.match(/(\d{1,2})月予定/);
+    if (!capM) continue;
+    const month = Number(capM[1]);
+    const now = new Date();
+    const jstNow = new Date(now.getTime() + 9 * 3600000);
+    let year = jstNow.getFullYear();
+    if (month < jstNow.getMonth() - 1) year++; // 遠い先月 → 来年
+
+    // 時間抽出用
+    const parseTime = (text) => {
+      const m = text.match(/(\d{1,2})時(?:(\d{2})分)?[～〜~ー－-]\s*(\d{1,2})時(?:(\d{2})分)?/);
+      if (!m) return null;
+      return { startHour: Number(m[1]), startMinute: Number(m[2] || 0), endHour: Number(m[3]), endMinute: Number(m[4] || 0) };
+    };
+
+    // rowspan処理用の状態
+    let currentVenue = "";
+    let currentAddr = "";
+    let currentTime = null;
+
+    const rows = table.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    for (const row of rows) {
+      if (/<th/.test(row)) continue; // ヘッダー行スキップ
+      const cells = (row.match(/<t[dh][\s\S]*?<\/t[dh]>/gi) || []).map(
+        (c) => stripTags(c).replace(/\s+/g, " ").trim()
+      );
+      if (cells.length === 0) continue;
+
+      // 日付テキストからD日を抽出するヘルパー
+      const extractDays = (text) => {
+        const withDay = [...text.matchAll(/(\d{1,2})日/g)].map((dm) => Number(dm[1]));
+        if (withDay.length > 0) return withDay;
+        // "10日、24日" → 数字のみ（●★除去）
+        return [...text.replace(/[●★]/g, "").matchAll(/(\d{1,2})/g)]
+          .map((dm) => Number(dm[1])).filter((n) => n >= 1 && n <= 31);
+      };
+      const pushEvents = (dateText) => {
+        for (const d of extractDays(dateText)) {
+          events.push({ y: year, mo: month, d, title: `出張子育て広場（${currentVenue}）`, timeRange: currentTime, venue: currentVenue, address: currentAddr });
+        }
+      };
+
+      // 4セル: 場所 | 日時 | 日付 | 担当
+      // 3セル: 場所 | 日時 | 日付 (担当がrowspan)
+      // 2セル: 日付 | 担当 (継続行)
+      // 1セル: 担当のみ (スキップ)
+      if (cells.length >= 4) {
+        currentVenue = cells[0].split(/[（(]/)[0].trim();
+        const addrM = cells[0].match(/[（(]([^)）]*市[^)）]*)[）)]/);
+        currentAddr = addrM ? addrM[1].replace(/\s+/g, "") : "";
+        currentTime = parseTime(cells[1]);
+        pushEvents(cells[2]);
+      } else if (cells.length === 3) {
+        // 新しい場所行（担当列がrowspanで省略）
+        currentVenue = cells[0].split(/[（(]/)[0].trim();
+        const addrM = cells[0].match(/[（(]([^)）]*市[^)）]*)[）)]/);
+        currentAddr = addrM ? addrM[1].replace(/\s+/g, "") : "";
+        currentTime = parseTime(cells[1]);
+        pushEvents(cells[2]);
+      } else if (cells.length === 2) {
+        pushEvents(cells[0]);
+      }
+      // 1セル = 担当名のみ → スキップ
     }
   }
   return events;
@@ -121,6 +201,7 @@ function createCollectTsukubaKosodateEvents(deps) {
     ちきんえっぐ: "つくば市吾妻1-7-1",
     つなぐ: "つくば市上横場2284-3",
   };
+  const SYUTCHO_URL = "https://www.city.tsukuba.lg.jp/soshikikarasagasu/kodomobukodomoseisakuka/gyomuannai/4/2/1001133.html";
 
   return async function collectTsukubaKosodateEvents(maxDays) {
     const months = getMonthsForRange(maxDays);
@@ -164,6 +245,15 @@ function createCollectTsukubaKosodateEvents(deps) {
       }
     }
 
+    // 出張子育て広場 (市公式ページ)
+    try {
+      const hirobaHtml = await fetchText(SYUTCHO_URL);
+      const hirobaEvts = parseSyutchoHiroba(hirobaHtml);
+      rawEvents.push(...hirobaEvts);
+    } catch (e) {
+      console.warn(`[${label}/出張子育て広場] failed:`, e.message || e);
+    }
+
     // 重複除去 + 範囲フィルタ
     const byId = new Map();
     for (const ev of rawEvents) {
@@ -172,7 +262,7 @@ function createCollectTsukubaKosodateEvents(deps) {
       const id = `${srcKey}:kosodate:${ev.venue}:${ev.title}:${dateKey}`;
       if (byId.has(id)) continue;
 
-      const facilityAddr = FACILITIES[ev.venue] || "";
+      const facilityAddr = ev.address || FACILITIES[ev.venue] || "";
       const point = resolveEventPoint(
         source,
         ev.venue,

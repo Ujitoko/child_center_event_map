@@ -263,6 +263,7 @@ const {
   NOGI_SOURCE, OYAMA_SOURCE, CHILD_KW, IKOYO_CHILD_KW, REGION_GROUPS, PREF_CENTERS,
   ADACHI_SOURCE, EDOGAWA_SOURCE, SUGINAMI_SOURCE, ITABASHI_SOURCE, NERIMA_SOURCE, SHINJUKU_SOURCE,
   NAKANO_SOURCE, TOSHIMA_SOURCE, SUMIDA_SOURCE, BUNKYO_SOURCE, TAITO_SOURCE, ARAKAWA_SOURCE,
+  IBARAKI_INASHIKI_MAMAFRE_SOURCE,
   buildSourceToPrefMap,
 } = require("./src/config/wards");
 const _wardsExports = require("./src/config/wards");
@@ -862,6 +863,7 @@ const collectYukiKosodateEvents = createCollectYukiKosodateEvents(geoFmDeps);
 // 倉敷市・富山市・山形市・白山市 (event.js)
 const collectTokyoOtaMamafreEvents = createMamafreCollector({ source: TOKYO_OTA_MAMAFRE_SOURCE, mamafre_base: "https://tokyo-ota-city.mamafre.jp", pref: "東京都", city: "大田区" }, geoFmDeps);
 const collectIbarakiKamisuMamafreEvents = createMamafreCollector({ source: IBARAKI_KAMISU_MAMAFRE_SOURCE, mamafre_base: "https://kamisu-city.mamafre.jp", pref: "茨城県", city: "神栖市" }, geoFmDeps);
+const collectInashikiMamafreEvents = createMamafreCollector({ source: IBARAKI_INASHIKI_MAMAFRE_SOURCE, mamafre_base: "https://inashiki-city.mamafre.jp", pref: "茨城県", city: "稲敷市" }, geoFmDeps);
 // いしかわ おやコミ！
 // おきなわ子育て応援パスポート
 // はっぴーママいしかわ
@@ -938,6 +940,7 @@ const collectToneIbCalJsonEvents = createCalendarJsonCollector({ source: TONE_IB
 const collectUenoGunmaCalEvents = createMunicipalCalendarCollector({ source: UENO_GUNMA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectUshikuCalPhpEvents = createCalPhpCollector({ source: USHIKU_SOURCE, category: 0, useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
 const collectUtsunomiyaCalEvents = createMunicipalCalendarCollector({ source: UTSUNOMIYA_SOURCE, calendarPath: "/event/", useKeywordFilter: true, childKeywords: CHILD_KW }, geoFmDeps);
+const collectUtsunomiyaEventDjsEvents = createEventJsCollector({ source: UTSUNOMIYA_SOURCE, jsFile: "event_d.js", childCategoryIds: ["2"], useKeywordFilter: true }, geoFmDeps);
 const collectYachiyoIbCalJsonEvents = createCalendarJsonCollector({ source: YACHIYO_IB_SOURCE, childKeywords: CHILD_KW, useKeywordFilter: true }, geoFmDeps);
 
 // 低カバレッジ都道府県 municipal-calendar collectors
@@ -1267,6 +1270,8 @@ const collectors = [
   collectUenoGunmaCalEvents,
   collectUshikuCalPhpEvents,
   collectUtsunomiyaCalEvents,
+  collectUtsunomiyaEventDjsEvents,
+  collectInashikiMamafreEvents,
   collectYachiyoIbCalJsonEvents,
   // 低カバレッジ都道府県 追加
   // Phase 2: 28 municipal calendar collectors

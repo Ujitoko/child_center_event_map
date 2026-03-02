@@ -235,43 +235,153 @@ function extractEventDatesFromContent(content, title, now) {
 /**
  * f-mirai.jp WordPress REST API からイベント記事を取得
  */
-async function fetchFmiraiEvents(maxDays) {
+async function fetchFmiraiEventsApi() {
   const events = [];
-  try {
-    const apiUrl = "https://f-mirai.jp/wp-json/wp/v2/posts?categories=34&per_page=50&_fields=id,title,content,link,date";
-    const text = await fetchText(apiUrl);
-    const posts = JSON.parse(text);
-    if (!Array.isArray(posts)) return events;
+  const apiUrl = "https://f-mirai.jp/wp-json/wp/v2/posts?categories=34&per_page=50&_fields=id,title,content,link,date";
+  const text = await fetchText(apiUrl);
+  const posts = JSON.parse(text);
+  if (!Array.isArray(posts)) return events;
 
-    const now = parseYmdFromJst(new Date());
+  const now = parseYmdFromJst(new Date());
 
-    for (const post of posts) {
-      const title = stripTags((post.title && post.title.rendered) || "").trim();
-      const content = stripTags((post.content && post.content.rendered) || "");
-      const postUrl = post.link || "";
+  for (const post of posts) {
+    const title = stripTags((post.title && post.title.rendered) || "").trim();
+    const content = stripTags((post.content && post.content.rendered) || "");
+    const postUrl = post.link || "";
+    if (!title || !FMIRAI_CHILD_RE.test(title + content)) continue;
+
+    const dates = extractEventDatesFromContent(content, title, now);
+
+    // Fallback: use post.date (ISO) if no dates extracted from content
+    if (dates.length === 0 && post.date) {
+      const pd = new Date(post.date + "+09:00");
+      if (!isNaN(pd.getTime())) {
+        const y = pd.getFullYear();
+        const mo = pd.getMonth() + 1;
+        const d = pd.getDate();
+        dates.push({ y, mo, d });
+      }
+    }
+
+    for (const dt of dates) {
+      events.push({ y: dt.y, mo: dt.mo, d: dt.d, title, url: postUrl, content });
+    }
+  }
+  return events;
+}
+
+/**
+ * entry-body div内のコンテンツをネストdiv対応で抽出
+ */
+function extractEntryBody(html) {
+  const startMatch = html.match(/<div[^>]*class="[^"]*entry-body[^"]*"[^>]*>/i);
+  if (!startMatch) return "";
+  const startIdx = html.indexOf(startMatch[0]);
+  const afterOpen = startIdx + startMatch[0].length;
+  let depth = 1;
+  let pos = afterOpen;
+  while (depth > 0 && pos < html.length) {
+    const nextOpen = html.indexOf("<div", pos);
+    const nextClose = html.indexOf("</div>", pos);
+    if (nextClose === -1) break;
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth++;
+      pos = nextOpen + 4;
+    } else {
+      depth--;
+      if (depth === 0) {
+        return normalizeJaDigits(stripTags(html.substring(afterOpen, nextClose)));
+      }
+      pos = nextClose + 6;
+    }
+  }
+  return "";
+}
+
+/**
+ * f-mirai.jp HTMLカテゴリページから記事をスクレイピング (REST API blocked時のフォールバック)
+ */
+async function fetchFmiraiEventsHtml() {
+  const events = [];
+  const now = parseYmdFromJst(new Date());
+  const articleUrls = new Set();
+
+  // カテゴリページ2ページ分から記事URLを収集
+  for (const page of [1, 2]) {
+    const catUrl = page === 1
+      ? "https://f-mirai.jp/?cat=34"
+      : "https://f-mirai.jp/?cat=34&paged=2";
+    try {
+      const catHtml = await fetchText(catUrl);
+      const articleRe = /<a\s+[^>]*href="(https?:\/\/f-mirai\.jp\/archives\/\d+)"[^>]*>/gi;
+      let m;
+      while ((m = articleRe.exec(catHtml)) !== null) {
+        articleUrls.add(m[1]);
+      }
+    } catch (e) {
+      // page 2 が404なら無視
+      if (page === 1) throw e;
+    }
+  }
+
+  // 各記事の詳細ページからイベント情報を抽出
+  for (const url of articleUrls) {
+    try {
+      const html = await fetchText(url);
+      // タイトル抽出: <h1 class="entry-title"> or <title>
+      const h1Match = html.match(/<h1[^>]*class="[^"]*entry-title[^"]*"[^>]*>([\s\S]*?)<\/h1>/i);
+      const titleMatch = html.match(/<title>([^<]*)<\/title>/i);
+      const title = stripTags(
+        h1Match ? h1Match[1] : (titleMatch ? titleMatch[1].replace(/\s*[|–-]\s*公益.*$/, "") : "")
+      ).trim();
+
+      // コンテンツエリア抽出: entry-body div (ネストdiv対応)
+      const content = extractEntryBody(html);
+
       if (!title || !FMIRAI_CHILD_RE.test(title + content)) continue;
 
       const dates = extractEventDatesFromContent(content, title, now);
 
-      // Fallback: use post.date (ISO) if no dates extracted from content
-      if (dates.length === 0 && post.date) {
-        const pd = new Date(post.date + "+09:00");
-        if (!isNaN(pd.getTime())) {
-          const y = pd.getFullYear();
-          const mo = pd.getMonth() + 1;
-          const d = pd.getDate();
-          dates.push({ y, mo, d });
+      // Fallback: 投稿日メタ情報から日付を取得
+      if (dates.length === 0) {
+        const pubMatch = html.match(/<span[^>]*class="[^"]*published[^"]*"[^>]*>(\d{4})年(\d{1,2})月(\d{1,2})日<\/span>/i);
+        if (pubMatch) {
+          dates.push({ y: Number(pubMatch[1]), mo: Number(pubMatch[2]), d: Number(pubMatch[3]) });
         }
       }
 
       for (const dt of dates) {
-        events.push({ y: dt.y, mo: dt.mo, d: dt.d, title, url: postUrl, content });
+        events.push({ y: dt.y, mo: dt.mo, d: dt.d, title, url, content });
       }
+    } catch (_) {
+      // 個別記事の取得失敗は無視
     }
+  }
+  return events;
+}
+
+/**
+ * f-mirai.jp イベント取得 (REST API → HTMLフォールバック)
+ */
+async function fetchFmiraiEvents(maxDays) {
+  // まずREST APIを試す
+  try {
+    const events = await fetchFmiraiEventsApi();
+    if (events.length > 0) return events;
   } catch (e) {
     console.warn("[藤沢市] f-mirai.jp API failed:", e.message || e);
   }
-  return events;
+  // APIが失敗またはイベント0件の場合、HTMLスクレイピングにフォールバック
+  try {
+    const events = await fetchFmiraiEventsHtml();
+    if (events.length > 0) {
+      console.log(`[藤沢市] f-mirai.jp HTML fallback: ${events.length} events`);
+    }
+    return events;
+  } catch (e) {
+    console.warn("[藤沢市] f-mirai.jp HTML fallback failed:", e.message || e);
+  }
+  return [];
 }
 
 /**
