@@ -17,7 +17,7 @@ concurrency:
 jobs:
   collect-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,7 +30,7 @@ jobs:
 
       - name: Run collection
         run: node --max-old-space-size=4096 scripts/collect.js
-        timeout-minutes: 25
+        timeout-minutes: 40
 
       - name: Verify output
         run: |
