@@ -8,7 +8,7 @@ const {
 const { sanitizeVenueText } = require("../text-utils");
 const { ICHIKAWA_SOURCE } = require("../../config/wards");
 
-const MAX_PAGES = 7;
+const MAX_PAGES = 18;
 
 /**
  * 市川市イベントポータル (JSP) から子育てイベントを収集
@@ -190,7 +190,7 @@ function createCollectIchikawaEvents(deps) {
  */
 const IKUJI365_BASE = "https://ichikawa.ikuji365.net";
 const IKUJI365_LIMIT = 20;
-const IKUJI365_MAX_PAGES = 8; // 最大160件
+const IKUJI365_MAX_PAGES = 15; // 最大300件
 
 function parseIkujiListPage(html) {
   const items = [];
