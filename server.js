@@ -60,6 +60,8 @@ const { createCollectSokaBokkurunEvents } = require("./src/server/collectors/sok
 const { createCollectNerimaHeiwadaiEvents } = require("./src/server/collectors/nerima-heiwadai-collector");
 const { createCollectArakawaFureaiEvents } = require("./src/server/collectors/arakawa-fureai-collector");
 const { createCollectTsukubaKosodateEvents } = require("./src/server/collectors/tsukuba-kosodate-collector");
+const { createCollectAsakaDoronkoEvents } = require("./src/server/collectors/asaka-doronko-collector");
+const { createCollectMisatoKosodateEvents } = require("./src/server/collectors/misato-kosodate-collector");
 const { createCollectNaritaEvents } = require("./src/server/collectors/narita");
 const { createCollectChibaEvents, createCollectChibaCityWardEvents, createCollectChibaKodomoEventPdf } = require("./src/server/collectors/chiba");
 const { createCollectChibaKoryukanEvents } = require("./src/server/collectors/chiba-koryukan-collector");
@@ -155,6 +157,9 @@ const {
   createCollectMeiwaPdfScheduleEvents,
   createCollectShintoPdfScheduleEvents,
 } = require("./src/server/collectors/tochigi-remaining");
+const { createCollectOyamaOdekakeEvents } = require("./src/server/collectors/oyama-odekake-collector");
+const { createCollectSanoJidokanEvents } = require("./src/server/collectors/sano-jidokan-collector");
+const { createCollectTatebayashiJidokanEvents } = require("./src/server/collectors/tatebayashi-jidokan-collector");
 const {
   createCollectKiryuEvents, createCollectNumataEvents,
   createCollectTatebayashiEvents, createCollectShibukawaEvents,
@@ -550,6 +555,7 @@ const collectKasukabeEvents = createCalendarJsonCollector({ source: KASUKABE_SOU
 const collectKasukabeJidokanEvents = createCollectKasukabeJidokanEvents(geoFmDeps);
 const collectFujiminoEvents = createCalendarJsonCollector({ source: FUJIMINO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "健診", "教室", "サロン", "相談", "キッズ", "児童", "おはなし", "広場", "赤ちゃん"] }, geoFmDeps);
 const collectMisatoEvents = createCalendarJsonCollector({ source: MISATO_SOURCE, childKeywords: ["子育て", "親子", "幼児", "乳幼児", "おはなし会", "読み聞かせ", "教室", "相談", "健診", "キッズ", "児童", "サロン", "ひろば", "赤ちゃん"] }, geoFmDeps);
+const collectMisatoKosodateEvents = createCollectMisatoKosodateEvents(geoFmDeps);
 // --- 埼玉県 event-js-collector ---
 const collectKawagoeEvents = createEventJsCollector({
   source: KAWAGOE_SOURCE, jsFile: "event.js",
@@ -570,6 +576,7 @@ const collectWarabiEvents = createEventJsCollector({
 const collectAgeoEvents = createMunicipalCalendarCollector({ source: AGEO_SOURCE, childCategoryIndex: null }, geoFmDeps);
 const collectNiizaEvents = createMunicipalCalendarCollector({ source: NIIZA_SOURCE, childCategoryIndex: 9 }, geoFmDeps);
 const collectAsakaEvents = createMunicipalCalendarCollector({ source: ASAKA_SOURCE, childCategoryIndex: null }, geoFmDeps);
+const collectAsakaDoronkoEvents = createCollectAsakaDoronkoEvents(geoFmDeps);
 const collectTodaEvents = createMunicipalCalendarCollector({ source: TODA_SOURCE, childCategoryIndex: 8 }, geoFmDeps);
 const collectShikiEvents = createMunicipalCalendarCollector({ source: SHIKI_SOURCE, childCategoryIndex: null, useIndexPhpFormat: true }, geoFmDeps);
 // --- 埼玉県 list-calendar-collector ---
@@ -642,6 +649,7 @@ const collectHanyuEvents = createCollectHanyuEvents({ ...geoFmDeps, source: HANY
 const collectMisatoSaitamaEvents = createCollectMisatoSaitamaEvents({ ...geoFmDeps, source: MISATO_SAITAMA_SOURCE });
 // --- 栃木県 calendar-json-collector ---
 const collectSanoEvents = createCollectSanoScheduleEvents(geoFmDeps); // スケジュール表コレクター
+const collectSanoJidokanEvents = createCollectSanoJidokanEvents(geoFmDeps);
 const collectNikkoEvents = createCalendarJsonCollector({ source: NIKKO_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
 const collectMokaEvents = createCollectMokaScheduleEvents(geoFmDeps); // スケジュール表コレクター
 const collectNasushiobaraEvents = createCalendarJsonCollector({ source: NASUSHIOBARA_SOURCE, childKeywords: CHILD_KW }, geoFmDeps);
@@ -686,6 +694,7 @@ const collectKiryuEvents = createEventJsCollector({
 }, geoFmDeps);
 const collectNumataEvents = createCollectNumataEvents(geoFmDeps);
 const collectTatebayashiEvents = createCollectTatebayashiEvents(geoFmDeps);
+const collectTatebayashiJidokanEvents = createCollectTatebayashiJidokanEvents(geoFmDeps);
 const collectShibukawaEvents = createCollectShibukawaEvents(geoFmDeps);
 const collectTomiokaEvents = createCollectTomiokaEvents(geoFmDeps);
 const collectMidoriEvents = createCollectMidoriEvents(geoFmDeps);
@@ -718,6 +727,7 @@ const collectNikkoScheduleEvents = createCollectNikkoScheduleEvents(geoFmDeps);
 const collectNikkoSupportCenterEvents = createCollectNikkoSupportCenterEvents(geoFmDeps);
 const collectNasushiobaraScheduleEvents = createCollectNasushiobaraScheduleEvents(geoFmDeps);
 const collectOyamaScheduleEvents = createCollectOyamaScheduleEvents(geoFmDeps);
+const collectOyamaOdekakeEvents = createCollectOyamaOdekakeEvents(geoFmDeps);
 const collectOhtawaraScheduleEvents = createCollectOhtawaraScheduleEvents(geoFmDeps);
 const collectAshikagaScheduleEvents = createCollectAshikagaScheduleEvents(geoFmDeps);
 const collectShimotsukeScheduleEvents = createCollectShimotsukeScheduleEvents(geoFmDeps);
@@ -1084,13 +1094,13 @@ const collectors = [
   collectKawaguchiEvents, collectKawaguchiJidokanEvents, collectKawaguchiKosodateEvents,
   collectKasukabeEvents, collectKasukabeJidokanEvents,
   collectFujiminoEvents,
-  collectMisatoEvents,
+  collectMisatoEvents, collectMisatoKosodateEvents,
   collectKawagoeEvents,
   collectWakoEvents,
   collectWarabiEvents,
   collectAgeoEvents,
   collectNiizaEvents,
-  collectAsakaEvents,
+  collectAsakaEvents, collectAsakaDoronkoEvents,
   collectTodaEvents,
   collectShikiEvents,
   collectFujimiEvents,
@@ -1149,7 +1159,7 @@ const collectors = [
   collectMisatoSaitamaEvents,
   // あきる野/府中/小金井/西東京 → additional-wards.js で収集 (重複削除)
   // Tochigi
-  collectSanoEvents, collectNikkoEvents, collectMokaEvents, collectNasushiobaraEvents,
+  collectSanoEvents, collectSanoJidokanEvents, collectNikkoEvents, collectMokaEvents, collectNasushiobaraEvents,
   collectTochigiCityEvents, collectYaitaEvents, collectUtsunomiyaEvents, collectAshikagaEvents,
   collectKanumaEvents, collectOyamaEvents, collectOhtawaraEvents, collectTochigiSakuraEvents,
   collectNasukarasuyamaEvents, collectShimotsukeEvents, collectKaminokawaEvents, collectMashikoEvents,
@@ -1158,7 +1168,7 @@ const collectors = [
   // Gunma
   collectMaebashiEvents, collectMaebashiJidokanEvents, collectIsesakiEvents, collectFujiokaGunmaEvents, collectTakasakiEvents,
   collectOtaGunmaEvents, collectKodomonokuniEvents, collectAnnakaEvents, collectNakanojoEvents, collectKiryuEvents,
-  collectNumataEvents, collectTatebayashiEvents, collectShibukawaEvents, collectTomiokaEvents,
+  collectNumataEvents, collectTatebayashiEvents, collectTatebayashiJidokanEvents, collectShibukawaEvents, collectTomiokaEvents,
   collectMidoriEvents, collectShintoEvents, collectYoshiokaEvents, collectUenoGunmaEvents,
   collectKannaEvents, collectShimonitaEvents, collectNanmokuEvents, collectKanraEvents,
   collectNaganoharaEvents, collectTsumagoiEvents, collectKusatsuEvents, collectTakayamaGunmaEvents,
@@ -1168,7 +1178,7 @@ const collectors = [
   // Tochigi schedule supplement
   collectNasuScheduleEvents, collectTakanezawaScheduleEvents, collectNikkoScheduleEvents,
   collectNikkoSupportCenterEvents, collectNasushiobaraScheduleEvents, collectOyamaScheduleEvents,
-  collectOhtawaraScheduleEvents, collectAshikagaScheduleEvents, collectShimotsukeScheduleEvents,
+  collectOyamaOdekakeEvents, collectOhtawaraScheduleEvents, collectAshikagaScheduleEvents, collectShimotsukeScheduleEvents,
   collectTochigiSakuraScheduleEvents, collectOhtawaraPdfScheduleEvents, collectKanumaPdfScheduleEvents,
   collectNasukarasuyamaPdfScheduleEvents,
   // PDF schedule collectors
